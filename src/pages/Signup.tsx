@@ -62,7 +62,6 @@ const Signup = () => {
         programme: formData.programme,
         section: formData.section,
         year: formData.year,
-        semester: formData.semester,
         roll_no: formData.rollNo,
         phone: formData.phone,
       });
