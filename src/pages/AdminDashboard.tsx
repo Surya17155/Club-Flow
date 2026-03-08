@@ -152,10 +152,10 @@ const AdminDashboard = () => {
                   <span className="text-muted-foreground">Program:</span>
                   <span className="font-medium text-foreground">{programme}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Semester:</span>
-                  <span className="font-medium text-foreground">{semester}</span>
-                </div>
+                
+
+
+                
               </div>
             </div>
 
