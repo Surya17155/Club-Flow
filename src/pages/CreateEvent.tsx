@@ -4,6 +4,7 @@ import { Switch } from '@/components/ui/switch';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useClub } from '@/contexts/ClubContext';
+import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
 import { toast } from 'sonner';
 import { QRCodeSVG } from 'qrcode.react';
 import { Navigate, useNavigate } from 'react-router-dom';
@@ -14,6 +15,7 @@ const CATEGORIES = ['Technical', 'Cultural', 'Sports', 'Academic', 'Social'];
 const CreateEvent = () => {
   const { user, loading } = useAuth();
   const { activeClub } = useClub();
+  const { hasPower } = useDelegatedPowers();
   const navigate = useNavigate();
 
   const [eventName, setEventName] = useState('');
@@ -42,6 +44,7 @@ const CreateEvent = () => {
 
   if (!user) return <Navigate to="/" replace />;
   if (!activeClub) return <Navigate to="/admin" replace />;
+  if (!hasPower('create_event')) return <Navigate to="/admin" replace />;
 
   const generateQR = () => {
     const token = crypto.randomUUID();

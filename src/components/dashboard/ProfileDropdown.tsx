@@ -3,11 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useClub } from '@/contexts/ClubContext';
 import { useProfile } from '@/hooks/useProfile';
-import { ChevronDown, User, Settings, LogOut, ArrowRightLeft, Check, ChevronRight } from 'lucide-react';
+import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
+import { ChevronDown, User, Settings, LogOut, ArrowRightLeft, Check, ChevronRight, Shield } from 'lucide-react';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import AssignPowersModal from './AssignPowersModal';
 
 const roleLabelMap: Record<string, string> = {
   admin: 'Admin',
@@ -23,12 +25,15 @@ const ProfileDropdown = () => {
   const { signOut } = useAuth();
   const { profile } = useProfile();
   const { activeClub, clubs, switchClub } = useClub();
+  const { isPresident } = useDelegatedPowers();
   const [showClubs, setShowClubs] = useState(false);
+  const [showPowersModal, setShowPowersModal] = useState(false);
 
   const fullName = profile?.full_name || 'User';
   const initials = fullName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
 
   return (
+    <>
     <DropdownMenu onOpenChange={() => setShowClubs(false)}>
       <DropdownMenuTrigger asChild>
         <button type="button" className="glass-input pl-1 pr-4 py-1 rounded-full flex items-center gap-3 cursor-pointer hover:bg-white/60 transition-colors outline-none relative z-10">
@@ -60,6 +65,12 @@ const ProfileDropdown = () => {
                   <span className="text-xs text-muted-foreground truncate max-w-[100px]">{activeClub.club_name}</span>
                 )}
                 <ChevronRight className="ml-1 h-3 w-3 text-muted-foreground" />
+              </DropdownMenuItem>
+            )}
+
+            {isPresident && (
+              <DropdownMenuItem onClick={() => setShowPowersModal(true)}>
+                <Shield className="mr-2 h-4 w-4" /> Assign Powers
               </DropdownMenuItem>
             )}
 
@@ -100,6 +111,8 @@ const ProfileDropdown = () => {
         )}
       </DropdownMenuContent>
     </DropdownMenu>
+    <AssignPowersModal open={showPowersModal} onOpenChange={setShowPowersModal} />
+    </>
   );
 };
 
