@@ -14,16 +14,347 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      attendance: {
+        Row: {
+          added_by: string | null
+          event_id: string
+          id: string
+          manually_added: boolean | null
+          scanned_at: string
+          status: string
+          student_id: string
+        }
+        Insert: {
+          added_by?: string | null
+          event_id: string
+          id?: string
+          manually_added?: boolean | null
+          scanned_at?: string
+          status?: string
+          student_id: string
+        }
+        Update: {
+          added_by?: string | null
+          event_id?: string
+          id?: string
+          manually_added?: boolean | null
+          scanned_at?: string
+          status?: string
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attendance_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      attendance_audit_log: {
+        Row: {
+          action: string
+          attendance_id: string | null
+          created_at: string
+          details: Json | null
+          event_id: string
+          id: string
+          performed_by: string
+          student_id: string
+        }
+        Insert: {
+          action: string
+          attendance_id?: string | null
+          created_at?: string
+          details?: Json | null
+          event_id: string
+          id?: string
+          performed_by: string
+          student_id: string
+        }
+        Update: {
+          action?: string
+          attendance_id?: string | null
+          created_at?: string
+          details?: Json | null
+          event_id?: string
+          id?: string
+          performed_by?: string
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attendance_audit_log_attendance_id_fkey"
+            columns: ["attendance_id"]
+            isOneToOne: false
+            referencedRelation: "attendance"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attendance_audit_log_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_members: {
+        Row: {
+          club_id: string
+          id: string
+          joined_at: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          club_id: string
+          id?: string
+          joined_at?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          club_id?: string
+          id?: string
+          joined_at?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_members_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      clubs: {
+        Row: {
+          about: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          logo_url: string | null
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          about?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          logo_url?: string | null
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          about?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          logo_url?: string | null
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      event_participants: {
+        Row: {
+          approved: boolean | null
+          created_at: string
+          event_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          approved?: boolean | null
+          created_at?: string
+          event_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          approved?: boolean | null
+          created_at?: string
+          event_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_participants_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          access_type: string
+          category: string
+          club_id: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          end_date: string | null
+          event_date: string
+          event_type: string
+          id: string
+          name: string
+          qr_token: string | null
+          qr_ttl_minutes: number | null
+          updated_at: string
+        }
+        Insert: {
+          access_type?: string
+          category?: string
+          club_id: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          end_date?: string | null
+          event_date: string
+          event_type?: string
+          id?: string
+          name: string
+          qr_token?: string | null
+          qr_ttl_minutes?: number | null
+          updated_at?: string
+        }
+        Update: {
+          access_type?: string
+          category?: string
+          club_id?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          end_date?: string | null
+          event_date?: string
+          event_type?: string
+          id?: string
+          name?: string
+          qr_token?: string | null
+          qr_ttl_minutes?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          about: string | null
+          avatar_url: string | null
+          created_at: string
+          email: string | null
+          full_name: string
+          id: string
+          phone: string | null
+          programme: string | null
+          roll_no: string | null
+          section: string | null
+          semester: string | null
+          social_github: string | null
+          social_linkedin: string | null
+          social_twitter: string | null
+          updated_at: string
+          user_id: string
+          year: string | null
+        }
+        Insert: {
+          about?: string | null
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name: string
+          id?: string
+          phone?: string | null
+          programme?: string | null
+          roll_no?: string | null
+          section?: string | null
+          semester?: string | null
+          social_github?: string | null
+          social_linkedin?: string | null
+          social_twitter?: string | null
+          updated_at?: string
+          user_id: string
+          year?: string | null
+        }
+        Update: {
+          about?: string | null
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string
+          id?: string
+          phone?: string | null
+          programme?: string | null
+          roll_no?: string | null
+          section?: string | null
+          semester?: string | null
+          social_github?: string | null
+          social_linkedin?: string | null
+          social_twitter?: string | null
+          updated_at?: string
+          user_id?: string
+          year?: string | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role:
+        | "admin"
+        | "president"
+        | "vice_president"
+        | "secretary"
+        | "social_media_head"
+        | "member"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +481,15 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: [
+        "admin",
+        "president",
+        "vice_president",
+        "secretary",
+        "social_media_head",
+        "member",
+      ],
+    },
   },
 } as const
