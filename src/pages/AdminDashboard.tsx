@@ -123,7 +123,7 @@ const AdminDashboard = () => {
           {!isPersonal && activeClub && ['admin', 'president', 'vice_president', 'secretary', 'social_media_head'].includes(activeClub.role) && (
             <button
               type="button"
-              onClick={() => setShowCreateEvent(true)}
+              onClick={() => navigate('/create-event')}
               className="text-primary-foreground text-sm font-medium px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-transform active:scale-95 gradient-gold"
             >
               <Edit3 className="w-4 h-4" /> Create Event
