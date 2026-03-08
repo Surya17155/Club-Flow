@@ -456,6 +456,7 @@ const AdminDashboard = () => {
           )}
         </DialogContent>
       </Dialog>
+      <ManageEventsModal open={manageEventsOpen} onOpenChange={setManageEventsOpen} />
     </div>);
 
 };
