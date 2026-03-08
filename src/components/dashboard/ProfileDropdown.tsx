@@ -25,7 +25,9 @@ const ProfileDropdown = () => {
   const { signOut } = useAuth();
   const { profile } = useProfile();
   const { activeClub, clubs, switchClub } = useClub();
+  const { isPresident } = useDelegatedPowers();
   const [showClubs, setShowClubs] = useState(false);
+  const [showPowersModal, setShowPowersModal] = useState(false);
 
   const fullName = profile?.full_name || 'User';
   const initials = fullName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
