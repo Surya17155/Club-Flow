@@ -88,7 +88,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Header */}
-      <header className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+      <header className="relative z-10 flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
         <div className="relative w-full md:w-64">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
