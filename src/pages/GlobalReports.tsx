@@ -6,6 +6,7 @@ import { Search, Download, Shield, ArrowLeft, Eye } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import ProfileDropdown from '@/components/dashboard/ProfileDropdown';
 
@@ -209,14 +210,17 @@ const GlobalReports = () => {
       <section className="mb-6">
         <h1 className="text-3xl font-bold mb-5 text-foreground">Global Reports & Management</h1>
         <div className="flex flex-wrap gap-3">
-          <select
-            value={clubFilter}
-            onChange={e => setClubFilter(e.target.value)}
-            className="glass-input rounded-xl px-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-ring"
-          >
-            <option value="all">All Clubs</option>
-            {clubs.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-          </select>
+          <Select value={clubFilter} onValueChange={setClubFilter}>
+            <SelectTrigger className="glass-input rounded-xl px-4 py-2.5 text-sm font-medium w-[200px] border-none focus:ring-2 focus:ring-ring">
+              <SelectValue placeholder="All Clubs" />
+            </SelectTrigger>
+            <SelectContent className="glass-card border-none rounded-2xl shadow-elevated backdrop-blur-[24px]">
+              <SelectItem value="all" className="rounded-lg focus:bg-accent/60">All Clubs</SelectItem>
+              {clubs.map(c => (
+                <SelectItem key={c.id} value={c.id} className="rounded-lg focus:bg-accent/60">{c.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </section>
 
