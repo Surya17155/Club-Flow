@@ -14,7 +14,6 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { cn } from '@/lib/utils';
 
 const EVENT_TYPES = ['Normal', 'Seminar', 'Workshop', 'Industrial Visit', 'Hackathon', 'Guest Lecture'];
-const CATEGORIES = ['Technical', 'Cultural', 'Sports', 'Academic', 'Social'];
 const LOCATIONS = ['Auditorium', 'Seminar Hall', 'Custom Location'];
 
 const CreateEvent = () => {
@@ -25,7 +24,7 @@ const CreateEvent = () => {
 
   const [eventName, setEventName] = useState('');
   const [eventType, setEventType] = useState('Normal');
-  const [category, setCategory] = useState('Technical');
+  
   const [eventDate, setEventDate] = useState('');
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
@@ -35,7 +34,7 @@ const CreateEvent = () => {
   const [clubMembersOnly, setClubMembersOnly] = useState(false);
   const [capacity, setCapacity] = useState('');
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
-  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
   const [isCustomLocation, setIsCustomLocation] = useState(false);
   const [qrToken, setQrToken] = useState<string | null>(null);
@@ -82,7 +81,7 @@ const CreateEvent = () => {
       const { error } = await supabase.from('events').insert({
         name: eventName.trim(),
         event_type: eventType.toLowerCase().replace(/\s+/g, '_'),
-        category: category.toLowerCase(),
+        
         event_date: dateTime,
         end_date: endDateTime,
         club_id: activeClub.club_id,
@@ -155,7 +154,7 @@ const CreateEvent = () => {
               <label className="block text-sm font-medium text-foreground/90">Event Type</label>
               <button
                 type="button"
-                onClick={() => {setShowTypeDropdown(!showTypeDropdown);setShowCategoryDropdown(false);}}
+                onClick={() => {setShowTypeDropdown(!showTypeDropdown);}}
                 className="glass-input w-full px-4 py-2.5 text-foreground flex justify-between items-center cursor-pointer rounded-lg">
                 
                 <span>{eventType}</span>
@@ -182,37 +181,6 @@ const CreateEvent = () => {
               }
             </div>
 
-            {/* Category */}
-            <div className="space-y-1.5 relative">
-              <label className="block text-sm font-medium text-foreground/90">Category</label>
-              <button
-                type="button"
-                onClick={() => {setShowCategoryDropdown(!showCategoryDropdown);setShowTypeDropdown(false);}}
-                className="glass-input w-full px-4 py-2.5 text-foreground flex justify-between items-center cursor-pointer rounded-lg">
-                
-                <span>{category}</span>
-                <ChevronDown className="w-4 h-4 text-muted-foreground" />
-              </button>
-              {showCategoryDropdown &&
-              <div className="absolute z-50 w-full mt-1 rounded-xl overflow-hidden shadow-lg border border-border/30" style={{ background: 'rgba(255, 255, 255, 0.85)', backdropFilter: 'blur(32px) saturate(1.3)', WebkitBackdropFilter: 'blur(32px) saturate(1.3)' }}>
-                  <div className="p-1 space-y-0.5">
-                    {CATEGORIES.map((cat) =>
-                  <div
-                    key={cat}
-                    onClick={() => {setCategory(cat);setShowCategoryDropdown(false);}}
-                    className={`px-4 py-2 rounded-lg cursor-pointer text-sm transition-colors ${
-                    category === cat ?
-                    'bg-primary/15 text-foreground font-medium' :
-                    'hover:bg-accent/40 text-muted-foreground'}`
-                    }>
-                    
-                        {cat}
-                      </div>
-                  )}
-                  </div>
-                </div>
-              }
-            </div>
 
             {/* Date & Time */}
              <div className="space-y-1.5">
@@ -288,7 +256,7 @@ const CreateEvent = () => {
               <label className="block text-sm font-medium text-foreground/90">Location / Platform</label>
               <button
                 type="button"
-                onClick={() => { setShowLocationDropdown(!showLocationDropdown); setShowTypeDropdown(false); setShowCategoryDropdown(false); }}
+                onClick={() => { setShowLocationDropdown(!showLocationDropdown); setShowTypeDropdown(false); }}
                 className="glass-input w-full px-4 py-2.5 text-foreground flex items-center gap-2 cursor-pointer rounded-lg">
                 <MapPin className="w-4 h-4 text-muted-foreground" />
                 <span className="flex-1 text-left">{location || 'Select location'}</span>
