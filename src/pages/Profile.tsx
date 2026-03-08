@@ -156,12 +156,12 @@ const Profile = () => {
               <Input value={val('social_linkedin')} onChange={e => setForm({ ...form, social_linkedin: e.target.value })} placeholder="https://linkedin.com/in/..." />
             </div>
             <div className="flex items-center gap-3">
-              <Twitter className="w-5 h-5 text-muted-foreground flex-shrink-0" />
-              <Input value={val('social_twitter')} onChange={e => setForm({ ...form, social_twitter: e.target.value })} placeholder="https://twitter.com/..." />
+              <Instagram className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+              <Input value={val('social_instagram')} onChange={e => setForm({ ...form, social_instagram: e.target.value })} placeholder="https://instagram.com/..." />
             </div>
             <div className="flex items-center gap-3">
-              <Github className="w-5 h-5 text-muted-foreground flex-shrink-0" />
-              <Input value={val('social_github')} onChange={e => setForm({ ...form, social_github: e.target.value })} placeholder="https://github.com/..." />
+              <Mail className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+              <Input value={val('social_gmail')} onChange={e => setForm({ ...form, social_gmail: e.target.value })} placeholder="yourname@gmail.com" type="email" />
             </div>
           </div>
         </div>
