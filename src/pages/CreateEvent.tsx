@@ -312,6 +312,14 @@ const CreateEvent = () => {
               )}
             </div>
 
+            <button
+              type="button"
+              onClick={generateQR}
+              className="w-full gradient-gold text-primary-foreground font-bold py-2.5 rounded-xl transition-all shadow-gold hover:shadow-elevated hover:-translate-y-0.5 font-display text-sm"
+            >
+              Generate QR Code
+            </button>
+
             {qrToken && (
               <button
                 type="button"
