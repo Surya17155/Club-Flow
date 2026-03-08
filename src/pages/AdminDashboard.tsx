@@ -29,13 +29,6 @@ const roleLabelMap: Record<string, string> = {
   secretary: 'Secretary', social_media_head: 'Social Media Head', member: 'Member'
 };
 
-const clubChartData = [
-{ name: 'Event 1', attendance: 45, engagement: 40 },
-{ name: 'Event 2', attendance: 80, engagement: 55 },
-{ name: 'Event 3', attendance: 60, engagement: 70 },
-{ name: 'Event 4', attendance: 75, engagement: 65 },
-{ name: 'Event 5', attendance: 85, engagement: 78.5 },
-{ name: 'Event 10', attendance: 50, engagement: 60 }];
 
 
 
