@@ -44,6 +44,7 @@ const CreateEvent = () => {
 
   if (!user) return <Navigate to="/" replace />;
   if (!activeClub) return <Navigate to="/admin" replace />;
+  if (!hasPower('create_event')) return <Navigate to="/admin" replace />;
 
   const generateQR = () => {
     const token = crypto.randomUUID();
