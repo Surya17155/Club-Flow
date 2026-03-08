@@ -14,11 +14,6 @@ const chartData = [
   { name: 'Event 10', attendance: 50, engagement: 60 },
 ];
 
-const tasks = [
-  { name: 'Instagram Poster', progress: 80, active: true },
-  { name: 'Event Budgeting', progress: 60, active: false },
-  { name: 'Vendor Coordination', progress: 40, active: false },
-];
 
 const upcomingEvents = [
   { name: 'Coding Workshop', month: 'OCT', day: '28', location: 'Hall A', icon: Calendar },
