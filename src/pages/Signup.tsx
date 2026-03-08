@@ -23,7 +23,6 @@ const Signup = () => {
     section: '',
     year: '',
     rollNo: '',
-    rollNo: '',
     phone: '',
   });
   const [showPassword, setShowPassword] = useState(false);
