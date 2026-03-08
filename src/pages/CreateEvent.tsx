@@ -35,7 +35,7 @@ const CreateEvent = () => {
   const [clubMembersOnly, setClubMembersOnly] = useState(false);
   const [capacity, setCapacity] = useState('');
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
-  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
   const [isCustomLocation, setIsCustomLocation] = useState(false);
   const [qrToken, setQrToken] = useState<string | null>(null);
