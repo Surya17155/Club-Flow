@@ -278,7 +278,7 @@ const AdminDashboard = () => {
                     }
                       </div>
                       <div>
-                        
+                        <h4 className="text-sm font-bold text-foreground">{club.club_name}</h4>
                         <span className="text-xs text-muted-foreground">
                           {roleLabelMap[club.role] ?? club.role}
                         </span>
