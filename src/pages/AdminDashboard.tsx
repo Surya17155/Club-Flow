@@ -132,8 +132,8 @@ const AdminDashboard = () => {
               </div>
             </div>
             <h2 className="text-xl font-bold" style={{ color: '#1f2937' }}>{fullName}</h2>
-            <p className="text-sm font-medium" style={{ color: '#6b7280' }}>President</p>
-            <p className="text-xs font-medium mb-6" style={{ color: '#9ca3af' }}>TechNova Club</p>
+            <span className="mt-1.5 mb-1 inline-block px-3 py-0.5 rounded-full text-xs font-semibold" style={{ backgroundColor: 'hsl(270 60% 95%)', color: 'hsl(270 60% 45%)' }}>President</span>
+            <p className="text-sm font-medium mb-6" style={{ color: '#4b5563' }}>TechNova Club</p>
 
             {/* About section */}
             <div className="w-full text-left rounded-xl p-4 mb-6" style={{ backgroundColor: 'rgba(255,255,255,0.3)' }}>
