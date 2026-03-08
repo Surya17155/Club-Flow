@@ -299,15 +299,6 @@ const CreateEvent = () => {
           <section className="glass-card rounded-3xl p-6 flex flex-col gap-5">
             <h2 className="text-lg font-bold text-foreground mb-1">Attendance & QR</h2>
 
-            <button
-              type="button"
-              onClick={generateQR}
-              className="w-full bg-accent/40 hover:bg-accent/60 text-foreground font-medium py-2.5 rounded-xl border border-border/50 transition-colors shadow-sm flex items-center justify-center gap-2"
-            >
-              <QrCode className="w-4 h-4" />
-              Generate Attendance QR Code
-            </button>
-
             <div className="flex-1 flex flex-col items-center justify-center p-8 bg-accent/10 backdrop-blur-md rounded-[24px] border border-border/40 shadow-inner">
               {qrToken ? (
                 <div className="bg-background p-4 rounded-2xl shadow-xl ring-1 ring-border/20">
@@ -316,10 +307,18 @@ const CreateEvent = () => {
               ) : (
                 <div className="text-center text-muted-foreground">
                   <QrCode className="w-16 h-16 mx-auto mb-3 opacity-20" />
-                  <p className="text-sm">Click the button above to generate a QR code</p>
+                  <p className="text-sm">Click the button below to generate a QR code</p>
                 </div>
               )}
             </div>
+
+            <button
+              type="button"
+              onClick={generateQR}
+              className="w-full gradient-gold text-primary-foreground font-bold py-2.5 rounded-xl transition-all shadow-gold hover:shadow-elevated hover:-translate-y-0.5 font-display text-sm"
+            >
+              Generate QR Code
+            </button>
 
             {qrToken && (
               <button
