@@ -20,7 +20,7 @@ const roleLabelMap: Record<string, string> = {
   member: 'Member',
 };
 
-const ProfileDropdown = () => {
+const ProfileDropdown = ({ viewMode = 'personal' }: { viewMode?: 'personal' | 'club' }) => {
   const navigate = useNavigate();
   const { signOut } = useAuth();
   const { profile } = useProfile();
