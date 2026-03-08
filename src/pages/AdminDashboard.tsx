@@ -375,7 +375,7 @@ const AdminDashboard = () => {
                 </div>
                 <div className="space-y-4">
                   {upcomingEvents.length > 0 ? upcomingEvents.map((event) =>
-                <div key={event.id} className="flex items-center gap-4 group cursor-pointer">
+                <div key={event.id} className="flex items-center gap-4 group cursor-pointer" onClick={() => { setSelectedEvent(event); setEventDialogOpen(true); }}>
                       <div className="rounded-lg shadow-sm w-12 h-12 flex flex-col items-center justify-center border border-border bg-white group-hover:shadow-md transition-shadow">
                         <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">{event.month}</span>
                         <span className="text-lg font-bold leading-none text-foreground">{event.day}</span>
@@ -396,6 +396,51 @@ const AdminDashboard = () => {
         </div>
       </main>
 
+      {/* Event Detail Dialog */}
+      <Dialog open={eventDialogOpen} onOpenChange={setEventDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold">{selectedEvent?.name}</DialogTitle>
+          </DialogHeader>
+          {selectedEvent && (
+            <div className="space-y-4 pt-2">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Calendar className="w-4 h-4 text-primary" />
+                <span>{selectedEvent.full_date}</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Clock className="w-4 h-4 text-primary" />
+                <span>{selectedEvent.time}</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Users className="w-4 h-4 text-primary" />
+                <span>{selectedEvent.club_name}</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {selectedEvent.event_type && (
+                  <Badge variant="secondary" className="text-xs">
+                    <Tag className="w-3 h-3 mr-1" />{selectedEvent.event_type}
+                  </Badge>
+                )}
+                {selectedEvent.category && (
+                  <Badge variant="outline" className="text-xs">{selectedEvent.category}</Badge>
+                )}
+                {selectedEvent.access_type && (
+                  <Badge variant="outline" className="text-xs">
+                    <Shield className="w-3 h-3 mr-1" />{selectedEvent.access_type}
+                  </Badge>
+                )}
+              </div>
+              {selectedEvent.description && (
+                <div>
+                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Description</h4>
+                  <p className="text-sm text-foreground/80 leading-relaxed">{selectedEvent.description}</p>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>);
 
 };
