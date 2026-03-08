@@ -209,6 +209,12 @@ const SuperAdminDashboard = () => {
         <section className="glass-card p-5 lg:col-span-3 flex flex-col max-h-[500px]">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-semibold text-foreground">Club Management</h2>
+            <button
+              onClick={() => setCreateClubOpen(true)}
+              className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg font-medium transition-colors gradient-gold text-primary-foreground shadow-gold"
+            >
+              <Plus className="w-3.5 h-3.5" /> Add Club
+            </button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 overflow-y-auto pr-2 flex-1">
             {loading ?
@@ -217,16 +223,28 @@ const SuperAdminDashboard = () => {
             <p className="text-muted-foreground col-span-3 text-center py-8">No clubs found</p> :
 
             filteredClubs.map((club) =>
-            <div key={club.id} className="rounded-xl p-4 border border-border/50 bg-card shadow-card">
+            <div key={club.id} className="rounded-xl p-4 border border-border/50 bg-card shadow-card relative">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                       {club.logo_url ?
                   <img src={club.logo_url} alt={club.name} className="w-8 h-8 rounded-full object-cover" /> :
-
                   <span className="text-primary font-bold text-lg">{club.name[0]}</span>
                   }
                     </div>
-                    <h4 className="font-bold text-foreground leading-tight">{club.name}</h4>
+                    <h4 className="font-bold text-foreground leading-tight flex-1">{club.name}</h4>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger className="p-1 rounded-lg hover:bg-accent/50 transition-colors outline-none">
+                        <MoreVertical className="w-4 h-4 text-muted-foreground" />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-40">
+                        <DropdownMenuItem
+                          onClick={() => handleDeleteClub(club.id, club.name)}
+                          className="text-destructive focus:text-destructive"
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" /> Delete Club
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                   <div className="text-xs text-muted-foreground space-y-1 mb-4">
                     <p>Members: {club.memberCount}</p>
@@ -236,7 +254,6 @@ const SuperAdminDashboard = () => {
                     <button
                   onClick={() => navigate(`/club/${club.id}`)}
                   className="flex-[1.5] text-center text-xs px-3 py-1.5 rounded-lg font-medium transition-colors bg-accent hover:bg-accent/80 text-accent-foreground">
-                  
                       View Analytics
                     </button>
                   </div>
