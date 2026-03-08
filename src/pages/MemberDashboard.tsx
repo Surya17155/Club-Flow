@@ -5,34 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Users, Calendar, CheckCircle, Clock, ChevronLeft, ChevronRight, ListTodo } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useState } from 'react';
+import { useProfile } from '@/hooks/useProfile';
+import { usePersonalStats } from '@/hooks/usePersonalStats';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
-const tasks = [
-  { name: 'Design Poster - Robotics Club', status: 'In Progress', statusColor: 'bg-warning' },
-  { name: 'Code Review - Coding Club', status: 'Pending', statusColor: 'bg-muted' },
-  { name: 'Event Setup - Art Club', status: 'Completed', statusColor: 'bg-success' },
-];
-
-const upcomingForYou = [
-  { name: 'Coding Workshop', when: 'In 2 days' },
-  { name: 'Game Dev Fest', when: 'In 4 days' },
-  { name: 'Guest Lecture', when: 'In 7 days' },
-];
-
-const attendanceHistory = [
-  { event: 'Web Dev Bootcamp', date: 'Oct 20', status: 'Present' },
-  { event: 'Hackathon', date: 'Oct 15', status: 'Present' },
-  { event: 'Guest Lecture', date: 'Oct 10', status: 'Absent' },
-  { event: 'AI Workshop', date: 'Oct 5', status: 'Present' },
-];
-
-const calendarEvents: Record<string, { name: string; color: string }[]> = {
-  '2025-10-03': [{ name: 'Coding Workshop', color: 'bg-info' }],
-  '2025-10-08': [{ name: 'Hackathon', color: 'bg-destructive' }],
-  '2025-10-15': [{ name: 'Guest Lecture', color: 'bg-success' }],
-};
 
 function getMiniCalendar(year: number, month: number) {
   const firstDay = new Date(year, month, 1).getDay();
@@ -49,15 +27,74 @@ function getMiniCalendar(year: number, month: number) {
 
 const MemberDashboard = () => {
   const { user } = useAuth();
-  const fullName = user?.user_metadata?.full_name || 'Rohan Das';
-  const programme = user?.user_metadata?.programme || 'B.Tech (CSE)';
-  const semester = user?.user_metadata?.semester || '6';
-  const year = user?.user_metadata?.year || '2025';
+  const { profile } = useProfile();
+  const { stats: personalStats } = usePersonalStats();
 
-  const [calMonth, setCalMonth] = useState(9);
-  const [calYear, setCalYear] = useState(2025);
+  const fullName = profile?.full_name || user?.user_metadata?.full_name || 'Student';
+  const programme = profile?.programme || user?.user_metadata?.programme || '';
+  const semester = profile?.semester || user?.user_metadata?.semester || '';
+  const year = profile?.year || user?.user_metadata?.year || '';
+
+  const now = new Date();
+  const [calMonth, setCalMonth] = useState(now.getMonth());
+  const [calYear, setCalYear] = useState(now.getFullYear());
   const weeks = getMiniCalendar(calYear, calMonth);
   const monthName = new Date(calYear, calMonth).toLocaleString('default', { month: 'long' });
+
+  const [upcomingForYou, setUpcomingForYou] = useState<{ name: string; when: string }[]>([]);
+  const [attendanceHistory, setAttendanceHistory] = useState<{ event: string; date: string; status: string }[]>([]);
+  const [calendarEvents, setCalendarEvents] = useState<Record<string, { name: string; color: string }[]>>({});
+
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchData = async () => {
+      // Upcoming events (next 30 days, across all clubs user belongs to)
+      const nowISO = new Date().toISOString();
+      const { data: upData } = await supabase
+        .from('events')
+        .select('id, name, event_date')
+        .gte('event_date', nowISO)
+        .order('event_date', { ascending: true })
+        .limit(5);
+
+      if (upData) {
+        setUpcomingForYou(upData.map((e: any) => {
+          const diff = Math.ceil((new Date(e.event_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+          return { name: e.name, when: diff <= 0 ? 'Today' : `In ${diff} day${diff > 1 ? 's' : ''}` };
+        }));
+
+        // Build calendar events map
+        const cEvents: Record<string, { name: string; color: string }[]> = {};
+        const colors = ['bg-info', 'bg-destructive', 'bg-success', 'bg-warning', 'bg-primary'];
+        upData.forEach((e: any, i: number) => {
+          const d = new Date(e.event_date);
+          const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+          if (!cEvents[key]) cEvents[key] = [];
+          cEvents[key].push({ name: e.name, color: colors[i % colors.length] });
+        });
+        setCalendarEvents(cEvents);
+      }
+
+      // Attendance history
+      const { data: attData } = await supabase
+        .from('attendance')
+        .select('status, scanned_at, events(name)')
+        .eq('student_id', user.id)
+        .order('scanned_at', { ascending: false })
+        .limit(6);
+
+      if (attData) {
+        setAttendanceHistory(attData.map((a: any) => ({
+          event: (a.events as any)?.name || 'Event',
+          date: new Date(a.scanned_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+          status: a.status === 'present' ? 'Present' : 'Absent',
+        })));
+      }
+    };
+
+    fetchData();
+  }, [user?.id]);
 
   return (
     <DashboardLayout>
@@ -68,11 +105,11 @@ const MemberDashboard = () => {
             <ProfileCard
               name={fullName}
               role="Member"
-              about="Our mission to foster tech innovation and collaboration, to develop engagement and determination content, together and rather together, and process."
+              about={profile?.about || ''}
               programme={programme}
-              semester={`Semester ${semester}`}
+              semester={semester ? `Semester ${semester}` : ''}
               year={year}
-              badges={['Member', 'Coding Club', 'Robotics Club']}
+              badges={['Member']}
             />
           </div>
 
@@ -80,16 +117,16 @@ const MemberDashboard = () => {
           <div className="lg:col-span-2 space-y-4">
             {/* Stats */}
             <div className="grid grid-cols-3 gap-3">
-              <StatCard title="Clubs Joined" value={3} icon={Users} />
-              <StatCard title="Events Attended" value={18} icon={CheckCircle} />
-              <StatCard title="Total Tasks" value={5} icon={ListTodo} />
+              <StatCard title="Clubs Joined" value={personalStats.clubCount} icon={Users} />
+              <StatCard title="Events Attended" value={personalStats.eventsAttended} icon={CheckCircle} />
+              <StatCard title="Total Events" value={personalStats.totalEvents} icon={ListTodo} />
             </div>
 
             {/* Calendar */}
             <Card className="shadow-card border-border/50">
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-base font-display">Unified Upcoming Events Calendar</CardTitle>
+                  <CardTitle className="text-base font-display">Upcoming Events Calendar</CardTitle>
                   <div className="flex items-center gap-2">
                     <button onClick={() => { if (calMonth === 0) { setCalMonth(11); setCalYear(y => y - 1); } else setCalMonth(m => m - 1); }} className="p-1 rounded hover:bg-muted"><ChevronLeft className="w-4 h-4" /></button>
                     <span className="text-sm font-medium min-w-[120px] text-center">{monthName} {calYear}</span>
@@ -131,7 +168,7 @@ const MemberDashboard = () => {
                   <CardTitle className="text-sm font-display">Upcoming for You</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                  {upcomingForYou.map((ev, i) => (
+                  {upcomingForYou.length > 0 ? upcomingForYou.map((ev, i) => (
                     <div key={i} className="flex items-center gap-2 p-2 rounded-lg bg-muted/50">
                       <Clock className="w-3.5 h-3.5 text-primary shrink-0" />
                       <div className="min-w-0">
@@ -139,7 +176,7 @@ const MemberDashboard = () => {
                         <p className="text-[10px] text-muted-foreground">{ev.when}</p>
                       </div>
                     </div>
-                  ))}
+                  )) : <p className="text-xs text-muted-foreground italic">No upcoming events</p>}
                 </CardContent>
               </Card>
 
@@ -148,7 +185,7 @@ const MemberDashboard = () => {
                   <CardTitle className="text-sm font-display">My Attendance History</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                  {attendanceHistory.map((item, i) => (
+                  {attendanceHistory.length > 0 ? attendanceHistory.map((item, i) => (
                     <div key={i} className="flex items-center justify-between p-2 rounded-lg bg-muted/50">
                       <div className="min-w-0">
                         <p className="text-xs font-medium truncate">{item.event}</p>
@@ -158,25 +195,27 @@ const MemberDashboard = () => {
                         {item.status}
                       </Badge>
                     </div>
-                  ))}
+                  )) : <p className="text-xs text-muted-foreground italic">No attendance records yet</p>}
                 </CardContent>
               </Card>
             </div>
           </div>
 
-          {/* Right - Tasks */}
+          {/* Right - placeholder for tasks (no tasks table yet) */}
           <div className="lg:col-span-1 space-y-4">
             <Card className="shadow-card border-border/50">
               <CardHeader className="pb-2">
-                <CardTitle className="text-base font-display">My Assigned Tasks</CardTitle>
+                <CardTitle className="text-base font-display">Quick Info</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                {tasks.map((task, i) => (
-                  <div key={i} className="p-3 rounded-lg bg-muted/50 space-y-1.5">
-                    <p className="text-sm font-medium">{task.name}</p>
-                    <Badge className={`text-[10px] text-primary-foreground ${task.statusColor}`}>{task.status}</Badge>
-                  </div>
-                ))}
+                <div className="p-3 rounded-lg bg-muted/50 space-y-1.5">
+                  <p className="text-sm font-medium">Attendance Rate</p>
+                  <Badge className="text-xs bg-success text-primary-foreground">{personalStats.attendanceRate}%</Badge>
+                </div>
+                <div className="p-3 rounded-lg bg-muted/50 space-y-1.5">
+                  <p className="text-sm font-medium">Events Attended</p>
+                  <Badge className="text-xs bg-info text-primary-foreground">{personalStats.eventsAttended} / {personalStats.totalEvents}</Badge>
+                </div>
               </CardContent>
             </Card>
           </div>

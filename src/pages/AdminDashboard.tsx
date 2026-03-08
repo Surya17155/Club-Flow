@@ -3,6 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useClub } from '@/contexts/ClubContext';
 import { useProfile } from '@/hooks/useProfile';
 import { usePersonalStats } from '@/hooks/usePersonalStats';
+import { useClubStats } from '@/hooks/useClubStats';
 import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { ChevronDown, Edit3, MoreHorizontal, Calendar, Users, MapPin, Award, CheckCircle, Clock, Tag, Shield, ClipboardList } from 'lucide-react';
@@ -28,13 +29,6 @@ const roleLabelMap: Record<string, string> = {
   secretary: 'Secretary', social_media_head: 'Social Media Head', member: 'Member'
 };
 
-const clubChartData = [
-{ name: 'Event 1', attendance: 45, engagement: 40 },
-{ name: 'Event 2', attendance: 80, engagement: 55 },
-{ name: 'Event 3', attendance: 60, engagement: 70 },
-{ name: 'Event 4', attendance: 75, engagement: 65 },
-{ name: 'Event 5', attendance: 85, engagement: 78.5 },
-{ name: 'Event 10', attendance: 50, engagement: 60 }];
 
 
 
@@ -46,6 +40,7 @@ const AdminDashboard = () => {
   const { profile } = useProfile();
   const { activeClub, clubs } = useClub();
   const { stats: personalStats } = usePersonalStats();
+  const { stats: clubStats } = useClubStats(activeClub?.club_id);
   const { hasPower } = useDelegatedPowers();
   const [viewMode, setViewMode] = useState<ViewMode>('personal');
   const navigate = useNavigate();
@@ -112,10 +107,10 @@ const AdminDashboard = () => {
   { label: 'Attendance Rate:', value: `${personalStats.attendanceRate}%`, path: 'M0,28 L30,20 L60,10 L100,2' }] :
 
   [
-  { label: 'Total Members:', value: '156', path: 'M0,25 C30,25 30,10 50,10 S70,20 100,5' },
-  { label: 'Total Events:', value: '24', path: 'M0,25 C20,28 40,5 60,15 S80,5 100,10' },
-  { label: 'Avg. Attendance Rate:', value: '78%', path: 'M0,20 C30,20 40,25 60,10 S90,5 100,5' },
-  { label: 'Overall Growth %:', value: '+5%', isGrowth: true, path: 'M0,28 L30,20 L60,10 L100,2' }];
+  { label: 'Total Members:', value: String(clubStats.totalMembers), path: 'M0,25 C30,25 30,10 50,10 S70,20 100,5' },
+  { label: 'Total Events:', value: String(clubStats.totalEvents), path: 'M0,25 C20,28 40,5 60,15 S80,5 100,10' },
+  { label: 'Avg. Attendance Rate:', value: `${clubStats.avgAttendanceRate}%`, path: 'M0,20 C30,20 40,25 60,10 S90,5 100,5' },
+  { label: 'Events with Data:', value: String(clubStats.chartData.length), path: 'M0,28 L30,20 L60,10 L100,2' }];
 
 
   return (
@@ -362,7 +357,7 @@ const AdminDashboard = () => {
                   </div>
                 </div>
                 <ResponsiveContainer width="100%" height={260}>
-                  <ComposedChart data={clubChartData}>
+                  <ComposedChart data={clubStats.chartData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                     <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#6b7280' }} />
                     <YAxis tick={{ fontSize: 11, fill: '#6b7280' }} domain={[0, 100]} />
