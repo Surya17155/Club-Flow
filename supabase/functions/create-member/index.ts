@@ -66,8 +66,10 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Create user with admin API (auto-confirms email)
-    const { data: newUser, error: createError } = await callerClient.auth.admin.createUser({
+    // Generate a random temporary password - member will set their own via signup/reset
+    const tempPassword = crypto.randomUUID() + "Aa1!";
+
+    // Create user with admin API (auto-confirms email so profile trigger fires)
       email,
       password,
       email_confirm: true,
