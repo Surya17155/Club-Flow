@@ -149,15 +149,8 @@ const Signup = () => {
                   </Select>
                 </div>
 
-                <div className="space-y-2">
-                  <Label>Semester *</Label>
-                  <Select value={formData.semester} onValueChange={v => updateField('semester', v)}>
-                    <SelectTrigger><SelectValue placeholder="Select semester" /></SelectTrigger>
-                    <SelectContent>
-                      {SEMESTERS.map(s => <SelectItem key={s} value={s}>Semester {s}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
+
+
 
                 <div className="space-y-2">
                   <Label htmlFor="password">Password *</Label>
