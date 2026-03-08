@@ -221,10 +221,11 @@ const CreateEvent = () => {
                     </button>
                   </PopoverTrigger>
                   <PopoverContent
-                    className="w-auto p-0 border-border/30 rounded-2xl overflow-hidden"
+                    className="w-auto p-0 border-border/30 rounded-2xl overflow-hidden z-[100]"
                     align="start"
+                    sideOffset={8}
                     style={{
-                      background: 'rgba(255, 255, 255, 0.88)',
+                      background: 'rgba(255, 255, 255, 0.92)',
                       backdropFilter: 'blur(32px) saturate(1.3)',
                       WebkitBackdropFilter: 'blur(32px) saturate(1.3)',
                     }}
@@ -259,10 +260,11 @@ const CreateEvent = () => {
                   </button>
                 </PopoverTrigger>
                 <PopoverContent
-                  className="w-auto p-0 border-border/30 rounded-2xl overflow-hidden"
+                  className="w-auto p-0 border-border/30 rounded-2xl overflow-hidden z-[100]"
                   align="start"
+                  sideOffset={8}
                   style={{
-                    background: 'rgba(255, 255, 255, 0.88)',
+                    background: 'rgba(255, 255, 255, 0.92)',
                     backdropFilter: 'blur(32px) saturate(1.3)',
                     WebkitBackdropFilter: 'blur(32px) saturate(1.3)',
                   }}
