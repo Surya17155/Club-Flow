@@ -256,7 +256,7 @@ const CreateEvent = () => {
               <label className="block text-sm font-medium text-foreground/90">Location / Platform</label>
               <button
                 type="button"
-                onClick={() => { setShowLocationDropdown(!showLocationDropdown); setShowTypeDropdown(false); setShowCategoryDropdown(false); }}
+                onClick={() => { setShowLocationDropdown(!showLocationDropdown); setShowTypeDropdown(false); }}
                 className="glass-input w-full px-4 py-2.5 text-foreground flex items-center gap-2 cursor-pointer rounded-lg">
                 <MapPin className="w-4 h-4 text-muted-foreground" />
                 <span className="flex-1 text-left">{location || 'Select location'}</span>
