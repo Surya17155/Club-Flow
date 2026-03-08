@@ -38,11 +38,14 @@ const ClubDashboard = () => {
   const { activeClub } = useClub();
   const { hasPower, isPresident } = useDelegatedPowers();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const clubId = activeClub?.club_id;
   const { stats: clubStats } = useClubStats(clubId);
   const [manageEventsOpen, setManageEventsOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'overview' | 'members'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'members'>(
+    searchParams.get('tab') === 'members' ? 'members' : 'overview'
+  );
 
   // Club details
   const [clubDetails, setClubDetails] = useState<{ about: string | null; logo_url: string | null }>({ about: null, logo_url: null });
