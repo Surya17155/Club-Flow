@@ -1,13 +1,21 @@
 import { useState, useEffect, useMemo } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar, Clock, Tag, Shield, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useClub } from '@/contexts/ClubContext';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
+import { format } from 'date-fns';
 
 interface CalendarEvent {
   id: string;
   name: string;
   event_date: string;
+  end_date?: string | null;
+  description?: string | null;
+  event_type?: string;
+  category?: string;
+  access_type?: string;
   club_id: string;
   club_name?: string;
 }
@@ -33,6 +41,9 @@ const EventCalendar = ({ mode }: Props) => {
   const { activeClub } = useClub();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const [selectedDayEvents, setSelectedDayEvents] = useState<CalendarEvent[]>([]);
+  const [selectedDay, setSelectedDay] = useState<number | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -45,7 +56,7 @@ const EventCalendar = ({ mode }: Props) => {
 
       let query = supabase
         .from('events')
-        .select('id, name, event_date, club_id, clubs(name)')
+        .select('id, name, event_date, end_date, description, event_type, category, access_type, club_id, clubs(name)')
         .gte('event_date', startOfMonth)
         .lte('event_date', endOfMonth)
         .order('event_date');
@@ -60,6 +71,11 @@ const EventCalendar = ({ mode }: Props) => {
           id: e.id,
           name: e.name,
           event_date: e.event_date,
+          end_date: e.end_date,
+          description: e.description,
+          event_type: e.event_type,
+          category: e.category,
+          access_type: e.access_type,
           club_id: e.club_id,
           club_name: e.clubs?.name,
         }))
@@ -68,7 +84,6 @@ const EventCalendar = ({ mode }: Props) => {
     fetchEvents();
   }, [user, year, month, mode, activeClub?.club_id]);
 
-  // Club color map for consistent colors
   const clubColorMap = useMemo(() => {
     const map = new Map<string, number>();
     let idx = 0;
@@ -97,6 +112,15 @@ const EventCalendar = ({ mode }: Props) => {
   const today = new Date();
   const isToday = (day: number) =>
     today.getDate() === day && today.getMonth() === month && today.getFullYear() === year;
+
+  const handleDayClick = (day: number) => {
+    const dayEvents = getEventsForDay(day);
+    if (dayEvents.length > 0) {
+      setSelectedDayEvents(dayEvents);
+      setSelectedDay(day);
+      setDialogOpen(true);
+    }
+  };
 
   return (
     <div className="glass-card p-6 flex flex-col h-full">
@@ -128,21 +152,21 @@ const EventCalendar = ({ mode }: Props) => {
 
       {/* Calendar grid */}
       <div className="grid grid-cols-7 gap-1 flex-1">
-        {/* Empty cells for offset */}
         {Array.from({ length: firstDayOfMonth }).map((_, i) => (
           <div key={`empty-${i}`} className="h-14 border border-transparent p-1" />
         ))}
 
-        {/* Day cells */}
         {Array.from({ length: daysInMonth }).map((_, i) => {
           const day = i + 1;
           const dayEvents = getEventsForDay(day);
+          const hasEvents = dayEvents.length > 0;
           return (
             <div
               key={day}
-              className={`h-14 border border-border/30 p-1 flex flex-col items-end hover:bg-white/40 transition rounded-lg ${
+              onClick={() => handleDayClick(day)}
+              className={`h-14 border border-border/30 p-1 flex flex-col items-end transition rounded-lg ${
                 isToday(day) ? 'bg-primary/10 border-primary/30' : ''
-              }`}
+              } ${hasEvents ? 'cursor-pointer hover:bg-primary/5 hover:border-primary/20' : 'hover:bg-white/40'}`}
             >
               <span className={`text-xs ${isToday(day) ? 'font-bold text-primary' : 'text-muted-foreground'}`}>
                 {day}
@@ -167,6 +191,76 @@ const EventCalendar = ({ mode }: Props) => {
           );
         })}
       </div>
+
+      {/* Event Details Dialog */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Calendar className="w-5 h-5 text-primary" />
+              Events on {selectedDay} {MONTHS[month]} {year}
+            </DialogTitle>
+            <DialogDescription>
+              {selectedDayEvents.length} event{selectedDayEvents.length !== 1 ? 's' : ''} scheduled
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+            {selectedDayEvents.map((ev) => {
+              const colorIdx = clubColorMap.get(ev.club_id) ?? 0;
+              const color = EVENT_COLORS[colorIdx];
+              return (
+                <div key={ev.id} className={`rounded-xl border border-border/50 p-4 space-y-3 ${color.bg}/20`}>
+                  <div>
+                    <h4 className="font-semibold text-foreground text-base">{ev.name}</h4>
+                    {ev.club_name && (
+                      <p className="text-xs text-muted-foreground mt-0.5">by {ev.club_name}</p>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div className="flex items-center gap-1.5 text-muted-foreground">
+                      <Clock className="w-3.5 h-3.5 text-primary" />
+                      <span>Start: {format(new Date(ev.event_date), 'MMM d, yyyy h:mm a')}</span>
+                    </div>
+                    {ev.end_date && (
+                      <div className="flex items-center gap-1.5 text-muted-foreground">
+                        <Clock className="w-3.5 h-3.5 text-primary" />
+                        <span>End: {format(new Date(ev.end_date), 'MMM d, yyyy h:mm a')}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex flex-wrap gap-1.5">
+                    {ev.event_type && (
+                      <Badge variant="secondary" className="text-[10px]">
+                        <Tag className="w-3 h-3 mr-1" />
+                        {ev.event_type}
+                      </Badge>
+                    )}
+                    {ev.category && (
+                      <Badge variant="outline" className="text-[10px]">
+                        {ev.category}
+                      </Badge>
+                    )}
+                    {ev.access_type && (
+                      <Badge variant="outline" className="text-[10px]">
+                        <Shield className="w-3 h-3 mr-1" />
+                        {ev.access_type}
+                      </Badge>
+                    )}
+                  </div>
+
+                  {ev.description && (
+                    <p className="text-xs text-muted-foreground leading-relaxed border-t border-border/30 pt-2">
+                      {ev.description}
+                    </p>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
