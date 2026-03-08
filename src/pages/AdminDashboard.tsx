@@ -157,13 +157,23 @@ const AdminDashboard = () => {
 
         <div className="flex items-center gap-4">
           {!isPersonal && activeClub && hasPower('create_event') &&
-          <button
-            type="button"
-            onClick={() => navigate('/create-event')}
-            className="text-primary-foreground text-sm font-medium px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-transform active:scale-95 gradient-gold">
-            
-              <Edit3 className="w-4 h-4" /> Create Event
-            </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                className="text-primary-foreground text-sm font-medium px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-transform active:scale-95 gradient-gold">
+                <Calendar className="w-4 h-4" /> Events <ChevronDown className="w-3 h-3" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem onClick={() => navigate('/create-event')}>
+                <Edit3 className="mr-2 h-4 w-4" /> Create Event
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setManageEventsOpen(true)}>
+                <ClipboardList className="mr-2 h-4 w-4" /> Manage Events
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           }
           <ProfileDropdown viewMode={viewMode} />
         </div>
