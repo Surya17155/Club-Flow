@@ -204,24 +204,41 @@ const CreateEvent = () => {
             </div>
 
             {/* Date & Time */}
-            <div className="space-y-1.5">
+             <div className="space-y-1.5">
               <label className="block text-sm font-medium text-foreground/90">Start Date & Time</label>
               <div className="flex gap-3">
-                <div className="relative flex-grow">
-                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-                  <input
-                    type="date"
-                    className="glass-input w-full pl-10 pr-3 py-2.5 text-foreground rounded-lg"
-                    value={eventDate}
-                    onChange={(e) => setEventDate(e.target.value)} />
-                  
-                </div>
-                
-
-
-
-
-
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      className={cn(
+                        "glass-input flex-grow flex items-center gap-2 pl-3 pr-3 py-2.5 text-foreground rounded-lg text-left text-sm",
+                        !eventDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="w-4 h-4 text-muted-foreground" />
+                      {eventDate ? format(parse(eventDate, 'yyyy-MM-dd', new Date()), 'PPP') : 'Select date'}
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    className="w-auto p-0 border-border/30 rounded-2xl overflow-hidden"
+                    align="start"
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.88)',
+                      backdropFilter: 'blur(32px) saturate(1.3)',
+                      WebkitBackdropFilter: 'blur(32px) saturate(1.3)',
+                    }}
+                  >
+                    <Calendar
+                      mode="single"
+                      selected={eventDate ? parse(eventDate, 'yyyy-MM-dd', new Date()) : undefined}
+                      onSelect={(date) => setEventDate(date ? format(date, 'yyyy-MM-dd') : '')}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </div>
 
 
                 
