@@ -42,7 +42,7 @@ const AdminDashboard = () => {
   const year = user?.user_metadata?.year || '2025';
 
   return (
-    <div className="min-h-screen relative antialiased p-6 md:p-8" style={{ backgroundColor: '#fdfbf7', color: '#4a4a4a' }}>
+    <div className="min-h-screen relative antialiased p-6 md:p-8 dashboard-corner-gradient" style={{ color: '#4a4a4a' }}>
       {/* Background blobs */}
       <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
         {/* Top-left warm yellow */}
