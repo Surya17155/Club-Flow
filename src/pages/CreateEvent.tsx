@@ -57,7 +57,9 @@ const CreateEvent = () => {
     if (!eventName.trim()) { toast.error('Event name is required'); return false; }
     if (!eventType) { toast.error('Event type is required'); return false; }
     if (!eventDate) { toast.error('Start date is required'); return false; }
-    if (!endDate) { toast.error('End date is required'); return false; }
+    if (!startTime) { toast.error('Start time is required'); return false; }
+    if (!endTime) { toast.error('End time is required'); return false; }
+    if (startTime && endTime && startTime >= endTime) { toast.error('End time must be after start time'); return false; }
     return true;
   };
 
