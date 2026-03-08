@@ -68,9 +68,24 @@ Deno.serve(async (req) => {
 
     let userId: string;
 
-    // Step 1: Check if user already exists by email
-    const { data: existingUsers } = await adminClient.auth.admin.listUsers();
-    const existingUser = existingUsers?.users?.find((u: any) => u.email === email.trim().toLowerCase());
+    // Step 1: Check if user already exists by looking up profile by email
+    const { data: existingProfile } = await adminClient
+      .from("profiles")
+      .select("user_id")
+      .eq("email", email.trim().toLowerCase())
+      .maybeSingle();
+
+    // Also try to find via auth (for users who signed up but profile email might differ)
+    let existingUserId: string | null = existingProfile?.user_id || null;
+    
+    if (!existingUserId) {
+      // Fallback: check auth users by email
+      const { data: authData } = await adminClient.auth.admin.listUsers({ page: 1, perPage: 1 });
+      // Use getUserByEmail-like approach via listing
+      const { data: usersData } = await adminClient.auth.admin.listUsers();
+      const found = usersData?.users?.find((u: any) => u.email === email.trim().toLowerCase());
+      if (found) existingUserId = found.id;
+    }
 
     if (existingUser) {
       userId = existingUser.id;
