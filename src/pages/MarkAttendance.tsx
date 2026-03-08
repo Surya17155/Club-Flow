@@ -57,6 +57,22 @@ const MarkAttendance = () => {
         return;
       }
 
+      // Check club membership restriction
+      if (event.access_type === 'club_only') {
+        const { data: membership } = await supabase
+          .from('club_members')
+          .select('id')
+          .eq('club_id', event.club_id)
+          .eq('user_id', user!.id)
+          .maybeSingle();
+
+        if (!membership) {
+          setStatus('error');
+          setMessage('This event is restricted to club members only. You are not a member of this club.');
+          return;
+        }
+      }
+
       // Check for duplicate
       const { data: existing } = await supabase
         .from('attendance')
