@@ -172,7 +172,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const isNewUser = !existingUser;
+    const isNewUser = !existingUserId;
     return new Response(JSON.stringify({ 
       success: true, 
       user_id: userId, 
