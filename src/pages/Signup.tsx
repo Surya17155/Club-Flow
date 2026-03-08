@@ -56,7 +56,7 @@ const Signup = () => {
 
     setIsLoading(true);
     try {
-      await signUp(formData.email, formData.password, {
+      const result = await signUp(formData.email, formData.password, {
         full_name: formData.fullName,
         programme: formData.programme,
         section: formData.section,
@@ -64,13 +64,35 @@ const Signup = () => {
         roll_no: formData.rollNo,
         phone: formData.phone,
       });
+
+      // Check if user already exists (pre-created by admin)
+      // Supabase returns a user with identities=[] when email is already taken
+      if (result?.user && result.user.identities && result.user.identities.length === 0) {
+        toast({
+          title: 'Account already exists',
+          description: 'Your account was pre-created by your club admin. Go to Login and use "Forgot Password" to set your password.',
+          variant: 'destructive',
+        });
+        setIsLoading(false);
+        return;
+      }
+
       toast({
         title: 'Account created!',
         description: 'Please check your email to verify your account.',
       });
       navigate('/');
     } catch (error: any) {
-      toast({ title: 'Signup failed', description: error.message, variant: 'destructive' });
+      // Handle "User already registered" error
+      if (error.message?.toLowerCase().includes('already registered') || error.message?.toLowerCase().includes('already been registered')) {
+        toast({
+          title: 'Account already exists',
+          description: 'An account with this email already exists. If your club admin pre-created it, use "Forgot Password" on the login page to set your password.',
+          variant: 'destructive',
+        });
+      } else {
+        toast({ title: 'Signup failed', description: error.message, variant: 'destructive' });
+      }
     } finally {
       setIsLoading(false);
     }
