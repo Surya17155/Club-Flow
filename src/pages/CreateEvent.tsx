@@ -53,15 +53,23 @@ const CreateEvent = () => {
   if (!activeClub) return <Navigate to="/admin" replace />;
   if (!hasPower('create_event')) return <Navigate to="/admin" replace />;
 
+  const validateMandatoryFields = (): boolean => {
+    if (!eventName.trim()) { toast.error('Event name is required'); return false; }
+    if (!eventType) { toast.error('Event type is required'); return false; }
+    if (!eventDate) { toast.error('Start date is required'); return false; }
+    if (!endDate) { toast.error('End date is required'); return false; }
+    return true;
+  };
+
   const generateQR = () => {
+    if (!validateMandatoryFields()) return;
     const token = crypto.randomUUID();
     setQrToken(token);
     toast.success('QR Code generated!');
   };
 
   const handlePublish = async () => {
-    if (!eventName.trim()) {toast.error('Event name is required');return;}
-    if (!eventDate) {toast.error('Event date is required');return;}
+    if (!validateMandatoryFields()) return;
 
     setPublishing(true);
     try {
