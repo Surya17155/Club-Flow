@@ -165,6 +165,41 @@ export type Database = {
         }
         Relationships: []
       }
+      delegated_powers: {
+        Row: {
+          club_id: string
+          granted_at: string
+          granted_by: string
+          id: string
+          power: string
+          user_id: string
+        }
+        Insert: {
+          club_id: string
+          granted_at?: string
+          granted_by: string
+          id?: string
+          power: string
+          user_id: string
+        }
+        Update: {
+          club_id?: string
+          granted_at?: string
+          granted_by?: string
+          id?: string
+          power?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delegated_powers_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_participants: {
         Row: {
           approved: boolean | null
