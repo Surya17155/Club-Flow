@@ -68,7 +68,7 @@ const ProfileDropdown = ({ viewMode = 'personal' }: { viewMode?: 'personal' | 'c
               </DropdownMenuItem>
             )}
 
-            {isPresident && (
+            {viewMode === 'club' && isPresident && (
               <DropdownMenuItem onClick={() => setShowPowersModal(true)}>
                 <Shield className="mr-2 h-4 w-4" /> Assign Powers
               </DropdownMenuItem>
