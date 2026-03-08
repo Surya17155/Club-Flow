@@ -14,7 +14,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { cn } from '@/lib/utils';
 
 const EVENT_TYPES = ['Normal', 'Seminar', 'Workshop', 'Industrial Visit', 'Hackathon', 'Guest Lecture'];
-const CATEGORIES = ['Technical', 'Cultural', 'Sports', 'Academic', 'Social'];
+const LOCATIONS = ['Auditorium', 'Seminar Hall', 'Custom Location'];
 const LOCATIONS = ['Auditorium', 'Seminar Hall', 'Custom Location'];
 
 const CreateEvent = () => {
