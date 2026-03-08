@@ -74,8 +74,14 @@ const CreateEvent = () => {
 
     setPublishing(true);
     try {
-      const dateTime = `${eventDate}T${startTime}:00`;
-      const endDateTime = `${eventDate}T${endTime}:00`;
+      // Build timezone offset string to preserve user's local time
+      const now = new Date();
+      const offsetMin = now.getTimezoneOffset();
+      const sign = offsetMin <= 0 ? '+' : '-';
+      const absOffset = Math.abs(offsetMin);
+      const tzStr = `${sign}${String(Math.floor(absOffset / 60)).padStart(2, '0')}:${String(absOffset % 60).padStart(2, '0')}`;
+      const dateTime = `${eventDate}T${startTime}:00${tzStr}`;
+      const endDateTime = `${eventDate}T${endTime}:00${tzStr}`;
       const accessType = clubMembersOnly ? 'club_only' : openToAll ? 'open' : 'restricted';
 
       const { error } = await supabase.from('events').insert({
