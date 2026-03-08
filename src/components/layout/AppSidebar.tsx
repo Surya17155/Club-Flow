@@ -10,6 +10,8 @@ import {
   GraduationCap,
   Building2,
   UserCircle,
+  ShieldCheck,
+  FileBarChart,
 } from 'lucide-react';
 import {
   Sidebar,

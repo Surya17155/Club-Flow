@@ -46,6 +46,8 @@ const App = () => (
               <Route path="/profile" element={<Profile />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/create-event" element={<CreateEvent />} />
+              <Route path="/super-admin" element={<SuperAdminDashboard />} />
+              <Route path="/global-reports" element={<GlobalReports />} />
               <Route path="/scan" element={<Events />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

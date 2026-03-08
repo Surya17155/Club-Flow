@@ -1,27 +1,37 @@
+import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
-/**
- * Placeholder dashboard router that will redirect based on user role.
- * For now, redirects to admin dashboard.
- */
 const Dashboard = () => {
   const { user, loading } = useAuth();
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
 
-  if (loading) {
+  useEffect(() => {
+    if (!user) return;
+    const check = async () => {
+      const { data } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin');
+      setIsAdmin(data && data.length > 0);
+    };
+    check();
+  }, [user?.id]);
+
+  if (loading || (user && isAdmin === null)) {
     return (
       <div className="min-h-screen flex items-center justify-center gradient-warm">
-        <div className="w-8 h-8 border-3 border-primary/30 border-t-primary rounded-full animate-spin" />
+        <div className="w-8 h-8 border-[3px] border-primary/30 border-t-primary rounded-full animate-spin" />
       </div>
     );
   }
 
-  if (!user) {
-    return <Navigate to="/" replace />;
-  }
+  if (!user) return <Navigate to="/" replace />;
 
-  // TODO: Check user role from database and redirect accordingly
-  // For now, default to admin dashboard
+  // Admins go to Super Admin dashboard, everyone else to regular dashboard
+  if (isAdmin) return <Navigate to="/super-admin" replace />;
   return <Navigate to="/admin" replace />;
 };
 
