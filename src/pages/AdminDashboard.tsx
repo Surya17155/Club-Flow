@@ -40,6 +40,7 @@ const AdminDashboard = () => {
   const { profile } = useProfile();
   const { activeClub, clubs } = useClub();
   const { stats: personalStats } = usePersonalStats();
+  const { stats: clubStats } = useClubStats(activeClub?.club_id);
   const { hasPower } = useDelegatedPowers();
   const [viewMode, setViewMode] = useState<ViewMode>('personal');
   const navigate = useNavigate();
