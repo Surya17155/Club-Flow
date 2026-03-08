@@ -43,6 +43,7 @@ const App = () => (
               <Route path="/mark-attendance/:token" element={<MarkAttendance />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/settings" element={<Settings />} />
+              <Route path="/create-event" element={<CreateEvent />} />
               <Route path="/scan" element={<Events />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

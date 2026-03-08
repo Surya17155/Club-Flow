@@ -374,15 +374,6 @@ const AdminDashboard = () => {
         </div>
       </main>
 
-      {/* Create Event Modal */}
-      {activeClub && (
-        <CreateEventModal
-          open={showCreateEvent}
-          onOpenChange={setShowCreateEvent}
-          clubId={activeClub.club_id}
-          clubName={activeClub.club_name}
-        />
-      )}
     </div>
   );
 };
