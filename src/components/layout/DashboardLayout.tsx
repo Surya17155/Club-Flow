@@ -39,15 +39,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           <header className="h-14 flex items-center gap-3 border-b border-border bg-card/80 backdrop-blur-sm px-4 shrink-0">
             <SidebarTrigger className="text-muted-foreground hover:text-foreground" />
 
-            <div className="flex-1 max-w-md">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search events, clubs, members..."
-                  className="pl-9 h-9 bg-muted/50 border-transparent focus:border-border"
-                />
-              </div>
-            </div>
+            <h1 className="text-lg font-bold font-display text-foreground">
+              {greeting}, <span className="text-primary">{firstName}</span> 👋
+            </h1>
 
             <div className="flex items-center gap-2 ml-auto">
               <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">

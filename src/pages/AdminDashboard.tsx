@@ -93,15 +93,9 @@ const AdminDashboard = () => {
 
       {/* Header */}
       <header className="relative z-10 flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-        <div className="relative w-full md:w-64">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <input
-            type="text"
-            placeholder="Search..."
-            className="glass-input w-full py-2.5 pl-10 pr-4 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 placeholder:text-muted-foreground"
-            style={{ backgroundColor: 'rgba(255,255,255,0.8)' }}
-          />
-        </div>
+        <h1 className="text-xl md:text-2xl font-bold font-display text-foreground">
+          {greeting}, <span className="text-primary">{fullName.split(' ')[0]}</span> 👋
+        </h1>
 
         {/* Functional Toggle */}
         <div className="inline-flex items-center rounded-[20px] p-1 bg-muted">
