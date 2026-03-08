@@ -15,6 +15,8 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   const { user, loading } = useAuth();
+  const greeting = useMemo(() => getRandomGreeting(), []);
+  const firstName = user?.user_metadata?.full_name?.split(' ')[0] || 'there';
 
   if (loading) {
     return (
