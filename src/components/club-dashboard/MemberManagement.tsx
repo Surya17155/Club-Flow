@@ -71,7 +71,7 @@ const MemberManagement = ({ clubId }: Props) => {
 
   // Add member form state
   const [addForm, setAddForm] = useState({
-    fullName: '', email: '', password: '', programme: '', section: '', year: '', rollNo: '', phone: '', role: 'member',
+    fullName: '', email: '', programme: '', section: '', year: '', rollNo: '', phone: '', role: 'member',
   });
 
   const updateAddForm = (field: string, value: string) => {
