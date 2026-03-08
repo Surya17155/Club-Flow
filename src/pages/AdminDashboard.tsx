@@ -260,39 +260,6 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          {/* Task Progress */}
-          <div className="glass-card p-6 flex-grow">
-            <h3 className="font-bold text-lg mb-4" style={{ color: '#1f2937' }}>Task Progress</h3>
-            <div className="space-y-6">
-              {tasks.map((task, i) => (
-                <div key={i}>
-                  <div className="flex justify-between items-end mb-2">
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="w-3 h-3 rounded-full"
-                        style={task.active
-                          ? { backgroundColor: '#e09f6e' }
-                          : { border: '1px solid #9ca3af' }
-                        }
-                      />
-                      <h4 className="text-sm font-semibold" style={{ color: '#1f2937' }}>{task.name}</h4>
-                    </div>
-                    <span className="text-xs font-bold" style={{ color: '#6b7280' }}>{task.progress}%</span>
-                  </div>
-                  <div className="h-2 w-full rounded-full overflow-hidden" style={{ backgroundColor: 'rgba(229,231,235,0.5)' }}>
-                    <div
-                      className="h-full rounded-full"
-                      style={{
-                        width: `${task.progress}%`,
-                        backgroundColor: '#e09f6e',
-                        opacity: task.active ? 1 : 0.7,
-                      }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </main>
     </div>
