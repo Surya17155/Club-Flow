@@ -27,8 +27,8 @@ const CreateEvent = () => {
   const [eventType, setEventType] = useState('Normal');
   const [category, setCategory] = useState('Technical');
   const [eventDate, setEventDate] = useState('');
-  const [eventTime, setEventTime] = useState('');
-  const [endDate, setEndDate] = useState('');
+  const [startTime, setStartTime] = useState('');
+  const [endTime, setEndTime] = useState('');
   const [location, setLocation] = useState('');
   const [description, setDescription] = useState('');
   const [openToAll, setOpenToAll] = useState(true);
@@ -57,7 +57,9 @@ const CreateEvent = () => {
     if (!eventName.trim()) { toast.error('Event name is required'); return false; }
     if (!eventType) { toast.error('Event type is required'); return false; }
     if (!eventDate) { toast.error('Start date is required'); return false; }
-    if (!endDate) { toast.error('End date is required'); return false; }
+    if (!startTime) { toast.error('Start time is required'); return false; }
+    if (!endTime) { toast.error('End time is required'); return false; }
+    if (startTime && endTime && startTime >= endTime) { toast.error('End time must be after start time'); return false; }
     return true;
   };
 
@@ -73,7 +75,8 @@ const CreateEvent = () => {
 
     setPublishing(true);
     try {
-      const dateTime = eventTime ? `${eventDate}T${eventTime}:00` : `${eventDate}T00:00:00`;
+      const dateTime = `${eventDate}T${startTime}:00`;
+      const endDateTime = `${eventDate}T${endTime}:00`;
       const accessType = clubMembersOnly ? 'club_only' : openToAll ? 'open' : 'restricted';
 
       const { error } = await supabase.from('events').insert({
@@ -81,7 +84,7 @@ const CreateEvent = () => {
         event_type: eventType.toLowerCase().replace(/\s+/g, '_'),
         category: category.toLowerCase(),
         event_date: dateTime,
-        end_date: endDate ? `${endDate}T23:59:59` : null,
+        end_date: endDateTime,
         club_id: activeClub.club_id,
         created_by: user.id,
         description: description.trim() || null,
@@ -249,42 +252,35 @@ const CreateEvent = () => {
               </div>
             </div>
 
-            {/* End Date */}
+            {/* Start & End Time */}
             <div className="space-y-1.5">
-              <label className="block text-sm font-medium text-foreground/90">
-                End Date <span className="text-muted-foreground text-xs">(optional)</span>
-              </label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <button
-                    type="button"
-                    className={cn(
-                      "glass-input w-full flex items-center gap-2 pl-3 pr-3 py-2.5 text-foreground rounded-lg text-left text-sm",
-                      !endDate && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="w-4 h-4 text-muted-foreground" />
-                    {endDate ? format(parse(endDate, 'yyyy-MM-dd', new Date()), 'PPP') : 'Select end date'}
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent
-                  className="w-auto p-0 border-border/30 rounded-2xl overflow-hidden z-[100]"
-                  align="start"
-                  sideOffset={8}
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.92)',
-                    backdropFilter: 'blur(32px) saturate(1.3)',
-                    WebkitBackdropFilter: 'blur(32px) saturate(1.3)',
-                  }}
-                >
-                  <Calendar
-                    mode="single"
-                    selected={endDate ? parse(endDate, 'yyyy-MM-dd', new Date()) : undefined}
-                    onSelect={(date) => setEndDate(date ? format(date, 'yyyy-MM-dd') : '')}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
+              <label className="block text-sm font-medium text-foreground/90">Event Time</label>
+              <div className="flex gap-3">
+                <div className="flex-1 space-y-1">
+                  <span className="text-xs text-muted-foreground">Start Time</span>
+                  <div className="relative">
+                    <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                    <input
+                      type="time"
+                      className="glass-input w-full pl-10 pr-3 py-2.5 text-foreground rounded-lg text-sm"
+                      value={startTime}
+                      onChange={(e) => setStartTime(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div className="flex-1 space-y-1">
+                  <span className="text-xs text-muted-foreground">End Time</span>
+                  <div className="relative">
+                    <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                    <input
+                      type="time"
+                      className="glass-input w-full pl-10 pr-3 py-2.5 text-foreground rounded-lg text-sm"
+                      value={endTime}
+                      onChange={(e) => setEndTime(e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Location */}
