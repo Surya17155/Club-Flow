@@ -147,7 +147,7 @@ const CreateEvent = () => {
                 <ChevronDown className="w-4 h-4 text-muted-foreground" />
               </button>
               {showTypeDropdown &&
-              <div className="absolute z-50 w-full mt-1 glass-card rounded-xl overflow-hidden shadow-lg">
+              <div className="absolute z-50 w-full mt-1 rounded-xl overflow-hidden shadow-lg border border-border/30" style={{ background: 'rgba(255, 255, 255, 0.85)', backdropFilter: 'blur(32px) saturate(1.3)', WebkitBackdropFilter: 'blur(32px) saturate(1.3)' }}>
                   <div className="p-1 space-y-0.5">
                     {EVENT_TYPES.map((type) =>
                   <div
