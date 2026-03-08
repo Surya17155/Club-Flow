@@ -110,6 +110,8 @@ const ProfileDropdown = () => {
         )}
       </DropdownMenuContent>
     </DropdownMenu>
+    <AssignPowersModal open={showPowersModal} onOpenChange={setShowPowersModal} />
+    </>
   );
 };
 
