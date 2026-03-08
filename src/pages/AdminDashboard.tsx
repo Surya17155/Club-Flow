@@ -1,6 +1,6 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
-import { Search, ChevronDown, Edit3, Star, MoreHorizontal, Calendar, Users, MapPin } from 'lucide-react';
+import { Search, ChevronDown, Edit3, MoreHorizontal, Calendar, Users, MapPin } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Line, ComposedChart,
 } from 'recharts';
@@ -221,21 +221,6 @@ const AdminDashboard = () => {
             </ResponsiveContainer>
           </div>
 
-          {/* Feedback */}
-          <div className="glass-card p-6 relative">
-            <div className="absolute top-6 right-6 text-2xl">🧠</div>
-            <h3 className="font-bold text-lg mb-2" style={{ color: '#1f2937' }}>Feedback Summary (AI-Powered Sentiment)</h3>
-            <div className="flex items-center gap-1 mb-2">
-              {[1, 2, 3, 4].map(i => (
-                <Star key={i} className="w-5 h-5 fill-current" style={{ color: '#f4c542' }} />
-              ))}
-              <Star className="w-5 h-5 fill-current" style={{ color: '#f4c542', opacity: 0.5 }} />
-              <span className="ml-2 font-bold" style={{ color: '#1f2937' }}>4.5 stars</span>
-            </div>
-            <p className="text-sm leading-relaxed" style={{ color: '#4b5563' }}>
-              Overall sentiment is positive. Recent event on Machine Learning received excellent reviews for content. Suggestions include better sound system for future sessions.
-            </p>
-          </div>
         </div>
 
         {/* RIGHT: Events + Tasks */}
