@@ -110,8 +110,8 @@ const ClubDashboard = () => {
 
   if (!user) return <Navigate to="/" replace />;
 
-  // Access check: president or has manage_club power
-  const hasAccess = isPresident || hasPower('manage_club');
+  // Access check: president, has manage_club power, or super admin
+  const hasAccess = isPresident || hasPower('manage_club') || isSuperAdmin;
   if (!hasAccess || !activeClub || !clubId) {
     return (
       <div className="min-h-screen flex items-center justify-center p-6" style={{ backgroundColor: '#fdfbf7' }}>
