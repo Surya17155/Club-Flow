@@ -79,7 +79,7 @@ const MemberManagement = ({ clubId }: Props) => {
   };
 
   const resetAddForm = () => {
-    setAddForm({ fullName: '', email: '', password: '', programme: '', section: '', year: '', rollNo: '', phone: '', role: 'member' });
+    setAddForm({ fullName: '', email: '', programme: '', section: '', year: '', rollNo: '', phone: '', role: 'member' });
   };
 
   const fetchMembers = async () => {
