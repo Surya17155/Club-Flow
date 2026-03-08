@@ -12,7 +12,6 @@ import { motion } from 'framer-motion';
 
 const PROGRAMMES = ['B.Tech (CS)', 'B.Tech (IT)', 'BBA', 'MBA', 'B.Com', 'BA (Hons)', 'BCA', 'MCA'];
 const YEARS = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
-const SEMESTERS = ['1', '2', '3', '4', '5', '6', '7', '8'];
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -23,7 +22,6 @@ const Signup = () => {
     programme: '',
     section: '',
     year: '',
-    semester: '',
     rollNo: '',
     phone: '',
   });
@@ -63,7 +61,6 @@ const Signup = () => {
         programme: formData.programme,
         section: formData.section,
         year: formData.year,
-        semester: formData.semester,
         roll_no: formData.rollNo,
         phone: formData.phone,
       });
@@ -152,15 +149,8 @@ const Signup = () => {
                   </Select>
                 </div>
 
-                <div className="space-y-2">
-                  <Label>Semester *</Label>
-                  <Select value={formData.semester} onValueChange={v => updateField('semester', v)}>
-                    <SelectTrigger><SelectValue placeholder="Select semester" /></SelectTrigger>
-                    <SelectContent>
-                      {SEMESTERS.map(s => <SelectItem key={s} value={s}>Semester {s}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
+
+
 
                 <div className="space-y-2">
                   <Label htmlFor="password">Password *</Label>
