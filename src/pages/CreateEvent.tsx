@@ -75,7 +75,8 @@ const CreateEvent = () => {
 
     setPublishing(true);
     try {
-      const dateTime = eventTime ? `${eventDate}T${eventTime}:00` : `${eventDate}T00:00:00`;
+      const dateTime = `${eventDate}T${startTime}:00`;
+      const endDateTime = `${eventDate}T${endTime}:00`;
       const accessType = clubMembersOnly ? 'club_only' : openToAll ? 'open' : 'restricted';
 
       const { error } = await supabase.from('events').insert({
@@ -83,7 +84,7 @@ const CreateEvent = () => {
         event_type: eventType.toLowerCase().replace(/\s+/g, '_'),
         category: category.toLowerCase(),
         event_date: dateTime,
-        end_date: endDate ? `${endDate}T23:59:59` : null,
+        end_date: endDateTime,
         club_id: activeClub.club_id,
         created_by: user.id,
         description: description.trim() || null,
