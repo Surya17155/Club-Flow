@@ -45,13 +45,34 @@ const ClubDashboard = () => {
   const clubId = routeClubId || activeClub?.club_id;
   const [clubNameOverride, setClubNameOverride] = useState<string | null>(null);
 
-  // Fetch club name from route param when super admin isn't a member
+  // Keep displayed club name aligned with route club (prevents stale activeClub name)
   useEffect(() => {
-    if (activeClub?.club_name || !routeClubId) return;
-    supabase.from('clubs').select('name').eq('id', routeClubId).maybeSingle().then(({ data }) => {
-      if (data) setClubNameOverride(data.name);
-    });
-  }, [routeClubId, activeClub?.club_name]);
+    if (!routeClubId) {
+      setClubNameOverride(null);
+      return;
+    }
+
+    if (routeClubId === activeClub?.club_id) {
+      setClubNameOverride(activeClub.club_name);
+      return;
+    }
+
+    let cancelled = false;
+    setClubNameOverride(null);
+
+    supabase
+      .from('clubs')
+      .select('name')
+      .eq('id', routeClubId)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!cancelled && data) setClubNameOverride(data.name);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [routeClubId, activeClub?.club_id, activeClub?.club_name]);
   const { stats: clubStats } = useClubStats(clubId);
   const [manageEventsOpen, setManageEventsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'overview' | 'members'>(
