@@ -20,7 +20,7 @@ const roleLabelMap: Record<string, string> = {
   member: 'Member',
 };
 
-const ProfileDropdown = () => {
+const ProfileDropdown = ({ viewMode = 'personal' }: { viewMode?: 'personal' | 'club' }) => {
   const navigate = useNavigate();
   const { signOut } = useAuth();
   const { profile } = useProfile();
@@ -68,7 +68,7 @@ const ProfileDropdown = () => {
               </DropdownMenuItem>
             )}
 
-            {isPresident && (
+            {viewMode === 'club' && isPresident && (
               <DropdownMenuItem onClick={() => setShowPowersModal(true)}>
                 <Shield className="mr-2 h-4 w-4" /> Assign Powers
               </DropdownMenuItem>

@@ -3,6 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useClub } from '@/contexts/ClubContext';
 import { useProfile } from '@/hooks/useProfile';
 import { usePersonalStats } from '@/hooks/usePersonalStats';
+import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { ChevronDown, Edit3, MoreHorizontal, Calendar, Users, MapPin, Award, CheckCircle } from 'lucide-react';
 
@@ -42,6 +43,7 @@ const AdminDashboard = () => {
   const { profile } = useProfile();
   const { activeClub, clubs } = useClub();
   const { stats: personalStats } = usePersonalStats();
+  const { hasPower } = useDelegatedPowers();
   const [viewMode, setViewMode] = useState<ViewMode>('personal');
   const navigate = useNavigate();
   const greeting = useMemo(() => getRandomGreeting(), []);
@@ -120,7 +122,7 @@ const AdminDashboard = () => {
         </div>
 
         <div className="flex items-center gap-4">
-          {!isPersonal && activeClub && ['admin', 'president', 'vice_president', 'secretary', 'social_media_head'].includes(activeClub.role) && (
+          {!isPersonal && activeClub && hasPower('create_event') && (
             <button
               type="button"
               onClick={() => navigate('/create-event')}
@@ -129,7 +131,7 @@ const AdminDashboard = () => {
               <Edit3 className="w-4 h-4" /> Create Event
             </button>
           )}
-          <ProfileDropdown />
+          <ProfileDropdown viewMode={viewMode} />
         </div>
       </header>
 
