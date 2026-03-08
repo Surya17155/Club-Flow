@@ -396,6 +396,44 @@ const SuperAdminDashboard = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Create Club Dialog */}
+      <Dialog open={createClubOpen} onOpenChange={setCreateClubOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Create New Club</DialogTitle>
+            <DialogDescription>Add a new club to the platform</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Club Name</Label>
+              <Input
+                value={newClubName}
+                onChange={(e) => setNewClubName(e.target.value)}
+                placeholder="e.g. Finance Club"
+                className="mt-1.5"
+              />
+            </div>
+            <div>
+              <Label>Description (optional)</Label>
+              <Textarea
+                value={newClubDescription}
+                onChange={(e) => setNewClubDescription(e.target.value)}
+                placeholder="Brief description of the club..."
+                className="mt-1.5"
+                rows={3}
+              />
+            </div>
+            <button
+              onClick={handleCreateClub}
+              disabled={creatingClub || !newClubName.trim()}
+              className="w-full py-2 rounded-lg gradient-gold text-primary-foreground font-medium text-sm disabled:opacity-50"
+            >
+              {creatingClub ? 'Creating...' : 'Create Club'}
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>);
 
 };
