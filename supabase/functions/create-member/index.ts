@@ -87,8 +87,8 @@ Deno.serve(async (req) => {
       if (found) existingUserId = found.id;
     }
 
-    if (existingUser) {
-      userId = existingUser.id;
+    if (existingUserId) {
+      userId = existingUserId;
 
       // Update their profile with any new info provided (only if fields are non-empty)
       const profileUpdates: Record<string, string> = {};
