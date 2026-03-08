@@ -33,6 +33,7 @@ const ProfileDropdown = () => {
   const initials = fullName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
 
   return (
+    <>
     <DropdownMenu onOpenChange={() => setShowClubs(false)}>
       <DropdownMenuTrigger asChild>
         <button type="button" className="glass-input pl-1 pr-4 py-1 rounded-full flex items-center gap-3 cursor-pointer hover:bg-white/60 transition-colors outline-none relative z-10">
