@@ -123,7 +123,7 @@ const ClubDashboard = () => {
 
   // Access check: president, has manage_club power, or super admin
   const hasAccess = isPresident || hasPower('manage_club') || isSuperAdmin;
-  if (!hasAccess || !activeClub || !clubId) {
+  if ((!hasAccess && !isSuperAdmin) || !clubId) {
     return (
       <div className="min-h-screen flex items-center justify-center p-6" style={{ backgroundColor: '#fdfbf7' }}>
         <div className="glass-card p-8 text-center max-w-md">
