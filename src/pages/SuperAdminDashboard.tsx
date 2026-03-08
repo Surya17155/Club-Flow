@@ -36,6 +36,9 @@ const SuperAdminDashboard = () => {
   const [newClubName, setNewClubName] = useState('');
   const [newClubDescription, setNewClubDescription] = useState('');
   const [creatingClub, setCreatingClub] = useState(false);
+  const [presidentForm, setPresidentForm] = useState({
+    fullName: '', email: '', programme: '', section: '', year: '', rollNo: '', phone: '',
+  });
   const { toast } = useToast();
 
   const { totalClubs, globalMembers, totalEvents, clubs, members, upcomingEvents, growthData, loading } = useSuperAdminStats();
@@ -92,23 +95,55 @@ const SuperAdminDashboard = () => {
   };
 
   const handleCreateClub = async () => {
-    if (!newClubName.trim()) return;
+    if (!newClubName.trim() || !presidentForm.fullName.trim() || !presidentForm.email.trim() || !presidentForm.programme.trim() || !presidentForm.year.trim()) {
+      toast({ title: 'Missing fields', description: 'Club name and president details (Name, Email, Programme, Year) are required.', variant: 'destructive' });
+      return;
+    }
     setCreatingClub(true);
-    const { error } = await supabase.from('clubs').insert({
+
+    // 1. Create the club first
+    const { data: clubData, error: clubError } = await supabase.from('clubs').insert({
       name: newClubName.trim(),
       description: newClubDescription.trim() || null,
       created_by: user!.id,
-    });
-    setCreatingClub(false);
-    if (error) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
-    } else {
-      toast({ title: 'Club created', description: `${newClubName} has been added.` });
-      setCreateClubOpen(false);
-      setNewClubName('');
-      setNewClubDescription('');
-      window.location.reload();
+    }).select('id').single();
+
+    if (clubError || !clubData) {
+      toast({ title: 'Error creating club', description: clubError?.message || 'Unknown error', variant: 'destructive' });
+      setCreatingClub(false);
+      return;
     }
+
+    // 2. Create president account via edge function
+    const { data: fnData, error: fnError } = await supabase.functions.invoke('create-member', {
+      body: {
+        email: presidentForm.email.trim(),
+        full_name: presidentForm.fullName.trim(),
+        programme: presidentForm.programme.trim(),
+        section: presidentForm.section.trim(),
+        year: presidentForm.year.trim(),
+        roll_no: presidentForm.rollNo.trim(),
+        phone: presidentForm.phone.trim(),
+        club_id: clubData.id,
+        role: 'president',
+      },
+    });
+
+    if (fnError || fnData?.error) {
+      // Club was created but president failed — delete the club
+      await supabase.from('clubs').delete().eq('id', clubData.id);
+      toast({ title: 'Error adding president', description: fnData?.error || fnError?.message || 'Failed to create president account', variant: 'destructive' });
+      setCreatingClub(false);
+      return;
+    }
+
+    toast({ title: 'Club created!', description: `${newClubName} has been created with ${presidentForm.fullName} as President. They can log in using "Forgot Password" to set their credentials.` });
+    setCreateClubOpen(false);
+    setNewClubName('');
+    setNewClubDescription('');
+    setPresidentForm({ fullName: '', email: '', programme: '', section: '', year: '', rollNo: '', phone: '' });
+    setCreatingClub(false);
+    window.location.reload();
   };
 
   const handleDeleteClub = async (clubId: string, clubName: string) => {
@@ -364,37 +399,70 @@ const SuperAdminDashboard = () => {
 
       {/* Create Club Dialog */}
       <Dialog open={createClubOpen} onOpenChange={setCreateClubOpen}>
-        <DialogContent className="max-w-sm">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Create New Club</DialogTitle>
-            <DialogDescription>Add a new club to the platform</DialogDescription>
+            <DialogDescription>Add a new club with its president. All president details are required.</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label>Club Name</Label>
-              <Input
-                value={newClubName}
-                onChange={(e) => setNewClubName(e.target.value)}
-                placeholder="e.g. Finance Club"
-                className="mt-1.5"
-              />
+          <div className="space-y-5">
+            {/* Club Info */}
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                <Building2 className="w-4 h-4 text-primary" /> Club Details
+              </h3>
+              <div>
+                <Label>Club Name <span className="text-destructive">*</span></Label>
+                <Input value={newClubName} onChange={(e) => setNewClubName(e.target.value)} placeholder="e.g. Finance Club" className="mt-1" />
+              </div>
+              <div>
+                <Label>Description (optional)</Label>
+                <Textarea value={newClubDescription} onChange={(e) => setNewClubDescription(e.target.value)} placeholder="Brief description..." className="mt-1" rows={2} />
+              </div>
             </div>
-            <div>
-              <Label>Description (optional)</Label>
-              <Textarea
-                value={newClubDescription}
-                onChange={(e) => setNewClubDescription(e.target.value)}
-                placeholder="Brief description of the club..."
-                className="mt-1.5"
-                rows={3}
-              />
+
+            {/* President Info */}
+            <div className="space-y-3 border-t border-border/40 pt-4">
+              <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                <Shield className="w-4 h-4 text-primary" /> President Details
+              </h3>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="col-span-2">
+                  <Label>Full Name <span className="text-destructive">*</span></Label>
+                  <Input value={presidentForm.fullName} onChange={(e) => setPresidentForm(p => ({ ...p, fullName: e.target.value }))} placeholder="President's full name" className="mt-1" />
+                </div>
+                <div className="col-span-2">
+                  <Label>Email <span className="text-destructive">*</span></Label>
+                  <Input type="email" value={presidentForm.email} onChange={(e) => setPresidentForm(p => ({ ...p, email: e.target.value }))} placeholder="president@example.com" className="mt-1" />
+                </div>
+                <div>
+                  <Label>Programme <span className="text-destructive">*</span></Label>
+                  <Input value={presidentForm.programme} onChange={(e) => setPresidentForm(p => ({ ...p, programme: e.target.value }))} placeholder="e.g. BCA, BBA" className="mt-1" />
+                </div>
+                <div>
+                  <Label>Year <span className="text-destructive">*</span></Label>
+                  <Input value={presidentForm.year} onChange={(e) => setPresidentForm(p => ({ ...p, year: e.target.value }))} placeholder="e.g. 2nd Year" className="mt-1" />
+                </div>
+                <div>
+                  <Label>Section</Label>
+                  <Input value={presidentForm.section} onChange={(e) => setPresidentForm(p => ({ ...p, section: e.target.value }))} placeholder="e.g. A" className="mt-1" />
+                </div>
+                <div>
+                  <Label>Roll No</Label>
+                  <Input value={presidentForm.rollNo} onChange={(e) => setPresidentForm(p => ({ ...p, rollNo: e.target.value }))} placeholder="e.g. 2301234" className="mt-1" />
+                </div>
+                <div className="col-span-2">
+                  <Label>Phone</Label>
+                  <Input value={presidentForm.phone} onChange={(e) => setPresidentForm(p => ({ ...p, phone: e.target.value }))} placeholder="e.g. 9876543210" className="mt-1" />
+                </div>
+              </div>
             </div>
+
             <button
               onClick={handleCreateClub}
-              disabled={creatingClub || !newClubName.trim()}
-              className="w-full py-2 rounded-lg gradient-gold text-primary-foreground font-medium text-sm disabled:opacity-50"
+              disabled={creatingClub || !newClubName.trim() || !presidentForm.fullName.trim() || !presidentForm.email.trim() || !presidentForm.programme.trim() || !presidentForm.year.trim()}
+              className="w-full py-2.5 rounded-lg gradient-gold text-primary-foreground font-medium text-sm disabled:opacity-50"
             >
-              {creatingClub ? 'Creating...' : 'Create Club'}
+              {creatingClub ? 'Creating Club & President...' : 'Create Club with President'}
             </button>
           </div>
         </DialogContent>
