@@ -3,7 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useClub } from '@/contexts/ClubContext';
 import { useProfile } from '@/hooks/useProfile';
 import { usePersonalStats } from '@/hooks/usePersonalStats';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { ChevronDown, Edit3, MoreHorizontal, Calendar, Users, MapPin, Award, CheckCircle } from 'lucide-react';
 
 const greetings = ['Hello', 'Hi', 'Hey', 'Yo', 'Welcome', "What's up", 'Howdy', 'Namaste'];
@@ -13,7 +13,7 @@ import {
 } from 'recharts';
 import ProfileDropdown from '@/components/dashboard/ProfileDropdown';
 import EventCalendar from '@/components/dashboard/EventCalendar';
-import CreateEventModal from '@/components/dashboard/CreateEventModal';
+
 
 const roleLabelMap: Record<string, string> = {
   admin: 'Admin', president: 'President', vice_president: 'Vice President',
@@ -43,7 +43,7 @@ const AdminDashboard = () => {
   const { activeClub, clubs } = useClub();
   const { stats: personalStats } = usePersonalStats();
   const [viewMode, setViewMode] = useState<ViewMode>('personal');
-  const [showCreateEvent, setShowCreateEvent] = useState(false);
+  const navigate = useNavigate();
   const greeting = useMemo(() => getRandomGreeting(), []);
 
   if (loading) {
@@ -123,7 +123,7 @@ const AdminDashboard = () => {
           {!isPersonal && activeClub && ['admin', 'president', 'vice_president', 'secretary', 'social_media_head'].includes(activeClub.role) && (
             <button
               type="button"
-              onClick={() => setShowCreateEvent(true)}
+              onClick={() => navigate('/create-event')}
               className="text-primary-foreground text-sm font-medium px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-transform active:scale-95 gradient-gold"
             >
               <Edit3 className="w-4 h-4" /> Create Event
@@ -374,15 +374,6 @@ const AdminDashboard = () => {
         </div>
       </main>
 
-      {/* Create Event Modal */}
-      {activeClub && (
-        <CreateEventModal
-          open={showCreateEvent}
-          onOpenChange={setShowCreateEvent}
-          clubId={activeClub.club_id}
-          clubName={activeClub.club_name}
-        />
-      )}
     </div>
   );
 };
