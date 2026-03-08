@@ -204,10 +204,9 @@ const SuperAdminDashboard = () => {
         
       </section>
 
-      {/* Main Grid: Clubs + Members */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
-        {/* Club Management */}
-        <section className="glass-card p-5 lg:col-span-3 flex flex-col max-h-[500px]">
+      {/* Club Management */}
+      <div className="mb-6">
+        <section className="glass-card p-5 flex flex-col max-h-[500px]">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-semibold text-foreground">Club Management</h2>
             <button
