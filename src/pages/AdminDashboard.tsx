@@ -121,7 +121,7 @@ const AdminDashboard = () => {
         </div>
 
         <div className="flex items-center gap-4">
-          {!isPersonal && activeClub && ['admin', 'president', 'vice_president', 'secretary', 'social_media_head'].includes(activeClub.role) && (
+          {!isPersonal && activeClub && hasPower('create_event') && (
             <button
               type="button"
               onClick={() => navigate('/create-event')}
@@ -130,7 +130,7 @@ const AdminDashboard = () => {
               <Edit3 className="w-4 h-4" /> Create Event
             </button>
           )}
-          <ProfileDropdown />
+          <ProfileDropdown viewMode={viewMode} />
         </div>
       </header>
 
