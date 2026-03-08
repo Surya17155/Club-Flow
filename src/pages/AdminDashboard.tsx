@@ -43,7 +43,7 @@ const AdminDashboard = () => {
   const { activeClub, clubs } = useClub();
   const { stats: personalStats } = usePersonalStats();
   const [viewMode, setViewMode] = useState<ViewMode>('personal');
-  const [showCreateEvent, setShowCreateEvent] = useState(false);
+  const navigate = useNavigate();
   const greeting = useMemo(() => getRandomGreeting(), []);
 
   if (loading) {
