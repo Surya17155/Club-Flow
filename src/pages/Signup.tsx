@@ -22,7 +22,7 @@ const Signup = () => {
     programme: '',
     section: '',
     year: '',
-    semester: '',
+    rollNo: '',
     rollNo: '',
     phone: '',
   });
