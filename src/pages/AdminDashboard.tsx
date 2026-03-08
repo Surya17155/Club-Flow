@@ -9,6 +9,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Line, ComposedChart,
 } from 'recharts';
 import ProfileDropdown from '@/components/dashboard/ProfileDropdown';
+import EventCalendar from '@/components/dashboard/EventCalendar';
 
 const roleLabelMap: Record<string, string> = {
   admin: 'Admin', president: 'President', vice_president: 'Vice President',
@@ -37,7 +38,7 @@ const AdminDashboard = () => {
   const { profile } = useProfile();
   const { activeClub, clubs } = useClub();
   const { stats: personalStats } = usePersonalStats();
-  const [viewMode, setViewMode] = useState<ViewMode>('club');
+  const [viewMode, setViewMode] = useState<ViewMode>('personal');
 
   if (loading) {
     return (
@@ -49,19 +50,18 @@ const AdminDashboard = () => {
 
   if (!user) return <Navigate to="/" replace />;
 
-  const fullName = profile?.full_name || user?.user_metadata?.full_name || 'Admin User';
-  const programme = profile?.programme || user?.user_metadata?.programme || 'B.Tech (CS)';
-  const semester = profile?.semester || user?.user_metadata?.semester || '6';
-  const year = profile?.year || user?.user_metadata?.year || '2025';
+  const fullName = profile?.full_name || user?.user_metadata?.full_name || 'Student';
+  const programme = profile?.programme || user?.user_metadata?.programme || '';
+  const semester = profile?.semester || user?.user_metadata?.semester || '';
+  const year = profile?.year || user?.user_metadata?.year || '';
   const about = profile?.about || '';
   const initials = fullName.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase();
 
-  const clubName = activeClub?.club_name || 'TechNova Club';
-  const roleLabel = activeClub ? roleLabelMap[activeClub.role] ?? activeClub.role : 'President';
+  const clubName = activeClub?.club_name || 'No Club Selected';
+  const roleLabel = activeClub ? roleLabelMap[activeClub.role] ?? activeClub.role : 'Member';
 
   const isPersonal = viewMode === 'personal';
 
-  // Stats based on mode
   const statsCards = isPersonal
     ? [
         { label: 'Clubs Joined:', value: String(personalStats.clubCount), path: 'M0,25 C30,25 30,10 50,10 S70,20 100,5' },
@@ -75,8 +75,6 @@ const AdminDashboard = () => {
         { label: 'Avg. Attendance Rate:', value: '78%', path: 'M0,20 C30,20 40,25 60,10 S90,5 100,5' },
         { label: 'Overall Growth %:', value: '+5%', isGrowth: true, path: 'M0,28 L30,20 L60,10 L100,2' },
       ];
-
-  const chartData = isPersonal ? personalStats.recentAttendance : clubChartData;
 
   return (
     <div className="min-h-screen relative antialiased p-6 md:p-8 dashboard-corner-gradient text-foreground">
@@ -153,7 +151,7 @@ const AdminDashboard = () => {
         ))}
       </section>
 
-      {/* Main 3-column grid */}
+      {/* Main grid */}
       <main className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* LEFT: Profile */}
         <div className="lg:col-span-3 h-full">
@@ -188,15 +186,19 @@ const AdminDashboard = () => {
               <h4 className="font-bold mb-3 text-foreground">About</h4>
               {about && <p className="text-sm text-muted-foreground mb-3">{about}</p>}
               <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Year:</span>
-                  <span className="font-medium text-foreground">{year}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Program:</span>
-                  <span className="font-medium text-foreground">{programme}</span>
-                </div>
-                {isPersonal && (
+                {year && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Year:</span>
+                    <span className="font-medium text-foreground">{year}</span>
+                  </div>
+                )}
+                {programme && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Program:</span>
+                    <span className="font-medium text-foreground">{programme}</span>
+                  </div>
+                )}
+                {isPersonal && semester && (
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Semester:</span>
                     <span className="font-medium text-foreground">{semester}</span>
@@ -246,146 +248,125 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* MIDDLE: Chart */}
-        <div className="lg:col-span-6 flex flex-col gap-6">
-          <div className="glass-card p-6 flex-grow">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="font-bold text-lg text-foreground">
-                {isPersonal ? 'My Attendance History' : 'Attendance Analytics'}
-              </h3>
-              <div className="glass-input px-3 py-1 rounded-lg text-xs flex items-center gap-1 cursor-pointer text-muted-foreground">
-                Last 30 Days <ChevronDown className="w-3 h-3" />
+        {/* MIDDLE + RIGHT: Calendar/Chart + Events */}
+        <div className="lg:col-span-9 flex flex-col gap-6">
+          {isPersonal ? (
+            /* Personal Mode: Calendar (full width) + Memberships below */
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2">
+                <EventCalendar mode="personal" />
               </div>
-            </div>
-            <div className="flex justify-between items-center text-xs mb-6">
-              <span className="font-semibold text-muted-foreground">
-                {isPersonal ? 'Your attendance per event' : 'Event Attendance & Engagement'}
-              </span>
-              {!isPersonal && (
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-primary" />
-                  <span className="text-muted-foreground">Engagement Score</span>
+              <div className="glass-card p-6">
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="font-bold text-lg text-foreground">My Memberships</h3>
+                  <MoreHorizontal className="w-5 h-5 cursor-pointer text-muted-foreground" />
                 </div>
-              )}
-            </div>
-            <ResponsiveContainer width="100%" height={260}>
-              {isPersonal ? (
-                <BarChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#6b7280' }} />
-                  <YAxis tick={{ fontSize: 11, fill: '#6b7280' }} domain={[0, 100]} />
-                  <Tooltip
-                    contentStyle={{
-                      background: 'rgba(255,255,255,0.9)',
-                      backdropFilter: 'blur(10px)',
-                      border: '1px solid rgba(255,255,255,0.6)',
-                      borderRadius: '12px',
-                      fontSize: '12px',
-                    }}
-                  />
-                  <defs>
-                    <linearGradient id="personalBarGradient" x1="0" y1="1" x2="0" y2="0">
-                      <stop offset="0%" stopColor="#7eb8da" />
-                      <stop offset="100%" stopColor="#a8d4ea" />
-                    </linearGradient>
-                  </defs>
-                  <Bar dataKey="attended" fill="url(#personalBarGradient)" radius={[8, 8, 0, 0]} name="Attended" />
-                </BarChart>
-              ) : (
-                <ComposedChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#6b7280' }} />
-                  <YAxis tick={{ fontSize: 11, fill: '#6b7280' }} domain={[0, 100]} />
-                  <Tooltip
-                    contentStyle={{
-                      background: 'rgba(255,255,255,0.9)',
-                      backdropFilter: 'blur(10px)',
-                      border: '1px solid rgba(255,255,255,0.6)',
-                      borderRadius: '12px',
-                      fontSize: '12px',
-                    }}
-                  />
-                  <defs>
-                    <linearGradient id="barGradient" x1="0" y1="1" x2="0" y2="0">
-                      <stop offset="0%" stopColor="#dfa579" />
-                      <stop offset="100%" stopColor="#eacda3" />
-                    </linearGradient>
-                  </defs>
-                  <Bar dataKey="attendance" fill="url(#barGradient)" radius={[8, 8, 0, 0]} name="Attendance %" />
-                  <Line
-                    type="monotone"
-                    dataKey="engagement"
-                    stroke="#bf7e54"
-                    strokeWidth={2.5}
-                    dot={{ fill: '#fdfbf7', stroke: '#bf7e54', strokeWidth: 2, r: 5 }}
-                    name="Engagement Score"
-                  />
-                </ComposedChart>
-              )}
-            </ResponsiveContainer>
-            {isPersonal && chartData.length === 0 && (
-              <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
-                <CheckCircle className="w-10 h-10 mb-2 opacity-30" />
-                <p className="text-sm">No attendance records yet</p>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* RIGHT: Events / Personal clubs */}
-        <div className="lg:col-span-3 flex flex-col gap-6">
-          <div className="glass-card p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="font-bold text-lg text-foreground">
-                {isPersonal ? 'My Memberships' : 'Upcoming Events'}
-              </h3>
-              <MoreHorizontal className="w-5 h-5 cursor-pointer text-muted-foreground" />
-            </div>
-
-            {isPersonal ? (
-              <div className="space-y-4">
-                {clubs.length > 0 ? clubs.map((club) => (
-                  <div key={club.club_id} className="flex items-center gap-4 group cursor-pointer">
-                    <div className="rounded-lg shadow-sm w-12 h-12 flex items-center justify-center border border-border bg-white group-hover:shadow-md transition-shadow">
-                      {club.logo_url ? (
-                        <img src={club.logo_url} alt={club.club_name} className="w-8 h-8 rounded object-cover" />
-                      ) : (
-                        <Award className="w-5 h-5 text-primary" />
-                      )}
+                <div className="space-y-4">
+                  {clubs.length > 0 ? clubs.map((club) => (
+                    <div key={club.club_id} className="flex items-center gap-4 group cursor-pointer">
+                      <div className="rounded-lg shadow-sm w-12 h-12 flex items-center justify-center border border-border bg-white group-hover:shadow-md transition-shadow">
+                        {club.logo_url ? (
+                          <img src={club.logo_url} alt={club.club_name} className="w-8 h-8 rounded object-cover" />
+                        ) : (
+                          <Award className="w-5 h-5 text-primary" />
+                        )}
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-bold text-foreground">{club.club_name}</h4>
+                        <span className="text-xs text-muted-foreground">
+                          {roleLabelMap[club.role] ?? club.role}
+                        </span>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="text-sm font-bold text-foreground">{club.club_name}</h4>
-                      <span className="text-xs text-muted-foreground">
-                        {roleLabelMap[club.role] ?? club.role}
-                      </span>
-                    </div>
+                  )) : (
+                    <p className="text-sm text-muted-foreground italic">No club memberships yet</p>
+                  )}
+                </div>
+
+                {/* Attendance chart below memberships */}
+                {personalStats.recentAttendance.length > 0 && (
+                  <div className="mt-8">
+                    <h4 className="font-bold text-sm text-foreground mb-3">Recent Attendance</h4>
+                    <ResponsiveContainer width="100%" height={160}>
+                      <BarChart data={personalStats.recentAttendance}>
+                        <XAxis dataKey="name" tick={{ fontSize: 9, fill: '#6b7280' }} />
+                        <YAxis tick={{ fontSize: 9, fill: '#6b7280' }} domain={[0, 100]} hide />
+                        <Tooltip contentStyle={{ background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.6)', borderRadius: '12px', fontSize: '11px' }} />
+                        <defs>
+                          <linearGradient id="personalBarGrad" x1="0" y1="1" x2="0" y2="0">
+                            <stop offset="0%" stopColor="#7eb8da" />
+                            <stop offset="100%" stopColor="#a8d4ea" />
+                          </linearGradient>
+                        </defs>
+                        <Bar dataKey="attended" fill="url(#personalBarGrad)" radius={[6, 6, 0, 0]} name="Attended" />
+                      </BarChart>
+                    </ResponsiveContainer>
                   </div>
-                )) : (
-                  <p className="text-sm text-muted-foreground italic">No club memberships yet</p>
                 )}
               </div>
-            ) : (
-              <div className="space-y-4">
-                {upcomingEvents.map((event, i) => (
-                  <div key={i} className="flex items-center gap-4 group cursor-pointer">
-                    <div className="rounded-lg shadow-sm w-12 h-12 flex flex-col items-center justify-center border border-border bg-white group-hover:shadow-md transition-shadow">
-                      <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">{event.month}</span>
-                      <span className="text-lg font-bold leading-none text-foreground">{event.day}</span>
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-bold text-foreground">{event.name}</h4>
-                      <span className="text-xs flex items-center gap-1 text-muted-foreground">
-                        <MapPin className="w-2.5 h-2.5" /> {event.location}
-                      </span>
-                    </div>
-                    <div className="ml-auto text-muted-foreground">
-                      <event.icon className="w-4 h-4" />
-                    </div>
+            </div>
+          ) : (
+            /* Club Mode: Analytics chart + Upcoming Events */
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2 glass-card p-6">
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="font-bold text-lg text-foreground">Attendance Analytics</h3>
+                  <div className="glass-input px-3 py-1 rounded-lg text-xs flex items-center gap-1 cursor-pointer text-muted-foreground">
+                    Last 30 Days <ChevronDown className="w-3 h-3" />
                   </div>
-                ))}
+                </div>
+                <div className="flex justify-between items-center text-xs mb-6">
+                  <span className="font-semibold text-muted-foreground">Event Attendance &amp; Engagement</span>
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-primary" />
+                    <span className="text-muted-foreground">Engagement Score</span>
+                  </div>
+                </div>
+                <ResponsiveContainer width="100%" height={260}>
+                  <ComposedChart data={clubChartData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                    <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#6b7280' }} />
+                    <YAxis tick={{ fontSize: 11, fill: '#6b7280' }} domain={[0, 100]} />
+                    <Tooltip contentStyle={{ background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.6)', borderRadius: '12px', fontSize: '12px' }} />
+                    <defs>
+                      <linearGradient id="barGradient" x1="0" y1="1" x2="0" y2="0">
+                        <stop offset="0%" stopColor="#dfa579" />
+                        <stop offset="100%" stopColor="#eacda3" />
+                      </linearGradient>
+                    </defs>
+                    <Bar dataKey="attendance" fill="url(#barGradient)" radius={[8, 8, 0, 0]} name="Attendance %" />
+                    <Line type="monotone" dataKey="engagement" stroke="#bf7e54" strokeWidth={2.5} dot={{ fill: '#fdfbf7', stroke: '#bf7e54', strokeWidth: 2, r: 5 }} name="Engagement Score" />
+                  </ComposedChart>
+                </ResponsiveContainer>
               </div>
-            )}
-          </div>
+
+              <div className="glass-card p-6">
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="font-bold text-lg text-foreground">Upcoming Events</h3>
+                  <MoreHorizontal className="w-5 h-5 cursor-pointer text-muted-foreground" />
+                </div>
+                <div className="space-y-4">
+                  {upcomingEvents.map((event, i) => (
+                    <div key={i} className="flex items-center gap-4 group cursor-pointer">
+                      <div className="rounded-lg shadow-sm w-12 h-12 flex flex-col items-center justify-center border border-border bg-white group-hover:shadow-md transition-shadow">
+                        <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">{event.month}</span>
+                        <span className="text-lg font-bold leading-none text-foreground">{event.day}</span>
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-bold text-foreground">{event.name}</h4>
+                        <span className="text-xs flex items-center gap-1 text-muted-foreground">
+                          <MapPin className="w-2.5 h-2.5" /> {event.location}
+                        </span>
+                      </div>
+                      <div className="ml-auto text-muted-foreground">
+                        <event.icon className="w-4 h-4" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </main>
     </div>
