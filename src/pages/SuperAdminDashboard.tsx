@@ -33,11 +33,11 @@ const SuperAdminDashboard = () => {
   useEffect(() => {
     if (!user) return;
     const checkAdmin = async () => {
-      const { data } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
-        .eq('role', 'admin');
+      const { data } = await supabase.
+      from('user_roles').
+      select('role').
+      eq('user_id', user.id).
+      eq('role', 'admin');
       setIsAdmin(data && data.length > 0);
     };
     checkAdmin();
@@ -47,8 +47,8 @@ const SuperAdminDashboard = () => {
     return (
       <div className="min-h-screen flex items-center justify-center dashboard-corner-gradient">
         <div className="w-8 h-8 border-[3px] border-primary/30 border-t-primary rounded-full animate-spin" />
-      </div>
-    );
+      </div>);
+
   }
 
   if (!user) return <Navigate to="/" replace />;
@@ -64,26 +64,26 @@ const SuperAdminDashboard = () => {
             Go to Dashboard
           </button>
         </div>
-      </div>
-    );
+      </div>);
+
   }
 
   const handleChangeRole = async () => {
     if (!selectedRoleMember || !newRole) return;
-    await supabase
-      .from('club_members')
-      .update({ role: newRole as any })
-      .eq('id', selectedRoleMember.membership_id);
+    await supabase.
+    from('club_members').
+    update({ role: newRole as any }).
+    eq('id', selectedRoleMember.membership_id);
     setRoleDialogOpen(false);
     setSelectedRoleMember(null);
     setNewRole('');
     window.location.reload();
   };
 
-  const filteredClubs = clubs.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase()));
-  const filteredMembers = members.filter(m =>
-    m.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    m.club_name.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredClubs = clubs.filter((c) => c.name.toLowerCase().includes(searchQuery.toLowerCase()));
+  const filteredMembers = members.filter((m) =>
+  m.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  m.club_name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   // Deduplicate members by user_id for the sidebar
@@ -95,10 +95,10 @@ const SuperAdminDashboard = () => {
   );
 
   const statsCards = [
-    { label: 'Total Active Clubs', value: totalClubs, icon: Building2, path: 'M0,25 C30,25 30,10 50,10 S70,20 100,5' },
-    { label: 'Global Member Count', value: globalMembers, icon: Users, path: 'M0,25 C20,28 40,5 60,15 S80,5 100,10' },
-    { label: 'Total Events Managed', value: totalEvents, icon: Calendar, path: 'M0,20 C30,20 40,25 60,10 S90,5 100,5' },
-  ];
+  { label: 'Total Active Clubs', value: totalClubs, icon: Building2, path: 'M0,25 C30,25 30,10 50,10 S70,20 100,5' },
+  { label: 'Global Member Count', value: globalMembers, icon: Users, path: 'M0,25 C20,28 40,5 60,15 S80,5 100,10' },
+  { label: 'Total Events Managed', value: totalEvents, icon: Calendar, path: 'M0,20 C30,20 40,25 60,10 S90,5 100,5' }];
+
 
   return (
     <div className="min-h-screen relative antialiased p-6 md:p-8 dashboard-corner-gradient text-foreground">
@@ -119,15 +119,15 @@ const SuperAdminDashboard = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
+              onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search..."
-              className="glass-input rounded-full py-2 pl-10 pr-4 w-64 focus:outline-none focus:ring-2 focus:ring-ring text-sm"
-            />
+              className="glass-input rounded-full py-2 pl-10 pr-4 w-64 focus:outline-none focus:ring-2 focus:ring-ring text-sm" />
+            
           </div>
           <button
             onClick={() => navigate('/global-reports')}
-            className="px-4 py-2 rounded-full font-medium flex items-center gap-2 text-sm bg-secondary hover:bg-secondary/80 text-secondary-foreground transition-colors"
-          >
+            className="px-4 py-2 rounded-full font-medium flex items-center gap-2 text-sm bg-secondary hover:bg-secondary/80 text-secondary-foreground transition-colors">
+            
             <FileText className="w-4 h-4" /> Global Reports
           </button>
           <ProfileDropdown viewMode="personal" />
@@ -136,8 +136,8 @@ const SuperAdminDashboard = () => {
 
       {/* Stats Row */}
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {statsCards.map((stat, i) => (
-          <div key={i} className="glass-card p-6 flex flex-col justify-between h-32 relative overflow-hidden group hover:bg-white/50 transition-colors">
+        {statsCards.map((stat, i) =>
+        <div key={i} className="glass-card p-6 flex flex-col justify-between h-32 relative overflow-hidden group hover:bg-white/50 transition-colors">
             <div>
               <p className="text-sm mb-1 text-muted-foreground">{stat.label}</p>
               <div className="flex items-center gap-2">
@@ -149,17 +149,17 @@ const SuperAdminDashboard = () => {
               <path d={stat.path} strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
-        ))}
+        )}
 
         {/* Growth Trends Mini Chart */}
-        <div className="glass-card p-5">
-          <h3 className="font-semibold text-sm mb-2 text-foreground">Growth Trends</h3>
-          <ResponsiveContainer width="100%" height={80}>
-            <BarChart data={growthData} barSize={6}>
-              <Bar dataKey="events" fill="hsl(var(--primary))" radius={[2, 2, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+        
+
+
+
+
+
+
+        
       </section>
 
       {/* Main Grid: Clubs + Members */}
@@ -170,20 +170,20 @@ const SuperAdminDashboard = () => {
             <h2 className="text-lg font-semibold text-foreground">Club Management</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 overflow-y-auto pr-2 flex-1">
-            {loading ? (
-              <p className="text-muted-foreground col-span-3 text-center py-8">Loading clubs...</p>
-            ) : filteredClubs.length === 0 ? (
-              <p className="text-muted-foreground col-span-3 text-center py-8">No clubs found</p>
-            ) : (
-              filteredClubs.map(club => (
-                <div key={club.id} className="rounded-xl p-4 border border-border/50 bg-card shadow-card">
+            {loading ?
+            <p className="text-muted-foreground col-span-3 text-center py-8">Loading clubs...</p> :
+            filteredClubs.length === 0 ?
+            <p className="text-muted-foreground col-span-3 text-center py-8">No clubs found</p> :
+
+            filteredClubs.map((club) =>
+            <div key={club.id} className="rounded-xl p-4 border border-border/50 bg-card shadow-card">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                      {club.logo_url ? (
-                        <img src={club.logo_url} alt={club.name} className="w-8 h-8 rounded-full object-cover" />
-                      ) : (
-                        <span className="text-primary font-bold text-lg">{club.name[0]}</span>
-                      )}
+                      {club.logo_url ?
+                  <img src={club.logo_url} alt={club.name} className="w-8 h-8 rounded-full object-cover" /> :
+
+                  <span className="text-primary font-bold text-lg">{club.name[0]}</span>
+                  }
                     </div>
                     <h4 className="font-bold text-foreground leading-tight">{club.name}</h4>
                   </div>
@@ -193,15 +193,15 @@ const SuperAdminDashboard = () => {
                   </div>
                   <div className="flex gap-2">
                     <button
-                      onClick={() => navigate(`/club/${club.id}`)}
-                      className="flex-[1.5] text-center text-xs px-3 py-1.5 rounded-lg font-medium transition-colors bg-accent hover:bg-accent/80 text-accent-foreground"
-                    >
+                  onClick={() => navigate(`/club/${club.id}`)}
+                  className="flex-[1.5] text-center text-xs px-3 py-1.5 rounded-lg font-medium transition-colors bg-accent hover:bg-accent/80 text-accent-foreground">
+                  
                       View Analytics
                     </button>
                   </div>
                 </div>
-              ))
-            )}
+            )
+            }
           </div>
         </section>
 
@@ -209,13 +209,13 @@ const SuperAdminDashboard = () => {
         <section className="glass-card p-5 flex flex-col max-h-[500px]">
           <h2 className="text-lg font-semibold text-foreground mb-4">Manage All Members</h2>
           <div className="flex flex-col gap-3 overflow-y-auto pr-1 flex-1">
-            {loading ? (
-              <p className="text-muted-foreground text-center py-8">Loading...</p>
-            ) : uniqueMembers.length === 0 ? (
-              <p className="text-muted-foreground text-center py-8">No members</p>
-            ) : (
-              uniqueMembers.map(member => (
-                <div key={member.user_id} className="rounded-xl p-3 flex justify-between items-center border border-border/50 bg-card shadow-card">
+            {loading ?
+            <p className="text-muted-foreground text-center py-8">Loading...</p> :
+            uniqueMembers.length === 0 ?
+            <p className="text-muted-foreground text-center py-8">No members</p> :
+
+            uniqueMembers.map((member) =>
+            <div key={member.user_id} className="rounded-xl p-3 flex justify-between items-center border border-border/50 bg-card shadow-card">
                   <div className="flex items-center gap-2 min-w-0">
                     <Avatar className="w-9 h-9 shrink-0">
                       <AvatarImage src={member.avatar_url || undefined} />
@@ -227,21 +227,21 @@ const SuperAdminDashboard = () => {
                   </div>
                   <div className="flex gap-1.5 shrink-0">
                     <button
-                      onClick={() => { setSelectedMember(member); setProfileDialogOpen(true); }}
-                      className="text-[11px] px-2.5 py-1.5 rounded-lg font-medium transition-colors bg-secondary hover:bg-secondary/80 text-secondary-foreground"
-                    >
+                  onClick={() => {setSelectedMember(member);setProfileDialogOpen(true);}}
+                  className="text-[11px] px-2.5 py-1.5 rounded-lg font-medium transition-colors bg-secondary hover:bg-secondary/80 text-secondary-foreground">
+                  
                       <Eye className="w-3 h-3" />
                     </button>
                     <button
-                      onClick={() => { setSelectedRoleMember(member); setNewRole(member.role); setRoleDialogOpen(true); }}
-                      className="text-[11px] px-2.5 py-1.5 rounded-lg font-medium transition-colors bg-accent hover:bg-accent/80 text-accent-foreground"
-                    >
+                  onClick={() => {setSelectedRoleMember(member);setNewRole(member.role);setRoleDialogOpen(true);}}
+                  className="text-[11px] px-2.5 py-1.5 rounded-lg font-medium transition-colors bg-accent hover:bg-accent/80 text-accent-foreground">
+                  
                       <UserCog className="w-3 h-3" />
                     </button>
                   </div>
                 </div>
-              ))
-            )}
+            )
+            }
           </div>
         </section>
       </div>
@@ -250,15 +250,15 @@ const SuperAdminDashboard = () => {
       <section className="glass-card p-5">
         <h2 className="text-lg font-semibold text-foreground mb-4">Global Event Feed</h2>
         <div className="flex gap-6 overflow-x-auto pb-2">
-          {loading ? (
-            <p className="text-muted-foreground py-4">Loading events...</p>
-          ) : upcomingEvents.length === 0 ? (
-            <p className="text-muted-foreground py-4">No upcoming events</p>
-          ) : (
-            upcomingEvents.map((event, i) => {
-              const d = new Date(event.event_date);
-              return (
-                <div key={event.id} className="shrink-0 border-l-2 pl-4 py-1" style={{ borderColor: i === 0 ? 'hsl(var(--primary))' : 'hsl(var(--border))' }}>
+          {loading ?
+          <p className="text-muted-foreground py-4">Loading events...</p> :
+          upcomingEvents.length === 0 ?
+          <p className="text-muted-foreground py-4">No upcoming events</p> :
+
+          upcomingEvents.map((event, i) => {
+            const d = new Date(event.event_date);
+            return (
+              <div key={event.id} className="shrink-0 border-l-2 pl-4 py-1" style={{ borderColor: i === 0 ? 'hsl(var(--primary))' : 'hsl(var(--border))' }}>
                   <h4 className="font-semibold text-foreground text-sm mb-1">
                     {event.name} ({event.club_name}) - {d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                   </h4>
@@ -266,10 +266,10 @@ const SuperAdminDashboard = () => {
                     <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
                     <span className="flex items-center gap-1"><Users className="w-3 h-3" /> {event.participant_count} Participants</span>
                   </div>
-                </div>
-              );
-            })
-          )}
+                </div>);
+
+          })
+          }
         </div>
       </section>
 
@@ -280,8 +280,8 @@ const SuperAdminDashboard = () => {
             <DialogTitle>Member Profile</DialogTitle>
             <DialogDescription>Full details for this member</DialogDescription>
           </DialogHeader>
-          {selectedMember && (
-            <div className="space-y-3">
+          {selectedMember &&
+          <div className="space-y-3">
               <div className="flex items-center gap-4 mb-4">
                 <Avatar className="w-16 h-16">
                   <AvatarImage src={selectedMember.avatar_url || undefined} />
@@ -305,7 +305,7 @@ const SuperAdminDashboard = () => {
                 {selectedMember.phone && <><span className="text-muted-foreground">Phone:</span><span>{selectedMember.phone}</span></>}
               </div>
             </div>
-          )}
+          }
         </DialogContent>
       </Dialog>
 
@@ -324,22 +324,22 @@ const SuperAdminDashboard = () => {
                 <SelectValue placeholder="Select role" />
               </SelectTrigger>
               <SelectContent>
-                {Object.entries(roleLabelMap).filter(([k]) => k !== 'admin').map(([key, label]) => (
-                  <SelectItem key={key} value={key}>{label}</SelectItem>
-                ))}
+                {Object.entries(roleLabelMap).filter(([k]) => k !== 'admin').map(([key, label]) =>
+                <SelectItem key={key} value={key}>{label}</SelectItem>
+                )}
               </SelectContent>
             </Select>
             <button
               onClick={handleChangeRole}
-              className="w-full py-2 rounded-lg gradient-gold text-primary-foreground font-medium text-sm"
-            >
+              className="w-full py-2 rounded-lg gradient-gold text-primary-foreground font-medium text-sm">
+              
               Save Role
             </button>
           </div>
         </DialogContent>
       </Dialog>
-    </div>
-  );
+    </div>);
+
 };
 
 export default SuperAdminDashboard;
