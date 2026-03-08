@@ -41,8 +41,23 @@ const AdminDashboard = () => {
   const { stats: personalStats } = usePersonalStats();
   const { hasPower } = useDelegatedPowers();
   const [viewMode, setViewMode] = useState<ViewMode>('personal');
+  const [upcomingEvents, setUpcomingEvents] = useState<any[]>([]);
   const navigate = useNavigate();
   const greeting = useMemo(() => getRandomGreeting(), []);
+
+  useEffect(() => {
+    const fetchUpcoming = async () => {
+      const now = new Date().toISOString();
+      const { data } = await supabase
+        .from('events')
+        .select('id, name, event_date, club_id, clubs(name)')
+        .gte('event_date', now)
+        .order('event_date', { ascending: true })
+        .limit(5);
+      setUpcomingEvents(data ?? []);
+    };
+    fetchUpcoming();
+  }, []);
 
   if (loading) {
     return (
