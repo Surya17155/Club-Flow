@@ -31,11 +31,6 @@ const clubChartData = [
   { name: 'Event 10', attendance: 50, engagement: 60 },
 ];
 
-const upcomingEvents = [
-  { name: 'Coding Workshop', month: 'OCT', day: '28', location: 'Hall A', icon: Calendar },
-  { name: 'Hackathon', month: 'NOV', day: '5', location: 'Main Lab', icon: Calendar },
-  { name: 'Guest Lecture', month: 'NOV', day: '12', location: 'Auditorium', icon: Users },
-];
 
 type ViewMode = 'personal' | 'club';
 
