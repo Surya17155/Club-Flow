@@ -132,7 +132,8 @@ const AdminDashboard = () => {
               </div>
             </div>
             <h2 className="text-xl font-bold" style={{ color: '#1f2937' }}>{fullName}</h2>
-            <p className="text-sm font-medium mb-6" style={{ color: '#6b7280' }}>President</p>
+            <p className="text-sm font-medium" style={{ color: '#6b7280' }}>President</p>
+            <p className="text-xs font-medium mb-6" style={{ color: '#9ca3af' }}>TechNova Club</p>
 
             {/* About section */}
             <div className="w-full text-left rounded-xl p-4 mb-6" style={{ backgroundColor: 'rgba(255,255,255,0.3)' }}>
