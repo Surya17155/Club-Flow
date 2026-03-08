@@ -45,6 +45,10 @@ const assignableRoles = [
   { value: 'member', label: 'Member' },
 ];
 
+const roleLabelMapExtended: Record<string, string> = {
+  ...roleLabelMap,
+};
+
 interface Props {
   clubId: string;
 }
