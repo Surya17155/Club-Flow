@@ -15,7 +15,6 @@ import { cn } from '@/lib/utils';
 
 const EVENT_TYPES = ['Normal', 'Seminar', 'Workshop', 'Industrial Visit', 'Hackathon', 'Guest Lecture'];
 const LOCATIONS = ['Auditorium', 'Seminar Hall', 'Custom Location'];
-const LOCATIONS = ['Auditorium', 'Seminar Hall', 'Custom Location'];
 
 const CreateEvent = () => {
   const { user, loading } = useAuth();
