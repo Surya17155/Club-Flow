@@ -1,15 +1,18 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useClub } from '@/contexts/ClubContext';
 import { useProfile } from '@/hooks/useProfile';
 import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
-import { ChevronDown, User, Settings, LogOut, ArrowRightLeft, Check, ChevronRight, Shield } from 'lucide-react';
+import { ChevronDown, User, Settings, LogOut, ArrowRightLeft, Check, ChevronRight, Shield, Crown } from 'lucide-react';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Switch } from '@/components/ui/switch';
 import AssignPowersModal from './AssignPowersModal';
+
+const SUPER_ADMIN_EMAIL = 'suryakant.gnbba2029@iilm.edu';
 
 const roleLabelMap: Record<string, string> = {
   admin: 'Admin',
@@ -22,12 +25,24 @@ const roleLabelMap: Record<string, string> = {
 
 const ProfileDropdown = ({ viewMode = 'personal' }: { viewMode?: 'personal' | 'club' }) => {
   const navigate = useNavigate();
-  const { signOut } = useAuth();
+  const location = useLocation();
+  const { user, signOut } = useAuth();
   const { profile } = useProfile();
   const { activeClub, clubs, switchClub } = useClub();
   const { isPresident } = useDelegatedPowers();
   const [showClubs, setShowClubs] = useState(false);
   const [showPowersModal, setShowPowersModal] = useState(false);
+
+  const isSuperAdminEmail = user?.email === SUPER_ADMIN_EMAIL;
+  const isSuperAdminMode = location.pathname === '/super-admin' || location.pathname === '/global-reports';
+
+  const handleSuperAdminToggle = (checked: boolean) => {
+    if (checked) {
+      navigate('/super-admin');
+    } else {
+      navigate('/admin');
+    }
+  };
 
   const fullName = profile?.full_name || 'User';
   const initials = fullName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
@@ -69,6 +84,23 @@ const ProfileDropdown = ({ viewMode = 'personal' }: { viewMode?: 'personal' | 'c
             {viewMode === 'club' && isPresident && (
               <DropdownMenuItem onClick={() => setShowPowersModal(true)}>
                 <Shield className="mr-2 h-4 w-4" /> Assign Powers
+              </DropdownMenuItem>
+            )}
+
+            {isSuperAdminEmail && (
+              <DropdownMenuItem
+                onSelect={(e) => e.preventDefault()}
+                className="flex items-center justify-between"
+              >
+                <div className="flex items-center">
+                  <Crown className="mr-2 h-4 w-4 text-amber-500" />
+                  <span>Super Admin Mode</span>
+                </div>
+                <Switch
+                  checked={isSuperAdminMode}
+                  onCheckedChange={handleSuperAdminToggle}
+                  className="ml-3 scale-90"
+                />
               </DropdownMenuItem>
             )}
 
