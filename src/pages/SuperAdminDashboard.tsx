@@ -3,13 +3,18 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useSuperAdminStats } from '@/hooks/useSuperAdminStats';
-import { Search, Plus, Settings, TrendingUp, Users, Calendar, Building2, Clock, ChevronDown, Eye, UserCog, Shield, FileText } from 'lucide-react';
+import { Search, Plus, Settings, TrendingUp, Users, Calendar, Building2, Clock, ChevronDown, Eye, UserCog, Shield, FileText, MoreVertical, Trash2 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import ProfileDropdown from '@/components/dashboard/ProfileDropdown';
+import { useToast } from '@/hooks/use-toast';
 
 const roleLabelMap: Record<string, string> = {
   admin: 'Admin', president: 'President', vice_president: 'Vice President',
@@ -26,6 +31,11 @@ const SuperAdminDashboard = () => {
   const [roleDialogOpen, setRoleDialogOpen] = useState(false);
   const [selectedRoleMember, setSelectedRoleMember] = useState<any>(null);
   const [newRole, setNewRole] = useState('');
+  const [createClubOpen, setCreateClubOpen] = useState(false);
+  const [newClubName, setNewClubName] = useState('');
+  const [newClubDescription, setNewClubDescription] = useState('');
+  const [creatingClub, setCreatingClub] = useState(false);
+  const { toast } = useToast();
 
   const { totalClubs, globalMembers, totalEvents, clubs, members, upcomingEvents, growthData, loading } = useSuperAdminStats();
 
@@ -78,6 +88,37 @@ const SuperAdminDashboard = () => {
     setSelectedRoleMember(null);
     setNewRole('');
     window.location.reload();
+  };
+
+  const handleCreateClub = async () => {
+    if (!newClubName.trim()) return;
+    setCreatingClub(true);
+    const { error } = await supabase.from('clubs').insert({
+      name: newClubName.trim(),
+      description: newClubDescription.trim() || null,
+      created_by: user!.id,
+    });
+    setCreatingClub(false);
+    if (error) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    } else {
+      toast({ title: 'Club created', description: `${newClubName} has been added.` });
+      setCreateClubOpen(false);
+      setNewClubName('');
+      setNewClubDescription('');
+      window.location.reload();
+    }
+  };
+
+  const handleDeleteClub = async (clubId: string, clubName: string) => {
+    if (!confirm(`Are you sure you want to delete "${clubName}"? This will remove all members, events, and data associated with this club.`)) return;
+    const { error } = await supabase.from('clubs').delete().eq('id', clubId);
+    if (error) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    } else {
+      toast({ title: 'Club deleted', description: `${clubName} has been removed.` });
+      window.location.reload();
+    }
   };
 
   const filteredClubs = clubs.filter((c) => c.name.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -168,6 +209,12 @@ const SuperAdminDashboard = () => {
         <section className="glass-card p-5 lg:col-span-3 flex flex-col max-h-[500px]">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-semibold text-foreground">Club Management</h2>
+            <button
+              onClick={() => setCreateClubOpen(true)}
+              className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg font-medium transition-colors gradient-gold text-primary-foreground shadow-gold"
+            >
+              <Plus className="w-3.5 h-3.5" /> Add Club
+            </button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 overflow-y-auto pr-2 flex-1">
             {loading ?
@@ -176,16 +223,28 @@ const SuperAdminDashboard = () => {
             <p className="text-muted-foreground col-span-3 text-center py-8">No clubs found</p> :
 
             filteredClubs.map((club) =>
-            <div key={club.id} className="rounded-xl p-4 border border-border/50 bg-card shadow-card">
+            <div key={club.id} className="rounded-xl p-4 border border-border/50 bg-card shadow-card relative">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                       {club.logo_url ?
                   <img src={club.logo_url} alt={club.name} className="w-8 h-8 rounded-full object-cover" /> :
-
                   <span className="text-primary font-bold text-lg">{club.name[0]}</span>
                   }
                     </div>
-                    <h4 className="font-bold text-foreground leading-tight">{club.name}</h4>
+                    <h4 className="font-bold text-foreground leading-tight flex-1">{club.name}</h4>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger className="p-1 rounded-lg hover:bg-accent/50 transition-colors outline-none">
+                        <MoreVertical className="w-4 h-4 text-muted-foreground" />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-40">
+                        <DropdownMenuItem
+                          onClick={() => handleDeleteClub(club.id, club.name)}
+                          className="text-destructive focus:text-destructive"
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" /> Delete Club
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                   <div className="text-xs text-muted-foreground space-y-1 mb-4">
                     <p>Members: {club.memberCount}</p>
@@ -195,7 +254,6 @@ const SuperAdminDashboard = () => {
                     <button
                   onClick={() => navigate(`/club/${club.id}`)}
                   className="flex-[1.5] text-center text-xs px-3 py-1.5 rounded-lg font-medium transition-colors bg-accent hover:bg-accent/80 text-accent-foreground">
-                  
                       View Analytics
                     </button>
                   </div>
@@ -334,6 +392,44 @@ const SuperAdminDashboard = () => {
               className="w-full py-2 rounded-lg gradient-gold text-primary-foreground font-medium text-sm">
               
               Save Role
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Create Club Dialog */}
+      <Dialog open={createClubOpen} onOpenChange={setCreateClubOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Create New Club</DialogTitle>
+            <DialogDescription>Add a new club to the platform</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Club Name</Label>
+              <Input
+                value={newClubName}
+                onChange={(e) => setNewClubName(e.target.value)}
+                placeholder="e.g. Finance Club"
+                className="mt-1.5"
+              />
+            </div>
+            <div>
+              <Label>Description (optional)</Label>
+              <Textarea
+                value={newClubDescription}
+                onChange={(e) => setNewClubDescription(e.target.value)}
+                placeholder="Brief description of the club..."
+                className="mt-1.5"
+                rows={3}
+              />
+            </div>
+            <button
+              onClick={handleCreateClub}
+              disabled={creatingClub || !newClubName.trim()}
+              className="w-full py-2 rounded-lg gradient-gold text-primary-foreground font-medium text-sm disabled:opacity-50"
+            >
+              {creatingClub ? 'Creating...' : 'Create Club'}
             </button>
           </div>
         </DialogContent>
