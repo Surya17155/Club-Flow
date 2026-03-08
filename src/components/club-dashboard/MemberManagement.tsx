@@ -115,13 +115,8 @@ const MemberManagement = ({ clubId }: Props) => {
   useEffect(() => { fetchMembers(); }, [clubId]);
 
   const handleAddMember = async () => {
-    if (!addForm.email.trim() || !addForm.fullName.trim() || !addForm.password.trim()) {
-      toast.error('Please fill in name, email, and password');
-      return;
-    }
-
-    if (addForm.password.length < 6) {
-      toast.error('Password must be at least 6 characters');
+    if (!addForm.email.trim() || !addForm.fullName.trim()) {
+      toast.error('Please fill in name and email');
       return;
     }
 
