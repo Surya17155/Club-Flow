@@ -125,6 +125,15 @@ const ClubDashboard = () => {
 
   if (!user) return <Navigate to="/" replace />;
 
+  // Wait for super-admin role check to avoid access flicker on direct club routes
+  if (!isRoleCheckComplete) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#fdfbf7' }}>
+        <div className="w-8 h-8 border-[3px] border-primary/30 border-t-primary rounded-full animate-spin" />
+      </div>
+    );
+  }
+
   // Access check: president, has manage_club power, or super admin
   const hasAccess = isPresident || hasPower('manage_club') || isSuperAdmin;
   if ((!hasAccess && !isSuperAdmin) || !clubId) {
