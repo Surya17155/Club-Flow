@@ -29,26 +29,42 @@ const ClubProfileSidebar = ({ clubId, clubName, clubAbout, clubLogo }: Props) =>
   const [postHolders, setPostHolders] = useState<PostHolder[]>([]);
 
   useEffect(() => {
-    const fetch = async () => {
-      const { data } = await supabase
+    const fetchPostHolders = async () => {
+      // Fetch club members with post-holder roles
+      const { data: membersData } = await supabase
         .from('club_members')
-        .select('user_id, role, profiles(full_name, avatar_url)')
+        .select('user_id, role')
         .eq('club_id', clubId)
         .in('role', roleOrder as any);
-      if (data) {
-        setPostHolders(
-          (data as any[])
-            .map(m => ({
-              user_id: m.user_id,
-              role: m.role,
-              full_name: m.profiles?.full_name ?? 'Unknown',
-              avatar_url: m.profiles?.avatar_url ?? null,
-            }))
-            .sort((a, b) => roleOrder.indexOf(a.role) - roleOrder.indexOf(b.role))
-        );
+
+      if (!membersData || membersData.length === 0) {
+        setPostHolders([]);
+        return;
       }
+
+      // Fetch profiles for those user_ids
+      const userIds = membersData.map(m => m.user_id);
+      const { data: profilesData } = await supabase
+        .from('profiles')
+        .select('user_id, full_name, avatar_url')
+        .in('user_id', userIds);
+
+      const profileMap = new Map(
+        (profilesData ?? []).map(p => [p.user_id, p])
+      );
+
+      setPostHolders(
+        membersData
+          .map(m => ({
+            user_id: m.user_id,
+            role: m.role,
+            full_name: profileMap.get(m.user_id)?.full_name ?? 'Unknown',
+            avatar_url: profileMap.get(m.user_id)?.avatar_url ?? null,
+          }))
+          .sort((a, b) => roleOrder.indexOf(a.role as any) - roleOrder.indexOf(b.role as any))
+      );
     };
-    fetch();
+    fetchPostHolders();
   }, [clubId]);
 
   return (
