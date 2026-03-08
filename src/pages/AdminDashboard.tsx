@@ -47,14 +47,16 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const greeting = useMemo(() => getRandomGreeting(), []);
 
-  const [upcomingEvents, setUpcomingEvents] = useState<{ id: string; name: string; month: string; day: string; location: string; club_name: string }[]>([]);
+  const [upcomingEvents, setUpcomingEvents] = useState<any[]>([]);
+  const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
+  const [eventDialogOpen, setEventDialogOpen] = useState(false);
 
   useEffect(() => {
     const fetchUpcoming = async () => {
       const now = new Date().toISOString();
       const { data } = await supabase
         .from('events')
-        .select('id, name, event_date, description, clubs(name)')
+        .select('id, name, event_date, end_date, description, event_type, category, access_type, clubs(name)')
         .gte('event_date', now)
         .order('event_date', { ascending: true })
         .limit(10);
@@ -62,12 +64,12 @@ const AdminDashboard = () => {
         setUpcomingEvents(data.map((e: any) => {
           const d = new Date(e.event_date);
           return {
-            id: e.id,
-            name: e.name,
+            ...e,
             month: d.toLocaleString('default', { month: 'short' }).toUpperCase(),
             day: String(d.getDate()),
-            location: e.description || '',
             club_name: e.clubs?.name || '',
+            full_date: d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+            time: d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
           };
         }));
       }
