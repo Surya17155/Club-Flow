@@ -207,7 +207,7 @@ const SuperAdminDashboard = () => {
           </div>
           <button
             onClick={() => navigate('/global-reports')}
-            className="px-4 py-2 rounded-full font-medium flex items-center gap-2 text-sm bg-secondary hover:bg-secondary/80 text-secondary-foreground transition-colors">
+            className="px-4 py-2 rounded-full font-medium flex items-center gap-2 text-sm bg-primary hover:bg-primary/90 text-primary-foreground transition-colors">
             
             <FileText className="w-4 h-4" /> Global Reports
           </button>
