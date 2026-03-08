@@ -1,10 +1,13 @@
+import { useMemo } from 'react';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from './AppSidebar';
 import { useAuth } from '@/contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
-import { Bell, MessageCircle, Search } from 'lucide-react';
+import { Bell, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+
+const greetings = ['Hello', 'Hi', 'Hey', 'Yo', 'Welcome', "What's up", 'Howdy', 'Namaste'];
+const getRandomGreeting = () => greetings[Math.floor(Math.random() * greetings.length)];
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
