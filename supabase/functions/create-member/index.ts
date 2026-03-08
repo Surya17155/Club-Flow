@@ -11,7 +11,6 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // Verify the caller is authenticated
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
       return new Response(JSON.stringify({ error: "No authorization header" }), {
@@ -22,8 +21,6 @@ Deno.serve(async (req) => {
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-
-    // Client to verify caller
     const callerClient = createClient(supabaseUrl, serviceRoleKey);
     const token = authHeader.replace("Bearer ", "");
     const { data: { user: caller }, error: callerError } = await callerClient.auth.getUser(token);
@@ -35,17 +32,8 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Check caller is admin or president in some club
-    const { data: callerRoles } = await callerClient
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", caller.id);
-
-    const { data: callerClubRoles } = await callerClient
-      .from("club_members")
-      .select("role")
-      .eq("user_id", caller.id);
-
+    const { data: callerRoles } = await callerClient.from("user_roles").select("role").eq("user_id", caller.id);
+    const { data: callerClubRoles } = await callerClient.from("club_members").select("role").eq("user_id", caller.id);
     const isAdmin = callerRoles?.some((r: any) => r.role === "admin");
     const isPresident = callerClubRoles?.some((r: any) => r.role === "president");
 
@@ -66,12 +54,12 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Generate a random temporary password - member will set their own via signup/reset
+    // Generate a random temporary password - member will reset via "Forgot Password"
     const tempPassword = crypto.randomUUID() + "Aa1!";
 
-    // Create user with admin API (auto-confirms email so profile trigger fires)
+    const { data: newUser, error: createError } = await callerClient.auth.admin.createUser({
       email,
-      password,
+      password: tempPassword,
       email_confirm: true,
       user_metadata: {
         full_name,
@@ -90,7 +78,6 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Add to club
     const { error: memberError } = await callerClient.from("club_members").insert({
       club_id,
       user_id: newUser.user.id,
