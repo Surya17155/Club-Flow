@@ -176,7 +176,9 @@ const ClubDashboard = () => {
     );
   }
 
-  const clubName = activeClub?.club_name || clubNameOverride || 'Club';
+  const clubName = routeClubId
+    ? (routeClubId === activeClub?.club_id ? activeClub?.club_name : clubNameOverride) || 'Club'
+    : activeClub?.club_name || clubNameOverride || 'Club';
   const statsItems = [
     { label: 'Total Members:', value: String(clubStats.totalMembers), path: 'M0,25 C30,25 30,10 50,10 S70,20 100,5' },
     { label: 'All-Time Attendance:', value: String(clubStats.chartData.reduce((s, d) => s + d.attendance, 0)), path: 'M0,25 C20,28 40,5 60,15 S80,5 100,10' },
