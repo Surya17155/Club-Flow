@@ -1,15 +1,18 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useClub } from '@/contexts/ClubContext';
 import { useProfile } from '@/hooks/useProfile';
 import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
-import { ChevronDown, User, Settings, LogOut, ArrowRightLeft, Check, ChevronRight, Shield } from 'lucide-react';
+import { ChevronDown, User, Settings, LogOut, ArrowRightLeft, Check, ChevronRight, Shield, Crown } from 'lucide-react';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Switch } from '@/components/ui/switch';
 import AssignPowersModal from './AssignPowersModal';
+
+const SUPER_ADMIN_EMAIL = 'suryakant.gnbba2029@iilm.edu';
 
 const roleLabelMap: Record<string, string> = {
   admin: 'Admin',
