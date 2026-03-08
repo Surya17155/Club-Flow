@@ -95,23 +95,55 @@ const SuperAdminDashboard = () => {
   };
 
   const handleCreateClub = async () => {
-    if (!newClubName.trim()) return;
+    if (!newClubName.trim() || !presidentForm.fullName.trim() || !presidentForm.email.trim() || !presidentForm.programme.trim() || !presidentForm.year.trim()) {
+      toast({ title: 'Missing fields', description: 'Club name and president details (Name, Email, Programme, Year) are required.', variant: 'destructive' });
+      return;
+    }
     setCreatingClub(true);
-    const { error } = await supabase.from('clubs').insert({
+
+    // 1. Create the club first
+    const { data: clubData, error: clubError } = await supabase.from('clubs').insert({
       name: newClubName.trim(),
       description: newClubDescription.trim() || null,
       created_by: user!.id,
-    });
-    setCreatingClub(false);
-    if (error) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
-    } else {
-      toast({ title: 'Club created', description: `${newClubName} has been added.` });
-      setCreateClubOpen(false);
-      setNewClubName('');
-      setNewClubDescription('');
-      window.location.reload();
+    }).select('id').single();
+
+    if (clubError || !clubData) {
+      toast({ title: 'Error creating club', description: clubError?.message || 'Unknown error', variant: 'destructive' });
+      setCreatingClub(false);
+      return;
     }
+
+    // 2. Create president account via edge function
+    const { data: fnData, error: fnError } = await supabase.functions.invoke('create-member', {
+      body: {
+        email: presidentForm.email.trim(),
+        full_name: presidentForm.fullName.trim(),
+        programme: presidentForm.programme.trim(),
+        section: presidentForm.section.trim(),
+        year: presidentForm.year.trim(),
+        roll_no: presidentForm.rollNo.trim(),
+        phone: presidentForm.phone.trim(),
+        club_id: clubData.id,
+        role: 'president',
+      },
+    });
+
+    if (fnError || fnData?.error) {
+      // Club was created but president failed — delete the club
+      await supabase.from('clubs').delete().eq('id', clubData.id);
+      toast({ title: 'Error adding president', description: fnData?.error || fnError?.message || 'Failed to create president account', variant: 'destructive' });
+      setCreatingClub(false);
+      return;
+    }
+
+    toast({ title: 'Club created!', description: `${newClubName} has been created with ${presidentForm.fullName} as President. They can log in using "Forgot Password" to set their credentials.` });
+    setCreateClubOpen(false);
+    setNewClubName('');
+    setNewClubDescription('');
+    setPresidentForm({ fullName: '', email: '', programme: '', section: '', year: '', rollNo: '', phone: '' });
+    setCreatingClub(false);
+    window.location.reload();
   };
 
   const handleDeleteClub = async (clubId: string, clubName: string) => {
