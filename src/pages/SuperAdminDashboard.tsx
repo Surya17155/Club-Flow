@@ -137,7 +137,11 @@ const SuperAdminDashboard = () => {
       return;
     }
 
-    toast({ title: 'Club created!', description: `${newClubName} has been created with ${presidentForm.fullName} as President. They can log in using "Forgot Password" to set their credentials.` });
+    const action = fnData?.action;
+    const presidentMsg = action === 'added_existing' 
+      ? `${presidentForm.fullName} (existing user) has been assigned as President.`
+      : `${presidentForm.fullName} has been added as President. They can log in using "Forgot Password" to set their credentials.`;
+    toast({ title: 'Club created!', description: `${newClubName} has been created. ${presidentMsg}` });
     setCreateClubOpen(false);
     setNewClubName('');
     setNewClubDescription('');
