@@ -1,0 +1,345 @@
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { Navigate, useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { useSuperAdminStats } from '@/hooks/useSuperAdminStats';
+import { Search, Plus, Settings, TrendingUp, Users, Calendar, Building2, Clock, ChevronDown, Eye, UserCog, Shield, FileText } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import ProfileDropdown from '@/components/dashboard/ProfileDropdown';
+
+const roleLabelMap: Record<string, string> = {
+  admin: 'Admin', president: 'President', vice_president: 'Vice President',
+  secretary: 'Secretary', social_media_head: 'Social Media Head', member: 'Member'
+};
+
+const SuperAdminDashboard = () => {
+  const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [profileDialogOpen, setProfileDialogOpen] = useState(false);
+  const [selectedMember, setSelectedMember] = useState<any>(null);
+  const [roleDialogOpen, setRoleDialogOpen] = useState(false);
+  const [selectedRoleMember, setSelectedRoleMember] = useState<any>(null);
+  const [newRole, setNewRole] = useState('');
+
+  const { totalClubs, globalMembers, totalEvents, clubs, members, upcomingEvents, growthData, loading } = useSuperAdminStats();
+
+  // Check admin role
+  useEffect(() => {
+    if (!user) return;
+    const checkAdmin = async () => {
+      const { data } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin');
+      setIsAdmin(data && data.length > 0);
+    };
+    checkAdmin();
+  }, [user?.id]);
+
+  if (authLoading || isAdmin === null) {
+    return (
+      <div className="min-h-screen flex items-center justify-center dashboard-corner-gradient">
+        <div className="w-8 h-8 border-[3px] border-primary/30 border-t-primary rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!user) return <Navigate to="/" replace />;
+
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen flex items-center justify-center dashboard-corner-gradient">
+        <div className="glass-card p-8 text-center max-w-md">
+          <Shield className="w-12 h-12 text-destructive mx-auto mb-4" />
+          <h2 className="text-xl font-bold mb-2">Restricted Access</h2>
+          <p className="text-muted-foreground mb-4">You don't have Super Admin privileges.</p>
+          <button onClick={() => navigate('/dashboard')} className="px-6 py-2 rounded-full gradient-gold text-primary-foreground font-medium">
+            Go to Dashboard
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const handleChangeRole = async () => {
+    if (!selectedRoleMember || !newRole) return;
+    await supabase
+      .from('club_members')
+      .update({ role: newRole as any })
+      .eq('id', selectedRoleMember.membership_id);
+    setRoleDialogOpen(false);
+    setSelectedRoleMember(null);
+    setNewRole('');
+    window.location.reload();
+  };
+
+  const filteredClubs = clubs.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase()));
+  const filteredMembers = members.filter(m =>
+    m.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    m.club_name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Deduplicate members by user_id for the sidebar
+  const uniqueMembers = Array.from(
+    filteredMembers.reduce((map, m) => {
+      if (!map.has(m.user_id)) map.set(m.user_id, m);
+      return map;
+    }, new Map()).values()
+  );
+
+  const statsCards = [
+    { label: 'Total Active Clubs', value: totalClubs, icon: Building2, path: 'M0,25 C30,25 30,10 50,10 S70,20 100,5' },
+    { label: 'Global Member Count', value: globalMembers, icon: Users, path: 'M0,25 C20,28 40,5 60,15 S80,5 100,10' },
+    { label: 'Total Events Managed', value: totalEvents, icon: Calendar, path: 'M0,20 C30,20 40,25 60,10 S90,5 100,5' },
+  ];
+
+  return (
+    <div className="min-h-screen relative antialiased p-6 md:p-8 dashboard-corner-gradient text-foreground">
+      {/* Background blobs */}
+      <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
+        <div className="absolute top-[-8%] left-[-8%] w-[550px] h-[550px] rounded-full mix-blend-multiply filter blur-[100px] opacity-80 animate-blob" style={{ backgroundColor: 'hsl(45 90% 85% / 0.9)' }} />
+        <div className="absolute top-[-5%] right-[-5%] w-[450px] h-[450px] rounded-full mix-blend-multiply filter blur-[90px] opacity-70 animate-blob animation-delay-2000" style={{ backgroundColor: 'hsl(25 80% 82% / 0.8)' }} />
+        <div className="absolute bottom-[-8%] left-[-5%] w-[500px] h-[500px] rounded-full mix-blend-multiply filter blur-[100px] opacity-60 animate-blob animation-delay-4000" style={{ backgroundColor: 'hsl(35 75% 78% / 0.6)' }} />
+      </div>
+
+      {/* Header */}
+      <header className="relative z-20 flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+        <h1 className="text-2xl font-bold font-display text-foreground">
+          Super Admin <span className="text-gradient-gold">Command Center</span>
+        </h1>
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <input
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              placeholder="Search..."
+              className="glass-input rounded-full py-2 pl-10 pr-4 w-64 focus:outline-none focus:ring-2 focus:ring-ring text-sm"
+            />
+          </div>
+          <button
+            onClick={() => navigate('/global-reports')}
+            className="px-4 py-2 rounded-full font-medium flex items-center gap-2 text-sm bg-secondary hover:bg-secondary/80 text-secondary-foreground transition-colors"
+          >
+            <FileText className="w-4 h-4" /> Global Reports
+          </button>
+          <ProfileDropdown viewMode="personal" />
+        </div>
+      </header>
+
+      {/* Stats Row */}
+      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {statsCards.map((stat, i) => (
+          <div key={i} className="glass-card p-6 flex flex-col justify-between h-32 relative overflow-hidden group hover:bg-white/50 transition-colors">
+            <div>
+              <p className="text-sm mb-1 text-muted-foreground">{stat.label}</p>
+              <div className="flex items-center gap-2">
+                <h3 className="text-3xl font-bold text-foreground">{loading ? '...' : stat.value}</h3>
+                <TrendingUp className="w-5 h-5 text-primary" />
+              </div>
+            </div>
+            <svg className="absolute bottom-4 right-4 w-24 h-12 text-primary/50" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 100 30">
+              <path d={stat.path} strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
+        ))}
+
+        {/* Growth Trends Mini Chart */}
+        <div className="glass-card p-5">
+          <h3 className="font-semibold text-sm mb-2 text-foreground">Growth Trends</h3>
+          <ResponsiveContainer width="100%" height={80}>
+            <BarChart data={growthData} barSize={6}>
+              <Bar dataKey="events" fill="hsl(var(--primary))" radius={[2, 2, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </section>
+
+      {/* Main Grid: Clubs + Members */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
+        {/* Club Management */}
+        <section className="glass-card p-5 lg:col-span-3 flex flex-col max-h-[500px]">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-semibold text-foreground">Club Management</h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 overflow-y-auto pr-2 flex-1">
+            {loading ? (
+              <p className="text-muted-foreground col-span-3 text-center py-8">Loading clubs...</p>
+            ) : filteredClubs.length === 0 ? (
+              <p className="text-muted-foreground col-span-3 text-center py-8">No clubs found</p>
+            ) : (
+              filteredClubs.map(club => (
+                <div key={club.id} className="rounded-xl p-4 border border-border/50 bg-card shadow-card">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                      {club.logo_url ? (
+                        <img src={club.logo_url} alt={club.name} className="w-8 h-8 rounded-full object-cover" />
+                      ) : (
+                        <span className="text-primary font-bold text-lg">{club.name[0]}</span>
+                      )}
+                    </div>
+                    <h4 className="font-bold text-foreground leading-tight">{club.name}</h4>
+                  </div>
+                  <div className="text-xs text-muted-foreground space-y-1 mb-4">
+                    <p>Members: {club.memberCount}</p>
+                    <p>Events: {club.eventCount}</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => navigate(`/club/${club.id}`)}
+                      className="flex-[1.5] text-center text-xs px-3 py-1.5 rounded-lg font-medium transition-colors bg-accent hover:bg-accent/80 text-accent-foreground"
+                    >
+                      View Analytics
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </section>
+
+        {/* Manage All Members */}
+        <section className="glass-card p-5 flex flex-col max-h-[500px]">
+          <h2 className="text-lg font-semibold text-foreground mb-4">Manage All Members</h2>
+          <div className="flex flex-col gap-3 overflow-y-auto pr-1 flex-1">
+            {loading ? (
+              <p className="text-muted-foreground text-center py-8">Loading...</p>
+            ) : uniqueMembers.length === 0 ? (
+              <p className="text-muted-foreground text-center py-8">No members</p>
+            ) : (
+              uniqueMembers.map(member => (
+                <div key={member.user_id} className="rounded-xl p-3 flex justify-between items-center border border-border/50 bg-card shadow-card">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <Avatar className="w-9 h-9 shrink-0">
+                      <AvatarImage src={member.avatar_url || undefined} />
+                      <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
+                        {member.full_name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="text-xs font-medium text-foreground truncate">{member.full_name}</span>
+                  </div>
+                  <div className="flex gap-1.5 shrink-0">
+                    <button
+                      onClick={() => { setSelectedMember(member); setProfileDialogOpen(true); }}
+                      className="text-[11px] px-2.5 py-1.5 rounded-lg font-medium transition-colors bg-secondary hover:bg-secondary/80 text-secondary-foreground"
+                    >
+                      <Eye className="w-3 h-3" />
+                    </button>
+                    <button
+                      onClick={() => { setSelectedRoleMember(member); setNewRole(member.role); setRoleDialogOpen(true); }}
+                      className="text-[11px] px-2.5 py-1.5 rounded-lg font-medium transition-colors bg-accent hover:bg-accent/80 text-accent-foreground"
+                    >
+                      <UserCog className="w-3 h-3" />
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </section>
+      </div>
+
+      {/* Global Event Feed */}
+      <section className="glass-card p-5">
+        <h2 className="text-lg font-semibold text-foreground mb-4">Global Event Feed</h2>
+        <div className="flex gap-6 overflow-x-auto pb-2">
+          {loading ? (
+            <p className="text-muted-foreground py-4">Loading events...</p>
+          ) : upcomingEvents.length === 0 ? (
+            <p className="text-muted-foreground py-4">No upcoming events</p>
+          ) : (
+            upcomingEvents.map((event, i) => {
+              const d = new Date(event.event_date);
+              return (
+                <div key={event.id} className="shrink-0 border-l-2 pl-4 py-1" style={{ borderColor: i === 0 ? 'hsl(var(--primary))' : 'hsl(var(--border))' }}>
+                  <h4 className="font-semibold text-foreground text-sm mb-1">
+                    {event.name} ({event.club_name}) - {d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  </h4>
+                  <div className="flex items-center text-xs text-muted-foreground gap-4">
+                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
+                    <span className="flex items-center gap-1"><Users className="w-3 h-3" /> {event.participant_count} Participants</span>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      </section>
+
+      {/* View Profile Dialog */}
+      <Dialog open={profileDialogOpen} onOpenChange={setProfileDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Member Profile</DialogTitle>
+            <DialogDescription>Full details for this member</DialogDescription>
+          </DialogHeader>
+          {selectedMember && (
+            <div className="space-y-3">
+              <div className="flex items-center gap-4 mb-4">
+                <Avatar className="w-16 h-16">
+                  <AvatarImage src={selectedMember.avatar_url || undefined} />
+                  <AvatarFallback className="bg-primary/10 text-primary text-lg font-bold">
+                    {selectedMember.full_name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <h3 className="font-bold text-lg">{selectedMember.full_name}</h3>
+                  <Badge variant="secondary">{roleLabelMap[selectedMember.role] || selectedMember.role}</Badge>
+                  <p className="text-xs text-muted-foreground mt-1">{selectedMember.club_name}</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                {selectedMember.email && <><span className="text-muted-foreground">Email:</span><span>{selectedMember.email}</span></>}
+                {selectedMember.roll_no && <><span className="text-muted-foreground">Roll No:</span><span>{selectedMember.roll_no}</span></>}
+                {selectedMember.programme && <><span className="text-muted-foreground">Programme:</span><span>{selectedMember.programme}</span></>}
+                {selectedMember.section && <><span className="text-muted-foreground">Section:</span><span>{selectedMember.section}</span></>}
+                {selectedMember.year && <><span className="text-muted-foreground">Year:</span><span>{selectedMember.year}</span></>}
+                {selectedMember.semester && <><span className="text-muted-foreground">Semester:</span><span>{selectedMember.semester}</span></>}
+                {selectedMember.phone && <><span className="text-muted-foreground">Phone:</span><span>{selectedMember.phone}</span></>}
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Change Role Dialog */}
+      <Dialog open={roleDialogOpen} onOpenChange={setRoleDialogOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Change Role</DialogTitle>
+            <DialogDescription>
+              Update role for {selectedRoleMember?.full_name} in {selectedRoleMember?.club_name}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Select value={newRole} onValueChange={setNewRole}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select role" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(roleLabelMap).filter(([k]) => k !== 'admin').map(([key, label]) => (
+                  <SelectItem key={key} value={key}>{label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <button
+              onClick={handleChangeRole}
+              className="w-full py-2 rounded-lg gradient-gold text-primary-foreground font-medium text-sm"
+            >
+              Save Role
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};
+
+export default SuperAdminDashboard;

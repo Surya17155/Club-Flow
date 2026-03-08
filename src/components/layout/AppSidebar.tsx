@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import {
@@ -10,6 +11,8 @@ import {
   GraduationCap,
   Building2,
   UserCircle,
+  ShieldCheck,
+  FileBarChart,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -27,6 +30,7 @@ import {
 import { NavLink } from '@/components/NavLink';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
 
 const mainItems = [
   { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
@@ -47,6 +51,20 @@ export function AppSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    const check = async () => {
+      const { data } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin');
+      setIsAdmin(!!(data && data.length > 0));
+    };
+    check();
+  }, [user?.id]);
 
   const isActive = (path: string) => location.pathname === path || location.pathname.startsWith(path + '/');
 
@@ -99,6 +117,42 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {isAdmin && (
+          <SidebarGroup>
+            <SidebarGroupLabel className="text-sidebar-foreground/40 uppercase text-[10px] tracking-wider font-semibold">
+              Admin
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={isActive('/super-admin')}
+                    className="text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent data-[active=true]:bg-sidebar-primary data-[active=true]:text-sidebar-primary-foreground"
+                  >
+                    <NavLink to="/super-admin" end activeClassName="">
+                      <ShieldCheck className="w-4 h-4" />
+                      {!collapsed && <span>Super Admin</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={isActive('/global-reports')}
+                    className="text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent data-[active=true]:bg-sidebar-primary data-[active=true]:text-sidebar-primary-foreground"
+                  >
+                    <NavLink to="/global-reports" end activeClassName="">
+                      <FileBarChart className="w-4 h-4" />
+                      {!collapsed && <span>Global Reports</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
 
         <SidebarGroup className="mt-auto">
           <SidebarGroupLabel className="text-sidebar-foreground/40 uppercase text-[10px] tracking-wider font-semibold">
