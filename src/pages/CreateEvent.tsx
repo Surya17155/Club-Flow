@@ -154,7 +154,7 @@ const CreateEvent = () => {
               <label className="block text-sm font-medium text-foreground/90">Event Type</label>
               <button
                 type="button"
-                onClick={() => {setShowTypeDropdown(!showTypeDropdown);setShowCategoryDropdown(false);}}
+                onClick={() => {setShowTypeDropdown(!showTypeDropdown);}}
                 className="glass-input w-full px-4 py-2.5 text-foreground flex justify-between items-center cursor-pointer rounded-lg">
                 
                 <span>{eventType}</span>
