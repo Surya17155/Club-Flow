@@ -1,6 +1,6 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
-import { Search, ChevronDown, Edit3, CheckCircle, Star, MoreHorizontal, Calendar, Users, MapPin } from 'lucide-react';
+import { Search, ChevronDown, Edit3, Star, MoreHorizontal, Calendar, Users, MapPin } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Line, ComposedChart,
 } from 'recharts';
