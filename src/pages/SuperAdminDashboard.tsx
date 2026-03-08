@@ -31,6 +31,11 @@ const SuperAdminDashboard = () => {
   const [roleDialogOpen, setRoleDialogOpen] = useState(false);
   const [selectedRoleMember, setSelectedRoleMember] = useState<any>(null);
   const [newRole, setNewRole] = useState('');
+  const [createClubOpen, setCreateClubOpen] = useState(false);
+  const [newClubName, setNewClubName] = useState('');
+  const [newClubDescription, setNewClubDescription] = useState('');
+  const [creatingClub, setCreatingClub] = useState(false);
+  const { toast } = useToast();
 
   const { totalClubs, globalMembers, totalEvents, clubs, members, upcomingEvents, growthData, loading } = useSuperAdminStats();
 
