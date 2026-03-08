@@ -3,6 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useClub } from '@/contexts/ClubContext';
 import { useProfile } from '@/hooks/useProfile';
 import { usePersonalStats } from '@/hooks/usePersonalStats';
+import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { ChevronDown, Edit3, MoreHorizontal, Calendar, Users, MapPin, Award, CheckCircle } from 'lucide-react';
 
