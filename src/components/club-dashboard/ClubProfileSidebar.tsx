@@ -34,7 +34,7 @@ const ClubProfileSidebar = ({ clubId, clubName, clubAbout, clubLogo }: Props) =>
         .from('club_members')
         .select('user_id, role, profiles(full_name, avatar_url)')
         .eq('club_id', clubId)
-        .in('role', roleOrder);
+        .in('role', roleOrder as unknown as string[]);
       if (data) {
         setPostHolders(
           (data as any[])
