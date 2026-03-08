@@ -87,6 +87,23 @@ const ProfileDropdown = ({ viewMode = 'personal' }: { viewMode?: 'personal' | 'c
               </DropdownMenuItem>
             )}
 
+            {isSuperAdminEmail && (
+              <DropdownMenuItem
+                onSelect={(e) => e.preventDefault()}
+                className="flex items-center justify-between"
+              >
+                <div className="flex items-center">
+                  <Crown className="mr-2 h-4 w-4 text-amber-500" />
+                  <span>Super Admin Mode</span>
+                </div>
+                <Switch
+                  checked={isSuperAdminMode}
+                  onCheckedChange={handleSuperAdminToggle}
+                  className="ml-3 scale-90"
+                />
+              </DropdownMenuItem>
+            )}
+
             <DropdownMenuItem onClick={() => navigate('/settings')}>
               <Settings className="mr-2 h-4 w-4" /> Settings
             </DropdownMenuItem>
