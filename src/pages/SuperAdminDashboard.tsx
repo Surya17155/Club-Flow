@@ -14,6 +14,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import ProfileDropdown from '@/components/dashboard/ProfileDropdown';
+import SuperAdminCalendar from '@/components/dashboard/SuperAdminCalendar';
 import { useToast } from '@/hooks/use-toast';
 
 const roleLabelMap: Record<string, string> = {
