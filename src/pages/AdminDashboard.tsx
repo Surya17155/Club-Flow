@@ -370,23 +370,21 @@ const AdminDashboard = () => {
                   <MoreHorizontal className="w-5 h-5 cursor-pointer text-muted-foreground" />
                 </div>
                 <div className="space-y-4">
-                  {upcomingEvents.map((event, i) =>
-                <div key={i} className="flex items-center gap-4 group cursor-pointer">
+                  {upcomingEvents.length > 0 ? upcomingEvents.map((event) =>
+                <div key={event.id} className="flex items-center gap-4 group cursor-pointer">
                       <div className="rounded-lg shadow-sm w-12 h-12 flex flex-col items-center justify-center border border-border bg-white group-hover:shadow-md transition-shadow">
                         <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">{event.month}</span>
                         <span className="text-lg font-bold leading-none text-foreground">{event.day}</span>
                       </div>
                       <div>
                         <h4 className="text-sm font-bold text-foreground">{event.name}</h4>
-                        <span className="text-xs flex items-center gap-1 text-muted-foreground">
-                          <MapPin className="w-2.5 h-2.5" /> {event.location}
-                        </span>
+                        <span className="text-xs text-muted-foreground">{event.club_name}</span>
                       </div>
                       <div className="ml-auto text-muted-foreground">
-                        <event.icon className="w-4 h-4" />
+                        <Calendar className="w-4 h-4" />
                       </div>
                     </div>
-                )}
+                ) : <p className="text-sm text-muted-foreground italic">No upcoming events</p>}
                 </div>
               </div>
             </div>)
