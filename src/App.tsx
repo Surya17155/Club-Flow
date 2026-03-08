@@ -17,6 +17,8 @@ import MarkAttendance from "./pages/MarkAttendance";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import CreateEvent from "./pages/CreateEvent";
+import SuperAdminDashboard from "./pages/SuperAdminDashboard";
+import GlobalReports from "./pages/GlobalReports";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
