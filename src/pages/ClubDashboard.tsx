@@ -41,8 +41,8 @@ const ClubDashboard = () => {
   const [searchParams] = useSearchParams();
   const { id: routeClubId } = useParams();
 
-  // Use activeClub if available, otherwise fall back to route param for super admins
-  const clubId = activeClub?.club_id || routeClubId;
+  // Prefer explicit route param (used by super admin "View Analytics") over active club context
+  const clubId = routeClubId || activeClub?.club_id;
   const [clubNameOverride, setClubNameOverride] = useState<string | null>(null);
 
   // Fetch club name from route param when super admin isn't a member
@@ -58,15 +58,19 @@ const ClubDashboard = () => {
     searchParams.get('tab') === 'members' ? 'members' : 'overview'
   );
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+  const [isRoleCheckComplete, setIsRoleCheckComplete] = useState(false);
 
   useEffect(() => {
     if (!user) return;
+
+    setIsRoleCheckComplete(false);
     supabase
       .from('user_roles')
       .select('role')
       .eq('user_id', user.id)
       .eq('role', 'admin')
-      .then(({ data }) => setIsSuperAdmin(!!(data && data.length > 0)));
+      .then(({ data }) => setIsSuperAdmin(!!(data && data.length > 0)))
+      .finally(() => setIsRoleCheckComplete(true));
   }, [user?.id]);
 
   // Club details
