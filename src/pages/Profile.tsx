@@ -87,21 +87,21 @@ const Profile = () => {
 
       <div className="max-w-3xl mx-auto grid gap-6">
         {/* Avatar Section */}
-        <div className="glass-card p-8 flex flex-col items-center">
+        <div className="glass-card p-6 flex flex-col items-center max-w-[240px] mx-auto aspect-square justify-center">
           <div className="relative group cursor-pointer" onClick={() => fileRef.current?.click()}>
             {profile?.avatar_url ? (
-              <img src={profile.avatar_url} alt="Avatar" className="w-28 h-28 rounded-full object-cover border-4 border-white shadow-lg" />
+              <img src={profile.avatar_url} alt="Avatar" className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg" />
             ) : (
-              <div className="w-28 h-28 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-3xl font-bold border-4 border-white shadow-lg">
+              <div className="w-24 h-24 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-2xl font-bold border-4 border-white shadow-lg">
                 {initials}
               </div>
             )}
             <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-              <Camera className="w-6 h-6 text-white" />
+              <Camera className="w-5 h-5 text-white" />
             </div>
           </div>
           <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
-          <p className="text-sm text-muted-foreground mt-3">Click to change photo</p>
+          <p className="text-xs text-muted-foreground mt-2">Click to change photo</p>
         </div>
 
         {/* Personal Info */}
