@@ -3,7 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
 import { useUserClubs } from '@/hooks/useUserClubs';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Camera, Github, Linkedin, Twitter, Save, Loader2 } from 'lucide-react';
+import { ArrowLeft, Camera, Linkedin, Instagram, Mail, Save, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
