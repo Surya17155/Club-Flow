@@ -240,24 +240,42 @@ const CreateEvent = () => {
               </div>
             </div>
 
-
-                
-              </div>
-            </div>
-
             {/* End Date */}
             <div className="space-y-1.5">
               <label className="block text-sm font-medium text-foreground/90">
                 End Date <span className="text-muted-foreground text-xs">(optional)</span>
               </label>
-              <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-                <input
-                  type="date"
-                  className="glass-input w-full pl-10 pr-3 py-2.5 text-foreground rounded-lg"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)} />
-                
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    className={cn(
+                      "glass-input w-full flex items-center gap-2 pl-3 pr-3 py-2.5 text-foreground rounded-lg text-left text-sm",
+                      !endDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="w-4 h-4 text-muted-foreground" />
+                    {endDate ? format(parse(endDate, 'yyyy-MM-dd', new Date()), 'PPP') : 'Select end date'}
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent
+                  className="w-auto p-0 border-border/30 rounded-2xl overflow-hidden"
+                  align="start"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.88)',
+                    backdropFilter: 'blur(32px) saturate(1.3)',
+                    WebkitBackdropFilter: 'blur(32px) saturate(1.3)',
+                  }}
+                >
+                  <Calendar
+                    mode="single"
+                    selected={endDate ? parse(endDate, 'yyyy-MM-dd', new Date()) : undefined}
+                    onSelect={(date) => setEndDate(date ? format(date, 'yyyy-MM-dd') : '')}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
               </div>
             </div>
 
