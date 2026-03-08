@@ -373,9 +373,6 @@ const AdminDashboard = () => {
           )}
         </div>
       </main>
-    </div>
-  );
-};
 
       {/* Create Event Modal */}
       {activeClub && (
