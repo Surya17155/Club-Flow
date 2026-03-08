@@ -25,12 +25,24 @@ const roleLabelMap: Record<string, string> = {
 
 const ProfileDropdown = ({ viewMode = 'personal' }: { viewMode?: 'personal' | 'club' }) => {
   const navigate = useNavigate();
-  const { signOut } = useAuth();
+  const location = useLocation();
+  const { user, signOut } = useAuth();
   const { profile } = useProfile();
   const { activeClub, clubs, switchClub } = useClub();
   const { isPresident } = useDelegatedPowers();
   const [showClubs, setShowClubs] = useState(false);
   const [showPowersModal, setShowPowersModal] = useState(false);
+
+  const isSuperAdminEmail = user?.email === SUPER_ADMIN_EMAIL;
+  const isSuperAdminMode = location.pathname === '/super-admin' || location.pathname === '/global-reports';
+
+  const handleSuperAdminToggle = (checked: boolean) => {
+    if (checked) {
+      navigate('/super-admin');
+    } else {
+      navigate('/admin');
+    }
+  };
 
   const fullName = profile?.full_name || 'User';
   const initials = fullName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
