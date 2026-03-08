@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Calendar, Clock, MapPin, Download, ArrowLeft, ChevronDown, QrCode } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, MapPin, Download, ArrowLeft, ChevronDown, QrCode } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -8,6 +8,10 @@ import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
 import { toast } from 'sonner';
 import { QRCodeSVG } from 'qrcode.react';
 import { Navigate, useNavigate } from 'react-router-dom';
+import { format, parse } from 'date-fns';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
 
 const EVENT_TYPES = ['Normal', 'Seminar', 'Workshop', 'Industrial Visit', 'Hackathon', 'Guest Lecture'];
 const CATEGORIES = ['Technical', 'Cultural', 'Sports', 'Academic', 'Social'];
