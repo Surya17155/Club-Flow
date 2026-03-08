@@ -282,12 +282,12 @@ const GlobalReports = () => {
           {/* Bar Chart */}
           <div>
             <h3 className="text-sm font-medium mb-4 text-foreground">Events Conducted per Club</h3>
-            <ResponsiveContainer width="100%" height={160}>
-              <BarChart data={eventsPerClub}>
-                <XAxis dataKey="name" tick={{ fontSize: 10 }} />
-                <YAxis tick={{ fontSize: 10 }} />
-                <Tooltip />
-                <Bar dataKey="events" fill="hsl(var(--primary))" radius={[3, 3, 0, 0]} />
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart data={eventsPerClub} barSize={28} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
+                <XAxis dataKey="name" tick={{ fontSize: 9 }} interval={0} angle={-20} textAnchor="end" height={40} />
+                <YAxis tick={{ fontSize: 10 }} allowDecimals={false} />
+                <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', fontSize: 12 }} />
+                <Bar dataKey="events" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
