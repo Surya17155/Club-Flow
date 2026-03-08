@@ -90,6 +90,37 @@ const SuperAdminDashboard = () => {
     window.location.reload();
   };
 
+  const handleCreateClub = async () => {
+    if (!newClubName.trim()) return;
+    setCreatingClub(true);
+    const { error } = await supabase.from('clubs').insert({
+      name: newClubName.trim(),
+      description: newClubDescription.trim() || null,
+      created_by: user!.id,
+    });
+    setCreatingClub(false);
+    if (error) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    } else {
+      toast({ title: 'Club created', description: `${newClubName} has been added.` });
+      setCreateClubOpen(false);
+      setNewClubName('');
+      setNewClubDescription('');
+      window.location.reload();
+    }
+  };
+
+  const handleDeleteClub = async (clubId: string, clubName: string) => {
+    if (!confirm(`Are you sure you want to delete "${clubName}"? This will remove all members, events, and data associated with this club.`)) return;
+    const { error } = await supabase.from('clubs').delete().eq('id', clubId);
+    if (error) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    } else {
+      toast({ title: 'Club deleted', description: `${clubName} has been removed.` });
+      window.location.reload();
+    }
+  };
+
   const filteredClubs = clubs.filter((c) => c.name.toLowerCase().includes(searchQuery.toLowerCase()));
   const filteredMembers = members.filter((m) =>
   m.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
