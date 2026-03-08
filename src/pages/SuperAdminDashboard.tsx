@@ -36,6 +36,9 @@ const SuperAdminDashboard = () => {
   const [newClubName, setNewClubName] = useState('');
   const [newClubDescription, setNewClubDescription] = useState('');
   const [creatingClub, setCreatingClub] = useState(false);
+  const [presidentForm, setPresidentForm] = useState({
+    fullName: '', email: '', programme: '', section: '', year: '', rollNo: '', phone: '',
+  });
   const { toast } = useToast();
 
   const { totalClubs, globalMembers, totalEvents, clubs, members, upcomingEvents, growthData, loading } = useSuperAdminStats();
