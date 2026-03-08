@@ -1,6 +1,6 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
-import { Search, ChevronDown, Edit3, CheckCircle, Star, MoreHorizontal, Calendar, Users, MapPin } from 'lucide-react';
+import { Search, ChevronDown, Edit3, Star, MoreHorizontal, Calendar, Users, MapPin } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Line, ComposedChart,
 } from 'recharts';
@@ -14,11 +14,6 @@ const chartData = [
   { name: 'Event 10', attendance: 50, engagement: 60 },
 ];
 
-const tasks = [
-  { name: 'Instagram Poster', progress: 80, active: true },
-  { name: 'Event Budgeting', progress: 60, active: false },
-  { name: 'Vendor Coordination', progress: 40, active: false },
-];
 
 const upcomingEvents = [
   { name: 'Coding Workshop', month: 'OCT', day: '28', location: 'Hall A', icon: Calendar },
@@ -78,9 +73,6 @@ const AdminDashboard = () => {
         <div className="flex items-center gap-4">
           <button className="text-white text-sm font-medium px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-transform active:scale-95" style={{ background: 'linear-gradient(to right, #f6b87a, #e89e68)' }}>
             <Edit3 className="w-4 h-4" /> Create Event
-          </button>
-          <button className="glass-input px-5 py-2.5 rounded-full text-sm font-medium flex items-center gap-2 border border-white hover:bg-white/60 transition-colors" style={{ color: '#4b5563' }}>
-            <CheckCircle className="w-4 h-4" /> Task Management
           </button>
           <div className="glass-input pl-1 pr-4 py-1 rounded-full flex items-center gap-3 cursor-pointer hover:bg-white/60 transition-colors">
             <div className="w-8 h-8 rounded-full bg-amber flex items-center justify-center text-white text-xs font-bold">
@@ -268,39 +260,6 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          {/* Task Progress */}
-          <div className="glass-card p-6 flex-grow">
-            <h3 className="font-bold text-lg mb-4" style={{ color: '#1f2937' }}>Task Progress</h3>
-            <div className="space-y-6">
-              {tasks.map((task, i) => (
-                <div key={i}>
-                  <div className="flex justify-between items-end mb-2">
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="w-3 h-3 rounded-full"
-                        style={task.active
-                          ? { backgroundColor: '#e09f6e' }
-                          : { border: '1px solid #9ca3af' }
-                        }
-                      />
-                      <h4 className="text-sm font-semibold" style={{ color: '#1f2937' }}>{task.name}</h4>
-                    </div>
-                    <span className="text-xs font-bold" style={{ color: '#6b7280' }}>{task.progress}%</span>
-                  </div>
-                  <div className="h-2 w-full rounded-full overflow-hidden" style={{ backgroundColor: 'rgba(229,231,235,0.5)' }}>
-                    <div
-                      className="h-full rounded-full"
-                      style={{
-                        width: `${task.progress}%`,
-                        backgroundColor: '#e09f6e',
-                        opacity: task.active ? 1 : 0.7,
-                      }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </main>
     </div>
