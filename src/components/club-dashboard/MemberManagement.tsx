@@ -273,10 +273,8 @@ const MemberManagement = ({ clubId }: Props) => {
                 <Input type="email" placeholder="student@iilm.edu" value={addForm.email} onChange={e => updateAddForm('email', e.target.value)} className="bg-white/30" />
               </div>
 
-              <div className="space-y-1.5 sm:col-span-2">
-                <Label>Password *</Label>
-                <Input type="password" placeholder="Min 6 characters (they can change later)" value={addForm.password} onChange={e => updateAddForm('password', e.target.value)} className="bg-white/30" />
-              </div>
+
+
 
               <div className="space-y-1.5">
                 <Label>Roll No. / Admission No.</Label>
