@@ -25,7 +25,7 @@ const CreateEvent = () => {
 
   const [eventName, setEventName] = useState('');
   const [eventType, setEventType] = useState('Normal');
-  const [category, setCategory] = useState('Technical');
+  
   const [eventDate, setEventDate] = useState('');
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
