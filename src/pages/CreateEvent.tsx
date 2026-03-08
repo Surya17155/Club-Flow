@@ -82,7 +82,7 @@ const CreateEvent = () => {
       const { error } = await supabase.from('events').insert({
         name: eventName.trim(),
         event_type: eventType.toLowerCase().replace(/\s+/g, '_'),
-        category: category.toLowerCase(),
+        
         event_date: dateTime,
         end_date: endDateTime,
         club_id: activeClub.club_id,
