@@ -12,7 +12,7 @@ interface ProfileCardProps {
   programme?: string;
   semester?: string;
   year?: string;
-  socialLinks?: { github?: string; linkedin?: string; twitter?: string };
+  socialLinks?: {github?: string;linkedin?: string;twitter?: string;};
   badges?: string[];
 }
 
@@ -26,9 +26,9 @@ export function ProfileCard({
   year,
   socialLinks,
   badges,
-  className,
+  className
 }: ProfileCardProps) {
-  const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  const initials = name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2);
 
   return (
     <Card className={`p-5 shadow-card border-border/50 ${className || ''}`}>
@@ -42,64 +42,64 @@ export function ProfileCard({
           {role}
         </Badge>
 
-        {badges && badges.length > 0 && (
-          <div className="flex flex-wrap gap-1 mt-2 justify-center">
-            {badges.map((badge, i) => (
-              <Badge key={i} variant="outline" className="text-xs">{badge}</Badge>
-            ))}
+        {badges && badges.length > 0 &&
+        <div className="flex flex-wrap gap-1 mt-2 justify-center">
+            {badges.map((badge, i) =>
+          <Badge key={i} variant="outline" className="text-xs">{badge}</Badge>
+          )}
           </div>
-        )}
+        }
 
-        {about && (
-          <div className="mt-4 w-full text-left">
+        {about &&
+        <div className="mt-4 w-full text-left">
             <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">About</h4>
             <p className="text-sm text-foreground/80 leading-relaxed">{about}</p>
           </div>
-        )}
+        }
 
-        {(programme || year || semester) && (
-          <div className="mt-4 w-full text-left space-y-1">
-            {year && (
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Class:</span>
+        {(programme || year || semester) &&
+        <div className="mt-4 w-full text-left space-y-1">
+            {year &&
+          <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">​Year</span>
                 <span className="font-medium">{year}</span>
               </div>
-            )}
-            {programme && (
-              <div className="flex justify-between text-sm">
+          }
+            {programme &&
+          <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Program:</span>
                 <span className="font-medium">{programme}</span>
               </div>
-            )}
-            {semester && (
-              <div className="flex justify-between text-sm">
+          }
+            {semester &&
+          <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Semester:</span>
                 <span className="font-medium">{semester}</span>
               </div>
-            )}
+          }
           </div>
-        )}
+        }
 
-        {socialLinks && (
-          <div className="flex gap-3 mt-4">
-            {socialLinks.github && (
-              <a href={socialLinks.github} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+        {socialLinks &&
+        <div className="flex gap-3 mt-4">
+            {socialLinks.github &&
+          <a href={socialLinks.github} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
                 <Github className="w-4 h-4" />
               </a>
-            )}
-            {socialLinks.linkedin && (
-              <a href={socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+          }
+            {socialLinks.linkedin &&
+          <a href={socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
                 <Linkedin className="w-4 h-4" />
               </a>
-            )}
-            {socialLinks.twitter && (
-              <a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+          }
+            {socialLinks.twitter &&
+          <a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
                 <Twitter className="w-4 h-4" />
               </a>
-            )}
+          }
           </div>
-        )}
+        }
       </div>
-    </Card>
-  );
+    </Card>);
+
 }
