@@ -107,10 +107,10 @@ const AdminDashboard = () => {
   { label: 'Attendance Rate:', value: `${personalStats.attendanceRate}%`, path: 'M0,28 L30,20 L60,10 L100,2' }] :
 
   [
-  { label: 'Total Members:', value: '156', path: 'M0,25 C30,25 30,10 50,10 S70,20 100,5' },
-  { label: 'Total Events:', value: '24', path: 'M0,25 C20,28 40,5 60,15 S80,5 100,10' },
-  { label: 'Avg. Attendance Rate:', value: '78%', path: 'M0,20 C30,20 40,25 60,10 S90,5 100,5' },
-  { label: 'Overall Growth %:', value: '+5%', isGrowth: true, path: 'M0,28 L30,20 L60,10 L100,2' }];
+  { label: 'Total Members:', value: String(clubStats.totalMembers), path: 'M0,25 C30,25 30,10 50,10 S70,20 100,5' },
+  { label: 'Total Events:', value: String(clubStats.totalEvents), path: 'M0,25 C20,28 40,5 60,15 S80,5 100,10' },
+  { label: 'Avg. Attendance Rate:', value: `${clubStats.avgAttendanceRate}%`, path: 'M0,20 C30,20 40,25 60,10 S90,5 100,5' },
+  { label: 'Events with Data:', value: String(clubStats.chartData.length), path: 'M0,28 L30,20 L60,10 L100,2' }];
 
 
   return (
