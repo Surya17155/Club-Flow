@@ -4,6 +4,7 @@ import { Switch } from '@/components/ui/switch';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useClub } from '@/contexts/ClubContext';
+import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
 import { toast } from 'sonner';
 import { QRCodeSVG } from 'qrcode.react';
 import { Navigate, useNavigate } from 'react-router-dom';
