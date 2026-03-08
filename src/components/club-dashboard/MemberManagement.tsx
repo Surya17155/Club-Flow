@@ -141,7 +141,7 @@ const MemberManagement = ({ clubId }: Props) => {
       if (response.error || response.data?.error) {
         toast.error(response.data?.error || 'Failed to create member');
       } else {
-        toast.success(`${addForm.fullName} added successfully! They can now log in with their email and password.`);
+        toast.success(`${addForm.fullName} added! They can use "Forgot Password" on the login page to set their password and log in.`);
         resetAddForm();
         setAddDialogOpen(false);
         await fetchMembers();
