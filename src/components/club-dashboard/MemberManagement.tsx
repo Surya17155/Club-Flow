@@ -324,9 +324,9 @@ const MemberManagement = ({ clubId }: Props) => {
               </div>
             </div>
 
-            <Button onClick={handleAddMember} disabled={adding || !addForm.email.trim() || !addForm.fullName.trim() || !addForm.password.trim()} className="w-full rounded-full">
+            <Button onClick={handleAddMember} disabled={adding || !addForm.email.trim() || !addForm.fullName.trim()} className="w-full rounded-full">
               {adding ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <UserPlus className="w-4 h-4 mr-2" />}
-              Create Account & Add Member
+              Add Member
             </Button>
           </div>
         </DialogContent>
