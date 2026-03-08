@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Calendar, Clock, MapPin, Download, ArrowLeft, ChevronDown, QrCode } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, MapPin, Download, ArrowLeft, ChevronDown, QrCode } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -8,6 +8,10 @@ import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
 import { toast } from 'sonner';
 import { QRCodeSVG } from 'qrcode.react';
 import { Navigate, useNavigate } from 'react-router-dom';
+import { format, parse } from 'date-fns';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
 
 const EVENT_TYPES = ['Normal', 'Seminar', 'Workshop', 'Industrial Visit', 'Hackathon', 'Guest Lecture'];
 const CATEGORIES = ['Technical', 'Cultural', 'Sports', 'Academic', 'Social'];
@@ -200,27 +204,39 @@ const CreateEvent = () => {
             </div>
 
             {/* Date & Time */}
-            <div className="space-y-1.5">
+             <div className="space-y-1.5">
               <label className="block text-sm font-medium text-foreground/90">Start Date & Time</label>
               <div className="flex gap-3">
-                <div className="relative flex-grow">
-                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-                  <input
-                    type="date"
-                    className="glass-input w-full pl-10 pr-3 py-2.5 text-foreground rounded-lg"
-                    value={eventDate}
-                    onChange={(e) => setEventDate(e.target.value)} />
-                  
-                </div>
-                
-
-
-
-
-
-
-
-                
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      className={cn(
+                        "glass-input flex-grow flex items-center gap-2 pl-3 pr-3 py-2.5 text-foreground rounded-lg text-left text-sm",
+                        !eventDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="w-4 h-4 text-muted-foreground" />
+                      {eventDate ? format(parse(eventDate, 'yyyy-MM-dd', new Date()), 'PPP') : 'Select date'}
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    className="w-auto p-0 border-border/30 rounded-2xl overflow-hidden"
+                    align="start"
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.88)',
+                      backdropFilter: 'blur(32px) saturate(1.3)',
+                      WebkitBackdropFilter: 'blur(32px) saturate(1.3)',
+                    }}
+                  >
+                    <Calendar
+                      mode="single"
+                      selected={eventDate ? parse(eventDate, 'yyyy-MM-dd', new Date()) : undefined}
+                      onSelect={(date) => setEventDate(date ? format(date, 'yyyy-MM-dd') : '')}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
             </div>
 
@@ -229,15 +245,36 @@ const CreateEvent = () => {
               <label className="block text-sm font-medium text-foreground/90">
                 End Date <span className="text-muted-foreground text-xs">(optional)</span>
               </label>
-              <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-                <input
-                  type="date"
-                  className="glass-input w-full pl-10 pr-3 py-2.5 text-foreground rounded-lg"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)} />
-                
-              </div>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    className={cn(
+                      "glass-input w-full flex items-center gap-2 pl-3 pr-3 py-2.5 text-foreground rounded-lg text-left text-sm",
+                      !endDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="w-4 h-4 text-muted-foreground" />
+                    {endDate ? format(parse(endDate, 'yyyy-MM-dd', new Date()), 'PPP') : 'Select end date'}
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent
+                  className="w-auto p-0 border-border/30 rounded-2xl overflow-hidden"
+                  align="start"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.88)',
+                    backdropFilter: 'blur(32px) saturate(1.3)',
+                    WebkitBackdropFilter: 'blur(32px) saturate(1.3)',
+                  }}
+                >
+                  <Calendar
+                    mode="single"
+                    selected={endDate ? parse(endDate, 'yyyy-MM-dd', new Date()) : undefined}
+                    onSelect={(date) => setEndDate(date ? format(date, 'yyyy-MM-dd') : '')}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
 
             {/* Location */}
@@ -408,7 +445,7 @@ const CreateEvent = () => {
             {publishing ?
             <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" /> :
 
-            <Calendar className="w-5 h-5" />
+            <CalendarIcon className="w-5 h-5" />
             }
             {publishing ? 'Publishing...' : 'Publish Event'}
           </button>
