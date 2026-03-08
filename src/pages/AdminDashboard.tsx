@@ -257,7 +257,7 @@ const AdminDashboard = () => {
               </div>
               <div className="glass-card p-6">
                 <div className="flex justify-between items-center mb-6">
-                  <h3 className="font-bold text-lg text-foreground">My Memberships</h3>
+                  <h3 className="font-bold text-lg text-foreground">My Clubs</h3>
                   <MoreHorizontal className="w-5 h-5 cursor-pointer text-muted-foreground" />
                 </div>
                 <div className="space-y-4">
@@ -271,7 +271,7 @@ const AdminDashboard = () => {
                     }
                       </div>
                       <div>
-                        
+                        <h4 className="text-sm font-bold text-foreground">{club.club_name}</h4>
                         <span className="text-xs text-muted-foreground">
                           {roleLabelMap[club.role] ?? club.role}
                         </span>
