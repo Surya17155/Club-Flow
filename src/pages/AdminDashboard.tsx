@@ -190,25 +190,18 @@ const AdminDashboard = () => {
             {/* About section */}
             <div className="w-full text-left rounded-xl p-4 mb-6 bg-white/30">
               <h4 className="font-bold mb-3 text-foreground">About</h4>
-              {about && <p className="text-sm text-muted-foreground mb-3">{about}</p>}
               <div className="space-y-2 text-sm">
-                {year &&
-                <div className="flex justify-between">
-                    <span className="text-muted-foreground">Year:</span>
-                    <span className="font-medium text-foreground">{year}</span>
-                  </div>
-                }
                 {programme &&
                 <div className="flex justify-between">
                     <span className="text-muted-foreground">Program:</span>
                     <span className="font-medium text-foreground">{programme}</span>
                   </div>
                 }
-                {isPersonal && semester
-
-
-
-
+                {year &&
+                <div className="flex justify-between">
+                    <span className="text-muted-foreground">Year:</span>
+                    <span className="font-medium text-foreground">{year}</span>
+                  </div>
                 }
               </div>
             </div>
