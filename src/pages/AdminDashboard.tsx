@@ -5,8 +5,10 @@ import { useProfile } from '@/hooks/useProfile';
 import { usePersonalStats } from '@/hooks/usePersonalStats';
 import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { ChevronDown, Edit3, MoreHorizontal, Calendar, Users, MapPin, Award, CheckCircle } from 'lucide-react';
+import { ChevronDown, Edit3, MoreHorizontal, Calendar, Users, MapPin, Award, CheckCircle, Clock, Tag, Shield } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
 
 const greetings = ['Hello', 'Hi', 'Hey', 'Yo', 'Welcome', "What's up", 'Howdy', 'Namaste'];
 const getRandomGreeting = () => greetings[Math.floor(Math.random() * greetings.length)];
@@ -45,14 +47,16 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const greeting = useMemo(() => getRandomGreeting(), []);
 
-  const [upcomingEvents, setUpcomingEvents] = useState<{ id: string; name: string; month: string; day: string; location: string; club_name: string }[]>([]);
+  const [upcomingEvents, setUpcomingEvents] = useState<any[]>([]);
+  const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
+  const [eventDialogOpen, setEventDialogOpen] = useState(false);
 
   useEffect(() => {
     const fetchUpcoming = async () => {
       const now = new Date().toISOString();
       const { data } = await supabase
         .from('events')
-        .select('id, name, event_date, description, clubs(name)')
+        .select('id, name, event_date, end_date, description, event_type, category, access_type, clubs(name)')
         .gte('event_date', now)
         .order('event_date', { ascending: true })
         .limit(10);
@@ -60,12 +64,12 @@ const AdminDashboard = () => {
         setUpcomingEvents(data.map((e: any) => {
           const d = new Date(e.event_date);
           return {
-            id: e.id,
-            name: e.name,
+            ...e,
             month: d.toLocaleString('default', { month: 'short' }).toUpperCase(),
             day: String(d.getDate()),
-            location: e.description || '',
             club_name: e.clubs?.name || '',
+            full_date: d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+            time: d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
           };
         }));
       }
@@ -371,7 +375,7 @@ const AdminDashboard = () => {
                 </div>
                 <div className="space-y-4">
                   {upcomingEvents.length > 0 ? upcomingEvents.map((event) =>
-                <div key={event.id} className="flex items-center gap-4 group cursor-pointer">
+                <div key={event.id} className="flex items-center gap-4 group cursor-pointer" onClick={() => { setSelectedEvent(event); setEventDialogOpen(true); }}>
                       <div className="rounded-lg shadow-sm w-12 h-12 flex flex-col items-center justify-center border border-border bg-white group-hover:shadow-md transition-shadow">
                         <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">{event.month}</span>
                         <span className="text-lg font-bold leading-none text-foreground">{event.day}</span>
@@ -392,6 +396,51 @@ const AdminDashboard = () => {
         </div>
       </main>
 
+      {/* Event Detail Dialog */}
+      <Dialog open={eventDialogOpen} onOpenChange={setEventDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold">{selectedEvent?.name}</DialogTitle>
+          </DialogHeader>
+          {selectedEvent && (
+            <div className="space-y-4 pt-2">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Calendar className="w-4 h-4 text-primary" />
+                <span>{selectedEvent.full_date}</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Clock className="w-4 h-4 text-primary" />
+                <span>{selectedEvent.time}</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Users className="w-4 h-4 text-primary" />
+                <span>{selectedEvent.club_name}</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {selectedEvent.event_type && (
+                  <Badge variant="secondary" className="text-xs">
+                    <Tag className="w-3 h-3 mr-1" />{selectedEvent.event_type}
+                  </Badge>
+                )}
+                {selectedEvent.category && (
+                  <Badge variant="outline" className="text-xs">{selectedEvent.category}</Badge>
+                )}
+                {selectedEvent.access_type && (
+                  <Badge variant="outline" className="text-xs">
+                    <Shield className="w-3 h-3 mr-1" />{selectedEvent.access_type}
+                  </Badge>
+                )}
+              </div>
+              {selectedEvent.description && (
+                <div>
+                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Description</h4>
+                  <p className="text-sm text-foreground/80 leading-relaxed">{selectedEvent.description}</p>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>);
 
 };
