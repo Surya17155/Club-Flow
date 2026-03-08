@@ -46,6 +46,17 @@ const ClubDashboard = () => {
   const [activeTab, setActiveTab] = useState<'overview' | 'members'>(
     searchParams.get('tab') === 'members' ? 'members' : 'overview'
   );
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id)
+      .eq('role', 'admin')
+      .then(({ data }) => setIsSuperAdmin(!!(data && data.length > 0)));
+  }, [user?.id]);
 
   // Club details
   const [clubDetails, setClubDetails] = useState<{ about: string | null; logo_url: string | null }>({ about: null, logo_url: null });
