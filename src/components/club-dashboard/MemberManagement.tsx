@@ -141,7 +141,14 @@ const MemberManagement = ({ clubId }: Props) => {
       if (response.error || response.data?.error) {
         toast.error(response.data?.error || 'Failed to create member');
       } else {
-        toast.success(`${addForm.fullName} added! They can use "Forgot Password" on the login page to set their password and log in.`);
+        const action = response.data?.action;
+        if (action === 'added_existing') {
+          toast.success(`${addForm.fullName} already had an account and has been added to this club.`);
+        } else if (action === 'role_updated') {
+          toast.success(`${addForm.fullName} was already in this club — their role has been updated.`);
+        } else {
+          toast.success(`${addForm.fullName} added! They can use "Forgot Password" on the login page to set their password and log in.`);
+        }
         resetAddForm();
         setAddDialogOpen(false);
         await fetchMembers();
