@@ -39,8 +39,19 @@ const ClubDashboard = () => {
   const { hasPower, isPresident } = useDelegatedPowers();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { id: routeClubId } = useParams();
 
-  const clubId = activeClub?.club_id;
+  // Use activeClub if available, otherwise fall back to route param for super admins
+  const clubId = activeClub?.club_id || routeClubId;
+  const [clubNameOverride, setClubNameOverride] = useState<string | null>(null);
+
+  // Fetch club name from route param when super admin isn't a member
+  useEffect(() => {
+    if (activeClub?.club_name || !routeClubId) return;
+    supabase.from('clubs').select('name').eq('id', routeClubId).maybeSingle().then(({ data }) => {
+      if (data) setClubNameOverride(data.name);
+    });
+  }, [routeClubId, activeClub?.club_name]);
   const { stats: clubStats } = useClubStats(clubId);
   const [manageEventsOpen, setManageEventsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'overview' | 'members'>(
