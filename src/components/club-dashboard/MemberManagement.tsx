@@ -71,7 +71,7 @@ const MemberManagement = ({ clubId }: Props) => {
 
   // Add member form state
   const [addForm, setAddForm] = useState({
-    fullName: '', email: '', password: '', programme: '', section: '', year: '', rollNo: '', phone: '', role: 'member',
+    fullName: '', email: '', programme: '', section: '', year: '', rollNo: '', phone: '', role: 'member',
   });
 
   const updateAddForm = (field: string, value: string) => {
@@ -79,7 +79,7 @@ const MemberManagement = ({ clubId }: Props) => {
   };
 
   const resetAddForm = () => {
-    setAddForm({ fullName: '', email: '', password: '', programme: '', section: '', year: '', rollNo: '', phone: '', role: 'member' });
+    setAddForm({ fullName: '', email: '', programme: '', section: '', year: '', rollNo: '', phone: '', role: 'member' });
   };
 
   const fetchMembers = async () => {
@@ -115,13 +115,8 @@ const MemberManagement = ({ clubId }: Props) => {
   useEffect(() => { fetchMembers(); }, [clubId]);
 
   const handleAddMember = async () => {
-    if (!addForm.email.trim() || !addForm.fullName.trim() || !addForm.password.trim()) {
-      toast.error('Please fill in name, email, and password');
-      return;
-    }
-
-    if (addForm.password.length < 6) {
-      toast.error('Password must be at least 6 characters');
+    if (!addForm.email.trim() || !addForm.fullName.trim()) {
+      toast.error('Please fill in name and email');
       return;
     }
 
@@ -132,7 +127,6 @@ const MemberManagement = ({ clubId }: Props) => {
       const response = await supabase.functions.invoke('create-member', {
         body: {
           email: addForm.email.trim(),
-          password: addForm.password,
           full_name: addForm.fullName.trim(),
           programme: addForm.programme,
           section: addForm.section,
@@ -147,7 +141,7 @@ const MemberManagement = ({ clubId }: Props) => {
       if (response.error || response.data?.error) {
         toast.error(response.data?.error || 'Failed to create member');
       } else {
-        toast.success(`${addForm.fullName} added successfully! They can now log in with their email and password.`);
+        toast.success(`${addForm.fullName} added! They can use "Forgot Password" on the login page to set their password and log in.`);
         resetAddForm();
         setAddDialogOpen(false);
         await fetchMembers();
@@ -279,10 +273,8 @@ const MemberManagement = ({ clubId }: Props) => {
                 <Input type="email" placeholder="student@iilm.edu" value={addForm.email} onChange={e => updateAddForm('email', e.target.value)} className="bg-white/30" />
               </div>
 
-              <div className="space-y-1.5 sm:col-span-2">
-                <Label>Password *</Label>
-                <Input type="password" placeholder="Min 6 characters (they can change later)" value={addForm.password} onChange={e => updateAddForm('password', e.target.value)} className="bg-white/30" />
-              </div>
+
+
 
               <div className="space-y-1.5">
                 <Label>Roll No. / Admission No.</Label>
@@ -332,9 +324,9 @@ const MemberManagement = ({ clubId }: Props) => {
               </div>
             </div>
 
-            <Button onClick={handleAddMember} disabled={adding || !addForm.email.trim() || !addForm.fullName.trim() || !addForm.password.trim()} className="w-full rounded-full">
+            <Button onClick={handleAddMember} disabled={adding || !addForm.email.trim() || !addForm.fullName.trim()} className="w-full rounded-full">
               {adding ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <UserPlus className="w-4 h-4 mr-2" />}
-              Create Account & Add Member
+              Add Member
             </Button>
           </div>
         </DialogContent>
