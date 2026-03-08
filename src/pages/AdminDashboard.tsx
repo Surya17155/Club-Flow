@@ -1,9 +1,17 @@
 import { useAuth } from '@/contexts/AuthContext';
+import { useClub } from '@/contexts/ClubContext';
+import { useProfile } from '@/hooks/useProfile';
 import { Navigate } from 'react-router-dom';
 import { Search, ChevronDown, Edit3, MoreHorizontal, Calendar, Users, MapPin } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Line, ComposedChart,
 } from 'recharts';
+import ProfileDropdown from '@/components/dashboard/ProfileDropdown';
+
+const roleLabelMap: Record<string, string> = {
+  admin: 'Admin', president: 'President', vice_president: 'Vice President',
+  secretary: 'Secretary', social_media_head: 'Social Media Head', member: 'Member',
+};
 
 const chartData = [
   { name: 'Event 1', attendance: 45, engagement: 40 },
@@ -14,7 +22,6 @@ const chartData = [
   { name: 'Event 10', attendance: 50, engagement: 60 },
 ];
 
-
 const upcomingEvents = [
   { name: 'Coding Workshop', month: 'OCT', day: '28', location: 'Hall A', icon: Calendar },
   { name: 'Hackathon', month: 'NOV', day: '5', location: 'Main Lab', icon: Calendar },
@@ -23,6 +30,8 @@ const upcomingEvents = [
 
 const AdminDashboard = () => {
   const { user, loading } = useAuth();
+  const { profile } = useProfile();
+  const { activeClub } = useClub();
 
   if (loading) {
     return (
@@ -36,58 +45,49 @@ const AdminDashboard = () => {
     return <Navigate to="/" replace />;
   }
 
-  const fullName = user?.user_metadata?.full_name || 'Admin User';
-  const programme = user?.user_metadata?.programme || 'B.Tech (CS)';
-  const semester = user?.user_metadata?.semester || '6';
-  const year = user?.user_metadata?.year || '2025';
+  const fullName = profile?.full_name || user?.user_metadata?.full_name || 'Admin User';
+  const programme = profile?.programme || user?.user_metadata?.programme || 'B.Tech (CS)';
+  const semester = profile?.semester || user?.user_metadata?.semester || '6';
+  const year = profile?.year || user?.user_metadata?.year || '2025';
+  const about = profile?.about || '';
+  const initials = fullName.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase();
+
+  const clubName = activeClub?.club_name || 'TechNova Club';
+  const roleLabel = activeClub ? (roleLabelMap[activeClub.role] ?? activeClub.role) : 'President';
 
   return (
-    <div className="min-h-screen relative antialiased p-6 md:p-8 dashboard-corner-gradient" style={{ color: '#4a4a4a' }}>
+    <div className="min-h-screen relative antialiased p-6 md:p-8 dashboard-corner-gradient text-foreground">
       {/* Background blobs */}
       <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
-        {/* Top-left warm yellow */}
         <div className="absolute top-[-8%] left-[-8%] w-[550px] h-[550px] rounded-full mix-blend-multiply filter blur-[100px] opacity-80 animate-blob" style={{ backgroundColor: 'hsl(45 90% 85% / 0.9)' }} />
-        {/* Top-right peach */}
         <div className="absolute top-[-5%] right-[-5%] w-[450px] h-[450px] rounded-full mix-blend-multiply filter blur-[90px] opacity-70 animate-blob animation-delay-2000" style={{ backgroundColor: 'hsl(25 80% 82% / 0.8)' }} />
-        {/* Bottom-left soft amber */}
         <div className="absolute bottom-[-8%] left-[-5%] w-[500px] h-[500px] rounded-full mix-blend-multiply filter blur-[100px] opacity-60 animate-blob animation-delay-4000" style={{ backgroundColor: 'hsl(35 75% 78% / 0.6)' }} />
-        {/* Bottom-right deep orange */}
         <div className="absolute bottom-[-10%] right-[-5%] w-[600px] h-[600px] rounded-full mix-blend-multiply filter blur-[100px] opacity-70 animate-blob" style={{ backgroundColor: 'hsl(28 70% 70% / 0.45)', animationDelay: '3s' }} />
-        {/* Center subtle glow */}
         <div className="absolute top-[40%] left-[30%] w-[300px] h-[300px] rounded-full filter blur-[120px] opacity-30" style={{ backgroundColor: 'hsl(40 80% 88%)' }} />
       </div>
 
       {/* Header */}
       <header className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-        {/* Search */}
         <div className="relative w-full md:w-64">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: '#9ca3af' }} />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
             type="text"
             placeholder="Search..."
-            className="glass-input w-full py-2.5 pl-10 pr-4 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-amber/50 placeholder-gray-400"
+            className="glass-input w-full py-2.5 pl-10 pr-4 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 placeholder:text-muted-foreground"
             style={{ backgroundColor: 'rgba(255,255,255,0.8)' }}
           />
         </div>
 
-        {/* Toggle */}
-        <div className="inline-flex items-center rounded-[20px] p-1" style={{ backgroundColor: '#eee' }}>
-          <span className="px-3 py-1.5 text-sm" style={{ color: '#888' }}>Personal</span>
-          <span className="px-4 py-1.5 rounded-2xl text-sm font-semibold shadow-sm" style={{ backgroundColor: 'white', color: '#e67e22' }}>Club</span>
+        <div className="inline-flex items-center rounded-[20px] p-1 bg-muted">
+          <span className="px-3 py-1.5 text-sm text-muted-foreground">Personal</span>
+          <span className="px-4 py-1.5 rounded-2xl text-sm font-semibold shadow-sm bg-white text-primary">Club</span>
         </div>
 
-        {/* Actions & Profile */}
         <div className="flex items-center gap-4">
-          <button className="text-white text-sm font-medium px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-transform active:scale-95" style={{ background: 'linear-gradient(to right, #f6b87a, #e89e68)' }}>
+          <button className="text-primary-foreground text-sm font-medium px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-transform active:scale-95 gradient-gold">
             <Edit3 className="w-4 h-4" /> Create Event
           </button>
-          <div className="glass-input pl-1 pr-4 py-1 rounded-full flex items-center gap-3 cursor-pointer hover:bg-white/60 transition-colors">
-            <div className="w-8 h-8 rounded-full bg-amber flex items-center justify-center text-white text-xs font-bold">
-              {fullName.split(' ').map(n => n[0]).join('').slice(0, 2)}
-            </div>
-            <span className="text-sm font-medium" style={{ color: '#374151' }}>{fullName}</span>
-            <ChevronDown className="w-3 h-3" style={{ color: '#6b7280' }} />
-          </div>
+          <ProfileDropdown />
         </div>
       </header>
 
@@ -101,17 +101,17 @@ const AdminDashboard = () => {
         ].map((stat, i) => (
           <div key={i} className="glass-card p-6 flex flex-col justify-between h-32 relative overflow-hidden group hover:bg-white/50 transition-colors">
             <div>
-              <p className="text-sm mb-1" style={{ color: '#6b7280' }}>{stat.label}</p>
+              <p className="text-sm mb-1 text-muted-foreground">{stat.label}</p>
               <div className="flex items-center gap-2">
-                <h3 className="text-3xl font-bold" style={{ color: '#1f2937' }}>{stat.value}</h3>
+                <h3 className="text-3xl font-bold text-foreground">{stat.value}</h3>
                 {stat.isGrowth && (
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="#22c55e" strokeWidth={3}>
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="hsl(var(--success))" strokeWidth={3}>
                     <path d="M5 15l7-7 7 7" />
                   </svg>
                 )}
               </div>
             </div>
-            <svg className="absolute bottom-4 right-4 w-24 h-12" style={{ color: '#e09f6e' }} fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 100 30">
+            <svg className="absolute bottom-4 right-4 w-24 h-12 text-primary/50" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 100 30">
               <path d={stat.path} strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
@@ -123,69 +123,82 @@ const AdminDashboard = () => {
         {/* LEFT: Profile */}
         <div className="lg:col-span-3 h-full">
           <div className="glass-card p-6 h-full flex flex-col items-center text-center">
-            {/* Avatar */}
             <div className="relative mb-4">
               <div className="absolute inset-0 rounded-full blur-xl transform scale-110" style={{ backgroundColor: 'hsl(30 70% 80% / 0.5)' }} />
-              <div className="w-[120px] h-[120px] rounded-full border-4 border-white shadow-lg relative z-10 flex items-center justify-center text-3xl font-bold" style={{ backgroundColor: 'hsl(var(--amber))', color: 'white' }}>
-                {fullName.split(' ').map(n => n[0]).join('').slice(0, 2)}
-              </div>
+              {profile?.avatar_url ? (
+                <img src={profile.avatar_url} alt={fullName} className="w-[120px] h-[120px] rounded-full border-4 border-white shadow-lg relative z-10 object-cover" />
+              ) : (
+                <div className="w-[120px] h-[120px] rounded-full border-4 border-white shadow-lg relative z-10 flex items-center justify-center text-3xl font-bold bg-primary text-primary-foreground">
+                  {initials}
+                </div>
+              )}
             </div>
-            <h2 className="text-xl font-bold" style={{ color: '#1f2937' }}>{fullName}</h2>
-            <span className="mt-1.5 mb-1 inline-block px-3 py-0.5 rounded-full text-xs font-semibold" style={{ backgroundColor: 'hsl(270 60% 95%)', color: 'hsl(270 60% 45%)' }}>President</span>
-            <p className="text-sm font-medium mb-6" style={{ color: '#4b5563' }}>TechNova Club</p>
+            <h2 className="text-xl font-bold text-foreground">{fullName}</h2>
+            <span className="mt-1.5 mb-1 inline-block px-3 py-0.5 rounded-full text-xs font-semibold" style={{ backgroundColor: 'hsl(270 60% 95%)', color: 'hsl(270 60% 45%)' }}>
+              {roleLabel}
+            </span>
+            <p className="text-sm font-medium mb-6 text-muted-foreground">{clubName}</p>
 
             {/* About section */}
-            <div className="w-full text-left rounded-xl p-4 mb-6" style={{ backgroundColor: 'rgba(255,255,255,0.3)' }}>
-              <h4 className="font-bold mb-3" style={{ color: '#374151' }}>About</h4>
+            <div className="w-full text-left rounded-xl p-4 mb-6 bg-white/30">
+              <h4 className="font-bold mb-3 text-foreground">About</h4>
+              {about && <p className="text-sm text-muted-foreground mb-3">{about}</p>}
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span style={{ color: '#6b7280' }}>Class:</span>
-                  <span className="font-medium" style={{ color: '#374151' }}>{year}</span>
+                  <span className="text-muted-foreground">Class:</span>
+                  <span className="font-medium text-foreground">{year}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span style={{ color: '#6b7280' }}>Program:</span>
-                  <span className="font-medium" style={{ color: '#374151' }}>{programme}</span>
+                  <span className="text-muted-foreground">Program:</span>
+                  <span className="font-medium text-foreground">{programme}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span style={{ color: '#6b7280' }}>Semester:</span>
-                  <span className="font-medium" style={{ color: '#374151' }}>{semester}</span>
+                  <span className="text-muted-foreground">Semester:</span>
+                  <span className="font-medium text-foreground">{semester}</span>
                 </div>
               </div>
             </div>
 
             {/* Social icons */}
             <div className="mt-auto flex gap-4 justify-center mt-5">
-              {/* LinkedIn */}
-              <a href="#" className="hover:opacity-75 transition-opacity">
-                <svg className="w-5 h-5" fill="#4a4a4a" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
-              </a>
-              {/* Twitter */}
-              <a href="#" className="hover:opacity-75 transition-opacity">
-                <svg className="w-5 h-5" fill="#4a4a4a" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
-              </a>
-              {/* Instagram */}
-              <a href="#" className="hover:opacity-75 transition-opacity">
-                <svg className="w-5 h-5" fill="#4a4a4a" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-              </a>
+              {profile?.social_linkedin && (
+                <a href={profile.social_linkedin} target="_blank" rel="noopener noreferrer" className="hover:opacity-75 transition-opacity">
+                  <svg className="w-5 h-5 fill-foreground" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                </a>
+              )}
+              {profile?.social_twitter && (
+                <a href={profile.social_twitter} target="_blank" rel="noopener noreferrer" className="hover:opacity-75 transition-opacity">
+                  <svg className="w-5 h-5 fill-foreground" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
+                </a>
+              )}
+              {profile?.social_github && (
+                <a href={profile.social_github} target="_blank" rel="noopener noreferrer" className="hover:opacity-75 transition-opacity">
+                  <svg className="w-5 h-5 fill-foreground" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                </a>
+              )}
+              {!profile?.social_linkedin && !profile?.social_twitter && !profile?.social_github && (
+                <>
+                  <span className="text-xs text-muted-foreground italic">Add social links in your profile</span>
+                </>
+              )}
             </div>
           </div>
         </div>
 
-        {/* MIDDLE: Chart + Feedback */}
+        {/* MIDDLE: Chart */}
         <div className="lg:col-span-6 flex flex-col gap-6">
-          {/* Chart */}
           <div className="glass-card p-6 flex-grow">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="font-bold text-lg" style={{ color: '#1f2937' }}>Attendance Analytics</h3>
-              <div className="glass-input px-3 py-1 rounded-lg text-xs flex items-center gap-1 cursor-pointer" style={{ color: '#4b5563' }}>
+              <h3 className="font-bold text-lg text-foreground">Attendance Analytics</h3>
+              <div className="glass-input px-3 py-1 rounded-lg text-xs flex items-center gap-1 cursor-pointer text-muted-foreground">
                 Last 30 Days <ChevronDown className="w-3 h-3" />
               </div>
             </div>
             <div className="flex justify-between items-center text-xs mb-6">
-              <span className="font-semibold" style={{ color: '#4b5563' }}>Event Attendance & Engagement</span>
+              <span className="font-semibold text-muted-foreground">Event Attendance & Engagement</span>
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: '#bf7e54' }} />
-                <span style={{ color: '#6b7280' }}>Engagement Score</span>
+                <span className="w-2 h-2 rounded-full bg-primary" />
+                <span className="text-muted-foreground">Engagement Score</span>
               </div>
             </div>
             <ResponsiveContainer width="100%" height={260}>
@@ -220,38 +233,35 @@ const AdminDashboard = () => {
               </ComposedChart>
             </ResponsiveContainer>
           </div>
-
         </div>
 
-        {/* RIGHT: Events + Tasks */}
+        {/* RIGHT: Events */}
         <div className="lg:col-span-3 flex flex-col gap-6">
-          {/* Upcoming Events */}
           <div className="glass-card p-6">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="font-bold text-lg" style={{ color: '#1f2937' }}>Upcoming Events</h3>
-              <MoreHorizontal className="w-5 h-5 cursor-pointer" style={{ color: '#6b7280' }} />
+              <h3 className="font-bold text-lg text-foreground">Upcoming Events</h3>
+              <MoreHorizontal className="w-5 h-5 cursor-pointer text-muted-foreground" />
             </div>
             <div className="space-y-4">
               {upcomingEvents.map((event, i) => (
                 <div key={i} className="flex items-center gap-4 group cursor-pointer">
-                  <div className="rounded-lg shadow-sm w-12 h-12 flex flex-col items-center justify-center border group-hover:shadow-md transition-shadow" style={{ backgroundColor: 'white', borderColor: '#f3f4f6' }}>
-                    <span className="text-[10px] font-bold uppercase tracking-wide" style={{ color: '#6b7280' }}>{event.month}</span>
-                    <span className="text-lg font-bold leading-none" style={{ color: '#1f2937' }}>{event.day}</span>
+                  <div className="rounded-lg shadow-sm w-12 h-12 flex flex-col items-center justify-center border border-border bg-white group-hover:shadow-md transition-shadow">
+                    <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">{event.month}</span>
+                    <span className="text-lg font-bold leading-none text-foreground">{event.day}</span>
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold" style={{ color: '#1f2937' }}>{event.name}</h4>
-                    <span className="text-xs flex items-center gap-1" style={{ color: '#6b7280' }}>
+                    <h4 className="text-sm font-bold text-foreground">{event.name}</h4>
+                    <span className="text-xs flex items-center gap-1 text-muted-foreground">
                       <MapPin className="w-2.5 h-2.5" /> {event.location}
                     </span>
                   </div>
-                  <div className="ml-auto" style={{ color: '#9ca3af' }}>
+                  <div className="ml-auto text-muted-foreground">
                     <event.icon className="w-4 h-4" />
                   </div>
                 </div>
               ))}
             </div>
           </div>
-
         </div>
       </main>
     </div>
