@@ -1,6 +1,7 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useClub } from '@/contexts/ClubContext';
+import { supabase } from '@/integrations/supabase/client';
 import { useProfile } from '@/hooks/useProfile';
 import { usePersonalStats } from '@/hooks/usePersonalStats';
 import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
@@ -30,11 +31,6 @@ const clubChartData = [
   { name: 'Event 10', attendance: 50, engagement: 60 },
 ];
 
-const upcomingEvents = [
-  { name: 'Coding Workshop', month: 'OCT', day: '28', location: 'Hall A', icon: Calendar },
-  { name: 'Hackathon', month: 'NOV', day: '5', location: 'Main Lab', icon: Calendar },
-  { name: 'Guest Lecture', month: 'NOV', day: '12', location: 'Auditorium', icon: Users },
-];
 
 type ViewMode = 'personal' | 'club';
 
@@ -45,8 +41,23 @@ const AdminDashboard = () => {
   const { stats: personalStats } = usePersonalStats();
   const { hasPower } = useDelegatedPowers();
   const [viewMode, setViewMode] = useState<ViewMode>('personal');
+  const [upcomingEvents, setUpcomingEvents] = useState<any[]>([]);
   const navigate = useNavigate();
   const greeting = useMemo(() => getRandomGreeting(), []);
+
+  useEffect(() => {
+    const fetchUpcoming = async () => {
+      const now = new Date().toISOString();
+      const { data } = await supabase
+        .from('events')
+        .select('id, name, event_date, club_id, clubs(name)')
+        .gte('event_date', now)
+        .order('event_date', { ascending: true })
+        .limit(5);
+      setUpcomingEvents(data ?? []);
+    };
+    fetchUpcoming();
+  }, []);
 
   if (loading) {
     return (
@@ -352,23 +363,32 @@ const AdminDashboard = () => {
                   <MoreHorizontal className="w-5 h-5 cursor-pointer text-muted-foreground" />
                 </div>
                 <div className="space-y-4">
-                  {upcomingEvents.map((event, i) => (
-                    <div key={i} className="flex items-center gap-4 group cursor-pointer">
-                      <div className="rounded-lg shadow-sm w-12 h-12 flex flex-col items-center justify-center border border-border bg-white group-hover:shadow-md transition-shadow">
-                        <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">{event.month}</span>
-                        <span className="text-lg font-bold leading-none text-foreground">{event.day}</span>
+                  {upcomingEvents.length === 0 && (
+                    <p className="text-sm text-muted-foreground text-center py-4">No upcoming events</p>
+                  )}
+                  {upcomingEvents.map((event) => {
+                    const d = new Date(event.event_date);
+                    const month = d.toLocaleString('default', { month: 'short' }).toUpperCase();
+                    const day = String(d.getDate());
+                    const clubName = event.clubs?.name || '';
+                    return (
+                      <div key={event.id} className="flex items-center gap-4 group cursor-pointer">
+                        <div className="rounded-lg shadow-sm w-12 h-12 flex flex-col items-center justify-center border border-border bg-white group-hover:shadow-md transition-shadow">
+                          <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">{month}</span>
+                          <span className="text-lg font-bold leading-none text-foreground">{day}</span>
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-bold text-foreground">{event.name}</h4>
+                          <span className="text-xs flex items-center gap-1 text-muted-foreground">
+                            <MapPin className="w-2.5 h-2.5" /> {clubName}
+                          </span>
+                        </div>
+                        <div className="ml-auto text-muted-foreground">
+                          <Calendar className="w-4 h-4" />
+                        </div>
                       </div>
-                      <div>
-                        <h4 className="text-sm font-bold text-foreground">{event.name}</h4>
-                        <span className="text-xs flex items-center gap-1 text-muted-foreground">
-                          <MapPin className="w-2.5 h-2.5" /> {event.location}
-                        </span>
-                      </div>
-                      <div className="ml-auto text-muted-foreground">
-                        <event.icon className="w-4 h-4" />
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             </div>
