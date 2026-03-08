@@ -43,6 +43,7 @@ const AdminDashboard = () => {
   const { hasPower } = useDelegatedPowers();
   const [viewMode, setViewMode] = useState<ViewMode>('personal');
   const [upcomingEvents, setUpcomingEvents] = useState<any[]>([]);
+  const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
   const navigate = useNavigate();
   const greeting = useMemo(() => getRandomGreeting(), []);
 
@@ -51,7 +52,7 @@ const AdminDashboard = () => {
       const now = new Date().toISOString();
       const { data } = await supabase
         .from('events')
-        .select('id, name, event_date, club_id, clubs(name)')
+        .select('id, name, event_date, end_date, description, event_type, category, access_type, club_id, clubs(name)')
         .gte('event_date', now)
         .order('event_date', { ascending: true })
         .limit(5);
