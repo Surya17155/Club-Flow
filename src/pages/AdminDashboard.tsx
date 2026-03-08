@@ -374,7 +374,7 @@ const AdminDashboard = () => {
                     const day = String(d.getDate());
                     const clubName = event.clubs?.name || '';
                     return (
-                      <div key={event.id} className="flex items-center gap-4 group cursor-pointer">
+                      <div key={event.id} className="flex items-center gap-4 group cursor-pointer" onClick={() => setSelectedEvent(event)}>
                         <div className="rounded-lg shadow-sm w-12 h-12 flex flex-col items-center justify-center border border-border bg-white group-hover:shadow-md transition-shadow">
                           <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">{month}</span>
                           <span className="text-lg font-bold leading-none text-foreground">{day}</span>
@@ -395,6 +395,62 @@ const AdminDashboard = () => {
               </div>
             </div>
           )}
+
+          {/* Event Detail Dialog */}
+          <Dialog open={!!selectedEvent} onOpenChange={(open) => !open && setSelectedEvent(null)}>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle className="text-xl">{selectedEvent?.name}</DialogTitle>
+              </DialogHeader>
+              {selectedEvent && (
+                <div className="space-y-4 pt-2">
+                  <div className="flex items-center gap-3 text-sm">
+                    <Calendar className="w-4 h-4 text-primary shrink-0" />
+                    <div>
+                      <p className="font-medium text-foreground">Start</p>
+                      <p className="text-muted-foreground">{new Date(selectedEvent.event_date).toLocaleString()}</p>
+                    </div>
+                  </div>
+                  {selectedEvent.end_date && (
+                    <div className="flex items-center gap-3 text-sm">
+                      <Clock className="w-4 h-4 text-primary shrink-0" />
+                      <div>
+                        <p className="font-medium text-foreground">End</p>
+                        <p className="text-muted-foreground">{new Date(selectedEvent.end_date).toLocaleString()}</p>
+                      </div>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-3 text-sm">
+                    <MapPin className="w-4 h-4 text-primary shrink-0" />
+                    <div>
+                      <p className="font-medium text-foreground">Club</p>
+                      <p className="text-muted-foreground">{selectedEvent.clubs?.name || '—'}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm">
+                    <Tag className="w-4 h-4 text-primary shrink-0" />
+                    <div>
+                      <p className="font-medium text-foreground">Type / Category</p>
+                      <p className="text-muted-foreground">{selectedEvent.event_type} · {selectedEvent.category}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm">
+                    <Shield className="w-4 h-4 text-primary shrink-0" />
+                    <div>
+                      <p className="font-medium text-foreground">Access</p>
+                      <p className="text-muted-foreground">{selectedEvent.access_type}</p>
+                    </div>
+                  </div>
+                  {selectedEvent.description && (
+                    <div className="pt-2 border-t border-border/40">
+                      <p className="text-sm font-medium text-foreground mb-1">Description</p>
+                      <p className="text-sm text-muted-foreground whitespace-pre-wrap">{selectedEvent.description}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
         </div>
       </main>
 
