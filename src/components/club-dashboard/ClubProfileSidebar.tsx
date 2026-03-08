@@ -16,7 +16,7 @@ const roleLabelMap: Record<string, string> = {
   social_media_head: 'Social Media Head',
 };
 
-const roleOrder = ['president', 'vice_president', 'secretary', 'social_media_head'];
+const roleOrder: ('president' | 'vice_president' | 'secretary' | 'social_media_head')[] = ['president', 'vice_president', 'secretary', 'social_media_head'];
 
 interface Props {
   clubId: string;
