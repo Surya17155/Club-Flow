@@ -307,7 +307,7 @@ const CreateEvent = () => {
               ) : (
                 <div className="text-center text-muted-foreground">
                   <QrCode className="w-16 h-16 mx-auto mb-3 opacity-20" />
-                  <p className="text-sm">Click the button above to generate a QR code</p>
+                  <p className="text-sm">Click the button below to generate a QR code</p>
                 </div>
               )}
             </div>
