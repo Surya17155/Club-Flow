@@ -50,6 +50,20 @@ export function AppSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    const check = async () => {
+      const { data } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin');
+      setIsAdmin(!!(data && data.length > 0));
+    };
+    check();
+  }, [user?.id]);
 
   const isActive = (path: string) => location.pathname === path || location.pathname.startsWith(path + '/');
 
