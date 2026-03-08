@@ -79,9 +79,7 @@ Deno.serve(async (req) => {
     let existingUserId: string | null = existingProfile?.user_id || null;
     
     if (!existingUserId) {
-      // Fallback: check auth users by email
-      const { data: authData } = await adminClient.auth.admin.listUsers({ page: 1, perPage: 1 });
-      // Use getUserByEmail-like approach via listing
+      // Fallback: check auth users by email via listing
       const { data: usersData } = await adminClient.auth.admin.listUsers();
       const found = usersData?.users?.find((u: any) => u.email === email.trim().toLowerCase());
       if (found) existingUserId = found.id;
