@@ -13,6 +13,7 @@ import {
 } from 'recharts';
 import ProfileDropdown from '@/components/dashboard/ProfileDropdown';
 import EventCalendar from '@/components/dashboard/EventCalendar';
+import CreateEventModal from '@/components/dashboard/CreateEventModal';
 
 const roleLabelMap: Record<string, string> = {
   admin: 'Admin', president: 'President', vice_president: 'Vice President',
@@ -42,6 +43,7 @@ const AdminDashboard = () => {
   const { activeClub, clubs } = useClub();
   const { stats: personalStats } = usePersonalStats();
   const [viewMode, setViewMode] = useState<ViewMode>('personal');
+  const [showCreateEvent, setShowCreateEvent] = useState(false);
   const greeting = useMemo(() => getRandomGreeting(), []);
 
   if (loading) {
@@ -119,7 +121,11 @@ const AdminDashboard = () => {
 
         <div className="flex items-center gap-4">
           {!isPersonal && activeClub && ['admin', 'president', 'vice_president', 'secretary', 'social_media_head'].includes(activeClub.role) && (
-            <button className="text-primary-foreground text-sm font-medium px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-transform active:scale-95 gradient-gold">
+            <button
+              type="button"
+              onClick={() => setShowCreateEvent(true)}
+              className="text-primary-foreground text-sm font-medium px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-transform active:scale-95 gradient-gold"
+            >
               <Edit3 className="w-4 h-4" /> Create Event
             </button>
           )}
@@ -367,6 +373,16 @@ const AdminDashboard = () => {
           )}
         </div>
       </main>
+
+      {/* Create Event Modal */}
+      {activeClub && (
+        <CreateEventModal
+          open={showCreateEvent}
+          onOpenChange={setShowCreateEvent}
+          clubId={activeClub.club_id}
+          clubName={activeClub.club_name}
+        />
+      )}
     </div>
   );
 };
