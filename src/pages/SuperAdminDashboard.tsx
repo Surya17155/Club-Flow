@@ -262,46 +262,11 @@ const SuperAdminDashboard = () => {
             }
           </div>
         </section>
+      </div>
 
-        {/* Manage All Members */}
-        <section className="glass-card p-5 flex flex-col max-h-[500px]">
-          <h2 className="text-lg font-semibold text-foreground mb-4">Manage All Members</h2>
-          <div className="flex flex-col gap-3 overflow-y-auto pr-1 flex-1">
-            {loading ?
-            <p className="text-muted-foreground text-center py-8">Loading...</p> :
-            uniqueMembers.length === 0 ?
-            <p className="text-muted-foreground text-center py-8">No members</p> :
-
-            uniqueMembers.map((member) =>
-            <div key={member.user_id} className="rounded-xl p-3 flex justify-between items-center border border-border/50 bg-card shadow-card">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <Avatar className="w-9 h-9 shrink-0">
-                      <AvatarImage src={member.avatar_url || undefined} />
-                      <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
-                        {member.full_name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="text-xs font-medium text-foreground truncate">{member.full_name}</span>
-                  </div>
-                  <div className="flex gap-1.5 shrink-0">
-                    <button
-                  onClick={() => {setSelectedMember(member);setProfileDialogOpen(true);}}
-                  className="text-[11px] px-2.5 py-1.5 rounded-lg font-medium transition-colors bg-secondary hover:bg-secondary/80 text-secondary-foreground">
-                  
-                      <Eye className="w-3 h-3" />
-                    </button>
-                    <button
-                  onClick={() => {setSelectedRoleMember(member);setNewRole(member.role);setRoleDialogOpen(true);}}
-                  className="text-[11px] px-2.5 py-1.5 rounded-lg font-medium transition-colors bg-accent hover:bg-accent/80 text-accent-foreground">
-                  
-                      <UserCog className="w-3 h-3" />
-                    </button>
-                  </div>
-                </div>
-            )
-            }
-          </div>
-        </section>
+      {/* Platform-wide Event Calendar */}
+      <div className="mb-6">
+        <SuperAdminCalendar />
       </div>
 
       {/* Global Event Feed */}
