@@ -45,13 +45,34 @@ const ClubDashboard = () => {
   const clubId = routeClubId || activeClub?.club_id;
   const [clubNameOverride, setClubNameOverride] = useState<string | null>(null);
 
-  // Fetch club name from route param when super admin isn't a member
+  // Keep displayed club name aligned with route club (prevents stale activeClub name)
   useEffect(() => {
-    if (activeClub?.club_name || !routeClubId) return;
-    supabase.from('clubs').select('name').eq('id', routeClubId).maybeSingle().then(({ data }) => {
-      if (data) setClubNameOverride(data.name);
-    });
-  }, [routeClubId, activeClub?.club_name]);
+    if (!routeClubId) {
+      setClubNameOverride(null);
+      return;
+    }
+
+    if (routeClubId === activeClub?.club_id) {
+      setClubNameOverride(activeClub.club_name);
+      return;
+    }
+
+    let cancelled = false;
+    setClubNameOverride(null);
+
+    supabase
+      .from('clubs')
+      .select('name')
+      .eq('id', routeClubId)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!cancelled && data) setClubNameOverride(data.name);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [routeClubId, activeClub?.club_id, activeClub?.club_name]);
   const { stats: clubStats } = useClubStats(clubId);
   const [manageEventsOpen, setManageEventsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'overview' | 'members'>(
@@ -155,7 +176,9 @@ const ClubDashboard = () => {
     );
   }
 
-  const clubName = activeClub?.club_name || clubNameOverride || 'Club';
+  const clubName = routeClubId
+    ? (routeClubId === activeClub?.club_id ? activeClub?.club_name : clubNameOverride) || 'Club'
+    : activeClub?.club_name || clubNameOverride || 'Club';
   const statsItems = [
     { label: 'Total Members:', value: String(clubStats.totalMembers), path: 'M0,25 C30,25 30,10 50,10 S70,20 100,5' },
     { label: 'All-Time Attendance:', value: String(clubStats.chartData.reduce((s, d) => s + d.attendance, 0)), path: 'M0,25 C20,28 40,5 60,15 S80,5 100,10' },
