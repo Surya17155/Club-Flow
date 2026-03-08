@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useClub } from '@/contexts/ClubContext';
 import { useProfile } from '@/hooks/useProfile';
@@ -6,6 +6,7 @@ import { usePersonalStats } from '@/hooks/usePersonalStats';
 import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { ChevronDown, Edit3, MoreHorizontal, Calendar, Users, MapPin, Award, CheckCircle } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 const greetings = ['Hello', 'Hi', 'Hey', 'Yo', 'Welcome', "What's up", 'Howdy', 'Namaste'];
 const getRandomGreeting = () => greetings[Math.floor(Math.random() * greetings.length)];
@@ -30,10 +31,6 @@ const clubChartData = [
 { name: 'Event 10', attendance: 50, engagement: 60 }];
 
 
-const upcomingEvents = [
-{ name: 'Coding Workshop', month: 'OCT', day: '28', location: 'Hall A', icon: Calendar },
-{ name: 'Hackathon', month: 'NOV', day: '5', location: 'Main Lab', icon: Calendar },
-{ name: 'Guest Lecture', month: 'NOV', day: '12', location: 'Auditorium', icon: Users }];
 
 
 type ViewMode = 'personal' | 'club';
@@ -47,6 +44,34 @@ const AdminDashboard = () => {
   const [viewMode, setViewMode] = useState<ViewMode>('personal');
   const navigate = useNavigate();
   const greeting = useMemo(() => getRandomGreeting(), []);
+
+  const [upcomingEvents, setUpcomingEvents] = useState<{ id: string; name: string; month: string; day: string; location: string; club_name: string }[]>([]);
+
+  useEffect(() => {
+    const fetchUpcoming = async () => {
+      const now = new Date().toISOString();
+      const { data } = await supabase
+        .from('events')
+        .select('id, name, event_date, description, clubs(name)')
+        .gte('event_date', now)
+        .order('event_date', { ascending: true })
+        .limit(10);
+      if (data) {
+        setUpcomingEvents(data.map((e: any) => {
+          const d = new Date(e.event_date);
+          return {
+            id: e.id,
+            name: e.name,
+            month: d.toLocaleString('default', { month: 'short' }).toUpperCase(),
+            day: String(d.getDate()),
+            location: e.description || '',
+            club_name: e.clubs?.name || '',
+          };
+        }));
+      }
+    };
+    fetchUpcoming();
+  }, []);
 
   if (loading) {
     return (
@@ -345,23 +370,21 @@ const AdminDashboard = () => {
                   <MoreHorizontal className="w-5 h-5 cursor-pointer text-muted-foreground" />
                 </div>
                 <div className="space-y-4">
-                  {upcomingEvents.map((event, i) =>
-                <div key={i} className="flex items-center gap-4 group cursor-pointer">
+                  {upcomingEvents.length > 0 ? upcomingEvents.map((event) =>
+                <div key={event.id} className="flex items-center gap-4 group cursor-pointer">
                       <div className="rounded-lg shadow-sm w-12 h-12 flex flex-col items-center justify-center border border-border bg-white group-hover:shadow-md transition-shadow">
                         <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">{event.month}</span>
                         <span className="text-lg font-bold leading-none text-foreground">{event.day}</span>
                       </div>
                       <div>
                         <h4 className="text-sm font-bold text-foreground">{event.name}</h4>
-                        <span className="text-xs flex items-center gap-1 text-muted-foreground">
-                          <MapPin className="w-2.5 h-2.5" /> {event.location}
-                        </span>
+                        <span className="text-xs text-muted-foreground">{event.club_name}</span>
                       </div>
                       <div className="ml-auto text-muted-foreground">
-                        <event.icon className="w-4 h-4" />
+                        <Calendar className="w-4 h-4" />
                       </div>
                     </div>
-                )}
+                ) : <p className="text-sm text-muted-foreground italic">No upcoming events</p>}
                 </div>
               </div>
             </div>)
