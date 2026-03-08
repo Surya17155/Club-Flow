@@ -13,7 +13,7 @@ import {
 } from 'recharts';
 import ProfileDropdown from '@/components/dashboard/ProfileDropdown';
 import EventCalendar from '@/components/dashboard/EventCalendar';
-import CreateEventModal from '@/components/dashboard/CreateEventModal';
+
 
 const roleLabelMap: Record<string, string> = {
   admin: 'Admin', president: 'President', vice_president: 'Vice President',
