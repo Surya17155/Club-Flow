@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
+import { Navigate, useNavigate, useSearchParams, useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useClub } from '@/contexts/ClubContext';
 import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
@@ -39,13 +39,35 @@ const ClubDashboard = () => {
   const { hasPower, isPresident } = useDelegatedPowers();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { id: routeClubId } = useParams();
 
-  const clubId = activeClub?.club_id;
+  // Use activeClub if available, otherwise fall back to route param for super admins
+  const clubId = activeClub?.club_id || routeClubId;
+  const [clubNameOverride, setClubNameOverride] = useState<string | null>(null);
+
+  // Fetch club name from route param when super admin isn't a member
+  useEffect(() => {
+    if (activeClub?.club_name || !routeClubId) return;
+    supabase.from('clubs').select('name').eq('id', routeClubId).maybeSingle().then(({ data }) => {
+      if (data) setClubNameOverride(data.name);
+    });
+  }, [routeClubId, activeClub?.club_name]);
   const { stats: clubStats } = useClubStats(clubId);
   const [manageEventsOpen, setManageEventsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'overview' | 'members'>(
     searchParams.get('tab') === 'members' ? 'members' : 'overview'
   );
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id)
+      .eq('role', 'admin')
+      .then(({ data }) => setIsSuperAdmin(!!(data && data.length > 0)));
+  }, [user?.id]);
 
   // Club details
   const [clubDetails, setClubDetails] = useState<{ about: string | null; logo_url: string | null }>({ about: null, logo_url: null });
@@ -99,9 +121,9 @@ const ClubDashboard = () => {
 
   if (!user) return <Navigate to="/" replace />;
 
-  // Access check: president or has manage_club power
-  const hasAccess = isPresident || hasPower('manage_club');
-  if (!hasAccess || !activeClub || !clubId) {
+  // Access check: president, has manage_club power, or super admin
+  const hasAccess = isPresident || hasPower('manage_club') || isSuperAdmin;
+  if ((!hasAccess && !isSuperAdmin) || !clubId) {
     return (
       <div className="min-h-screen flex items-center justify-center p-6" style={{ backgroundColor: '#fdfbf7' }}>
         <div className="glass-card p-8 text-center max-w-md">
@@ -115,7 +137,7 @@ const ClubDashboard = () => {
     );
   }
 
-  const clubName = activeClub.club_name;
+  const clubName = activeClub?.club_name || clubNameOverride || 'Club';
   const statsItems = [
     { label: 'Total Members:', value: String(clubStats.totalMembers), path: 'M0,25 C30,25 30,10 50,10 S70,20 100,5' },
     { label: 'All-Time Attendance:', value: String(clubStats.chartData.reduce((s, d) => s + d.attendance, 0)), path: 'M0,25 C20,28 40,5 60,15 S80,5 100,10' },
