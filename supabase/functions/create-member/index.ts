@@ -57,10 +57,10 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.json();
-    const { email, password, full_name, programme, section, year, roll_no, phone, club_id, role } = body;
+    const { email, full_name, programme, section, year, roll_no, phone, club_id, role } = body;
 
-    if (!email || !password || !full_name || !club_id) {
-      return new Response(JSON.stringify({ error: "Missing required fields" }), {
+    if (!email || !full_name || !club_id) {
+      return new Response(JSON.stringify({ error: "Missing required fields (email, full_name, club_id)" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
