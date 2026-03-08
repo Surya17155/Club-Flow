@@ -12,7 +12,6 @@ import { motion } from 'framer-motion';
 
 const PROGRAMMES = ['B.Tech (CS)', 'B.Tech (IT)', 'BBA', 'MBA', 'B.Com', 'BA (Hons)', 'BCA', 'MCA'];
 const YEARS = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
-const SEMESTERS = ['1', '2', '3', '4', '5', '6', '7', '8'];
 
 const Signup = () => {
   const [formData, setFormData] = useState({

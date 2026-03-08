@@ -6,8 +6,9 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
+import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { UserPlus, Trash2, Eye, Loader2, Search, Users, MoreVertical, ShieldCheck, ShieldOff } from 'lucide-react';
+import { UserPlus, Trash2, Eye, Loader2, Search, Users, MoreVertical, ShieldCheck } from 'lucide-react';
 
 interface Member {
   id: string;
@@ -21,8 +22,11 @@ interface Member {
   avatar_url: string | null;
   phone: string | null;
   year: string | null;
-  semester: string | null;
   section: string | null;
+  about: string | null;
+  social_linkedin: string | null;
+  social_instagram: string | null;
+  social_gmail: string | null;
 }
 
 const roleLabelMap: Record<string, string> = {
@@ -45,9 +49,8 @@ const assignableRoles = [
   { value: 'member', label: 'Member' },
 ];
 
-const roleLabelMapExtended: Record<string, string> = {
-  ...roleLabelMap,
-};
+const PROGRAMMES = ['B.Tech (CS)', 'B.Tech (IT)', 'BBA', 'MBA', 'B.Com', 'BA (Hons)', 'BCA', 'MCA'];
+const YEARS = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
 
 interface Props {
   clubId: string;
@@ -59,8 +62,6 @@ const MemberManagement = ({ clubId }: Props) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMember, setViewMember] = useState<Member | null>(null);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
-  const [addEmail, setAddEmail] = useState('');
-  const [addRole, setAddRole] = useState('member');
   const [adding, setAdding] = useState(false);
   const [removing, setRemoving] = useState<string | null>(null);
   const [roleDialogOpen, setRoleDialogOpen] = useState(false);
@@ -68,11 +69,24 @@ const MemberManagement = ({ clubId }: Props) => {
   const [newRole, setNewRole] = useState('member');
   const [changingRole, setChangingRole] = useState(false);
 
+  // Add member form state
+  const [addForm, setAddForm] = useState({
+    fullName: '', email: '', password: '', programme: '', section: '', year: '', rollNo: '', phone: '', role: 'member',
+  });
+
+  const updateAddForm = (field: string, value: string) => {
+    setAddForm(prev => ({ ...prev, [field]: value }));
+  };
+
+  const resetAddForm = () => {
+    setAddForm({ fullName: '', email: '', password: '', programme: '', section: '', year: '', rollNo: '', phone: '', role: 'member' });
+  };
+
   const fetchMembers = async () => {
     setLoading(true);
     const { data } = await supabase
       .from('club_members')
-      .select('id, user_id, role, joined_at, profiles(full_name, email, programme, roll_no, avatar_url, phone, year, semester, section)')
+      .select('id, user_id, role, joined_at, profiles(full_name, email, programme, roll_no, avatar_url, phone, year, section, about, social_linkedin, social_instagram, social_gmail)')
       .eq('club_id', clubId);
 
     if (data) {
@@ -88,8 +102,11 @@ const MemberManagement = ({ clubId }: Props) => {
         avatar_url: m.profiles?.avatar_url ?? null,
         phone: m.profiles?.phone ?? null,
         year: m.profiles?.year ?? null,
-        semester: m.profiles?.semester ?? null,
         section: m.profiles?.section ?? null,
+        about: m.profiles?.about ?? null,
+        social_linkedin: m.profiles?.social_linkedin ?? null,
+        social_instagram: m.profiles?.social_instagram ?? null,
+        social_gmail: m.profiles?.social_gmail ?? null,
       })));
     }
     setLoading(false);
@@ -98,43 +115,47 @@ const MemberManagement = ({ clubId }: Props) => {
   useEffect(() => { fetchMembers(); }, [clubId]);
 
   const handleAddMember = async () => {
-    if (!addEmail.trim()) return;
+    if (!addForm.email.trim() || !addForm.fullName.trim() || !addForm.password.trim()) {
+      toast.error('Please fill in name, email, and password');
+      return;
+    }
+
+    if (addForm.password.length < 6) {
+      toast.error('Password must be at least 6 characters');
+      return;
+    }
+
     setAdding(true);
 
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('user_id')
-      .eq('email', addEmail.trim())
-      .maybeSingle();
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const response = await supabase.functions.invoke('create-member', {
+        body: {
+          email: addForm.email.trim(),
+          password: addForm.password,
+          full_name: addForm.fullName.trim(),
+          programme: addForm.programme,
+          section: addForm.section,
+          year: addForm.year,
+          roll_no: addForm.rollNo,
+          phone: addForm.phone,
+          club_id: clubId,
+          role: addForm.role,
+        },
+      });
 
-    if (!profile) {
-      toast.error('No user found with that email');
-      setAdding(false);
-      return;
+      if (response.error || response.data?.error) {
+        toast.error(response.data?.error || 'Failed to create member');
+      } else {
+        toast.success(`${addForm.fullName} added successfully! They can now log in with their email and password.`);
+        resetAddForm();
+        setAddDialogOpen(false);
+        await fetchMembers();
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to add member');
     }
 
-    const existing = members.find(m => m.user_id === profile.user_id);
-    if (existing) {
-      toast.error('User is already a member of this club');
-      setAdding(false);
-      return;
-    }
-
-    const { error } = await supabase.from('club_members').insert({
-      club_id: clubId,
-      user_id: profile.user_id,
-      role: addRole as any,
-    });
-
-    if (error) {
-      toast.error('Failed to add member');
-    } else {
-      toast.success('Member added successfully');
-      setAddEmail('');
-      setAddRole('member');
-      setAddDialogOpen(false);
-      await fetchMembers();
-    }
     setAdding(false);
   };
 
@@ -199,7 +220,6 @@ const MemberManagement = ({ clubId }: Props) => {
         </Button>
       </div>
 
-      {/* Search */}
       <div className="relative mb-4">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
@@ -240,31 +260,81 @@ const MemberManagement = ({ clubId }: Props) => {
         </div>
       )}
 
-      {/* Add Member Dialog */}
-      <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
-        <DialogContent className="glass-card border-white/20 max-w-md">
+      {/* Add Member Dialog - Full Registration Form */}
+      <Dialog open={addDialogOpen} onOpenChange={(open) => { setAddDialogOpen(open); if (!open) resetAddForm(); }}>
+        <DialogContent className="glass-card border-white/20 max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="font-display text-lg">Add Member</DialogTitle>
+            <DialogTitle className="font-display text-lg">Add New Member</DialogTitle>
+            <p className="text-sm text-muted-foreground">Fill in their details so they can log in directly without signing up.</p>
           </DialogHeader>
           <div className="space-y-4 mt-2">
-            <div>
-              <label className="text-sm font-medium text-foreground mb-1 block">Email Address</label>
-              <Input placeholder="student@example.com" value={addEmail} onChange={e => setAddEmail(e.target.value)} className="bg-white/30" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label>Full Name *</Label>
+                <Input placeholder="Enter full name" value={addForm.fullName} onChange={e => updateAddForm('fullName', e.target.value)} className="bg-white/30" />
+              </div>
+
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label>College Email *</Label>
+                <Input type="email" placeholder="student@iilm.edu" value={addForm.email} onChange={e => updateAddForm('email', e.target.value)} className="bg-white/30" />
+              </div>
+
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label>Password *</Label>
+                <Input type="password" placeholder="Min 6 characters (they can change later)" value={addForm.password} onChange={e => updateAddForm('password', e.target.value)} className="bg-white/30" />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label>Roll No. / Admission No.</Label>
+                <Input placeholder="e.g., 2021CSE001" value={addForm.rollNo} onChange={e => updateAddForm('rollNo', e.target.value)} className="bg-white/30" />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label>Phone Number</Label>
+                <Input type="tel" placeholder="+91 XXXXXXXXXX" value={addForm.phone} onChange={e => updateAddForm('phone', e.target.value)} className="bg-white/30" />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label>Programme</Label>
+                <Select value={addForm.programme} onValueChange={v => updateAddForm('programme', v)}>
+                  <SelectTrigger className="bg-white/30"><SelectValue placeholder="Select programme" /></SelectTrigger>
+                  <SelectContent>
+                    {PROGRAMMES.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label>Section</Label>
+                <Input placeholder="e.g., A, B, C" value={addForm.section} onChange={e => updateAddForm('section', e.target.value)} className="bg-white/30" />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label>Year</Label>
+                <Select value={addForm.year} onValueChange={v => updateAddForm('year', v)}>
+                  <SelectTrigger className="bg-white/30"><SelectValue placeholder="Select year" /></SelectTrigger>
+                  <SelectContent>
+                    {YEARS.map(y => <SelectItem key={y} value={y}>{y}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label>Club Role</Label>
+                <Select value={addForm.role} onValueChange={v => updateAddForm('role', v)}>
+                  <SelectTrigger className="bg-white/30"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {assignableRoles.map(r => (
+                      <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-            <div>
-              <label className="text-sm font-medium text-foreground mb-1 block">Role</label>
-              <Select value={addRole} onValueChange={setAddRole}>
-                <SelectTrigger className="bg-white/30"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {assignableRoles.map(r => (
-                    <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <Button onClick={handleAddMember} disabled={adding || !addEmail.trim()} className="w-full rounded-full">
+
+            <Button onClick={handleAddMember} disabled={adding || !addForm.email.trim() || !addForm.fullName.trim() || !addForm.password.trim()} className="w-full rounded-full">
               {adding ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <UserPlus className="w-4 h-4 mr-2" />}
-              Add Member
+              Create Account & Add Member
             </Button>
           </div>
         </DialogContent>
@@ -294,7 +364,7 @@ const MemberManagement = ({ clubId }: Props) => {
                 </div>
               </div>
               <div>
-                <label className="text-sm font-medium text-foreground mb-1 block">New Role</label>
+                <Label className="mb-1 block">New Role</Label>
                 <Select value={newRole} onValueChange={setNewRole}>
                   <SelectTrigger className="bg-white/30"><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -336,16 +406,32 @@ const MemberManagement = ({ clubId }: Props) => {
                   {roleLabelMap[viewMember.role] ?? viewMember.role}
                 </Badge>
               </div>
+
+              {viewMember.about && (
+                <div className="w-full text-left bg-white/10 rounded-xl p-3">
+                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">About</h4>
+                  <p className="text-sm text-foreground/80 leading-relaxed">{viewMember.about}</p>
+                </div>
+              )}
+
               <div className="w-full text-left space-y-2 bg-white/20 rounded-xl p-4 text-sm">
                 {viewMember.email && <InfoRow label="Email" value={viewMember.email} />}
                 {viewMember.roll_no && <InfoRow label="Roll No" value={viewMember.roll_no} />}
                 {viewMember.programme && <InfoRow label="Programme" value={viewMember.programme} />}
                 {viewMember.year && <InfoRow label="Year" value={viewMember.year} />}
-                {viewMember.semester && <InfoRow label="Semester" value={viewMember.semester} />}
                 {viewMember.section && <InfoRow label="Section" value={viewMember.section} />}
                 {viewMember.phone && <InfoRow label="Phone" value={viewMember.phone} />}
                 <InfoRow label="Joined" value={new Date(viewMember.joined_at).toLocaleDateString()} />
               </div>
+
+              {(viewMember.social_linkedin || viewMember.social_instagram || viewMember.social_gmail) && (
+                <div className="w-full text-left space-y-2 bg-white/20 rounded-xl p-4 text-sm">
+                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Social Profiles</h4>
+                  {viewMember.social_linkedin && <InfoRow label="LinkedIn" value={viewMember.social_linkedin} />}
+                  {viewMember.social_instagram && <InfoRow label="Instagram" value={viewMember.social_instagram} />}
+                  {viewMember.social_gmail && <InfoRow label="Gmail" value={viewMember.social_gmail} />}
+                </div>
+              )}
             </div>
           )}
         </DialogContent>
@@ -357,12 +443,12 @@ const MemberManagement = ({ clubId }: Props) => {
 const InfoRow = ({ label, value }: { label: string; value: string }) => (
   <div className="flex justify-between">
     <span className="text-muted-foreground">{label}:</span>
-    <span className="font-medium text-foreground">{value}</span>
+    <span className="font-medium text-foreground break-all text-right">{value}</span>
   </div>
 );
 
 const MemberRow = ({ member, onView, onRemove, onChangeRole, removing }: { member: Member; onView: () => void; onRemove: () => void; onChangeRole: () => void; removing: boolean }) => (
-  <div className="flex items-center justify-between p-3 rounded-xl bg-white/20 hover:bg-white/30 transition-colors">
+  <div className="flex items-center justify-between p-3 rounded-xl bg-white/20 hover:bg-white/30 transition-colors cursor-pointer" onClick={onView}>
     <div className="flex items-center gap-3">
       <div className="w-9 h-9 rounded-full overflow-hidden border-2 border-white/40 shrink-0">
         {member.avatar_url ? (
@@ -378,7 +464,7 @@ const MemberRow = ({ member, onView, onRemove, onChangeRole, removing }: { membe
         <p className="text-xs text-muted-foreground">{member.email || member.roll_no || ''}</p>
       </div>
     </div>
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
       <Badge variant="outline" className={`text-xs ${roleColors[member.role] || ''}`}>
         {roleLabelMap[member.role] ?? member.role}
       </Badge>
