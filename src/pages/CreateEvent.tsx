@@ -27,8 +27,8 @@ const CreateEvent = () => {
   const [eventType, setEventType] = useState('Normal');
   const [category, setCategory] = useState('Technical');
   const [eventDate, setEventDate] = useState('');
-  const [eventTime, setEventTime] = useState('');
-  const [endDate, setEndDate] = useState('');
+  const [startTime, setStartTime] = useState('');
+  const [endTime, setEndTime] = useState('');
   const [location, setLocation] = useState('');
   const [description, setDescription] = useState('');
   const [openToAll, setOpenToAll] = useState(true);
