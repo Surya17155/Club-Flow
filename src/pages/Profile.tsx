@@ -50,9 +50,9 @@ const Profile = () => {
         phone: val('phone'),
         roll_no: val('roll_no'),
         section: val('section'),
-        social_github: val('social_github'),
         social_linkedin: val('social_linkedin'),
-        social_twitter: val('social_twitter'),
+        social_instagram: val('social_instagram'),
+        social_gmail: val('social_gmail'),
       });
       setForm({});
       toast({ title: 'Profile updated', description: 'Your changes have been saved.' });
