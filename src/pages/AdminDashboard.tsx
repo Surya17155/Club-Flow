@@ -45,9 +45,16 @@ const AdminDashboard = () => {
     <div className="min-h-screen relative antialiased p-6 md:p-8" style={{ backgroundColor: '#fdfbf7', color: '#4a4a4a' }}>
       {/* Background blobs */}
       <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
-        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full mix-blend-multiply filter blur-[80px] opacity-70 animate-blob" style={{ backgroundColor: 'hsl(50 80% 90% / 0.8)' }} />
-        <div className="absolute top-[20%] right-[-10%] w-[400px] h-[400px] rounded-full mix-blend-multiply filter blur-[80px] opacity-70 animate-blob animation-delay-2000" style={{ backgroundColor: 'hsl(30 80% 92% / 0.8)' }} />
-        <div className="absolute bottom-[-10%] right-[10%] w-[600px] h-[600px] rounded-full mix-blend-multiply filter blur-[80px] opacity-70 animate-blob animation-delay-4000" style={{ backgroundColor: 'hsl(25 60% 65% / 0.3)' }} />
+        {/* Top-left warm yellow */}
+        <div className="absolute top-[-8%] left-[-8%] w-[550px] h-[550px] rounded-full mix-blend-multiply filter blur-[100px] opacity-80 animate-blob" style={{ backgroundColor: 'hsl(45 90% 85% / 0.9)' }} />
+        {/* Top-right peach */}
+        <div className="absolute top-[-5%] right-[-5%] w-[450px] h-[450px] rounded-full mix-blend-multiply filter blur-[90px] opacity-70 animate-blob animation-delay-2000" style={{ backgroundColor: 'hsl(25 80% 82% / 0.8)' }} />
+        {/* Bottom-left soft amber */}
+        <div className="absolute bottom-[-8%] left-[-5%] w-[500px] h-[500px] rounded-full mix-blend-multiply filter blur-[100px] opacity-60 animate-blob animation-delay-4000" style={{ backgroundColor: 'hsl(35 75% 78% / 0.6)' }} />
+        {/* Bottom-right deep orange */}
+        <div className="absolute bottom-[-10%] right-[-5%] w-[600px] h-[600px] rounded-full mix-blend-multiply filter blur-[100px] opacity-70 animate-blob" style={{ backgroundColor: 'hsl(28 70% 70% / 0.45)', animationDelay: '3s' }} />
+        {/* Center subtle glow */}
+        <div className="absolute top-[40%] left-[30%] w-[300px] h-[300px] rounded-full filter blur-[120px] opacity-30" style={{ backgroundColor: 'hsl(40 80% 88%)' }} />
       </div>
 
       {/* Header */}
