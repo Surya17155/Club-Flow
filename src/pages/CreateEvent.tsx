@@ -304,7 +304,7 @@ const CreateEvent = () => {
 
             <div className="flex-1 flex flex-col items-center justify-center p-8 bg-accent/10 backdrop-blur-md rounded-[24px] border border-border/40 shadow-inner">
               {qrToken ?
-              <div className="bg-background p-4 rounded-2xl shadow-xl ring-1 ring-border/20">
+              <div className="qr-code-container bg-background p-4 rounded-2xl shadow-xl ring-1 ring-border/20">
                   <QRCodeSVG value={qrToken} size={160} />
                 </div> :
 
@@ -328,7 +328,26 @@ const CreateEvent = () => {
               type="button"
               className="glass-card w-full flex items-center justify-center gap-2 py-3.5 hover:bg-accent/60 transition-all text-foreground font-semibold rounded-xl"
               onClick={() => {
-                toast.info('Right-click the QR code to save it as an image');
+                const svg = document.querySelector('.qr-code-container svg') as SVGElement;
+                if (!svg) { toast.error('QR code not found'); return; }
+                const canvas = document.createElement('canvas');
+                const size = 320;
+                canvas.width = size;
+                canvas.height = size;
+                const ctx = canvas.getContext('2d')!;
+                const svgData = new XMLSerializer().serializeToString(svg);
+                const img = new Image();
+                img.onload = () => {
+                  ctx.fillStyle = '#ffffff';
+                  ctx.fillRect(0, 0, size, size);
+                  ctx.drawImage(img, 0, 0, size, size);
+                  const link = document.createElement('a');
+                  link.download = `qr-code-${eventName || 'event'}.png`;
+                  link.href = canvas.toDataURL('image/png');
+                  link.click();
+                  toast.success('QR Code downloaded!');
+                };
+                img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
               }}>
               
                 <Download className="w-4 h-4" />
