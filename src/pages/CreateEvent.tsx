@@ -276,8 +276,6 @@ const CreateEvent = () => {
                 </PopoverContent>
               </Popover>
             </div>
-              </div>
-            </div>
 
             {/* Location */}
             <div className="space-y-1.5 relative">
