@@ -304,9 +304,9 @@ export type Database = {
           roll_no: string | null
           section: string | null
           semester: string | null
-          social_github: string | null
+          social_gmail: string | null
+          social_instagram: string | null
           social_linkedin: string | null
-          social_twitter: string | null
           updated_at: string
           user_id: string
           year: string | null
@@ -323,9 +323,9 @@ export type Database = {
           roll_no?: string | null
           section?: string | null
           semester?: string | null
-          social_github?: string | null
+          social_gmail?: string | null
+          social_instagram?: string | null
           social_linkedin?: string | null
-          social_twitter?: string | null
           updated_at?: string
           user_id: string
           year?: string | null
@@ -342,9 +342,9 @@ export type Database = {
           roll_no?: string | null
           section?: string | null
           semester?: string | null
-          social_github?: string | null
+          social_gmail?: string | null
+          social_instagram?: string | null
           social_linkedin?: string | null
-          social_twitter?: string | null
           updated_at?: string
           user_id?: string
           year?: string | null

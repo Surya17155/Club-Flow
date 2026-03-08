@@ -3,7 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
 import { useUserClubs } from '@/hooks/useUserClubs';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Camera, Github, Linkedin, Twitter, Save, Loader2 } from 'lucide-react';
+import { ArrowLeft, Camera, Linkedin, Instagram, Mail, Save, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -50,9 +50,9 @@ const Profile = () => {
         phone: val('phone'),
         roll_no: val('roll_no'),
         section: val('section'),
-        social_github: val('social_github'),
         social_linkedin: val('social_linkedin'),
-        social_twitter: val('social_twitter'),
+        social_instagram: val('social_instagram'),
+        social_gmail: val('social_gmail'),
       });
       setForm({});
       toast({ title: 'Profile updated', description: 'Your changes have been saved.' });
@@ -156,12 +156,12 @@ const Profile = () => {
               <Input value={val('social_linkedin')} onChange={e => setForm({ ...form, social_linkedin: e.target.value })} placeholder="https://linkedin.com/in/..." />
             </div>
             <div className="flex items-center gap-3">
-              <Twitter className="w-5 h-5 text-muted-foreground flex-shrink-0" />
-              <Input value={val('social_twitter')} onChange={e => setForm({ ...form, social_twitter: e.target.value })} placeholder="https://twitter.com/..." />
+              <Instagram className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+              <Input value={val('social_instagram')} onChange={e => setForm({ ...form, social_instagram: e.target.value })} placeholder="https://instagram.com/..." />
             </div>
             <div className="flex items-center gap-3">
-              <Github className="w-5 h-5 text-muted-foreground flex-shrink-0" />
-              <Input value={val('social_github')} onChange={e => setForm({ ...form, social_github: e.target.value })} placeholder="https://github.com/..." />
+              <Mail className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+              <Input value={val('social_gmail')} onChange={e => setForm({ ...form, social_gmail: e.target.value })} placeholder="yourname@gmail.com" type="email" />
             </div>
           </div>
         </div>
