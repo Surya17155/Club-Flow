@@ -336,7 +336,7 @@ const CreateEvent = () => {
         </main>
 
         {/* Publish Button - properly placed below the grid */}
-        <div className="flex justify-end mt-8 pb-8">
+        <div className="flex justify-center mt-8 pb-8">
           <button
             type="button"
             onClick={handlePublish}
