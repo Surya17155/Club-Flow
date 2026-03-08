@@ -182,37 +182,6 @@ const CreateEvent = () => {
               }
             </div>
 
-            {/* Category */}
-            <div className="space-y-1.5 relative">
-              <label className="block text-sm font-medium text-foreground/90">Category</label>
-              <button
-                type="button"
-                onClick={() => {setShowCategoryDropdown(!showCategoryDropdown);setShowTypeDropdown(false);}}
-                className="glass-input w-full px-4 py-2.5 text-foreground flex justify-between items-center cursor-pointer rounded-lg">
-                
-                <span>{category}</span>
-                <ChevronDown className="w-4 h-4 text-muted-foreground" />
-              </button>
-              {showCategoryDropdown &&
-              <div className="absolute z-50 w-full mt-1 rounded-xl overflow-hidden shadow-lg border border-border/30" style={{ background: 'rgba(255, 255, 255, 0.85)', backdropFilter: 'blur(32px) saturate(1.3)', WebkitBackdropFilter: 'blur(32px) saturate(1.3)' }}>
-                  <div className="p-1 space-y-0.5">
-                    {CATEGORIES.map((cat) =>
-                  <div
-                    key={cat}
-                    onClick={() => {setCategory(cat);setShowCategoryDropdown(false);}}
-                    className={`px-4 py-2 rounded-lg cursor-pointer text-sm transition-colors ${
-                    category === cat ?
-                    'bg-primary/15 text-foreground font-medium' :
-                    'hover:bg-accent/40 text-muted-foreground'}`
-                    }>
-                    
-                        {cat}
-                      </div>
-                  )}
-                  </div>
-                </div>
-              }
-            </div>
 
             {/* Date & Time */}
              <div className="space-y-1.5">
