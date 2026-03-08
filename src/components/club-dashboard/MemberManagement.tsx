@@ -5,8 +5,9 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
-import { UserPlus, Trash2, Eye, Loader2, Search, Users } from 'lucide-react';
+import { UserPlus, Trash2, Eye, Loader2, Search, Users, MoreVertical, ShieldCheck, ShieldOff } from 'lucide-react';
 
 interface Member {
   id: string;
@@ -37,6 +38,13 @@ const roleColors: Record<string, string> = {
   member: 'bg-muted text-muted-foreground',
 };
 
+const assignableRoles = [
+  { value: 'vice_president', label: 'Vice President' },
+  { value: 'secretary', label: 'Secretary' },
+  { value: 'social_media_head', label: 'Social Media Head' },
+  { value: 'member', label: 'Member' },
+];
+
 interface Props {
   clubId: string;
 }
@@ -51,6 +59,10 @@ const MemberManagement = ({ clubId }: Props) => {
   const [addRole, setAddRole] = useState('member');
   const [adding, setAdding] = useState(false);
   const [removing, setRemoving] = useState<string | null>(null);
+  const [roleDialogOpen, setRoleDialogOpen] = useState(false);
+  const [roleTarget, setRoleTarget] = useState<Member | null>(null);
+  const [newRole, setNewRole] = useState('member');
+  const [changingRole, setChangingRole] = useState(false);
 
   const fetchMembers = async () => {
     setLoading(true);
@@ -85,7 +97,6 @@ const MemberManagement = ({ clubId }: Props) => {
     if (!addEmail.trim()) return;
     setAdding(true);
 
-    // Find user by email
     const { data: profile } = await supabase
       .from('profiles')
       .select('user_id')
@@ -98,7 +109,6 @@ const MemberManagement = ({ clubId }: Props) => {
       return;
     }
 
-    // Check if already a member
     const existing = members.find(m => m.user_id === profile.user_id);
     if (existing) {
       toast.error('User is already a member of this club');
@@ -140,6 +150,30 @@ const MemberManagement = ({ clubId }: Props) => {
     setRemoving(null);
   };
 
+  const handleChangeRole = async () => {
+    if (!roleTarget || !newRole) return;
+    setChangingRole(true);
+    const { error } = await supabase
+      .from('club_members')
+      .update({ role: newRole as any })
+      .eq('id', roleTarget.id);
+    if (error) {
+      toast.error('Failed to update role');
+    } else {
+      toast.success(`${roleTarget.full_name} is now ${roleLabelMap[newRole] ?? newRole}`);
+      setRoleDialogOpen(false);
+      setRoleTarget(null);
+      await fetchMembers();
+    }
+    setChangingRole(false);
+  };
+
+  const openRoleDialog = (member: Member) => {
+    setRoleTarget(member);
+    setNewRole(member.role);
+    setRoleDialogOpen(true);
+  };
+
   const filtered = members.filter(m =>
     m.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     m.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -178,24 +212,22 @@ const MemberManagement = ({ clubId }: Props) => {
         </div>
       ) : (
         <div className="space-y-6">
-          {/* Post-holders section */}
           {postHolders.length > 0 && (
             <div>
               <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Post-holders ({postHolders.length})</h4>
               <div className="space-y-2">
                 {postHolders.map(m => (
-                  <MemberRow key={m.id} member={m} onView={() => setViewMember(m)} onRemove={() => handleRemoveMember(m)} removing={removing === m.id} />
+                  <MemberRow key={m.id} member={m} onView={() => setViewMember(m)} onRemove={() => handleRemoveMember(m)} onChangeRole={() => openRoleDialog(m)} removing={removing === m.id} />
                 ))}
               </div>
             </div>
           )}
 
-          {/* Regular members */}
           <div>
             <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Members ({regularMembers.length})</h4>
             <div className="space-y-2">
               {regularMembers.length > 0 ? regularMembers.map(m => (
-                <MemberRow key={m.id} member={m} onView={() => setViewMember(m)} onRemove={() => handleRemoveMember(m)} removing={removing === m.id} />
+                <MemberRow key={m.id} member={m} onView={() => setViewMember(m)} onRemove={() => handleRemoveMember(m)} onChangeRole={() => openRoleDialog(m)} removing={removing === m.id} />
               )) : (
                 <p className="text-sm text-muted-foreground italic text-center py-4">No members found</p>
               )}
@@ -213,24 +245,16 @@ const MemberManagement = ({ clubId }: Props) => {
           <div className="space-y-4 mt-2">
             <div>
               <label className="text-sm font-medium text-foreground mb-1 block">Email Address</label>
-              <Input
-                placeholder="student@example.com"
-                value={addEmail}
-                onChange={e => setAddEmail(e.target.value)}
-                className="bg-white/30"
-              />
+              <Input placeholder="student@example.com" value={addEmail} onChange={e => setAddEmail(e.target.value)} className="bg-white/30" />
             </div>
             <div>
               <label className="text-sm font-medium text-foreground mb-1 block">Role</label>
               <Select value={addRole} onValueChange={setAddRole}>
-                <SelectTrigger className="bg-white/30">
-                  <SelectValue />
-                </SelectTrigger>
+                <SelectTrigger className="bg-white/30"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="member">Member</SelectItem>
-                  <SelectItem value="vice_president">Vice President</SelectItem>
-                  <SelectItem value="secretary">Secretary</SelectItem>
-                  <SelectItem value="social_media_head">Social Media Head</SelectItem>
+                  {assignableRoles.map(r => (
+                    <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -239,6 +263,49 @@ const MemberManagement = ({ clubId }: Props) => {
               Add Member
             </Button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Change Role Dialog */}
+      <Dialog open={roleDialogOpen} onOpenChange={setRoleDialogOpen}>
+        <DialogContent className="glass-card border-white/20 max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-display text-lg">Change Role</DialogTitle>
+          </DialogHeader>
+          {roleTarget && (
+            <div className="space-y-4 mt-2">
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-white/20">
+                <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white/40 shrink-0">
+                  {roleTarget.avatar_url ? (
+                    <img src={roleTarget.avatar_url} alt={roleTarget.full_name} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-primary/20 flex items-center justify-center text-sm font-bold text-primary">
+                      {roleTarget.full_name[0]}
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-foreground">{roleTarget.full_name}</p>
+                  <p className="text-xs text-muted-foreground">Current: {roleLabelMap[roleTarget.role] ?? roleTarget.role}</p>
+                </div>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-foreground mb-1 block">New Role</label>
+                <Select value={newRole} onValueChange={setNewRole}>
+                  <SelectTrigger className="bg-white/30"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {assignableRoles.map(r => (
+                      <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button onClick={handleChangeRole} disabled={changingRole || newRole === roleTarget.role} className="w-full rounded-full">
+                {changingRole ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <ShieldCheck className="w-4 h-4 mr-2" />}
+                Update Role
+              </Button>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
 
@@ -290,7 +357,7 @@ const InfoRow = ({ label, value }: { label: string; value: string }) => (
   </div>
 );
 
-const MemberRow = ({ member, onView, onRemove, removing }: { member: Member; onView: () => void; onRemove: () => void; removing: boolean }) => (
+const MemberRow = ({ member, onView, onRemove, onChangeRole, removing }: { member: Member; onView: () => void; onRemove: () => void; onChangeRole: () => void; removing: boolean }) => (
   <div className="flex items-center justify-between p-3 rounded-xl bg-white/20 hover:bg-white/30 transition-colors">
     <div className="flex items-center gap-3">
       <div className="w-9 h-9 rounded-full overflow-hidden border-2 border-white/40 shrink-0">
@@ -311,14 +378,30 @@ const MemberRow = ({ member, onView, onRemove, removing }: { member: Member; onV
       <Badge variant="outline" className={`text-xs ${roleColors[member.role] || ''}`}>
         {roleLabelMap[member.role] ?? member.role}
       </Badge>
-      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onView}>
-        <Eye className="w-4 h-4" />
-      </Button>
-      {member.role !== 'president' && (
-        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={onRemove} disabled={removing}>
-          {removing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-        </Button>
-      )}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon" className="h-8 w-8">
+            <MoreVertical className="w-4 h-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-44">
+          <DropdownMenuItem onClick={onView}>
+            <Eye className="w-4 h-4 mr-2" /> View Details
+          </DropdownMenuItem>
+          {member.role !== 'president' && (
+            <>
+              <DropdownMenuItem onClick={onChangeRole}>
+                <ShieldCheck className="w-4 h-4 mr-2" /> Change Role
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={onRemove} disabled={removing} className="text-destructive focus:text-destructive">
+                {removing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Trash2 className="w-4 h-4 mr-2" />}
+                Remove Member
+              </DropdownMenuItem>
+            </>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   </div>
 );
