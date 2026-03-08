@@ -357,7 +357,7 @@ const AdminDashboard = () => {
                   </div>
                 </div>
                 <ResponsiveContainer width="100%" height={260}>
-                  <ComposedChart data={clubChartData}>
+                  <ComposedChart data={clubStats.chartData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                     <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#6b7280' }} />
                     <YAxis tick={{ fontSize: 11, fill: '#6b7280' }} domain={[0, 100]} />
