@@ -17,6 +17,10 @@ import {
 'recharts';
 import ProfileDropdown from '@/components/dashboard/ProfileDropdown';
 import EventCalendar from '@/components/dashboard/EventCalendar';
+import ManageEventsModal from '@/components/dashboard/ManageEventsModal';
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 
 const roleLabelMap: Record<string, string> = {
