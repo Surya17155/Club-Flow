@@ -74,9 +74,6 @@ const AdminDashboard = () => {
           <button className="text-white text-sm font-medium px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-transform active:scale-95" style={{ background: 'linear-gradient(to right, #f6b87a, #e89e68)' }}>
             <Edit3 className="w-4 h-4" /> Create Event
           </button>
-          <button className="glass-input px-5 py-2.5 rounded-full text-sm font-medium flex items-center gap-2 border border-white hover:bg-white/60 transition-colors" style={{ color: '#4b5563' }}>
-            <CheckCircle className="w-4 h-4" /> Task Management
-          </button>
           <div className="glass-input pl-1 pr-4 py-1 rounded-full flex items-center gap-3 cursor-pointer hover:bg-white/60 transition-colors">
             <div className="w-8 h-8 rounded-full bg-amber flex items-center justify-center text-white text-xs font-bold">
               {fullName.split(' ').map(n => n[0]).join('').slice(0, 2)}
