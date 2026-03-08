@@ -69,8 +69,7 @@ const CreateEvent = () => {
   };
 
   const handlePublish = async () => {
-    if (!eventName.trim()) {toast.error('Event name is required');return;}
-    if (!eventDate) {toast.error('Event date is required');return;}
+    if (!validateMandatoryFields()) return;
 
     setPublishing(true);
     try {
