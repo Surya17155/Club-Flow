@@ -63,14 +63,19 @@ const ClubDashboard = () => {
   useEffect(() => {
     if (!user) return;
 
-    setIsRoleCheckComplete(false);
-    supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id)
-      .eq('role', 'admin')
-      .then(({ data }) => setIsSuperAdmin(!!(data && data.length > 0)))
-      .finally(() => setIsRoleCheckComplete(true));
+    const checkSuperAdmin = async () => {
+      setIsRoleCheckComplete(false);
+      const { data } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin');
+
+      setIsSuperAdmin(!!(data && data.length > 0));
+      setIsRoleCheckComplete(true);
+    };
+
+    checkSuperAdmin();
   }, [user?.id]);
 
   // Club details
