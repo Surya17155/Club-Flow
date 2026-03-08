@@ -151,6 +151,14 @@ const AdminDashboard = () => {
         </div>
 
         <div className="flex items-center gap-4">
+          {!isPersonal && activeClub && (activeClub.role === 'president' || activeClub.role === 'admin') && (
+            <button
+              onClick={() => navigate('/club-dashboard')}
+              className="text-primary-foreground text-sm font-medium px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-transform active:scale-95 gradient-gold"
+            >
+              <Users className="w-4 h-4" /> Manage Club
+            </button>
+          )}
           {!isPersonal && activeClub && hasPower('create_event') &&
           <DropdownMenu>
             <DropdownMenuTrigger className="text-primary-foreground text-sm font-medium px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-transform active:scale-95 gradient-gold">
