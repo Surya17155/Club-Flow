@@ -45,6 +45,34 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const greeting = useMemo(() => getRandomGreeting(), []);
 
+  const [upcomingEvents, setUpcomingEvents] = useState<{ id: string; name: string; month: string; day: string; location: string; club_name: string }[]>([]);
+
+  useEffect(() => {
+    const fetchUpcoming = async () => {
+      const now = new Date().toISOString();
+      const { data } = await supabase
+        .from('events')
+        .select('id, name, event_date, description, clubs(name)')
+        .gte('event_date', now)
+        .order('event_date', { ascending: true })
+        .limit(10);
+      if (data) {
+        setUpcomingEvents(data.map((e: any) => {
+          const d = new Date(e.event_date);
+          return {
+            id: e.id,
+            name: e.name,
+            month: d.toLocaleString('default', { month: 'short' }).toUpperCase(),
+            day: String(d.getDate()),
+            location: e.description || '',
+            club_name: e.clubs?.name || '',
+          };
+        }));
+      }
+    };
+    fetchUpcoming();
+  }, []);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#fdfbf7' }}>
