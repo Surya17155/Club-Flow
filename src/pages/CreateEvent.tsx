@@ -15,6 +15,7 @@ const CATEGORIES = ['Technical', 'Cultural', 'Sports', 'Academic', 'Social'];
 const CreateEvent = () => {
   const { user, loading } = useAuth();
   const { activeClub } = useClub();
+  const { hasPower } = useDelegatedPowers();
   const navigate = useNavigate();
 
   const [eventName, setEventName] = useState('');
