@@ -11,6 +11,7 @@ import { Navigate, useNavigate } from 'react-router-dom';
 
 const EVENT_TYPES = ['Normal', 'Seminar', 'Workshop', 'Industrial Visit', 'Hackathon', 'Guest Lecture'];
 const CATEGORIES = ['Technical', 'Cultural', 'Sports', 'Academic', 'Social'];
+const LOCATIONS = ['Auditorium', 'Seminar Hall', 'Custom Location'];
 
 const CreateEvent = () => {
   const { user, loading } = useAuth();
