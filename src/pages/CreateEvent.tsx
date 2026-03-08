@@ -11,6 +11,7 @@ import { Navigate, useNavigate } from 'react-router-dom';
 
 const EVENT_TYPES = ['Normal', 'Seminar', 'Workshop', 'Industrial Visit', 'Hackathon', 'Guest Lecture'];
 const CATEGORIES = ['Technical', 'Cultural', 'Sports', 'Academic', 'Social'];
+const LOCATIONS = ['Auditorium', 'Seminar Hall', 'Custom Location'];
 
 const CreateEvent = () => {
   const { user, loading } = useAuth();
@@ -31,6 +32,8 @@ const CreateEvent = () => {
   const [capacity, setCapacity] = useState('');
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  const [showLocationDropdown, setShowLocationDropdown] = useState(false);
+  const [isCustomLocation, setIsCustomLocation] = useState(false);
   const [qrToken, setQrToken] = useState<string | null>(null);
   const [publishing, setPublishing] = useState(false);
 
@@ -238,17 +241,54 @@ const CreateEvent = () => {
             </div>
 
             {/* Location */}
-            <div className="space-y-1.5">
+            <div className="space-y-1.5 relative">
               <label className="block text-sm font-medium text-foreground/90">Location / Platform</label>
-              <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-                <input
-                  className="glass-input w-full pl-10 pr-4 py-2.5 text-foreground placeholder:text-muted-foreground/50 rounded-lg"
-                  placeholder="e.g. Hall A, Main Lab"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)} />
-                
-              </div>
+              <button
+                type="button"
+                onClick={() => { setShowLocationDropdown(!showLocationDropdown); setShowTypeDropdown(false); setShowCategoryDropdown(false); }}
+                className="glass-input w-full px-4 py-2.5 text-foreground flex items-center gap-2 cursor-pointer rounded-lg">
+                <MapPin className="w-4 h-4 text-muted-foreground" />
+                <span className="flex-1 text-left">{location || 'Select location'}</span>
+                <ChevronDown className="w-4 h-4 text-muted-foreground" />
+              </button>
+              {showLocationDropdown && (
+                <div
+                  className="absolute z-50 w-full mt-1 rounded-xl overflow-hidden shadow-lg border border-border/30"
+                  style={{ background: 'rgba(255, 255, 255, 0.75)', backdropFilter: 'blur(32px) saturate(1.3)', WebkitBackdropFilter: 'blur(32px) saturate(1.3)' }}>
+                  <div className="p-1 space-y-0.5">
+                    {LOCATIONS.map((loc) => (
+                      <div
+                        key={loc}
+                        onClick={() => {
+                          if (loc === 'Custom Location') {
+                            setIsCustomLocation(true);
+                            setLocation('');
+                          } else {
+                            setIsCustomLocation(false);
+                            setLocation(loc);
+                          }
+                          setShowLocationDropdown(false);
+                        }}
+                        className={`px-4 py-2 rounded-lg cursor-pointer text-sm transition-colors ${
+                          location === loc ? 'bg-primary/15 text-foreground font-medium' : 'hover:bg-accent/40 text-muted-foreground'
+                        }`}>
+                        {loc}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {isCustomLocation && (
+                <div className="relative mt-2">
+                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                  <input
+                    className="glass-input w-full pl-10 pr-4 py-2.5 text-foreground placeholder:text-muted-foreground/50 rounded-lg"
+                    placeholder="Enter custom location..."
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    autoFocus />
+                </div>
+              )}
             </div>
           </section>
 
