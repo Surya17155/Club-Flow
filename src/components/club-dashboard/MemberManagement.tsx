@@ -127,7 +127,6 @@ const MemberManagement = ({ clubId }: Props) => {
       const response = await supabase.functions.invoke('create-member', {
         body: {
           email: addForm.email.trim(),
-          password: addForm.password,
           full_name: addForm.fullName.trim(),
           programme: addForm.programme,
           section: addForm.section,
