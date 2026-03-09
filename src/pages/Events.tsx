@@ -44,7 +44,7 @@ const Events = () => {
     setLoading(true);
     const { data, error } = await supabase
       .from('events')
-      .select('id, name, event_type, category, event_date, access_type, description, qr_token, club_id, clubs(name)')
+      .select('id, name, event_type, category, event_date, end_date, access_type, description, qr_token, club_id, clubs(name)')
       .order('event_date', { ascending: false });
 
     if (!error && data) {
