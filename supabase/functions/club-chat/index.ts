@@ -101,7 +101,7 @@ serve(async (req) => {
 
     // Events
     let eventsQuery = adminClient.from("events").select("id, name, event_date, end_date, club_id, category, event_type, access_type, description").order("event_date", { ascending: false }).limit(50);
-    if (!isSuperAdmin) eventsQuery = eventsQuery.in("club_id", clubIds!);
+    if (!isSuperAdmin) eventsQuery = eventsQuery.in("club_id", clubIds);
     const { data: events } = await eventsQuery;
 
     // Attendance summary
