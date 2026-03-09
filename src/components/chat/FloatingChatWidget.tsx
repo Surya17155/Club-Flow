@@ -13,9 +13,10 @@ const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/club-chat`;
 
 interface FloatingChatWidgetProps {
   visible?: boolean;
+  activeClubId?: string;
 }
 
-export function FloatingChatWidget({ visible = true }: FloatingChatWidgetProps) {
+export function FloatingChatWidget({ visible = true, activeClubId }: FloatingChatWidgetProps) {
   const { session } = useAuth();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([]);
