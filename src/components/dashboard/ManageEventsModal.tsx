@@ -171,7 +171,7 @@ const ManageEventsModal = ({ open, onOpenChange }: { open: boolean; onOpenChange
             {/* Event info summary */}
             <div className="flex flex-wrap gap-2 mb-4">
               <Badge variant="secondary" className="text-xs"><Calendar className="w-3 h-3 mr-1" />{formatDate(selectedEvent.event_date)}</Badge>
-              <Badge variant="outline" className="text-xs"><Clock className="w-3 h-3 mr-1" />{formatTime(selectedEvent.event_date)}</Badge>
+              <Badge variant="outline" className="text-xs"><Clock className="w-3 h-3 mr-1" />{formatTime(selectedEvent.event_date)}{selectedEvent.end_date ? ` – ${formatTime(selectedEvent.end_date)}` : ''}</Badge>
               <Badge variant="outline" className="text-xs"><Shield className="w-3 h-3 mr-1" />{selectedEvent.access_type}</Badge>
               <Badge variant="outline" className="text-xs"><Users className="w-3 h-3 mr-1" />{attendees.length} attended</Badge>
             </div>
