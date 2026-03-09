@@ -205,6 +205,46 @@ const MemberManagement = ({ clubId }: Props) => {
     setRoleDialogOpen(true);
   };
 
+  const handleImportExcel = async (file: File) => {
+    setImporting(true);
+    setImportResults(null);
+
+    try {
+      const data = await file.arrayBuffer();
+      const workbook = XLSX.read(data);
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 }) as any[][];
+
+      if (jsonData.length < 2) {
+        toast.error('Excel file must have a header row and at least one data row');
+        setImporting(false);
+        return;
+      }
+
+      const headers = jsonData[0].map((h: any) => String(h || ''));
+      const rows = jsonData.slice(1).filter(row => row.some(cell => cell != null && cell !== ''));
+
+      toast.info(`Processing ${rows.length} rows with AI...`);
+
+      const response = await supabase.functions.invoke('import-members', {
+        body: { club_id: clubId, raw_data: rows, headers },
+      });
+
+      if (response.error || response.data?.error) {
+        toast.error(response.data?.error || 'Import failed');
+      } else {
+        const { summary, results } = response.data;
+        setImportResults({ summary, results });
+        toast.success(`Import complete: ${summary.added} added, ${summary.updated} updated, ${summary.skipped} skipped, ${summary.failed} failed`);
+        await fetchMembers();
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to process Excel file');
+    }
+
+    setImporting(false);
+  };
+
   const filtered = members.filter(m =>
     m.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     m.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
