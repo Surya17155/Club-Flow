@@ -91,7 +91,7 @@ serve(async (req) => {
 
     // Fetch club data
     let clubsQuery = adminClient.from("clubs").select("id, name, description, about");
-    if (!isSuperAdmin) clubsQuery = clubsQuery.in("id", clubIds!);
+    if (!isSuperAdmin) clubsQuery = clubsQuery.in("id", clubIds);
     const { data: clubs } = await clubsQuery;
 
     // Member counts per club
