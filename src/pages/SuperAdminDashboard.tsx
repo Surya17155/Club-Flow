@@ -16,6 +16,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import ProfileDropdown from '@/components/dashboard/ProfileDropdown';
 import SuperAdminCalendar from '@/components/dashboard/SuperAdminCalendar';
 import { useToast } from '@/hooks/use-toast';
+import { FloatingChatWidget } from '@/components/chat/FloatingChatWidget';
 
 const roleLabelMap: Record<string, string> = {
   admin: 'Admin', president: 'President', vice_president: 'Vice President',
