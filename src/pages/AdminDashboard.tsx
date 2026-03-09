@@ -22,7 +22,7 @@ import ManageEventsModal from '@/components/dashboard/ManageEventsModal';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-
+import { FloatingChatWidget } from '@/components/chat/FloatingChatWidget';
 
 const roleLabelMap: Record<string, string> = {
   admin: 'Admin', president: 'President', vice_president: 'Vice President',
