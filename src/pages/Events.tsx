@@ -145,7 +145,12 @@ const Events = () => {
                       </div>
                       <div className="flex items-center gap-2">
                         <Clock className="w-3.5 h-3.5" />
-                        <span>{d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
+                        <span>
+                          {d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                          {event.end_date && (
+                            <> – {new Date(event.end_date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</>
+                          )}
+                        </span>
                       </div>
                       <div className="flex items-center gap-2">
                         <span>{attendanceCounts[event.id] || 0} attendees</span>
