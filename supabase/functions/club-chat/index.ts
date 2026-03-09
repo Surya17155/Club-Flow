@@ -116,7 +116,7 @@ serve(async (req) => {
     const memberUserIds = (members || []).map((m: any) => m.user_id);
     let profiles: any[] = [];
     if (memberUserIds.length > 0) {
-      const { data } = await adminClient.from("profiles").select("user_id, full_name, email, programme, year, roll_no").in("user_id", memberUserIds);
+      const { data } = await adminClient.from("profiles").select("user_id, full_name, email, programme, year, roll_no, phone, social_instagram, social_linkedin, social_gmail").in("user_id", memberUserIds);
       profiles = data || [];
     }
 
@@ -127,7 +127,7 @@ serve(async (req) => {
       const clubAttendance = attendanceData.filter((a: any) => clubEvents.some((e: any) => e.id === a.event_id));
       const memberDetails = clubMembers.map((m: any) => {
         const p = profiles.find((pr: any) => pr.user_id === m.user_id);
-        return { name: p?.full_name || "Unknown", email: p?.email, role: m.role, programme: p?.programme, year: p?.year };
+        return { name: p?.full_name || "Unknown", email: p?.email, role: m.role, programme: p?.programme, year: p?.year, phone: p?.phone, instagram: p?.social_instagram, linkedin: p?.social_linkedin, gmail: p?.social_gmail };
       });
 
       return {
