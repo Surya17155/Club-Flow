@@ -147,7 +147,7 @@ const ManageEventsModal = ({ open, onOpenChange }: { open: boolean; onOpenChange
                     <div className="flex-1 min-w-0">
                       <h4 className="text-sm font-bold text-foreground truncate">{event.name}</h4>
                       <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
-                        <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{formatTime(event.event_date)}</span>
+                        <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{formatTime(event.event_date)}{event.end_date ? ` – ${formatTime(event.end_date)}` : ''}</span>
                         <span className="flex items-center gap-1"><Tag className="w-3 h-3" />{event.event_type}</span>
                       </div>
                     </div>
