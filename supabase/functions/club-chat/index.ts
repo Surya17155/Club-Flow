@@ -29,7 +29,7 @@ serve(async (req) => {
     }
     const userId = claimsData.claims.sub;
 
-    const { message, conversation_history = [] } = await req.json();
+    const { message, conversation_history = [], active_club_id } = await req.json();
     if (!message) {
       return new Response(JSON.stringify({ error: "Message is required" }), { status: 400, headers: corsHeaders });
     }
@@ -55,9 +55,20 @@ serve(async (req) => {
       .select("club_id, role, clubs(id, name, description, about)")
       .eq("user_id", userId);
 
-    const clubIds = isSuperAdmin
-      ? undefined // will fetch all
-      : (userClubs || []).map((c: any) => c.club_id);
+    // For non-super-admins, scope to the active club only
+    let clubIds: string[];
+    if (isSuperAdmin) {
+      clubIds = []; // will fetch all
+    } else if (active_club_id) {
+      // Verify user is actually a member of this club
+      const isMember = (userClubs || []).some((c: any) => c.club_id === active_club_id);
+      if (!isMember) {
+        return new Response(JSON.stringify({ error: "You are not a member of this club" }), { status: 403, headers: corsHeaders });
+      }
+      clubIds = [active_club_id];
+    } else {
+      clubIds = (userClubs || []).map((c: any) => c.club_id);
+    }
 
     if (!isSuperAdmin && (!clubIds || clubIds.length === 0)) {
       // User has no clubs
