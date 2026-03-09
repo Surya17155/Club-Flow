@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,7 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { UserPlus, Trash2, Eye, Loader2, Search, Users, MoreVertical, ShieldCheck } from 'lucide-react';
+import { UserPlus, Trash2, Eye, Loader2, Search, Users, MoreVertical, ShieldCheck, Upload, FileSpreadsheet, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
+import * as XLSX from 'xlsx';
 
 interface Member {
   id: string;
@@ -68,6 +69,10 @@ const MemberManagement = ({ clubId }: Props) => {
   const [roleTarget, setRoleTarget] = useState<Member | null>(null);
   const [newRole, setNewRole] = useState('member');
   const [changingRole, setChangingRole] = useState(false);
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const [importResults, setImportResults] = useState<{ summary: any; results: any[] } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Add member form state
   const [addForm, setAddForm] = useState({
@@ -200,6 +205,46 @@ const MemberManagement = ({ clubId }: Props) => {
     setRoleDialogOpen(true);
   };
 
+  const handleImportExcel = async (file: File) => {
+    setImporting(true);
+    setImportResults(null);
+
+    try {
+      const data = await file.arrayBuffer();
+      const workbook = XLSX.read(data);
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 }) as any[][];
+
+      if (jsonData.length < 2) {
+        toast.error('Excel file must have a header row and at least one data row');
+        setImporting(false);
+        return;
+      }
+
+      const headers = jsonData[0].map((h: any) => String(h || ''));
+      const rows = jsonData.slice(1).filter(row => row.some(cell => cell != null && cell !== ''));
+
+      toast.info(`Processing ${rows.length} rows with AI...`);
+
+      const response = await supabase.functions.invoke('import-members', {
+        body: { club_id: clubId, raw_data: rows, headers },
+      });
+
+      if (response.error || response.data?.error) {
+        toast.error(response.data?.error || 'Import failed');
+      } else {
+        const { summary, results } = response.data;
+        setImportResults({ summary, results });
+        toast.success(`Import complete: ${summary.added} added, ${summary.updated} updated, ${summary.skipped} skipped, ${summary.failed} failed`);
+        await fetchMembers();
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to process Excel file');
+    }
+
+    setImporting(false);
+  };
+
   const filtered = members.filter(m =>
     m.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     m.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -216,9 +261,19 @@ const MemberManagement = ({ clubId }: Props) => {
           <Users className="w-5 h-5 text-primary" />
           <h3 className="font-bold text-lg text-foreground">Members ({members.length})</h3>
         </div>
-        <Button onClick={() => setAddDialogOpen(true)} size="sm" className="rounded-full gap-2">
-          <UserPlus className="w-4 h-4" /> Add Member
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={() => { setImportResults(null); setImportDialogOpen(true); }}
+            size="sm"
+            variant="outline"
+            className="rounded-full gap-2"
+          >
+            <Upload className="w-4 h-4" /> Import
+          </Button>
+          <Button onClick={() => setAddDialogOpen(true)} size="sm" className="rounded-full gap-2">
+            <UserPlus className="w-4 h-4" /> Add Member
+          </Button>
+        </div>
       </div>
 
       <div className="relative mb-4">
@@ -433,6 +488,122 @@ const MemberManagement = ({ clubId }: Props) => {
               )}
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Import Members Dialog */}
+      <Dialog open={importDialogOpen} onOpenChange={(open) => { setImportDialogOpen(open); if (!open) setImportResults(null); }}>
+        <DialogContent className="glass-card border-white/20 max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-display text-lg flex items-center gap-2">
+              <FileSpreadsheet className="w-5 h-5 text-primary" />
+              Import Members from Excel
+            </DialogTitle>
+            <p className="text-sm text-muted-foreground">
+              Upload an Excel file (.xlsx, .xls, .csv) with member details. AI will automatically map columns and assign roles.
+            </p>
+          </DialogHeader>
+
+          <div className="space-y-4 mt-2">
+            {!importResults && (
+              <>
+                <div
+                  className="border-2 border-dashed border-primary/30 rounded-xl p-8 text-center cursor-pointer hover:border-primary/60 hover:bg-primary/5 transition-all"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  {importing ? (
+                    <div className="flex flex-col items-center gap-3">
+                      <Loader2 className="w-10 h-10 animate-spin text-primary" />
+                      <div>
+                        <p className="text-sm font-semibold text-foreground">AI is analyzing your data...</p>
+                        <p className="text-xs text-muted-foreground mt-1">Mapping columns, detecting roles, and importing members</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center gap-3">
+                      <Upload className="w-10 h-10 text-primary/60" />
+                      <div>
+                        <p className="text-sm font-semibold text-foreground">Click to upload Excel file</p>
+                        <p className="text-xs text-muted-foreground mt-1">Supports .xlsx, .xls, and .csv files</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".xlsx,.xls,.csv"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleImportExcel(file);
+                    e.target.value = '';
+                  }}
+                />
+
+                <div className="bg-muted/30 rounded-xl p-4 space-y-2">
+                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Expected Columns</h4>
+                  <div className="grid grid-cols-2 gap-1 text-xs text-muted-foreground">
+                    <span>• Name (required)</span>
+                    <span>• Email (required)</span>
+                    <span>• Programme</span>
+                    <span>• Year</span>
+                    <span>• Section</span>
+                    <span>• Roll No</span>
+                    <span>• Phone</span>
+                    <span>• Role / Position</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground/70 mt-2">
+                    Column names don't need to be exact — AI will intelligently match them.
+                  </p>
+                </div>
+              </>
+            )}
+
+            {importResults && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-4 gap-2">
+                  <div className="bg-green-100 dark:bg-green-900/30 rounded-lg p-3 text-center">
+                    <p className="text-lg font-bold text-green-700 dark:text-green-400">{importResults.summary.added}</p>
+                    <p className="text-xs text-green-600 dark:text-green-500">Added</p>
+                  </div>
+                  <div className="bg-blue-100 dark:bg-blue-900/30 rounded-lg p-3 text-center">
+                    <p className="text-lg font-bold text-blue-700 dark:text-blue-400">{importResults.summary.updated}</p>
+                    <p className="text-xs text-blue-600 dark:text-blue-500">Updated</p>
+                  </div>
+                  <div className="bg-muted rounded-lg p-3 text-center">
+                    <p className="text-lg font-bold text-muted-foreground">{importResults.summary.skipped}</p>
+                    <p className="text-xs text-muted-foreground">Skipped</p>
+                  </div>
+                  <div className="bg-red-100 dark:bg-red-900/30 rounded-lg p-3 text-center">
+                    <p className="text-lg font-bold text-red-700 dark:text-red-400">{importResults.summary.failed}</p>
+                    <p className="text-xs text-red-600 dark:text-red-500">Failed</p>
+                  </div>
+                </div>
+
+                <div className="max-h-60 overflow-y-auto space-y-1">
+                  {importResults.results.map((r: any, i: number) => (
+                    <div key={i} className="flex items-center justify-between p-2 rounded-lg bg-white/10 text-sm">
+                      <span className="font-medium text-foreground truncate flex-1">{r.name}</span>
+                      <div className="flex items-center gap-1 shrink-0 ml-2">
+                        {r.status === 'added' && <CheckCircle2 className="w-4 h-4 text-green-600" />}
+                        {r.status === 'role_updated' && <ShieldCheck className="w-4 h-4 text-blue-600" />}
+                        {r.status === 'already_exists' && <AlertCircle className="w-4 h-4 text-muted-foreground" />}
+                        {r.status === 'skipped' && <AlertCircle className="w-4 h-4 text-yellow-600" />}
+                        {r.status === 'failed' && <XCircle className="w-4 h-4 text-red-600" />}
+                        <span className="text-xs text-muted-foreground capitalize">{r.status.replace('_', ' ')}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <Button onClick={() => { setImportResults(null); setImportDialogOpen(false); }} className="w-full rounded-full">
+                  Done
+                </Button>
+              </div>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </div>
