@@ -146,15 +146,19 @@ serve(async (req) => {
       };
     });
 
+    const activeClubName = (!isSuperAdmin && active_club_id)
+      ? (clubs || []).find((c: any) => c.id === active_club_id)?.name || "your club"
+      : null;
+
     const userRoleDesc = isSuperAdmin
       ? "Super Admin with unrestricted access to all clubs"
-      : `Club member with access to: ${(userClubs || []).map((c: any) => `${c.clubs?.name} (${c.role})`).join(", ")}`;
+      : `Club member currently viewing: ${activeClubName || (userClubs || []).map((c: any) => `${c.clubs?.name} (${c.role})`).join(", ")}`;
 
     const systemPrompt = `You are ClubBot, an AI assistant for a club management platform. You have real-time access to club data.
 
 **User Role**: ${userRoleDesc}
 
-${!isSuperAdmin ? `**SECURITY RULE**: You must ONLY answer questions about the user's own club(s). If asked about other clubs, respond: "Sorry, I cannot provide information about other clubs for security purposes."` : "You have unrestricted access to all club data."}
+${!isSuperAdmin ? `**SECURITY RULE**: You must ONLY answer questions about ${activeClubName ? `"${activeClubName}"` : "the user's own club"}. You have been given data ONLY for this club. If asked about other clubs, respond: "Sorry, I cannot provide information about other clubs for security purposes." Do NOT reference or reveal data from any other club.` : "You have unrestricted access to all club data."}
 
 **Club Data**:
 ${JSON.stringify(clubSummaries, null, 2)}
