@@ -261,9 +261,19 @@ const MemberManagement = ({ clubId }: Props) => {
           <Users className="w-5 h-5 text-primary" />
           <h3 className="font-bold text-lg text-foreground">Members ({members.length})</h3>
         </div>
-        <Button onClick={() => setAddDialogOpen(true)} size="sm" className="rounded-full gap-2">
-          <UserPlus className="w-4 h-4" /> Add Member
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={() => { setImportResults(null); setImportDialogOpen(true); }}
+            size="sm"
+            variant="outline"
+            className="rounded-full gap-2"
+          >
+            <Upload className="w-4 h-4" /> Import
+          </Button>
+          <Button onClick={() => setAddDialogOpen(true)} size="sm" className="rounded-full gap-2">
+            <UserPlus className="w-4 h-4" /> Add Member
+          </Button>
+        </div>
       </div>
 
       <div className="relative mb-4">
