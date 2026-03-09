@@ -50,18 +50,16 @@ const ProfileDropdown = ({ viewMode = 'personal' }: { viewMode?: 'personal' | 'c
   return (
     <>
     <DropdownMenu onOpenChange={() => setShowClubs(false)}>
-      <DropdownMenuTrigger asChild>
-        <button className="glass-input pl-1 pr-4 py-1 rounded-full flex items-center gap-3 cursor-pointer hover:bg-white/60 transition-colors outline-none focus:ring-2 focus:ring-primary/20">
-          {profile?.avatar_url ? (
-            <img src={profile.avatar_url} alt={fullName} className="w-8 h-8 rounded-full object-cover" />
-          ) : (
-            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold">
-              {initials}
-            </div>
-          )}
-          <span className="text-sm font-medium text-foreground">{fullName}</span>
-          <ChevronDown className="w-3 h-3 text-muted-foreground" />
-        </button>
+      <DropdownMenuTrigger className="glass-input pl-1 pr-4 py-1 rounded-full flex items-center gap-3 cursor-pointer hover:bg-white/60 transition-colors outline-none focus:ring-2 focus:ring-primary/20">
+        {profile?.avatar_url ? (
+          <img src={profile.avatar_url} alt={fullName} className="w-8 h-8 rounded-full object-cover" />
+        ) : (
+          <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold">
+            {initials}
+          </div>
+        )}
+        <span className="text-sm font-medium text-foreground">{fullName}</span>
+        <ChevronDown className="w-3 h-3 text-muted-foreground" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-64">
         {!showClubs ? (
