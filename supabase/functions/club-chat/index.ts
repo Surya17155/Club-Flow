@@ -29,7 +29,7 @@ serve(async (req) => {
     }
     const userId = claimsData.claims.sub;
 
-    const { message, conversation_history = [] } = await req.json();
+    const { message, conversation_history = [], active_club_id } = await req.json();
     if (!message) {
       return new Response(JSON.stringify({ error: "Message is required" }), { status: 400, headers: corsHeaders });
     }
@@ -55,9 +55,20 @@ serve(async (req) => {
       .select("club_id, role, clubs(id, name, description, about)")
       .eq("user_id", userId);
 
-    const clubIds = isSuperAdmin
-      ? undefined // will fetch all
-      : (userClubs || []).map((c: any) => c.club_id);
+    // For non-super-admins, scope to the active club only
+    let clubIds: string[];
+    if (isSuperAdmin) {
+      clubIds = []; // will fetch all
+    } else if (active_club_id) {
+      // Verify user is actually a member of this club
+      const isMember = (userClubs || []).some((c: any) => c.club_id === active_club_id);
+      if (!isMember) {
+        return new Response(JSON.stringify({ error: "You are not a member of this club" }), { status: 403, headers: corsHeaders });
+      }
+      clubIds = [active_club_id];
+    } else {
+      clubIds = (userClubs || []).map((c: any) => c.club_id);
+    }
 
     if (!isSuperAdmin && (!clubIds || clubIds.length === 0)) {
       // User has no clubs
@@ -80,17 +91,17 @@ serve(async (req) => {
 
     // Fetch club data
     let clubsQuery = adminClient.from("clubs").select("id, name, description, about");
-    if (!isSuperAdmin) clubsQuery = clubsQuery.in("id", clubIds!);
+    if (!isSuperAdmin) clubsQuery = clubsQuery.in("id", clubIds);
     const { data: clubs } = await clubsQuery;
 
     // Member counts per club
     let membersQuery = adminClient.from("club_members").select("club_id, role, user_id");
-    if (!isSuperAdmin) membersQuery = membersQuery.in("club_id", clubIds!);
+    if (!isSuperAdmin) membersQuery = membersQuery.in("club_id", clubIds);
     const { data: members } = await membersQuery;
 
     // Events
     let eventsQuery = adminClient.from("events").select("id, name, event_date, end_date, club_id, category, event_type, access_type, description").order("event_date", { ascending: false }).limit(50);
-    if (!isSuperAdmin) eventsQuery = eventsQuery.in("club_id", clubIds!);
+    if (!isSuperAdmin) eventsQuery = eventsQuery.in("club_id", clubIds);
     const { data: events } = await eventsQuery;
 
     // Attendance summary
@@ -135,15 +146,19 @@ serve(async (req) => {
       };
     });
 
+    const activeClubName = (!isSuperAdmin && active_club_id)
+      ? (clubs || []).find((c: any) => c.id === active_club_id)?.name || "your club"
+      : null;
+
     const userRoleDesc = isSuperAdmin
       ? "Super Admin with unrestricted access to all clubs"
-      : `Club member with access to: ${(userClubs || []).map((c: any) => `${c.clubs?.name} (${c.role})`).join(", ")}`;
+      : `Club member currently viewing: ${activeClubName || (userClubs || []).map((c: any) => `${c.clubs?.name} (${c.role})`).join(", ")}`;
 
     const systemPrompt = `You are ClubBot, an AI assistant for a club management platform. You have real-time access to club data.
 
 **User Role**: ${userRoleDesc}
 
-${!isSuperAdmin ? `**SECURITY RULE**: You must ONLY answer questions about the user's own club(s). If asked about other clubs, respond: "Sorry, I cannot provide information about other clubs for security purposes."` : "You have unrestricted access to all club data."}
+${!isSuperAdmin ? `**SECURITY RULE**: You must ONLY answer questions about ${activeClubName ? `"${activeClubName}"` : "the user's own club"}. You have been given data ONLY for this club. If asked about other clubs, respond: "Sorry, I cannot provide information about other clubs for security purposes." Do NOT reference or reveal data from any other club.` : "You have unrestricted access to all club data."}
 
 **Club Data**:
 ${JSON.stringify(clubSummaries, null, 2)}

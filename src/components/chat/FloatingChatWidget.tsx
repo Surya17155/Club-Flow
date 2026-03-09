@@ -13,15 +13,22 @@ const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/club-chat`;
 
 interface FloatingChatWidgetProps {
   visible?: boolean;
+  activeClubId?: string;
 }
 
-export function FloatingChatWidget({ visible = true }: FloatingChatWidgetProps) {
+export function FloatingChatWidget({ visible = true, activeClubId }: FloatingChatWidgetProps) {
   const { session } = useAuth();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Clear chat when active club changes
+  useEffect(() => {
+    setMessages([]);
+    setInput('');
+  }, [activeClubId]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -62,6 +69,7 @@ export function FloatingChatWidget({ visible = true }: FloatingChatWidgetProps) 
         body: JSON.stringify({
           message: text,
           conversation_history: messages.map(m => ({ role: m.role, content: m.content })),
+          active_club_id: activeClubId || undefined,
         }),
       });
 
