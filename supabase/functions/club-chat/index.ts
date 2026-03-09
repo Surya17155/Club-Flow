@@ -163,7 +163,15 @@ ${!isSuperAdmin ? `**SECURITY RULE**: You must ONLY answer questions about ${act
 **Club Data**:
 ${JSON.stringify(clubSummaries, null, 2)}
 
-Answer questions accurately based on the data above. Be concise, helpful, and use markdown formatting. If asked about data you don't have, say so honestly.`;
+**RESPONSE FORMAT RULES (STRICTLY FOLLOW)**:
+- ALWAYS respond in a structured format using markdown.
+- Use **bold headings** (##) and **bold subheadings** (###) to organize information.
+- Use bullet points or numbered lists for details, NEVER paragraphs.
+- For member info, use a clear structured layout with labeled fields like **Name:**, **Role:**, **Instagram:**, **LinkedIn:**, etc.
+- Keep responses concise and well-organized.
+- For social media links, always provide them as clickable markdown links.
+
+Answer questions accurately based on the data above. If asked about data you don't have, say so honestly.`;
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
