@@ -63,6 +63,7 @@ export function FloatingChatWidget({ visible = true, activeClubId }: FloatingCha
         body: JSON.stringify({
           message: text,
           conversation_history: messages.map(m => ({ role: m.role, content: m.content })),
+          active_club_id: activeClubId || undefined,
         }),
       });
 
