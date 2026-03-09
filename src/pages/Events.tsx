@@ -18,6 +18,7 @@ interface EventRow {
   event_type: string;
   category: string;
   event_date: string;
+  end_date: string | null;
   access_type: string;
   description: string | null;
   qr_token: string | null;
@@ -43,7 +44,7 @@ const Events = () => {
     setLoading(true);
     const { data, error } = await supabase
       .from('events')
-      .select('id, name, event_type, category, event_date, access_type, description, qr_token, club_id, clubs(name)')
+      .select('id, name, event_type, category, event_date, end_date, access_type, description, qr_token, club_id, clubs(name)')
       .order('event_date', { ascending: false });
 
     if (!error && data) {
@@ -144,7 +145,12 @@ const Events = () => {
                       </div>
                       <div className="flex items-center gap-2">
                         <Clock className="w-3.5 h-3.5" />
-                        <span>{d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
+                        <span>
+                          {d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                          {event.end_date && (
+                            <> – {new Date(event.end_date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</>
+                          )}
+                        </span>
                       </div>
                       <div className="flex items-center gap-2">
                         <span>{attendanceCounts[event.id] || 0} attendees</span>
@@ -187,7 +193,10 @@ const Events = () => {
               <p><strong>Type:</strong> {selectedEvent.event_type}</p>
               <p><strong>Category:</strong> {selectedEvent.category}</p>
               <p><strong>Access:</strong> {selectedEvent.access_type}</p>
-              <p><strong>Date:</strong> {new Date(selectedEvent.event_date).toLocaleString()}</p>
+              <p><strong>Start:</strong> {new Date(selectedEvent.event_date).toLocaleString()}</p>
+              {selectedEvent.end_date && (
+                <p><strong>End:</strong> {new Date(selectedEvent.end_date).toLocaleString()}</p>
+              )}
               <p><strong>Attendees:</strong> {attendanceCounts[selectedEvent.id] || 0}</p>
               {selectedEvent.description && <p><strong>Description:</strong> {selectedEvent.description}</p>}
             </div>

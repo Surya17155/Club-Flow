@@ -147,7 +147,7 @@ const ManageEventsModal = ({ open, onOpenChange }: { open: boolean; onOpenChange
                     <div className="flex-1 min-w-0">
                       <h4 className="text-sm font-bold text-foreground truncate">{event.name}</h4>
                       <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
-                        <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{formatTime(event.event_date)}</span>
+                        <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{formatTime(event.event_date)}{event.end_date ? ` – ${formatTime(event.end_date)}` : ''}</span>
                         <span className="flex items-center gap-1"><Tag className="w-3 h-3" />{event.event_type}</span>
                       </div>
                     </div>
@@ -171,7 +171,7 @@ const ManageEventsModal = ({ open, onOpenChange }: { open: boolean; onOpenChange
             {/* Event info summary */}
             <div className="flex flex-wrap gap-2 mb-4">
               <Badge variant="secondary" className="text-xs"><Calendar className="w-3 h-3 mr-1" />{formatDate(selectedEvent.event_date)}</Badge>
-              <Badge variant="outline" className="text-xs"><Clock className="w-3 h-3 mr-1" />{formatTime(selectedEvent.event_date)}</Badge>
+              <Badge variant="outline" className="text-xs"><Clock className="w-3 h-3 mr-1" />{formatTime(selectedEvent.event_date)}{selectedEvent.end_date ? ` – ${formatTime(selectedEvent.end_date)}` : ''}</Badge>
               <Badge variant="outline" className="text-xs"><Shield className="w-3 h-3 mr-1" />{selectedEvent.access_type}</Badge>
               <Badge variant="outline" className="text-xs"><Users className="w-3 h-3 mr-1" />{attendees.length} attended</Badge>
             </div>
