@@ -127,7 +127,7 @@ serve(async (req) => {
       const clubAttendance = attendanceData.filter((a: any) => clubEvents.some((e: any) => e.id === a.event_id));
       const memberDetails = clubMembers.map((m: any) => {
         const p = profiles.find((pr: any) => pr.user_id === m.user_id);
-        return { name: p?.full_name || "Unknown", email: p?.email, role: m.role, programme: p?.programme, year: p?.year };
+        return { name: p?.full_name || "Unknown", email: p?.email, role: m.role, programme: p?.programme, year: p?.year, phone: p?.phone, instagram: p?.social_instagram, linkedin: p?.social_linkedin, gmail: p?.social_gmail };
       });
 
       return {
