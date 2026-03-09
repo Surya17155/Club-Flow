@@ -18,6 +18,7 @@ interface EventRow {
   event_type: string;
   category: string;
   event_date: string;
+  end_date: string | null;
   access_type: string;
   description: string | null;
   qr_token: string | null;
