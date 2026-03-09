@@ -60,6 +60,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           </main>
         </div>
       </div>
+      <FloatingChatWidget />
     </SidebarProvider>
   );
 }
