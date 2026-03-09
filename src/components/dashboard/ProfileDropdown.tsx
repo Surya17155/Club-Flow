@@ -51,7 +51,7 @@ const ProfileDropdown = ({ viewMode = 'personal' }: { viewMode?: 'personal' | 'c
     <>
     <DropdownMenu onOpenChange={() => setShowClubs(false)}>
       <DropdownMenuTrigger asChild>
-        <button className="glass-input pl-1 pr-4 py-1 rounded-full flex items-center gap-3 cursor-pointer hover:bg-white/60 transition-colors outline-none relative z-10">
+        <button className="glass-input pl-1 pr-4 py-1 rounded-full flex items-center gap-3 cursor-pointer hover:bg-white/60 transition-colors outline-none focus:ring-2 focus:ring-primary/20">
           {profile?.avatar_url ? (
             <img src={profile.avatar_url} alt={fullName} className="w-8 h-8 rounded-full object-cover" />
           ) : (
