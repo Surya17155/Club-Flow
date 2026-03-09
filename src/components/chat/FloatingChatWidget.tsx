@@ -24,6 +24,12 @@ export function FloatingChatWidget({ visible = true, activeClubId }: FloatingCha
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // Clear chat when active club changes
+  useEffect(() => {
+    setMessages([]);
+    setInput('');
+  }, [activeClubId]);
+
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
