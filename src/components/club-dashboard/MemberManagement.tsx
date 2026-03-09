@@ -490,6 +490,122 @@ const MemberManagement = ({ clubId }: Props) => {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Import Members Dialog */}
+      <Dialog open={importDialogOpen} onOpenChange={(open) => { setImportDialogOpen(open); if (!open) setImportResults(null); }}>
+        <DialogContent className="glass-card border-white/20 max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-display text-lg flex items-center gap-2">
+              <FileSpreadsheet className="w-5 h-5 text-primary" />
+              Import Members from Excel
+            </DialogTitle>
+            <p className="text-sm text-muted-foreground">
+              Upload an Excel file (.xlsx, .xls, .csv) with member details. AI will automatically map columns and assign roles.
+            </p>
+          </DialogHeader>
+
+          <div className="space-y-4 mt-2">
+            {!importResults && (
+              <>
+                <div
+                  className="border-2 border-dashed border-primary/30 rounded-xl p-8 text-center cursor-pointer hover:border-primary/60 hover:bg-primary/5 transition-all"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  {importing ? (
+                    <div className="flex flex-col items-center gap-3">
+                      <Loader2 className="w-10 h-10 animate-spin text-primary" />
+                      <div>
+                        <p className="text-sm font-semibold text-foreground">AI is analyzing your data...</p>
+                        <p className="text-xs text-muted-foreground mt-1">Mapping columns, detecting roles, and importing members</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center gap-3">
+                      <Upload className="w-10 h-10 text-primary/60" />
+                      <div>
+                        <p className="text-sm font-semibold text-foreground">Click to upload Excel file</p>
+                        <p className="text-xs text-muted-foreground mt-1">Supports .xlsx, .xls, and .csv files</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".xlsx,.xls,.csv"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleImportExcel(file);
+                    e.target.value = '';
+                  }}
+                />
+
+                <div className="bg-muted/30 rounded-xl p-4 space-y-2">
+                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Expected Columns</h4>
+                  <div className="grid grid-cols-2 gap-1 text-xs text-muted-foreground">
+                    <span>• Name (required)</span>
+                    <span>• Email (required)</span>
+                    <span>• Programme</span>
+                    <span>• Year</span>
+                    <span>• Section</span>
+                    <span>• Roll No</span>
+                    <span>• Phone</span>
+                    <span>• Role / Position</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground/70 mt-2">
+                    Column names don't need to be exact — AI will intelligently match them.
+                  </p>
+                </div>
+              </>
+            )}
+
+            {importResults && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-4 gap-2">
+                  <div className="bg-green-100 dark:bg-green-900/30 rounded-lg p-3 text-center">
+                    <p className="text-lg font-bold text-green-700 dark:text-green-400">{importResults.summary.added}</p>
+                    <p className="text-xs text-green-600 dark:text-green-500">Added</p>
+                  </div>
+                  <div className="bg-blue-100 dark:bg-blue-900/30 rounded-lg p-3 text-center">
+                    <p className="text-lg font-bold text-blue-700 dark:text-blue-400">{importResults.summary.updated}</p>
+                    <p className="text-xs text-blue-600 dark:text-blue-500">Updated</p>
+                  </div>
+                  <div className="bg-muted rounded-lg p-3 text-center">
+                    <p className="text-lg font-bold text-muted-foreground">{importResults.summary.skipped}</p>
+                    <p className="text-xs text-muted-foreground">Skipped</p>
+                  </div>
+                  <div className="bg-red-100 dark:bg-red-900/30 rounded-lg p-3 text-center">
+                    <p className="text-lg font-bold text-red-700 dark:text-red-400">{importResults.summary.failed}</p>
+                    <p className="text-xs text-red-600 dark:text-red-500">Failed</p>
+                  </div>
+                </div>
+
+                <div className="max-h-60 overflow-y-auto space-y-1">
+                  {importResults.results.map((r: any, i: number) => (
+                    <div key={i} className="flex items-center justify-between p-2 rounded-lg bg-white/10 text-sm">
+                      <span className="font-medium text-foreground truncate flex-1">{r.name}</span>
+                      <div className="flex items-center gap-1 shrink-0 ml-2">
+                        {r.status === 'added' && <CheckCircle2 className="w-4 h-4 text-green-600" />}
+                        {r.status === 'role_updated' && <ShieldCheck className="w-4 h-4 text-blue-600" />}
+                        {r.status === 'already_exists' && <AlertCircle className="w-4 h-4 text-muted-foreground" />}
+                        {r.status === 'skipped' && <AlertCircle className="w-4 h-4 text-yellow-600" />}
+                        {r.status === 'failed' && <XCircle className="w-4 h-4 text-red-600" />}
+                        <span className="text-xs text-muted-foreground capitalize">{r.status.replace('_', ' ')}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <Button onClick={() => { setImportResults(null); setImportDialogOpen(false); }} className="w-full rounded-full">
+                  Done
+                </Button>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
