@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
 import { Bell, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { FloatingChatWidget } from '@/components/chat/FloatingChatWidget';
 
 const greetings = ['Hello', 'Hi', 'Hey', 'Yo', 'Welcome', "What's up", 'Howdy', 'Namaste'];
 const getRandomGreeting = () => greetings[Math.floor(Math.random() * greetings.length)];
