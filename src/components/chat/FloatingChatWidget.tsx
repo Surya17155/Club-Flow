@@ -11,7 +11,11 @@ type Msg = { role: 'user' | 'assistant'; content: string };
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/club-chat`;
 
-export function FloatingChatWidget() {
+interface FloatingChatWidgetProps {
+  visible?: boolean;
+}
+
+export function FloatingChatWidget({ visible = true }: FloatingChatWidgetProps) {
   const { session } = useAuth();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([]);
@@ -102,7 +106,7 @@ export function FloatingChatWidget() {
     }
   };
 
-  if (!session) return null;
+  if (!session || !visible) return null;
 
   return (
     <>
