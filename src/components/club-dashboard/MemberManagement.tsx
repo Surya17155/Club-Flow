@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,7 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { UserPlus, Trash2, Eye, Loader2, Search, Users, MoreVertical, ShieldCheck } from 'lucide-react';
+import { UserPlus, Trash2, Eye, Loader2, Search, Users, MoreVertical, ShieldCheck, Upload, FileSpreadsheet, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
+import * as XLSX from 'xlsx';
 
 interface Member {
   id: string;
