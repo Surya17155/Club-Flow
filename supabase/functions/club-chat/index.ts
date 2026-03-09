@@ -116,7 +116,7 @@ serve(async (req) => {
     const memberUserIds = (members || []).map((m: any) => m.user_id);
     let profiles: any[] = [];
     if (memberUserIds.length > 0) {
-      const { data } = await adminClient.from("profiles").select("user_id, full_name, email, programme, year, roll_no").in("user_id", memberUserIds);
+      const { data } = await adminClient.from("profiles").select("user_id, full_name, email, programme, year, roll_no, phone, social_instagram, social_linkedin, social_gmail").in("user_id", memberUserIds);
       profiles = data || [];
     }
 
