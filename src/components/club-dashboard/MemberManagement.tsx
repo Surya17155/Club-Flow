@@ -69,6 +69,10 @@ const MemberManagement = ({ clubId }: Props) => {
   const [roleTarget, setRoleTarget] = useState<Member | null>(null);
   const [newRole, setNewRole] = useState('member');
   const [changingRole, setChangingRole] = useState(false);
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const [importResults, setImportResults] = useState<{ summary: any; results: any[] } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Add member form state
   const [addForm, setAddForm] = useState({
