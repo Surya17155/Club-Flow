@@ -106,7 +106,7 @@ export function FloatingChatWidget({ visible = true }: FloatingChatWidgetProps) 
     }
   };
 
-  if (!session) return null;
+  if (!session || !visible) return null;
 
   return (
     <>

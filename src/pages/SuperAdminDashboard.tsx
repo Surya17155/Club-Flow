@@ -472,6 +472,7 @@ const SuperAdminDashboard = () => {
           </div>
         </DialogContent>
       </Dialog>
+      <FloatingChatWidget />
     </div>);
 
 };
