@@ -1,6 +1,4 @@
-import { useNavigate } from 'react-router-dom';
-import { Settings, Instagram, Linkedin, Mail } from 'lucide-react';
-import ProfileDropdown from '@/components/dashboard/ProfileDropdown';
+import { Instagram, Linkedin, Mail } from 'lucide-react';
 
 interface MobileProfileCardProps {
   fullName: string;
