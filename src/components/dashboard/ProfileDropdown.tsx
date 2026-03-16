@@ -4,13 +4,14 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useClub } from '@/contexts/ClubContext';
 import { useProfile } from '@/hooks/useProfile';
 import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
-import { ChevronDown, User, Settings, LogOut, ArrowRightLeft, Check, ChevronRight, Shield, Crown } from 'lucide-react';
+import { ChevronDown, User, Settings, LogOut, ArrowRightLeft, Check, ChevronRight, Shield, Crown, Settings2 } from 'lucide-react';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Switch } from '@/components/ui/switch';
 import AssignPowersModal from './AssignPowersModal';
+import ClubSettingsModal from './ClubSettingsModal';
 
 const SUPER_ADMIN_EMAIL = 'suryakant.gnbba2029@iilm.edu';
 
@@ -32,9 +33,10 @@ const ProfileDropdown = ({ viewMode = 'personal' }: { viewMode?: 'personal' | 'c
   const { isPresident } = useDelegatedPowers();
   const [showClubs, setShowClubs] = useState(false);
   const [showPowersModal, setShowPowersModal] = useState(false);
+  const [showClubSettings, setShowClubSettings] = useState(false);
 
   const isSuperAdminEmail = user?.email === SUPER_ADMIN_EMAIL;
-  const isSuperAdminMode = location.pathname === '/super-admin' || location.pathname === '/global-reports';
+  const isSuperAdminMode = location.pathname === '/super-admin' || location.pathname === '/global-reports' || location.pathname.startsWith('/club/');
 
   const handleSuperAdminToggle = (checked: boolean) => {
     if (checked) {
@@ -82,9 +84,14 @@ const ProfileDropdown = ({ viewMode = 'personal' }: { viewMode?: 'personal' | 'c
             )}
 
             {viewMode === 'club' && isPresident && (
-              <DropdownMenuItem onClick={() => setShowPowersModal(true)}>
-                <Shield className="mr-2 h-4 w-4" /> Assign Powers
-              </DropdownMenuItem>
+              <>
+                <DropdownMenuItem onClick={() => setShowPowersModal(true)}>
+                  <Shield className="mr-2 h-4 w-4" /> Assign Powers
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setShowClubSettings(true)}>
+                  <Settings2 className="mr-2 h-4 w-4" /> Club Settings
+                </DropdownMenuItem>
+              </>
             )}
 
             {isSuperAdminEmail && (
@@ -142,6 +149,7 @@ const ProfileDropdown = ({ viewMode = 'personal' }: { viewMode?: 'personal' | 'c
       </DropdownMenuContent>
     </DropdownMenu>
     <AssignPowersModal open={showPowersModal} onOpenChange={setShowPowersModal} />
+    <ClubSettingsModal open={showClubSettings} onOpenChange={setShowClubSettings} />
     </>
   );
 };

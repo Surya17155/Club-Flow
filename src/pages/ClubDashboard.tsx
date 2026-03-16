@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Navigate, useNavigate, useSearchParams, useParams } from 'react-router-dom';
+import { Navigate, useNavigate, useSearchParams, useParams, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useClub } from '@/contexts/ClubContext';
 import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
@@ -38,6 +38,7 @@ const ClubDashboard = () => {
   const { activeClub } = useClub();
   const { hasPower, isPresident } = useDelegatedPowers();
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const { id: routeClubId } = useParams();
 
@@ -78,6 +79,9 @@ const ClubDashboard = () => {
   const [activeTab, setActiveTab] = useState<'overview' | 'members'>(
     searchParams.get('tab') === 'members' ? 'members' : 'overview'
   );
+
+  // Track where user came from for proper back navigation
+  const cameFromSuperAdmin = location.state?.from === 'super-admin';
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [isRoleCheckComplete, setIsRoleCheckComplete] = useState(false);
 
@@ -197,7 +201,7 @@ const ClubDashboard = () => {
       {/* Header */}
       <header className="relative z-20 flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" className="rounded-full" onClick={() => navigate('/dashboard')}>
+          <Button variant="ghost" size="icon" className="rounded-full" onClick={() => navigate(cameFromSuperAdmin ? '/super-admin' : '/admin')}>
             <ChevronLeft className="w-5 h-5" />
           </Button>
           <h1 className="text-xl md:text-2xl font-bold font-display text-foreground">

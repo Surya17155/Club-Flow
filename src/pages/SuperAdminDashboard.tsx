@@ -292,7 +292,7 @@ const SuperAdminDashboard = () => {
                   </div>
                   <div className="flex gap-2">
                     <button
-                  onClick={() => navigate(`/club/${club.id}`)}
+                  onClick={() => navigate(`/club/${club.id}`, { state: { from: 'super-admin' } })}
                   className="flex-[1.5] text-center text-xs px-3 py-1.5 rounded-lg font-medium transition-colors bg-accent hover:bg-accent/80 text-accent-foreground">
                       View Analytics
                     </button>
