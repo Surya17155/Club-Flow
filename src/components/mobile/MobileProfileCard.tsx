@@ -39,55 +39,72 @@ export function MobileProfileCard({
   const hasSocials = socialLinkedin || socialInstagram || socialGmail;
 
   return (
-    <div className="relative rounded-3xl overflow-hidden glass-card">
-      {/* Hero image area — image fills the card frame */}
-      <div className="relative w-full aspect-[3/4]">
-        {avatarUrl ? (
-          <img
-            src={avatarUrl}
-            alt={fullName}
-            className="w-full h-full object-contain rounded-3xl"
-            style={{ objectPosition: 'top center' }}
-          />
-        ) : (
-          <div
-            className="w-full h-full flex items-center justify-center text-5xl font-bold text-primary-foreground rounded-3xl"
-            style={{
-              background: 'linear-gradient(145deg, hsl(30 60% 78%), hsl(36 55% 72%), hsl(25 50% 68%))',
-            }}
-          >
-            {initials}
-          </div>
-        )}
-
-        {/* Seamless white-tone gradient blur overlay at bottom */}
-        <div
-          className="absolute inset-x-0 bottom-0 h-[55%] rounded-b-3xl pointer-events-none"
+    <div
+      className="relative mx-auto overflow-hidden"
+      style={{
+        width: '100%',
+        maxWidth: '320px',
+        aspectRatio: '3 / 4',
+        borderRadius: '28px',
+        background: '#111',
+        boxShadow: '0 20px 40px rgba(0,0,0,0.35), 0 8px 16px rgba(0,0,0,0.25)',
+      }}
+    >
+      {/* Layer 1: Profile Image */}
+      {avatarUrl ? (
+        <img
+          src={avatarUrl}
+          alt={fullName}
+          className="absolute inset-0 w-full h-full"
           style={{
-            background: 'linear-gradient(to top, hsl(var(--card)) 0%, hsl(var(--card)) 15%, hsl(var(--card) / 0.92) 25%, hsl(var(--card) / 0.7) 40%, hsl(var(--card) / 0.4) 55%, hsl(var(--card) / 0.15) 70%, hsl(var(--card) / 0.05) 85%, transparent 100%)',
+            objectFit: 'cover',
+            objectPosition: 'center',
+            zIndex: 1,
           }}
         />
+      ) : (
         <div
-          className="absolute inset-x-0 bottom-0 h-[40%] rounded-b-3xl pointer-events-none"
+          className="absolute inset-0 w-full h-full flex items-center justify-center text-5xl font-bold text-white"
           style={{
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
-            maskImage: 'linear-gradient(to top, black 0%, black 30%, transparent 100%)',
-            WebkitMaskImage: 'linear-gradient(to top, black 0%, black 30%, transparent 100%)',
+            background: 'linear-gradient(145deg, hsl(30 60% 78%), hsl(36 55% 72%), hsl(25 50% 68%))',
+            zIndex: 1,
           }}
-        />
+        >
+          {initials}
+        </div>
+      )}
 
-        {/* Social icons on image */}
+      {/* Layer 2: Blur / Gradient Overlay */}
+      <div
+        className="absolute bottom-0 left-0 w-full pointer-events-none"
+        style={{
+          height: '45%',
+          zIndex: 2,
+          borderRadius: '0 0 28px 28px',
+          backdropFilter: 'blur(14px)',
+          WebkitBackdropFilter: 'blur(14px)',
+          background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 50%, rgba(0,0,0,0) 100%)',
+          maskImage: 'linear-gradient(to top, black 70%, transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(to top, black 70%, transparent 100%)',
+        }}
+      />
+
+      {/* Layer 3: Content Layer */}
+      <div
+        className="absolute bottom-0 left-0 right-0 p-5 flex flex-col justify-end"
+        style={{ zIndex: 3, height: '45%' }}
+      >
+        {/* Social icons */}
         {hasSocials && (
-          <div className="absolute bottom-16 left-5 z-10 flex gap-3">
+          <div className="flex gap-3 mb-3">
             {socialLinkedin && (
               <a
                 href={socialLinkedin.startsWith('http') ? socialLinkedin : `https://${socialLinkedin}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-8 h-8 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center hover:bg-white/50 transition-colors"
+                className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center hover:bg-white/40 transition-colors"
               >
-                <Linkedin className="w-4 h-4 text-foreground" />
+                <Linkedin className="w-4 h-4 text-white" />
               </a>
             )}
             {socialInstagram && (
@@ -95,61 +112,40 @@ export function MobileProfileCard({
                 href={socialInstagram.startsWith('http') ? socialInstagram : `https://${socialInstagram}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-8 h-8 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center hover:bg-white/50 transition-colors"
+                className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center hover:bg-white/40 transition-colors"
               >
-                <Instagram className="w-4 h-4 text-foreground" />
+                <Instagram className="w-4 h-4 text-white" />
               </a>
             )}
             {socialGmail && (
               <a
                 href={`mailto:${socialGmail}`}
-                className="w-8 h-8 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center hover:bg-white/50 transition-colors"
+                className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center hover:bg-white/40 transition-colors"
               >
-                <Mail className="w-4 h-4 text-foreground" />
+                <Mail className="w-4 h-4 text-white" />
               </a>
             )}
           </div>
         )}
 
-        {/* Name & role text on top of blur */}
-        <div className="absolute bottom-4 left-5 right-5 z-10">
-          <h2 className="text-xl font-bold font-display text-foreground drop-shadow-sm">{fullName}</h2>
-          <p className="text-sm font-semibold text-muted-foreground mt-0.5">
-            {isPersonal ? 'Student' : `${roleLabel} • ${clubName}`}
-          </p>
-        </div>
+        {/* Name & role */}
+        <h2 className="text-xl font-bold font-display text-white drop-shadow-md">{fullName}</h2>
+        <p className="text-sm font-medium text-white/75 mt-0.5">
+          {isPersonal ? 'Student' : `${roleLabel} • ${clubName}`}
+        </p>
 
-        {/* ProfileDropdown removed from card — now in header */}
-      </div>
-
-      {/* Info below image */}
-      <div className="px-5 pt-4 pb-5 space-y-4">
-        {/* Programme & Year chips */}
+        {/* Programme & Year */}
         {(programme || year) && (
-          <div className="flex gap-6 text-sm">
-            {year && (
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-primary/80">Year</p>
-                <p className="font-medium text-foreground">{year}</p>
-              </div>
-            )}
-            {programme && (
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-primary/80">Program</p>
-                <p className="font-medium text-foreground">{programme}</p>
-              </div>
-            )}
+          <div className="flex gap-4 mt-3 text-xs text-white/60">
+            {year && <span>{year}</span>}
+            {programme && <span>{programme}</span>}
           </div>
         )}
 
-        {/* About / Bio */}
+        {/* About */}
         {about && (
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-primary/80 mb-1">About</p>
-            <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">{about}</p>
-          </div>
+          <p className="text-xs text-white/55 mt-2 line-clamp-2 leading-relaxed">{about}</p>
         )}
-
       </div>
     </div>
   );
