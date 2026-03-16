@@ -92,14 +92,19 @@ export function MobileDashboardView({
 
       {/* Top header with mode toggle */}
       <header className="sticky top-0 z-40 px-4 pt-4 pb-2 safe-area-top">
-        <div className="flex items-center justify-between mb-3">
+        {/* Top row: profile dropdown (left spacer), app name center, profile avatar right */}
+        <div className="flex items-center justify-between mb-2">
+          <div className="w-9" /> {/* spacer for centering */}
           <h1 className="text-lg font-bold font-display text-foreground">
             Club<span className="text-primary">Hub</span>
           </h1>
-          <button className="w-9 h-9 rounded-full bg-white/40 backdrop-blur-sm flex items-center justify-center">
-            <Bell className="w-4 h-4 text-foreground" />
-          </button>
+          <ProfileDropdown viewMode={viewMode} />
         </div>
+
+        {/* Greeting */}
+        <p className="text-center text-sm text-muted-foreground mb-3">
+          Hi, <span className="font-semibold text-foreground">{fullName?.split(' ')[0] || 'there'}</span> 👋
+        </p>
 
         {/* Mode toggle pill */}
         <div className="glass-card flex p-1 rounded-full max-w-[240px] mx-auto">
