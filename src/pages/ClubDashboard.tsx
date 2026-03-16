@@ -77,8 +77,8 @@ const ClubDashboard = () => {
   }, [routeClubId, activeClub?.club_id, activeClub?.club_name]);
   const { stats: clubStats } = useClubStats(clubId);
   const [manageEventsOpen, setManageEventsOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'overview' | 'members'>(
-    searchParams.get('tab') === 'members' ? 'members' : 'overview'
+  const [activeTab, setActiveTab] = useState<'overview' | 'members' | 'requests'>(
+    searchParams.get('tab') === 'members' ? 'members' : searchParams.get('tab') === 'requests' ? 'requests' : 'overview'
   );
 
   // Track where user came from for proper back navigation
