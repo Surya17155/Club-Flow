@@ -150,39 +150,6 @@ export function MobileProfileCard({
           </div>
         )}
 
-        {/* Social handles */}
-        {hasSocials && (
-          <div className="flex gap-4 pt-1">
-            {socialLinkedin && (
-              <a
-                href={socialLinkedin.startsWith('http') ? socialLinkedin : `https://${socialLinkedin}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
-              >
-                <Linkedin className="w-4 h-4 text-primary" />
-              </a>
-            )}
-            {socialInstagram && (
-              <a
-                href={socialInstagram.startsWith('http') ? socialInstagram : `https://${socialInstagram}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
-              >
-                <Instagram className="w-4 h-4 text-primary" />
-              </a>
-            )}
-            {socialGmail && (
-              <a
-                href={`mailto:${socialGmail}`}
-                className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
-              >
-                <Mail className="w-4 h-4 text-primary" />
-              </a>
-            )}
-          </div>
-        )}
       </div>
     </div>
   );
