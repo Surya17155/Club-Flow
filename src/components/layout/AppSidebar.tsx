@@ -36,7 +36,7 @@ const mainItems = [
   { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
   { title: 'Events', url: '/events', icon: Calendar },
   { title: 'Clubs', url: '/clubs', icon: Building2 },
-  { title: 'Discover Clubs', url: '/discover', icon: QrCode },
+  { title: 'Discover Clubs', url: '/discover', icon: Compass },
   { title: 'Members', url: '/members', icon: Users },
 ];
 
