@@ -20,6 +20,7 @@ import Settings from "./pages/Settings";
 import CreateEvent from "./pages/CreateEvent";
 import SuperAdminDashboard from "./pages/SuperAdminDashboard";
 import GlobalReports from "./pages/GlobalReports";
+import DiscoverClubs from "./pages/DiscoverClubs";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
