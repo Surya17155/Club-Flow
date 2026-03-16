@@ -2,7 +2,7 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Clock, Eye, QrCode, Trash2, Plus } from 'lucide-react';
+import { Calendar, Clock, Eye, QrCode, Trash2, Plus, MessageSquare } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
@@ -11,6 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useClub } from '@/contexts/ClubContext';
 import { useNavigate } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
+import EventFeedbackModal from '@/components/dashboard/EventFeedbackModal';
 
 interface EventRow {
   id: string;
@@ -39,6 +40,8 @@ const Events = () => {
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [qrDialogOpen, setQrDialogOpen] = useState(false);
   const [attendanceCounts, setAttendanceCounts] = useState<Record<string, number>>({});
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [feedbackEvent, setFeedbackEvent] = useState<{ id: string; name: string } | null>(null);
 
   const fetchEvents = async () => {
     setLoading(true);
@@ -49,7 +52,6 @@ const Events = () => {
 
     if (!error && data) {
       setEvents(data as any);
-      // Fetch attendance counts
       const ids = data.map((e: any) => e.id);
       if (ids.length > 0) {
         const { data: attData } = await supabase
@@ -86,19 +88,19 @@ const Events = () => {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6 animate-fade-in">
-        <div className="flex items-center justify-between">
+      <div className="space-y-4 sm:space-y-6 animate-fade-in">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-display font-bold text-foreground">Events</h1>
+            <h1 className="text-xl sm:text-2xl font-display font-bold text-foreground">Events</h1>
             <p className="text-sm text-muted-foreground">Manage and view all events</p>
           </div>
-          <Button onClick={() => navigate('/create-event')} className="gradient-gold text-primary-foreground shadow-gold hover:opacity-90">
+          <Button onClick={() => navigate('/create-event')} className="gradient-gold text-primary-foreground shadow-gold hover:opacity-90 w-full sm:w-auto">
             <Plus className="w-4 h-4 mr-1" /> Create Event
           </Button>
         </div>
 
         {/* Filters */}
-        <div className="flex gap-2">
+        <div className="flex gap-2 overflow-x-auto">
           {['all', 'upcoming', 'completed'].map(f => (
             <Button key={f} variant={filter === f ? 'default' : 'outline'} size="sm"
               onClick={() => setFilter(f)}
@@ -115,24 +117,25 @@ const Events = () => {
         ) : filteredEvents.length === 0 ? (
           <p className="text-center text-muted-foreground py-12">No events found.</p>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredEvents.map(event => {
               const status = getStatus(event);
               const d = new Date(event.event_date);
+              const isPast = status === 'completed';
               return (
                 <Card key={event.id} className="shadow-card border-border/50 hover:shadow-elevated transition-shadow">
                   <CardHeader className="pb-2">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <CardTitle className="text-base font-display">{event.name}</CardTitle>
-                        <div className="flex gap-1.5 mt-1.5">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <CardTitle className="text-base font-display truncate">{event.name}</CardTitle>
+                        <div className="flex gap-1.5 mt-1.5 flex-wrap">
                           <Badge variant="outline" className="text-xs">{event.event_type}</Badge>
                           <Badge className={`text-xs ${event.category === 'Mandatory' ? 'bg-destructive/10 text-destructive border-destructive/20' : 'bg-success/10 text-success border-success/20'}`} variant="outline">
                             {event.category}
                           </Badge>
                         </div>
                       </div>
-                      <Badge variant={status === 'upcoming' ? 'default' : 'secondary'} className={status === 'upcoming' ? 'gradient-gold text-primary-foreground border-0' : ''}>
+                      <Badge variant={status === 'upcoming' ? 'default' : 'secondary'} className={`shrink-0 ${status === 'upcoming' ? 'gradient-gold text-primary-foreground border-0' : ''}`}>
                         {status}
                       </Badge>
                     </div>
@@ -140,11 +143,11 @@ const Events = () => {
                   <CardContent>
                     <div className="space-y-2 text-sm text-muted-foreground">
                       <div className="flex items-center gap-2">
-                        <Calendar className="w-3.5 h-3.5" />
+                        <Calendar className="w-3.5 h-3.5 shrink-0" />
                         <span>{d.toLocaleDateString()}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Clock className="w-3.5 h-3.5" />
+                        <Clock className="w-3.5 h-3.5 shrink-0" />
                         <span>
                           {d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                           {event.end_date && (
@@ -161,10 +164,15 @@ const Events = () => {
                         </div>
                       )}
                     </div>
-                    <div className="flex gap-2 mt-4">
+                    <div className="flex gap-2 mt-4 flex-wrap">
                       <Button variant="outline" size="sm" className="flex-1" onClick={() => { setSelectedEvent(event); setViewDialogOpen(true); }}>
                         <Eye className="w-3.5 h-3.5 mr-1" /> View
                       </Button>
+                      {isPast && (
+                        <Button variant="outline" size="sm" onClick={() => { setFeedbackEvent({ id: event.id, name: event.name }); setFeedbackOpen(true); }}>
+                          <MessageSquare className="w-3.5 h-3.5" />
+                        </Button>
+                      )}
                       {event.qr_token && (
                         <Button variant="outline" size="sm" onClick={() => { setSelectedEvent(event); setQrDialogOpen(true); }}>
                           <QrCode className="w-3.5 h-3.5" />
@@ -217,6 +225,16 @@ const Events = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Feedback Modal */}
+      {feedbackEvent && (
+        <EventFeedbackModal
+          open={feedbackOpen}
+          onOpenChange={setFeedbackOpen}
+          eventId={feedbackEvent.id}
+          eventName={feedbackEvent.name}
+        />
+      )}
     </DashboardLayout>
   );
 };

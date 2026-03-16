@@ -159,6 +159,14 @@ const AdminDashboard = () => {
               <Users className="w-4 h-4" /> Manage Club
             </button>
           )}
+          {isPersonal && (
+            <button
+              onClick={() => navigate('/discover')}
+              className="text-sm font-medium px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-transform active:scale-95 bg-accent hover:bg-accent/80 text-accent-foreground"
+            >
+              <MapPin className="w-4 h-4" /> Discover Clubs
+            </button>
+          )}
           {!isPersonal && activeClub && hasPower('create_event') &&
           <DropdownMenu>
             <DropdownMenuTrigger className="text-primary-foreground text-sm font-medium px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-transform active:scale-95 gradient-gold">

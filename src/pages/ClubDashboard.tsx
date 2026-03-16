@@ -16,6 +16,7 @@ import ClubProfileSidebar from '@/components/club-dashboard/ClubProfileSidebar';
 import ClubStatsRow from '@/components/club-dashboard/ClubStatsRow';
 import ClubUpcomingEvents from '@/components/club-dashboard/ClubUpcomingEvents';
 import MemberManagement from '@/components/club-dashboard/MemberManagement';
+import JoinRequestsPanel from '@/components/club-dashboard/JoinRequestsPanel';
 import { Button } from '@/components/ui/button';
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -76,8 +77,8 @@ const ClubDashboard = () => {
   }, [routeClubId, activeClub?.club_id, activeClub?.club_name]);
   const { stats: clubStats } = useClubStats(clubId);
   const [manageEventsOpen, setManageEventsOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'overview' | 'members'>(
-    searchParams.get('tab') === 'members' ? 'members' : 'overview'
+  const [activeTab, setActiveTab] = useState<'overview' | 'members' | 'requests'>(
+    searchParams.get('tab') === 'members' ? 'members' : searchParams.get('tab') === 'requests' ? 'requests' : 'overview'
   );
 
   // Track where user came from for proper back navigation
@@ -214,16 +215,24 @@ const ClubDashboard = () => {
           <div className="inline-flex items-center rounded-[20px] p-1 bg-muted">
             <button
               onClick={() => setActiveTab('overview')}
-              className={`px-4 py-1.5 rounded-2xl text-sm font-semibold transition-all ${activeTab === 'overview' ? 'shadow-sm bg-white text-primary' : 'text-muted-foreground'}`}
+              className={`px-3 sm:px-4 py-1.5 rounded-2xl text-sm font-semibold transition-all ${activeTab === 'overview' ? 'shadow-sm bg-white text-primary' : 'text-muted-foreground'}`}
             >
               Overview
             </button>
             <button
               onClick={() => setActiveTab('members')}
-              className={`px-4 py-1.5 rounded-2xl text-sm font-semibold transition-all ${activeTab === 'members' ? 'shadow-sm bg-white text-primary' : 'text-muted-foreground'}`}
+              className={`px-3 sm:px-4 py-1.5 rounded-2xl text-sm font-semibold transition-all ${activeTab === 'members' ? 'shadow-sm bg-white text-primary' : 'text-muted-foreground'}`}
             >
               Members
             </button>
+            {isPresident && (
+              <button
+                onClick={() => setActiveTab('requests')}
+                className={`px-3 sm:px-4 py-1.5 rounded-2xl text-sm font-semibold transition-all ${activeTab === 'requests' ? 'shadow-sm bg-white text-primary' : 'text-muted-foreground'}`}
+              >
+                Requests
+              </button>
+            )}
           </div>
 
           {hasPower('create_event') && (
@@ -323,9 +332,15 @@ const ClubDashboard = () => {
             </div>
           </main>
         </>
-      ) : (
+      ) : activeTab === 'members' ? (
         /* Members Tab */
         <MemberManagement clubId={clubId} />
+      ) : (
+        /* Join Requests Tab */
+        <div className="glass-card p-6">
+          <h2 className="text-lg font-bold text-foreground mb-4">Pending Join Requests</h2>
+          <JoinRequestsPanel clubId={clubId} />
+        </div>
       )}
 
       <ManageEventsModal open={manageEventsOpen} onOpenChange={setManageEventsOpen} />

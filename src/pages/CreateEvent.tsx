@@ -362,7 +362,7 @@ const CreateEvent = () => {
             <div className="flex-1 flex flex-col items-center justify-center p-8 bg-accent/10 backdrop-blur-md rounded-[24px] border border-border/40 shadow-inner">
               {qrToken ?
               <div className="qr-code-container bg-background p-4 rounded-2xl shadow-xl ring-1 ring-border/20">
-                  <QRCodeSVG value={qrToken} size={160} />
+                  <QRCodeSVG value={`${window.location.origin}/mark-attendance/${qrToken}`} size={160} />
                 </div> :
 
               <div className="text-center text-muted-foreground">
