@@ -78,6 +78,9 @@ const ClubDashboard = () => {
   const [activeTab, setActiveTab] = useState<'overview' | 'members'>(
     searchParams.get('tab') === 'members' ? 'members' : 'overview'
   );
+
+  // Track where user came from for proper back navigation
+  const cameFromSuperAdmin = location.state?.from === 'super-admin';
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [isRoleCheckComplete, setIsRoleCheckComplete] = useState(false);
 
