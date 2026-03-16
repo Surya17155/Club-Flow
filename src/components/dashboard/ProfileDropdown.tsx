@@ -33,6 +33,7 @@ const ProfileDropdown = ({ viewMode = 'personal' }: { viewMode?: 'personal' | 'c
   const { isPresident } = useDelegatedPowers();
   const [showClubs, setShowClubs] = useState(false);
   const [showPowersModal, setShowPowersModal] = useState(false);
+  const [showClubSettings, setShowClubSettings] = useState(false);
 
   const isSuperAdminEmail = user?.email === SUPER_ADMIN_EMAIL;
   const isSuperAdminMode = location.pathname === '/super-admin' || location.pathname === '/global-reports';
