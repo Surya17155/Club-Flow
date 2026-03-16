@@ -36,6 +36,9 @@ interface MobileDashboardViewProps {
   canManageClub: boolean;
   canManageEvents: boolean;
   onManageEventsOpen: () => void;
+  socialLinkedin?: string;
+  socialInstagram?: string;
+  socialGmail?: string;
 }
 
 const roleLabelMap: Record<string, string> = {
