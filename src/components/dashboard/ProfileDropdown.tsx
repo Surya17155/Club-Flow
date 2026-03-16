@@ -36,7 +36,7 @@ const ProfileDropdown = ({ viewMode = 'personal' }: { viewMode?: 'personal' | 'c
   const [showClubSettings, setShowClubSettings] = useState(false);
 
   const isSuperAdminEmail = user?.email === SUPER_ADMIN_EMAIL;
-  const isSuperAdminMode = location.pathname === '/super-admin' || location.pathname === '/global-reports';
+  const isSuperAdminMode = location.pathname === '/super-admin' || location.pathname === '/global-reports' || location.pathname.startsWith('/club/');
 
   const handleSuperAdminToggle = (checked: boolean) => {
     if (checked) {
