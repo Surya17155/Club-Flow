@@ -1,6 +1,4 @@
-import { useNavigate } from 'react-router-dom';
-import { Settings, Instagram, Linkedin, Mail } from 'lucide-react';
-import ProfileDropdown from '@/components/dashboard/ProfileDropdown';
+import { Instagram, Linkedin, Mail } from 'lucide-react';
 
 interface MobileProfileCardProps {
   fullName: string;
@@ -62,15 +60,20 @@ export function MobileProfileCard({
           </div>
         )}
 
-        {/* White-tone gradient blur overlay at bottom */}
+        {/* Seamless white-tone gradient blur overlay at bottom */}
         <div
-          className="absolute inset-x-0 bottom-0 h-[50%] rounded-b-3xl"
+          className="absolute inset-x-0 bottom-0 h-[55%] rounded-b-3xl pointer-events-none"
           style={{
-            background: 'linear-gradient(to top, hsl(var(--card)) 0%, hsl(var(--card) / 0.85) 30%, hsl(var(--card) / 0.4) 60%, transparent 100%)',
-            backdropFilter: 'blur(6px)',
-            WebkitBackdropFilter: 'blur(6px)',
-            maskImage: 'linear-gradient(to top, black 50%, transparent 100%)',
-            WebkitMaskImage: 'linear-gradient(to top, black 50%, transparent 100%)',
+            background: 'linear-gradient(to top, hsl(var(--card)) 0%, hsl(var(--card)) 15%, hsl(var(--card) / 0.92) 25%, hsl(var(--card) / 0.7) 40%, hsl(var(--card) / 0.4) 55%, hsl(var(--card) / 0.15) 70%, hsl(var(--card) / 0.05) 85%, transparent 100%)',
+          }}
+        />
+        <div
+          className="absolute inset-x-0 bottom-0 h-[40%] rounded-b-3xl pointer-events-none"
+          style={{
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            maskImage: 'linear-gradient(to top, black 0%, black 30%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(to top, black 0%, black 30%, transparent 100%)',
           }}
         />
 
@@ -116,10 +119,7 @@ export function MobileProfileCard({
           </p>
         </div>
 
-        {/* ProfileDropdown trigger (top-right settings) */}
-        <div className="absolute top-3 right-3 z-20">
-          <ProfileDropdown viewMode={viewMode} />
-        </div>
+        {/* ProfileDropdown removed from card — now in header */}
       </div>
 
       {/* Info below image */}
