@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,9 +7,19 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
-import { UserPlus, Trash2, Eye, Loader2, Search, Users, MoreVertical, ShieldCheck, Upload, FileSpreadsheet, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
+import { UserPlus, Trash2, Eye, Loader2, Search, Users, MoreVertical, ShieldCheck, Upload, FileSpreadsheet, CheckCircle2, XCircle, AlertCircle, ChevronRight } from 'lucide-react';
 import * as XLSX from 'xlsx';
+
+interface SearchedUser {
+  user_id: string;
+  full_name: string;
+  email: string | null;
+  programme: string | null;
+  year: string | null;
+  avatar_url: string | null;
+}
 
 interface Member {
   id: string;
@@ -74,6 +84,15 @@ const MemberManagement = ({ clubId }: Props) => {
   const [importResults, setImportResults] = useState<{ summary: any; results: any[] } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Search existing users state
+  const [userSearchQuery, setUserSearchQuery] = useState('');
+  const [userSearchResults, setUserSearchResults] = useState<SearchedUser[]>([]);
+  const [searchingUsers, setSearchingUsers] = useState(false);
+  const [selectedSearchUser, setSelectedSearchUser] = useState<SearchedUser | null>(null);
+  const [searchUserRole, setSearchUserRole] = useState('member');
+  const [addingSearchUser, setAddingSearchUser] = useState(false);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   // Add member form state
   const [addForm, setAddForm] = useState({
     fullName: '', email: '', programme: '', section: '', year: '', rollNo: '', phone: '', role: 'member',
@@ -85,6 +104,68 @@ const MemberManagement = ({ clubId }: Props) => {
 
   const resetAddForm = () => {
     setAddForm({ fullName: '', email: '', programme: '', section: '', year: '', rollNo: '', phone: '', role: 'member' });
+    setUserSearchQuery('');
+    setUserSearchResults([]);
+    setSelectedSearchUser(null);
+    setSearchUserRole('member');
+  };
+
+  // Live search for existing users
+  const searchExistingUsers = useCallback(async (query: string) => {
+    if (query.trim().length < 2) {
+      setUserSearchResults([]);
+      return;
+    }
+    setSearchingUsers(true);
+    const q = query.trim().toLowerCase();
+    const { data } = await supabase
+      .from('profiles')
+      .select('user_id, full_name, email, programme, year, avatar_url')
+      .or(`full_name.ilike.%${q}%,email.ilike.%${q}%`)
+      .limit(10);
+
+    if (data) {
+      // Filter out users already in this club
+      const existingUserIds = new Set(members.map(m => m.user_id));
+      setUserSearchResults(
+        (data as SearchedUser[]).filter(u => !existingUserIds.has(u.user_id))
+      );
+    }
+    setSearchingUsers(false);
+  }, [members]);
+
+  const handleUserSearchChange = (value: string) => {
+    setUserSearchQuery(value);
+    setSelectedSearchUser(null);
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    searchTimeoutRef.current = setTimeout(() => searchExistingUsers(value), 300);
+  };
+
+  const handleAddSearchedUser = async () => {
+    if (!selectedSearchUser) return;
+    setAddingSearchUser(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const response = await supabase.functions.invoke('create-member', {
+        body: {
+          email: selectedSearchUser.email || '',
+          full_name: selectedSearchUser.full_name,
+          club_id: clubId,
+          role: searchUserRole,
+        },
+      });
+      if (response.error || response.data?.error) {
+        toast.error(response.data?.error || 'Failed to add member');
+      } else {
+        toast.success(`${selectedSearchUser.full_name} added to the club as ${roleLabelMap[searchUserRole] || searchUserRole}!`);
+        resetAddForm();
+        setAddDialogOpen(false);
+        await fetchMembers();
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to add member');
+    }
+    setAddingSearchUser(false);
   };
 
   const fetchMembers = async () => {
@@ -316,14 +397,114 @@ const MemberManagement = ({ clubId }: Props) => {
         </div>
       )}
 
-      {/* Add Member Dialog - Full Registration Form */}
+      {/* Add Member Dialog - Search + Manual Entry */}
       <Dialog open={addDialogOpen} onOpenChange={(open) => { setAddDialogOpen(open); if (!open) resetAddForm(); }}>
         <DialogContent className="glass-card border-white/20 max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="font-display text-lg">Add New Member</DialogTitle>
-            <p className="text-sm text-muted-foreground">Fill in their details so they can log in directly without signing up.</p>
+            <p className="text-sm text-muted-foreground">Search for an existing user or fill in details manually.</p>
           </DialogHeader>
           <div className="space-y-4 mt-2">
+            {/* Search Existing Users */}
+            <div className="space-y-2">
+              <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Search Existing Users</Label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder="Type a name or email to search..."
+                  value={userSearchQuery}
+                  onChange={e => handleUserSearchChange(e.target.value)}
+                  className="pl-10 bg-white/30"
+                />
+                {searchingUsers && (
+                  <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-primary" />
+                )}
+              </div>
+
+              {/* Search Results */}
+              {userSearchQuery.trim().length >= 2 && (
+                <div className="rounded-xl border border-white/20 bg-white/10 max-h-48 overflow-y-auto">
+                  {userSearchResults.length === 0 && !searchingUsers ? (
+                    <p className="text-xs text-muted-foreground text-center py-4">No users found. Use manual entry below.</p>
+                  ) : (
+                    userSearchResults.map(u => (
+                      <div
+                        key={u.user_id}
+                        className={`flex items-center justify-between p-3 hover:bg-white/20 transition-colors cursor-pointer ${selectedSearchUser?.user_id === u.user_id ? 'bg-primary/10 border-l-2 border-primary' : ''}`}
+                        onClick={() => setSelectedSearchUser(u)}
+                      >
+                        <div className="flex items-center gap-3 min-w-0 flex-1">
+                          <div className="w-8 h-8 rounded-full overflow-hidden border border-white/30 shrink-0">
+                            {u.avatar_url ? (
+                              <img src={u.avatar_url} alt={u.full_name} className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full bg-primary/20 flex items-center justify-center text-xs font-bold text-primary">
+                                {u.full_name[0]}
+                              </div>
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-sm font-semibold text-foreground truncate">{u.full_name}</p>
+                            <p className="text-xs text-muted-foreground truncate">
+                              {[u.programme, u.year, u.email].filter(Boolean).join(' · ')}
+                            </p>
+                          </div>
+                        </div>
+                        <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+
+              {/* Selected User - Role Assignment */}
+              {selectedSearchUser && (
+                <div className="rounded-xl bg-primary/5 border border-primary/20 p-4 space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-primary/30 shrink-0">
+                      {selectedSearchUser.avatar_url ? (
+                        <img src={selectedSearchUser.avatar_url} alt={selectedSearchUser.full_name} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full bg-primary/20 flex items-center justify-center text-sm font-bold text-primary">
+                          {selectedSearchUser.full_name[0]}
+                        </div>
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold text-foreground">{selectedSearchUser.full_name}</p>
+                      <p className="text-xs text-muted-foreground">{selectedSearchUser.email}</p>
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs">Assign Club Role</Label>
+                    <Select value={searchUserRole} onValueChange={setSearchUserRole}>
+                      <SelectTrigger className="bg-white/30"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {assignableRoles.map(r => (
+                          <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Button
+                    onClick={handleAddSearchedUser}
+                    disabled={addingSearchUser}
+                    className="w-full rounded-full"
+                  >
+                    {addingSearchUser ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <UserPlus className="w-4 h-4 mr-2" />}
+                    Add {selectedSearchUser.full_name.split(' ')[0]} as {roleLabelMap[searchUserRole]}
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            <div className="relative flex items-center gap-3">
+              <Separator className="flex-1" />
+              <span className="text-xs font-medium text-muted-foreground uppercase">or add manually</span>
+              <Separator className="flex-1" />
+            </div>
+
+            {/* Manual Entry Form */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5 sm:col-span-2">
                 <Label>Full Name *</Label>
@@ -334,9 +515,6 @@ const MemberManagement = ({ clubId }: Props) => {
                 <Label>College Email *</Label>
                 <Input type="email" placeholder="student@iilm.edu" value={addForm.email} onChange={e => updateAddForm('email', e.target.value)} className="bg-white/30" />
               </div>
-
-
-
 
               <div className="space-y-1.5">
                 <Label>Roll No. / Admission No.</Label>
@@ -388,7 +566,7 @@ const MemberManagement = ({ clubId }: Props) => {
 
             <Button onClick={handleAddMember} disabled={adding || !addForm.email.trim() || !addForm.fullName.trim()} className="w-full rounded-full">
               {adding ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <UserPlus className="w-4 h-4 mr-2" />}
-              Add Member
+              Add Member Manually
             </Button>
           </div>
         </DialogContent>
