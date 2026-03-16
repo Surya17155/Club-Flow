@@ -38,6 +38,7 @@ const ClubDashboard = () => {
   const { activeClub } = useClub();
   const { hasPower, isPresident } = useDelegatedPowers();
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const { id: routeClubId } = useParams();
 
