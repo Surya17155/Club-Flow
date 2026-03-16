@@ -4,18 +4,24 @@ import { useClub } from '@/contexts/ClubContext';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Users, Clock, ChevronRight, ArrowLeft, Tag, Shield, Trash2 } from 'lucide-react';
+import { Calendar, Users, Clock, ChevronRight, ArrowLeft, Tag, Shield, Trash2, Download, UserPlus, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
+import { exportAttendanceXLSX } from '@/utils/exportAttendance';
+import ManualAttendanceModal from './ManualAttendanceModal';
+import EventFeedbackModal from './EventFeedbackModal';
+import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
 
 interface Attendee {
   id: string;
   student_id: string;
   scanned_at: string;
   status: string;
+  manually_added: boolean | null;
   full_name: string;
   roll_no: string | null;
   programme: string | null;
   section: string | null;
+  year: string | null;
 }
 
 interface ClubEvent {
@@ -27,11 +33,13 @@ interface ClubEvent {
   event_type: string;
   category: string;
   access_type: string;
+  club_id: string;
   attendee_count: number;
 }
 
 const ManageEventsModal = ({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) => {
   const { activeClub } = useClub();
+  const { isPresident } = useDelegatedPowers();
   const [events, setEvents] = useState<ClubEvent[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<ClubEvent | null>(null);
@@ -39,18 +47,20 @@ const ManageEventsModal = ({ open, onOpenChange }: { open: boolean; onOpenChange
   const [loadingAttendees, setLoadingAttendees] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<ClubEvent | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [manualAttendanceOpen, setManualAttendanceOpen] = useState(false);
+  const [feedbackStats, setFeedbackStats] = useState<{ avg: number; count: number } | null>(null);
 
   const fetchEvents = async () => {
     if (!activeClub) return;
     setLoading(true);
     const { data, error } = await supabase
       .from('events')
-      .select('id, name, event_date, end_date, description, event_type, category, access_type')
+      .select('id, name, event_date, end_date, description, event_type, category, access_type, club_id')
       .eq('club_id', activeClub.club_id)
       .order('event_date', { ascending: false });
 
     if (error) {
-      toast.error(error.message?.includes('security') ? 'Permission denied. You may not have access to manage events.' : 'Failed to load events');
+      toast.error(error.message?.includes('security') ? 'Permission denied.' : 'Failed to load events');
       setLoading(false);
       return;
     }
@@ -83,7 +93,7 @@ const ManageEventsModal = ({ open, onOpenChange }: { open: boolean; onOpenChange
     setLoadingAttendees(true);
     const { data, error } = await supabase
       .from('attendance')
-      .select('id, student_id, scanned_at, status')
+      .select('id, student_id, scanned_at, status, manually_added')
       .eq('event_id', event.id)
       .order('scanned_at', { ascending: true });
 
@@ -97,7 +107,7 @@ const ManageEventsModal = ({ open, onOpenChange }: { open: boolean; onOpenChange
       const studentIds = data.map((a: any) => a.student_id);
       const { data: profiles } = await supabase
         .from('profiles')
-        .select('user_id, full_name, roll_no, programme, section')
+        .select('user_id, full_name, roll_no, programme, section, year')
         .in('user_id', studentIds);
 
       const profileMap: Record<string, any> = {};
@@ -109,35 +119,49 @@ const ManageEventsModal = ({ open, onOpenChange }: { open: boolean; onOpenChange
         roll_no: profileMap[a.student_id]?.roll_no || null,
         programme: profileMap[a.student_id]?.programme || null,
         section: profileMap[a.student_id]?.section || null,
+        year: profileMap[a.student_id]?.year || null,
       })));
     } else {
       setAttendees([]);
     }
+
+    // Fetch feedback stats
+    const { data: fbData } = await supabase
+      .from('event_feedback')
+      .select('rating')
+      .eq('event_id', event.id);
+    if (fbData && fbData.length > 0) {
+      const avg = fbData.reduce((s, f) => s + f.rating, 0) / fbData.length;
+      setFeedbackStats({ avg: Math.round(avg * 10) / 10, count: fbData.length });
+    } else {
+      setFeedbackStats(null);
+    }
+
     setLoadingAttendees(false);
   };
 
   const handleDeleteEvent = async () => {
     if (!deleteTarget) return;
     setDeleting(true);
-
-    // Delete related records first
     await supabase.from('attendance').delete().eq('event_id', deleteTarget.id);
     await supabase.from('event_participants').delete().eq('event_id', deleteTarget.id);
-
+    await supabase.from('event_feedback').delete().eq('event_id', deleteTarget.id);
     const { error } = await supabase.from('events').delete().eq('id', deleteTarget.id);
-
     if (error) {
-      toast.error(error.message?.includes('security') || error.message?.includes('policy')
-        ? 'Permission denied. Only admins and club leaders can delete events.'
-        : 'Failed to delete event');
+      toast.error('Failed to delete event');
     } else {
       toast.success(`"${deleteTarget.name}" deleted successfully`);
       setEvents(prev => prev.filter(e => e.id !== deleteTarget.id));
       if (selectedEvent?.id === deleteTarget.id) setSelectedEvent(null);
     }
-
     setDeleteTarget(null);
     setDeleting(false);
+  };
+
+  const handleExport = () => {
+    if (!selectedEvent || attendees.length === 0) return;
+    exportAttendanceXLSX(attendees, selectedEvent.name, selectedEvent.event_date);
+    toast.success('Attendance exported to XLSX!');
   };
 
   const formatDate = (d: string) => new Date(d).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
@@ -175,10 +199,7 @@ const ManageEventsModal = ({ open, onOpenChange }: { open: boolean; onOpenChange
                   const d = new Date(event.event_date);
                   const isPast = d < new Date();
                   return (
-                    <div
-                      key={event.id}
-                      className="flex items-center gap-4 p-4 rounded-xl border border-border/50 bg-white/40 hover:bg-white/70 cursor-pointer transition-colors group"
-                    >
+                    <div key={event.id} className="flex items-center gap-4 p-4 rounded-xl border border-border/50 bg-white/40 hover:bg-white/70 cursor-pointer transition-colors group">
                       <div onClick={() => viewAttendance(event)} className="flex items-center gap-4 flex-1 min-w-0">
                         <div className="rounded-lg shadow-sm w-12 h-12 flex flex-col items-center justify-center border border-border bg-white shrink-0">
                           <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
@@ -223,6 +244,29 @@ const ManageEventsModal = ({ open, onOpenChange }: { open: boolean; onOpenChange
                 <Badge variant="outline" className="text-xs"><Clock className="w-3 h-3 mr-1" />{formatTime(selectedEvent.event_date)}{selectedEvent.end_date ? ` – ${formatTime(selectedEvent.end_date)}` : ''}</Badge>
                 <Badge variant="outline" className="text-xs"><Shield className="w-3 h-3 mr-1" />{selectedEvent.access_type}</Badge>
                 <Badge variant="outline" className="text-xs"><Users className="w-3 h-3 mr-1" />{attendees.length} attended</Badge>
+                {feedbackStats && (
+                  <Badge variant="outline" className="text-xs"><MessageSquare className="w-3 h-3 mr-1" />{feedbackStats.avg}★ ({feedbackStats.count})</Badge>
+                )}
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex flex-wrap gap-2 mb-4">
+                {attendees.length > 0 && (
+                  <button
+                    onClick={handleExport}
+                    className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg font-medium transition-colors gradient-gold text-primary-foreground shadow-gold"
+                  >
+                    <Download className="w-3.5 h-3.5" /> Export XLSX
+                  </button>
+                )}
+                {isPresident && (
+                  <button
+                    onClick={() => setManualAttendanceOpen(true)}
+                    className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg font-medium transition-colors bg-accent hover:bg-accent/80 text-accent-foreground"
+                  >
+                    <UserPlus className="w-3.5 h-3.5" /> Add Manually
+                  </button>
+                )}
               </div>
 
               {loadingAttendees ? (
@@ -241,6 +285,7 @@ const ManageEventsModal = ({ open, onOpenChange }: { open: boolean; onOpenChange
                         <th className="text-left px-4 py-2.5">Roll No</th>
                         <th className="text-left px-4 py-2.5">Programme</th>
                         <th className="text-left px-4 py-2.5">Scanned At</th>
+                        <th className="text-left px-4 py-2.5">Method</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -251,6 +296,11 @@ const ManageEventsModal = ({ open, onOpenChange }: { open: boolean; onOpenChange
                           <td className="px-4 py-2.5 text-muted-foreground">{a.roll_no || '—'}</td>
                           <td className="px-4 py-2.5 text-muted-foreground">{a.programme || '—'}{a.section ? ` (${a.section})` : ''}</td>
                           <td className="px-4 py-2.5 text-muted-foreground">{formatTime(a.scanned_at)}</td>
+                          <td className="px-4 py-2.5">
+                            <Badge variant={a.manually_added ? 'outline' : 'secondary'} className="text-[10px]">
+                              {a.manually_added ? 'Manual' : 'QR'}
+                            </Badge>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -267,7 +317,7 @@ const ManageEventsModal = ({ open, onOpenChange }: { open: boolean; onOpenChange
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Event</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete <strong>"{deleteTarget?.name}"</strong>? This will also remove all attendance records for this event. This action cannot be undone.
+              Are you sure you want to delete <strong>"{deleteTarget?.name}"</strong>? This will also remove all attendance records and feedback. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -278,6 +328,18 @@ const ManageEventsModal = ({ open, onOpenChange }: { open: boolean; onOpenChange
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {selectedEvent && (
+        <ManualAttendanceModal
+          open={manualAttendanceOpen}
+          onOpenChange={setManualAttendanceOpen}
+          eventId={selectedEvent.id}
+          eventName={selectedEvent.name}
+          clubId={selectedEvent.club_id}
+          accessType={selectedEvent.access_type}
+          onAdded={() => viewAttendance(selectedEvent)}
+        />
+      )}
     </>
   );
 };
