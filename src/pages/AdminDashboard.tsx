@@ -19,6 +19,7 @@ import {
   Tag,
   Shield,
   ClipboardList,
+  Compass,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -222,6 +223,14 @@ const AdminDashboard = () => {
         </div>
 
         <div className="flex items-center gap-4">
+          {isPersonal && (
+            <button
+              onClick={() => navigate("/discover")}
+              className="text-primary-foreground text-sm font-medium px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-transform active:scale-95 gradient-gold"
+            >
+              <Compass className="w-4 h-4" /> Discover Clubs
+            </button>
+          )}
           {!isPersonal && activeClub && (activeClub.role === "president" || activeClub.role === "admin") && (
             <button
               onClick={() => navigate("/clubs")}
