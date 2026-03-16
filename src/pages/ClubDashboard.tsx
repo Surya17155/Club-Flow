@@ -215,16 +215,24 @@ const ClubDashboard = () => {
           <div className="inline-flex items-center rounded-[20px] p-1 bg-muted">
             <button
               onClick={() => setActiveTab('overview')}
-              className={`px-4 py-1.5 rounded-2xl text-sm font-semibold transition-all ${activeTab === 'overview' ? 'shadow-sm bg-white text-primary' : 'text-muted-foreground'}`}
+              className={`px-3 sm:px-4 py-1.5 rounded-2xl text-sm font-semibold transition-all ${activeTab === 'overview' ? 'shadow-sm bg-white text-primary' : 'text-muted-foreground'}`}
             >
               Overview
             </button>
             <button
               onClick={() => setActiveTab('members')}
-              className={`px-4 py-1.5 rounded-2xl text-sm font-semibold transition-all ${activeTab === 'members' ? 'shadow-sm bg-white text-primary' : 'text-muted-foreground'}`}
+              className={`px-3 sm:px-4 py-1.5 rounded-2xl text-sm font-semibold transition-all ${activeTab === 'members' ? 'shadow-sm bg-white text-primary' : 'text-muted-foreground'}`}
             >
               Members
             </button>
+            {isPresident && (
+              <button
+                onClick={() => setActiveTab('requests')}
+                className={`px-3 sm:px-4 py-1.5 rounded-2xl text-sm font-semibold transition-all ${activeTab === 'requests' ? 'shadow-sm bg-white text-primary' : 'text-muted-foreground'}`}
+              >
+                Requests
+              </button>
+            )}
           </div>
 
           {hasPower('create_event') && (
