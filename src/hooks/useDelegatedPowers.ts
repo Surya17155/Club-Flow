@@ -15,6 +15,7 @@ export interface DelegatedPower {
 export const AVAILABLE_POWERS = [
   { key: 'create_event', label: 'Create Event', description: 'Can create and publish events for the club' },
   { key: 'manage_club', label: 'Official Dashboard', description: 'Can access the official club dashboard to manage members and view all details' },
+  { key: 'use_chatbot', label: 'ClubBot Access', description: 'Can use the AI ClubBot assistant for club insights' },
 ] as const;
 
 export type PowerKey = typeof AVAILABLE_POWERS[number]['key'];
