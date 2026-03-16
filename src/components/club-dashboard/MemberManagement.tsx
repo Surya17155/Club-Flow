@@ -84,6 +84,15 @@ const MemberManagement = ({ clubId }: Props) => {
   const [importResults, setImportResults] = useState<{ summary: any; results: any[] } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Search existing users state
+  const [userSearchQuery, setUserSearchQuery] = useState('');
+  const [userSearchResults, setUserSearchResults] = useState<SearchedUser[]>([]);
+  const [searchingUsers, setSearchingUsers] = useState(false);
+  const [selectedSearchUser, setSelectedSearchUser] = useState<SearchedUser | null>(null);
+  const [searchUserRole, setSearchUserRole] = useState('member');
+  const [addingSearchUser, setAddingSearchUser] = useState(false);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   // Add member form state
   const [addForm, setAddForm] = useState({
     fullName: '', email: '', programme: '', section: '', year: '', rollNo: '', phone: '', role: 'member',
@@ -95,6 +104,68 @@ const MemberManagement = ({ clubId }: Props) => {
 
   const resetAddForm = () => {
     setAddForm({ fullName: '', email: '', programme: '', section: '', year: '', rollNo: '', phone: '', role: 'member' });
+    setUserSearchQuery('');
+    setUserSearchResults([]);
+    setSelectedSearchUser(null);
+    setSearchUserRole('member');
+  };
+
+  // Live search for existing users
+  const searchExistingUsers = useCallback(async (query: string) => {
+    if (query.trim().length < 2) {
+      setUserSearchResults([]);
+      return;
+    }
+    setSearchingUsers(true);
+    const q = query.trim().toLowerCase();
+    const { data } = await supabase
+      .from('profiles')
+      .select('user_id, full_name, email, programme, year, avatar_url')
+      .or(`full_name.ilike.%${q}%,email.ilike.%${q}%`)
+      .limit(10);
+
+    if (data) {
+      // Filter out users already in this club
+      const existingUserIds = new Set(members.map(m => m.user_id));
+      setUserSearchResults(
+        (data as SearchedUser[]).filter(u => !existingUserIds.has(u.user_id))
+      );
+    }
+    setSearchingUsers(false);
+  }, [members]);
+
+  const handleUserSearchChange = (value: string) => {
+    setUserSearchQuery(value);
+    setSelectedSearchUser(null);
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    searchTimeoutRef.current = setTimeout(() => searchExistingUsers(value), 300);
+  };
+
+  const handleAddSearchedUser = async () => {
+    if (!selectedSearchUser) return;
+    setAddingSearchUser(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const response = await supabase.functions.invoke('create-member', {
+        body: {
+          email: selectedSearchUser.email || '',
+          full_name: selectedSearchUser.full_name,
+          club_id: clubId,
+          role: searchUserRole,
+        },
+      });
+      if (response.error || response.data?.error) {
+        toast.error(response.data?.error || 'Failed to add member');
+      } else {
+        toast.success(`${selectedSearchUser.full_name} added to the club as ${roleLabelMap[searchUserRole] || searchUserRole}!`);
+        resetAddForm();
+        setAddDialogOpen(false);
+        await fetchMembers();
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to add member');
+    }
+    setAddingSearchUser(false);
   };
 
   const fetchMembers = async () => {
