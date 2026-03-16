@@ -201,7 +201,7 @@ const ClubDashboard = () => {
       {/* Header */}
       <header className="relative z-20 flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" className="rounded-full" onClick={() => navigate('/dashboard')}>
+          <Button variant="ghost" size="icon" className="rounded-full" onClick={() => navigate(cameFromSuperAdmin ? '/super-admin' : '/admin')}>
             <ChevronLeft className="w-5 h-5" />
           </Button>
           <h1 className="text-xl md:text-2xl font-bold font-display text-foreground">

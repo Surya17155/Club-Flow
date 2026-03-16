@@ -149,6 +149,7 @@ const ProfileDropdown = ({ viewMode = 'personal' }: { viewMode?: 'personal' | 'c
       </DropdownMenuContent>
     </DropdownMenu>
     <AssignPowersModal open={showPowersModal} onOpenChange={setShowPowersModal} />
+    <ClubSettingsModal open={showClubSettings} onOpenChange={setShowClubSettings} />
     </>
   );
 };
