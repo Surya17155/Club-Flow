@@ -70,6 +70,9 @@ export function MobileDashboardView({
   canManageClub,
   canManageEvents,
   onManageEventsOpen,
+  socialLinkedin,
+  socialInstagram,
+  socialGmail,
 }: MobileDashboardViewProps) {
   const navigate = useNavigate();
 
