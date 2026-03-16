@@ -5,7 +5,7 @@ import {
   LayoutDashboard,
   Calendar,
   Users,
-  QrCode,
+  Compass,
   Settings,
   LogOut,
   GraduationCap,
