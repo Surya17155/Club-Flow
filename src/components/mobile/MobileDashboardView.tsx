@@ -127,6 +127,10 @@ export function MobileDashboardView({
           year={year}
           about={about}
           isPersonal={isPersonal}
+          viewMode={viewMode}
+          socialLinkedin={socialLinkedin}
+          socialInstagram={socialInstagram}
+          socialGmail={socialGmail}
         />
 
         {/* Stats Row */}
