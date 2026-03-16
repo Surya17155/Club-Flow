@@ -135,32 +135,41 @@ export type Database = {
       clubs: {
         Row: {
           about: string | null
+          category: string | null
+          club_type: string | null
           created_at: string
           created_by: string | null
           description: string | null
           id: string
           logo_url: string | null
           name: string
+          tagline: string | null
           updated_at: string
         }
         Insert: {
           about?: string | null
+          category?: string | null
+          club_type?: string | null
           created_at?: string
           created_by?: string | null
           description?: string | null
           id?: string
           logo_url?: string | null
           name: string
+          tagline?: string | null
           updated_at?: string
         }
         Update: {
           about?: string | null
+          category?: string | null
+          club_type?: string | null
           created_at?: string
           created_by?: string | null
           description?: string | null
           id?: string
           logo_url?: string | null
           name?: string
+          tagline?: string | null
           updated_at?: string
         }
         Relationships: []
