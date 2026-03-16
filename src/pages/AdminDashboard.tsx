@@ -173,6 +173,53 @@ const AdminDashboard = () => {
         { label: "Events with Data:", value: String(clubStats.chartData.length), path: "M0,28 L30,20 L60,10 L100,2" },
       ];
 
+  const canManageClub = !isPersonal && !!activeClub && (activeClub.role === "president" || activeClub.role === "admin");
+  const canManageEvents = !isPersonal && !!activeClub && hasPower("create_event");
+
+  if (isMobile) {
+    return (
+      <>
+        <MobileDashboardView
+          fullName={fullName}
+          roleLabel={roleLabel}
+          clubName={clubName}
+          avatarUrl={profile?.avatar_url || undefined}
+          programme={programme}
+          year={year}
+          about={about}
+          isPersonal={isPersonal}
+          viewMode={viewMode}
+          setViewMode={setViewMode}
+          statsCards={statsCards}
+          upcomingEvents={upcomingEvents}
+          clubs={clubs}
+          onEventClick={(event: any) => {
+            setSelectedEvent(event);
+            setEventDialogOpen(true);
+          }}
+          canManageClub={canManageClub}
+          canManageEvents={canManageEvents}
+          onManageEventsOpen={() => setManageEventsOpen(true)}
+        />
+        <Dialog open={eventDialogOpen} onOpenChange={setEventDialogOpen}>
+          <DialogContent className="max-w-[95vw] rounded-2xl">
+            <DialogHeader>
+              <DialogTitle className="text-lg font-bold">{selectedEvent?.name}</DialogTitle>
+            </DialogHeader>
+            {selectedEvent && (
+              <div className="space-y-3 pt-2 text-sm">
+                <p className="text-muted-foreground">{selectedEvent.full_date} • {selectedEvent.time}</p>
+                <p className="text-muted-foreground">{selectedEvent.club_name}</p>
+                {selectedEvent.description && <p className="text-foreground/80">{selectedEvent.description}</p>}
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+        <ManageEventsModal open={manageEventsOpen} onOpenChange={setManageEventsOpen} />
+      </>
+    );
+  }
+
   return (
     <div className="min-h-screen relative antialiased p-6 md:p-8 dashboard-corner-gradient text-foreground">
       {/* Background blobs */}
