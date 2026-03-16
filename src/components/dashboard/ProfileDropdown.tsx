@@ -4,13 +4,14 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useClub } from '@/contexts/ClubContext';
 import { useProfile } from '@/hooks/useProfile';
 import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
-import { ChevronDown, User, Settings, LogOut, ArrowRightLeft, Check, ChevronRight, Shield, Crown } from 'lucide-react';
+import { ChevronDown, User, Settings, LogOut, ArrowRightLeft, Check, ChevronRight, Shield, Crown, Settings2 } from 'lucide-react';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Switch } from '@/components/ui/switch';
 import AssignPowersModal from './AssignPowersModal';
+import ClubSettingsModal from './ClubSettingsModal';
 
 const SUPER_ADMIN_EMAIL = 'suryakant.gnbba2029@iilm.edu';
 
