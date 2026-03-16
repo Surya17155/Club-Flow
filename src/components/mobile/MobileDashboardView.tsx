@@ -117,7 +117,7 @@ export function MobileDashboardView({
               !isPersonal ? 'bg-white shadow-sm text-primary' : 'text-muted-foreground'
             }`}
           >
-            Club Admin
+            Club
           </button>
         </div>
       </header>
