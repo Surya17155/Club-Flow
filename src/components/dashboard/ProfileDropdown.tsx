@@ -84,9 +84,14 @@ const ProfileDropdown = ({ viewMode = 'personal' }: { viewMode?: 'personal' | 'c
             )}
 
             {viewMode === 'club' && isPresident && (
-              <DropdownMenuItem onClick={() => setShowPowersModal(true)}>
-                <Shield className="mr-2 h-4 w-4" /> Assign Powers
-              </DropdownMenuItem>
+              <>
+                <DropdownMenuItem onClick={() => setShowPowersModal(true)}>
+                  <Shield className="mr-2 h-4 w-4" /> Assign Powers
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setShowClubSettings(true)}>
+                  <Settings2 className="mr-2 h-4 w-4" /> Club Settings
+                </DropdownMenuItem>
+              </>
             )}
 
             {isSuperAdminEmail && (
