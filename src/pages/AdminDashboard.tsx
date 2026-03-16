@@ -72,6 +72,7 @@ const AdminDashboard = () => {
   const [viewMode, setViewMode] = useState<ViewMode>("personal");
   const navigate = useNavigate();
   const greeting = useMemo(() => getRandomGreeting(), []);
+  const isMobile = useIsMobile();
 
   const [upcomingEvents, setUpcomingEvents] = useState<any[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
