@@ -90,13 +90,11 @@ export function MobileDashboardView({
       </div>
 
       {/* Top header with mode toggle */}
-      <header className="sticky top-0 z-40 px-4 pt-4 pb-2 safe-area-top">
-        {/* Top row: profile dropdown (left spacer), app name center, profile avatar right */}
+      <header className="fixed top-0 left-0 right-0 z-40 px-4 pt-4 pb-3 safe-area-top bg-background/80 backdrop-blur-lg">
+        {/* Top row: spacer, app name center, circular profile avatar right */}
         <div className="flex items-center justify-between mb-2">
-          <div className="w-9" /> {/* spacer for centering */}
-          <h1 className="text-lg font-bold font-display text-foreground">
-            Club<span className="text-primary">Hub</span>
-          </h1>
+          <div className="w-9" />
+          <h1 className="text-lg font-bold font-display text-foreground">Club</h1>
           <ProfileDropdown viewMode={viewMode} />
         </div>
 
@@ -125,6 +123,9 @@ export function MobileDashboardView({
           </button>
         </div>
       </header>
+
+      {/* Spacer for fixed header */}
+      <div className="h-[160px] safe-area-top" />
 
       <main className="px-4 py-4 space-y-5">
         {/* Profile Card */}

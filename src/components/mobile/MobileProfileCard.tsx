@@ -56,11 +56,7 @@ export function MobileProfileCard({
           src={avatarUrl}
           alt={fullName}
           className="absolute inset-0 w-full h-full"
-          style={{
-            objectFit: 'cover',
-            objectPosition: 'center',
-            zIndex: 1,
-          }}
+          style={{ objectFit: 'cover', objectPosition: 'center', zIndex: 1 }}
         />
       ) : (
         <div
@@ -91,12 +87,28 @@ export function MobileProfileCard({
 
       {/* Layer 3: Content Layer */}
       <div
-        className="absolute bottom-0 left-0 right-0 p-5 flex flex-col justify-end"
+        className="absolute bottom-0 left-0 right-0 px-5 pb-5 flex flex-col justify-end"
         style={{ zIndex: 3, height: '45%' }}
       >
-        {/* Social icons */}
+        {/* Name */}
+        <h2 className="text-xl font-bold font-display text-white drop-shadow-md">{fullName}</h2>
+
+        {/* Role */}
+        <p className="text-sm font-medium text-white/75 mt-0.5">
+          {isPersonal ? 'Student' : `${roleLabel} • ${clubName}`}
+        </p>
+
+        {/* Programme & Year */}
+        {(programme || year) && (
+          <div className="flex gap-4 mt-2 text-xs text-white/60">
+            {year && <span>{year}</span>}
+            {programme && <span>{programme}</span>}
+          </div>
+        )}
+
+        {/* Social icons — below programme/year */}
         {hasSocials && (
-          <div className="flex gap-3 mb-3">
+          <div className="flex gap-3 mt-3">
             {socialLinkedin && (
               <a
                 href={socialLinkedin.startsWith('http') ? socialLinkedin : `https://${socialLinkedin}`}
@@ -125,20 +137,6 @@ export function MobileProfileCard({
                 <Mail className="w-4 h-4 text-white" />
               </a>
             )}
-          </div>
-        )}
-
-        {/* Name & role */}
-        <h2 className="text-xl font-bold font-display text-white drop-shadow-md">{fullName}</h2>
-        <p className="text-sm font-medium text-white/75 mt-0.5">
-          {isPersonal ? 'Student' : `${roleLabel} • ${clubName}`}
-        </p>
-
-        {/* Programme & Year */}
-        {(programme || year) && (
-          <div className="flex gap-4 mt-3 text-xs text-white/60">
-            {year && <span>{year}</span>}
-            {programme && <span>{programme}</span>}
           </div>
         )}
 
