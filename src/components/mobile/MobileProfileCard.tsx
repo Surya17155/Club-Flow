@@ -121,10 +121,7 @@ export function MobileProfileCard({
           </p>
         </div>
 
-        {/* ProfileDropdown trigger (top-right settings) */}
-        <div className="absolute top-3 right-3 z-20">
-          <ProfileDropdown viewMode={viewMode} />
-        </div>
+        {/* ProfileDropdown removed from card — now in header */}
       </div>
 
       {/* Info below image */}
