@@ -36,6 +36,9 @@ interface MobileDashboardViewProps {
   canManageClub: boolean;
   canManageEvents: boolean;
   onManageEventsOpen: () => void;
+  socialLinkedin?: string;
+  socialInstagram?: string;
+  socialGmail?: string;
 }
 
 const roleLabelMap: Record<string, string> = {
@@ -67,6 +70,9 @@ export function MobileDashboardView({
   canManageClub,
   canManageEvents,
   onManageEventsOpen,
+  socialLinkedin,
+  socialInstagram,
+  socialGmail,
 }: MobileDashboardViewProps) {
   const navigate = useNavigate();
 
@@ -127,6 +133,10 @@ export function MobileDashboardView({
           year={year}
           about={about}
           isPersonal={isPersonal}
+          viewMode={viewMode}
+          socialLinkedin={socialLinkedin}
+          socialInstagram={socialInstagram}
+          socialGmail={socialGmail}
         />
 
         {/* Stats Row */}

@@ -200,6 +200,9 @@ const AdminDashboard = () => {
           canManageClub={canManageClub}
           canManageEvents={canManageEvents}
           onManageEventsOpen={() => setManageEventsOpen(true)}
+          socialLinkedin={profile?.social_linkedin || undefined}
+          socialInstagram={profile?.social_instagram || undefined}
+          socialGmail={profile?.social_gmail || undefined}
         />
         <Dialog open={eventDialogOpen} onOpenChange={setEventDialogOpen}>
           <DialogContent className="max-w-[95vw] rounded-2xl">
