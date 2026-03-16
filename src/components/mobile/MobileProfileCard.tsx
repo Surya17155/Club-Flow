@@ -42,17 +42,18 @@ export function MobileProfileCard({
 
   return (
     <div className="relative rounded-3xl overflow-hidden glass-card">
-      {/* Hero image area — image fills most of the card */}
-      <div className="relative w-full aspect-[4/3]">
+      {/* Hero image area — image fills the card frame */}
+      <div className="relative w-full aspect-[3/4]">
         {avatarUrl ? (
           <img
             src={avatarUrl}
             alt={fullName}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain rounded-3xl"
+            style={{ objectPosition: 'top center' }}
           />
         ) : (
           <div
-            className="w-full h-full flex items-center justify-center text-5xl font-bold text-primary-foreground"
+            className="w-full h-full flex items-center justify-center text-5xl font-bold text-primary-foreground rounded-3xl"
             style={{
               background: 'linear-gradient(145deg, hsl(30 60% 78%), hsl(36 55% 72%), hsl(25 50% 68%))',
             }}
@@ -61,22 +62,56 @@ export function MobileProfileCard({
           </div>
         )}
 
-        {/* Gradient blur overlay at bottom of image */}
+        {/* White-tone gradient blur overlay at bottom */}
         <div
-          className="absolute inset-x-0 bottom-0 h-[45%]"
+          className="absolute inset-x-0 bottom-0 h-[50%] rounded-b-3xl"
           style={{
-            background: 'linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.35) 50%, transparent 100%)',
-            backdropFilter: 'blur(4px)',
-            WebkitBackdropFilter: 'blur(4px)',
-            maskImage: 'linear-gradient(to top, black 40%, transparent 100%)',
-            WebkitMaskImage: 'linear-gradient(to top, black 40%, transparent 100%)',
+            background: 'linear-gradient(to top, hsl(var(--card)) 0%, hsl(var(--card) / 0.85) 30%, hsl(var(--card) / 0.4) 60%, transparent 100%)',
+            backdropFilter: 'blur(6px)',
+            WebkitBackdropFilter: 'blur(6px)',
+            maskImage: 'linear-gradient(to top, black 50%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(to top, black 50%, transparent 100%)',
           }}
         />
 
+        {/* Social icons on image */}
+        {hasSocials && (
+          <div className="absolute bottom-16 left-5 z-10 flex gap-3">
+            {socialLinkedin && (
+              <a
+                href={socialLinkedin.startsWith('http') ? socialLinkedin : `https://${socialLinkedin}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-8 h-8 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center hover:bg-white/50 transition-colors"
+              >
+                <Linkedin className="w-4 h-4 text-foreground" />
+              </a>
+            )}
+            {socialInstagram && (
+              <a
+                href={socialInstagram.startsWith('http') ? socialInstagram : `https://${socialInstagram}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-8 h-8 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center hover:bg-white/50 transition-colors"
+              >
+                <Instagram className="w-4 h-4 text-foreground" />
+              </a>
+            )}
+            {socialGmail && (
+              <a
+                href={`mailto:${socialGmail}`}
+                className="w-8 h-8 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center hover:bg-white/50 transition-colors"
+              >
+                <Mail className="w-4 h-4 text-foreground" />
+              </a>
+            )}
+          </div>
+        )}
+
         {/* Name & role text on top of blur */}
         <div className="absolute bottom-4 left-5 right-5 z-10">
-          <h2 className="text-xl font-bold font-display text-white drop-shadow-md">{fullName}</h2>
-          <p className="text-sm font-semibold text-white/85 mt-0.5 drop-shadow-sm">
+          <h2 className="text-xl font-bold font-display text-foreground drop-shadow-sm">{fullName}</h2>
+          <p className="text-sm font-semibold text-muted-foreground mt-0.5">
             {isPersonal ? 'Student' : `${roleLabel} • ${clubName}`}
           </p>
         </div>
@@ -115,39 +150,6 @@ export function MobileProfileCard({
           </div>
         )}
 
-        {/* Social handles */}
-        {hasSocials && (
-          <div className="flex gap-4 pt-1">
-            {socialLinkedin && (
-              <a
-                href={socialLinkedin.startsWith('http') ? socialLinkedin : `https://${socialLinkedin}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
-              >
-                <Linkedin className="w-4 h-4 text-primary" />
-              </a>
-            )}
-            {socialInstagram && (
-              <a
-                href={socialInstagram.startsWith('http') ? socialInstagram : `https://${socialInstagram}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
-              >
-                <Instagram className="w-4 h-4 text-primary" />
-              </a>
-            )}
-            {socialGmail && (
-              <a
-                href={`mailto:${socialGmail}`}
-                className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
-              >
-                <Mail className="w-4 h-4 text-primary" />
-              </a>
-            )}
-          </div>
-        )}
       </div>
     </div>
   );
