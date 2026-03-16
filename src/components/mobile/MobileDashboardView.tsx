@@ -9,7 +9,6 @@ import {
   TrendingUp,
   Clock,
   ChevronRight,
-  Bell,
   Compass,
   Edit3,
   ClipboardList,
