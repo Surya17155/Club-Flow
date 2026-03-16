@@ -1,12 +1,12 @@
-import { useMemo } from 'react';
-import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
-import { AppSidebar } from './AppSidebar';
-import { useAuth } from '@/contexts/AuthContext';
-import { Navigate } from 'react-router-dom';
-import { Bell, MessageCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useMemo } from "react";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "./AppSidebar";
+import { useAuth } from "@/contexts/AuthContext";
+import { Navigate } from "react-router-dom";
+import { Bell, MessageCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-const greetings = ['Hello', 'Hi', 'Hey', 'Yo', 'Welcome', "What's up", 'Howdy', 'Namaste'];
+const greetings = ["Hello", "Hi", "Hey", "Welcome", "What's up"];
 const getRandomGreeting = () => greetings[Math.floor(Math.random() * greetings.length)];
 
 interface DashboardLayoutProps {
@@ -16,7 +16,7 @@ interface DashboardLayoutProps {
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   const { user, loading } = useAuth();
   const greeting = useMemo(() => getRandomGreeting(), []);
-  const firstName = user?.user_metadata?.full_name?.split(' ')[0] || 'there';
+  const firstName = user?.user_metadata?.full_name?.split(" ")[0] || "there";
 
   if (loading) {
     return (
@@ -54,9 +54,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           </header>
 
           {/* Main content */}
-          <main className="flex-1 overflow-auto p-4 md:p-6">
-            {children}
-          </main>
+          <main className="flex-1 overflow-auto p-4 md:p-6">{children}</main>
         </div>
       </div>
     </SidebarProvider>
