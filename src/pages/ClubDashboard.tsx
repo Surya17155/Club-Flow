@@ -332,9 +332,15 @@ const ClubDashboard = () => {
             </div>
           </main>
         </>
-      ) : (
+      ) : activeTab === 'members' ? (
         /* Members Tab */
         <MemberManagement clubId={clubId} />
+      ) : (
+        /* Join Requests Tab */
+        <div className="glass-card p-6">
+          <h2 className="text-lg font-bold text-foreground mb-4">Pending Join Requests</h2>
+          <JoinRequestsPanel clubId={clubId} />
+        </div>
       )}
 
       <ManageEventsModal open={manageEventsOpen} onOpenChange={setManageEventsOpen} />
