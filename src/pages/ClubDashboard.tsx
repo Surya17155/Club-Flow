@@ -16,6 +16,7 @@ import ClubProfileSidebar from '@/components/club-dashboard/ClubProfileSidebar';
 import ClubStatsRow from '@/components/club-dashboard/ClubStatsRow';
 import ClubUpcomingEvents from '@/components/club-dashboard/ClubUpcomingEvents';
 import MemberManagement from '@/components/club-dashboard/MemberManagement';
+import JoinRequestsPanel from '@/components/club-dashboard/JoinRequestsPanel';
 import { Button } from '@/components/ui/button';
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
