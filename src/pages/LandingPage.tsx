@@ -4,22 +4,22 @@ import { motion } from "framer-motion";
 import dashboardMockup from "@/assets/dashboard-mockup.png";
 
 const features = [
-  {
-    icon: QrCode,
-    title: "Seamless Attendance",
-    desc: "QR code based tracking for effortless check-ins.",
-  },
-  {
-    icon: Shield,
-    title: "Club Identity",
-    desc: "Dedicated dashboards for clubs and members to build community.",
-  },
-  {
-    icon: Brain,
-    title: "AI Insights",
-    desc: "Automated feedback summaries and performance metrics.",
-  },
-];
+{
+  icon: QrCode,
+  title: "Seamless Attendance",
+  desc: "QR code based tracking for effortless check-ins."
+},
+{
+  icon: Shield,
+  title: "Club Identity",
+  desc: "Dedicated dashboards for clubs and members to build community."
+},
+{
+  icon: Brain,
+  title: "AI Insights",
+  desc: "Automated feedback summaries and performance metrics."
+}];
+
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -43,13 +43,13 @@ const LandingPage = () => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="relative z-10 mx-auto flex max-w-7xl items-center justify-center sm:justify-start px-6 py-5"
-      >
+        className="relative z-10 mx-auto flex max-w-7xl items-center justify-center sm:justify-start px-6 py-5">
+        
         <div className="glass-card flex items-center gap-3 rounded-2xl px-5 py-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[hsl(36,72%,48%)] to-[hsl(30,85%,55%)]">
             <span className="font-display text-sm font-bold text-white">CS</span>
           </div>
-          <span className="font-display text-xl font-bold text-foreground">ClubSync</span>
+          <span className="font-display text-xl font-bold text-foreground">​IILM Club  </span>
         </div>
       </motion.nav>
 
@@ -59,8 +59,8 @@ const LandingPage = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="font-display text-5xl font-extrabold leading-tight tracking-tight text-foreground sm:text-6xl md:text-7xl lg:text-8xl"
-        >
+          className="font-display text-5xl font-extrabold leading-tight tracking-tight text-foreground sm:text-6xl md:text-7xl lg:text-8xl">
+          
           Empower Your
           <br />
           College Clubs
@@ -70,8 +70,8 @@ const LandingPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.4 }}
-          className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground sm:text-xl"
-        >
+          className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground sm:text-xl">
+          
           The ultimate platform for attendance tracking, event management, and member growth.
         </motion.p>
 
@@ -80,12 +80,12 @@ const LandingPage = () => {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, delay: 0.6 }}
-          className="mt-10"
-        >
+          className="mt-10">
+          
           <button
             onClick={() => navigate("/login")}
-            className="glass-card group inline-flex items-center gap-3 rounded-2xl px-8 py-4 font-display text-lg font-semibold text-foreground shadow-gold transition-all hover:scale-105 hover:shadow-elevated"
-          >
+            className="glass-card group inline-flex items-center gap-3 rounded-2xl px-8 py-4 font-display text-lg font-semibold text-foreground shadow-gold transition-all hover:scale-105 hover:shadow-elevated">
+            
             Get Started / Sign In
             <ArrowUpRight className="h-5 w-5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
           </button>
@@ -96,15 +96,15 @@ const LandingPage = () => {
           initial={{ opacity: 0, y: 60 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.8 }}
-          className="relative mx-auto mt-16 max-w-4xl"
-        >
+          className="relative mx-auto mt-16 max-w-4xl">
+          
           <div className="absolute inset-0 -z-10 rounded-3xl bg-gradient-to-b from-[hsl(36,72%,48%,0.15)] to-transparent blur-2xl" />
           <img
             src={dashboardMockup}
             alt="ClubSync Dashboard Preview"
             className="w-full drop-shadow-2xl"
-            loading="lazy"
-          />
+            loading="lazy" />
+          
         </motion.div>
 
         {/* Feature Cards */}
@@ -112,16 +112,16 @@ const LandingPage = () => {
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 1.1 }}
-          className="mx-auto mt-20 grid max-w-5xl grid-cols-1 gap-6 sm:grid-cols-3"
-        >
-          {features.map((f, i) => (
-            <motion.div
-              key={f.title}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 1.2 + i * 0.15 }}
-              className="glass-card flex items-start gap-4 rounded-3xl p-6 text-left"
-            >
+          className="mx-auto mt-20 grid max-w-5xl grid-cols-1 gap-6 sm:grid-cols-3">
+          
+          {features.map((f, i) =>
+          <motion.div
+            key={f.title}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 1.2 + i * 0.15 }}
+            className="glass-card flex items-start gap-4 rounded-3xl p-6 text-left">
+            
               <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[hsl(var(--gold-light))] to-[hsl(var(--amber-light))]">
                 <f.icon className="h-7 w-7 text-primary" />
               </div>
@@ -130,7 +130,7 @@ const LandingPage = () => {
                 <p className="mt-1 text-sm text-muted-foreground">{f.desc}</p>
               </div>
             </motion.div>
-          ))}
+          )}
         </motion.div>
 
         {/* Contact Support — bottom of page */}
@@ -138,18 +138,18 @@ const LandingPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 1.5 }}
-          className="mt-20"
-        >
+          className="mt-20">
+          
           <button
             onClick={() => navigate("/login")}
-            className="glass-card cursor-pointer rounded-2xl px-6 py-3 font-display text-sm font-semibold text-primary transition-all hover:shadow-gold"
-          >
+            className="glass-card cursor-pointer rounded-2xl px-6 py-3 font-display text-sm font-semibold text-primary transition-all hover:shadow-gold">
+            
             Contact Support
           </button>
         </motion.div>
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default LandingPage;
