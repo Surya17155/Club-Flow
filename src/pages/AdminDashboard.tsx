@@ -69,7 +69,13 @@ const AdminDashboard = () => {
   const { stats: personalStats } = usePersonalStats();
   const { stats: clubStats } = useClubStats(activeClub?.club_id);
   const { hasPower } = useDelegatedPowers();
-  const [viewMode, setViewMode] = useState<ViewMode>("personal");
+  const [viewMode, setViewModeState] = useState<ViewMode>(() => {
+    return (localStorage.getItem('dashboardViewMode') as ViewMode) || 'personal';
+  });
+  const setViewMode = (mode: ViewMode) => {
+    setViewModeState(mode);
+    localStorage.setItem('dashboardViewMode', mode);
+  };
   const navigate = useNavigate();
   const greeting = useMemo(() => getRandomGreeting(), []);
   const isMobile = useIsMobile();
