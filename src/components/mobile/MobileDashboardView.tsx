@@ -76,7 +76,7 @@ export function MobileDashboardView({
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen pb-20 dashboard-corner-gradient">
+    <div className="min-h-screen pb-20 dashboard-corner-gradient overflow-x-hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
       {/* Fixed background blobs */}
       <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
         <div
@@ -90,11 +90,11 @@ export function MobileDashboardView({
       </div>
 
       {/* Top header with mode toggle */}
-      <header className="fixed top-0 left-0 right-0 z-40 px-4 pt-4 pb-3 safe-area-top bg-background/80 backdrop-blur-lg">
+      <header className="fixed top-0 left-0 right-0 z-40 px-4 pt-4 pb-3 safe-area-top">
         {/* Top row: spacer, app name center, circular profile avatar right */}
         <div className="flex items-center justify-between mb-2">
           <div className="w-9" />
-          <h1 className="text-lg font-bold font-display text-foreground">Club</h1>
+          <h1 className="text-lg font-bold font-display text-foreground">IILM Club</h1>
           <ProfileDropdown viewMode={viewMode} />
         </div>
 

@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useClub } from '@/contexts/ClubContext';
+import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
 import { useNavigate } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import EventFeedbackModal from '@/components/dashboard/EventFeedbackModal';
@@ -32,7 +33,22 @@ const Events = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   const { activeClub } = useClub();
+  const { hasPower } = useDelegatedPowers();
   const navigate = useNavigate();
+
+  // Read viewMode from localStorage (set by AdminDashboard)
+  const [viewMode, setViewMode] = useState<'personal' | 'club'>(() => {
+    return (localStorage.getItem('dashboardViewMode') as 'personal' | 'club') || 'personal';
+  });
+
+  // Listen for storage changes
+  useEffect(() => {
+    const handler = () => {
+      setViewMode((localStorage.getItem('dashboardViewMode') as 'personal' | 'club') || 'personal');
+    };
+    window.addEventListener('storage', handler);
+    return () => window.removeEventListener('storage', handler);
+  }, []);
 
   const [events, setEvents] = useState<EventRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -45,10 +61,21 @@ const Events = () => {
 
   const fetchEvents = async () => {
     setLoading(true);
-    const { data, error } = await supabase
+
+    let query = supabase
       .from('events')
       .select('id, name, event_type, category, event_date, end_date, access_type, description, qr_token, club_id, clubs(name)')
-      .order('event_date', { ascending: false });
+      .order('event_date', { ascending: true });
+
+    if (viewMode === 'personal') {
+      // Personal mode: show all events from today onwards
+      query = query.gte('event_date', new Date().toISOString());
+    } else if (viewMode === 'club' && activeClub) {
+      // Club mode: show only this club's events
+      query = query.eq('club_id', activeClub.club_id);
+    }
+
+    const { data, error } = await query;
 
     if (!error && data) {
       setEvents(data as any);
@@ -68,7 +95,7 @@ const Events = () => {
     setLoading(false);
   };
 
-  useEffect(() => { fetchEvents(); }, []);
+  useEffect(() => { fetchEvents(); }, [viewMode, activeClub?.club_id]);
 
   const handleDelete = async (eventId: string) => {
     const { error } = await supabase.from('events').delete().eq('id', eventId);
@@ -86,17 +113,29 @@ const Events = () => {
 
   const filteredEvents = events.filter(e => filter === 'all' || getStatus(e) === filter);
 
+  // Show create button only in club mode AND user has permission
+  const canCreateEvent = viewMode === 'club' && hasPower('create_event');
+
+  // Show delete only for authorized users in club mode
+  const canManageEvents = viewMode === 'club' && hasPower('create_event');
+
   return (
     <DashboardLayout>
       <div className="space-y-4 sm:space-y-6 animate-fade-in">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div>
-            <h1 className="text-xl sm:text-2xl font-display font-bold text-foreground">Events</h1>
-            <p className="text-sm text-muted-foreground">Manage and view all events</p>
+            <h1 className="text-xl sm:text-2xl font-display font-bold text-foreground">
+              {viewMode === 'personal' ? 'All College Events' : `${activeClub?.club_name || 'Club'} Events`}
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              {viewMode === 'personal' ? 'Upcoming events across all clubs' : 'Events for your club'}
+            </p>
           </div>
-          <Button onClick={() => navigate('/create-event')} className="gradient-gold text-primary-foreground shadow-gold hover:opacity-90 w-full sm:w-auto">
-            <Plus className="w-4 h-4 mr-1" /> Create Event
-          </Button>
+          {canCreateEvent && (
+            <Button onClick={() => navigate('/create-event')} className="gradient-gold text-primary-foreground shadow-gold hover:opacity-90 w-full sm:w-auto">
+              <Plus className="w-4 h-4 mr-1" /> Create Event
+            </Button>
+          )}
         </div>
 
         {/* Filters */}
@@ -178,9 +217,11 @@ const Events = () => {
                           <QrCode className="w-3.5 h-3.5" />
                         </Button>
                       )}
-                      <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" onClick={() => handleDelete(event.id)}>
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </Button>
+                      {canManageEvents && (
+                        <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" onClick={() => handleDelete(event.id)}>
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
