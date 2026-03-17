@@ -71,10 +71,10 @@ export function MobileBottomNav() {
         {canCreateEvent ? (
           <button
             onClick={() => navigate("/create-event")}
-            className="relative -mt-7 flex items-center justify-center transition-transform duration-200 active:scale-95"
+            className="relative -mt-6 flex items-center justify-center transition-transform duration-200 active:scale-95"
             style={{
-              width: "56px",
-              height: "56px",
+              width: "50px",
+              height: "50px",
               borderRadius: "50%",
               background: "hsl(var(--primary))",
               boxShadow: "0px 8px 20px hsla(var(--primary) / 0.45)",
