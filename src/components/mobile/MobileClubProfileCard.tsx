@@ -29,79 +29,98 @@ export function MobileClubProfileCard({
 
   return (
     <div
-      className="relative mx-auto overflow-hidden"
+      className="mx-auto w-full overflow-hidden"
       style={{
-        width: '100%',
         maxWidth: '320px',
-        aspectRatio: '3 / 4',
-        borderRadius: '28px',
-        background: '#111',
-        boxShadow: '0 20px 40px rgba(0,0,0,0.35), 0 8px 16px rgba(0,0,0,0.25)',
+        borderRadius: '22px',
+        background: 'hsl(var(--card))',
+        boxShadow:
+          '0 4px 6px -1px rgba(0,0,0,0.06), 0 10px 20px -2px rgba(0,0,0,0.08), 0 20px 40px -4px rgba(0,0,0,0.04)',
       }}
     >
-      {/* Layer 1: Club Logo / Image */}
-      {clubLogo ? (
-        <img
-          src={clubLogo}
-          alt={clubName}
-          className="absolute inset-0 w-full h-full"
-          style={{ objectFit: 'cover', objectPosition: 'center', zIndex: 1 }}
-        />
-      ) : (
-        <div
-          className="absolute inset-0 w-full h-full flex items-center justify-center text-5xl font-bold text-white"
-          style={{
-            background: 'linear-gradient(145deg, hsl(30 60% 78%), hsl(36 55% 72%), hsl(25 50% 68%))',
-            zIndex: 1,
-          }}
-        >
-          {initials}
-        </div>
-      )}
-
-      {/* Layer 2: Blur / Gradient Overlay */}
+      {/* Image container */}
       <div
-        className="absolute bottom-0 left-0 w-full pointer-events-none"
+        className="relative w-full overflow-hidden"
         style={{
-          height: '45%',
-          zIndex: 2,
-          borderRadius: '0 0 28px 28px',
-          backdropFilter: 'blur(14px)',
-          WebkitBackdropFilter: 'blur(14px)',
-          background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 50%, rgba(0,0,0,0) 100%)',
-          maskImage: 'linear-gradient(to top, black 70%, transparent 100%)',
-          WebkitMaskImage: 'linear-gradient(to top, black 70%, transparent 100%)',
+          margin: '10px 10px 0 10px',
+          width: 'calc(100% - 20px)',
+          aspectRatio: '3 / 4',
+          borderRadius: '16px',
         }}
-      />
-
-      {/* Layer 3: Content Layer */}
-      <div
-        className="absolute bottom-0 left-0 right-0 px-5 pb-5 flex flex-col justify-end"
-        style={{ zIndex: 3, height: '45%' }}
       >
-        {/* Club Name */}
-        <h2 className="text-xl font-bold font-display text-white drop-shadow-md">{clubName}</h2>
-
-        {/* Badge */}
-        <Badge className="mt-1.5 w-fit bg-white/20 text-white border-0 text-[10px] font-semibold backdrop-blur-md">
-          Official Dashboard
-        </Badge>
-
-        {/* Post-holders preview */}
-        {postHolders.length > 0 && (
-          <div className="mt-3 space-y-1">
-            {postHolders.slice(0, 3).map((ph, i) => (
-              <div key={i} className="flex justify-between text-xs">
-                <span className="text-white/55">{roleLabelMap[ph.role] ?? ph.role}</span>
-                <span className="text-white/80 font-medium">{ph.full_name}</span>
-              </div>
-            ))}
+        {clubLogo ? (
+          <img
+            src={clubLogo}
+            alt={clubName}
+            className="w-full h-full object-cover object-center"
+          />
+        ) : (
+          <div
+            className="w-full h-full flex items-center justify-center text-5xl font-bold"
+            style={{
+              background:
+                'linear-gradient(145deg, hsl(var(--primary) / 0.15), hsl(var(--primary) / 0.25))',
+              color: 'hsl(var(--primary))',
+            }}
+          >
+            {initials}
           </div>
         )}
+      </div>
 
-        {/* About */}
-        {clubAbout && (
-          <p className="text-xs text-white/55 mt-2 line-clamp-2 leading-relaxed">{clubAbout}</p>
+      {/* Content section */}
+      <div className="px-4 pt-3.5 pb-4 space-y-2.5">
+        {/* Name row with verification dot */}
+        <div className="flex items-center gap-2">
+          <h2 className="text-lg font-bold font-display text-foreground leading-tight">
+            {clubName}
+          </h2>
+          <div
+            className="w-[18px] h-[18px] rounded-full flex items-center justify-center flex-shrink-0"
+            style={{ background: 'hsl(var(--primary))' }}
+          >
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+              <path
+                d="M2.5 5L4.5 7L7.5 3"
+                stroke="white"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+        </div>
+
+        {/* About / Description — 2 lines max */}
+        {clubAbout ? (
+          <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+            {clubAbout}
+          </p>
+        ) : (
+          <p className="text-xs text-muted-foreground italic">Official Club Dashboard</p>
+        )}
+
+        {/* Footer: post-holders preview as badges */}
+        {postHolders.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 pt-1">
+            {postHolders.slice(0, 3).map((ph, i) => (
+              <Badge
+                key={i}
+                variant="secondary"
+                className="text-[10px] font-medium bg-primary/10 text-primary border-0 px-2 py-0.5"
+              >
+                {roleLabelMap[ph.role] ?? ph.role}
+              </Badge>
+            ))}
+            {postHolders.length > 3 && (
+              <Badge
+                variant="outline"
+                className="text-[10px] font-medium px-2 py-0.5"
+              >
+                +{postHolders.length - 3}
+              </Badge>
+            )}
+          </div>
         )}
       </div>
     </div>
