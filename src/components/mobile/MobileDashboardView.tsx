@@ -272,5 +272,6 @@ export function MobileDashboardView({
 
       <MobileBottomNav />
     </div>
+    </>
   );
 }
