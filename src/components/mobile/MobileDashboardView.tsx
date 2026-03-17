@@ -76,21 +76,9 @@ export function MobileDashboardView({
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen pb-20 dashboard-corner-gradient overflow-x-hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-      {/* Fixed background blobs */}
-      <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
-        <div
-          className="absolute top-[-8%] left-[-8%] w-[300px] h-[300px] rounded-full mix-blend-multiply filter blur-[80px] opacity-60 animate-blob"
-          style={{ backgroundColor: 'hsl(45 90% 85% / 0.9)' }}
-        />
-        <div
-          className="absolute bottom-[20%] right-[-10%] w-[250px] h-[250px] rounded-full mix-blend-multiply filter blur-[80px] opacity-50 animate-blob animation-delay-2000"
-          style={{ backgroundColor: 'hsl(25 80% 82% / 0.8)' }}
-        />
-      </div>
-
-      {/* Top header with mode toggle */}
-      <header className="fixed top-0 left-0 right-0 z-40 px-4 pt-4 pb-3 safe-area-top">
+    <>
+      {/* Fixed header — rendered OUTSIDE scrollable container */}
+      <header className="fixed top-0 left-0 right-0 z-40 px-4 pt-4 pb-3 safe-area-top pointer-events-auto">
         {/* Top row: spacer, app name center, circular profile avatar right */}
         <div className="flex items-center justify-between mb-2">
           <div className="w-9" />
@@ -124,10 +112,23 @@ export function MobileDashboardView({
         </div>
       </header>
 
-      {/* Spacer for fixed header */}
-      <div className="h-[160px] safe-area-top" />
+      <div className="min-h-screen pb-20 dashboard-corner-gradient overflow-x-hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+        {/* Fixed background blobs */}
+        <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
+          <div
+            className="absolute top-[-8%] left-[-8%] w-[300px] h-[300px] rounded-full mix-blend-multiply filter blur-[80px] opacity-60 animate-blob"
+            style={{ backgroundColor: 'hsl(45 90% 85% / 0.9)' }}
+          />
+          <div
+            className="absolute bottom-[20%] right-[-10%] w-[250px] h-[250px] rounded-full mix-blend-multiply filter blur-[80px] opacity-50 animate-blob animation-delay-2000"
+            style={{ backgroundColor: 'hsl(25 80% 82% / 0.8)' }}
+          />
+        </div>
 
-      <main className="px-4 py-4 space-y-5">
+        {/* Spacer for fixed header */}
+        <div className="h-[160px] safe-area-top" />
+
+        <main className="px-4 py-4 space-y-5">
         {/* Profile Card */}
         <MobileProfileCard
           fullName={fullName}
@@ -271,5 +272,6 @@ export function MobileDashboardView({
 
       <MobileBottomNav />
     </div>
+    </>
   );
 }
