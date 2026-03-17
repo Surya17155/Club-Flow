@@ -70,18 +70,17 @@ export function MobileProfileCard({
         </div>
       )}
 
-      {/* Layer 2: Blur / Gradient Overlay */}
+      {/* Layer 2: Progressive blur overlay */}
       <div
-        className="absolute bottom-0 left-0 w-full pointer-events-none"
+        className="absolute inset-0 pointer-events-none"
         style={{
-          height: '45%',
           zIndex: 2,
-          borderRadius: '0 0 28px 28px',
-          backdropFilter: 'blur(14px)',
-          WebkitBackdropFilter: 'blur(14px)',
-          background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 50%, rgba(0,0,0,0) 100%)',
-          maskImage: 'linear-gradient(to top, black 70%, transparent 100%)',
-          WebkitMaskImage: 'linear-gradient(to top, black 70%, transparent 100%)',
+          borderRadius: '28px',
+          backdropFilter: 'blur(22px)',
+          WebkitBackdropFilter: 'blur(22px)',
+          background: 'linear-gradient(to top, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.25) 30%, rgba(0,0,0,0.1) 55%, rgba(0,0,0,0) 75%)',
+          maskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.85) 25%, rgba(0,0,0,0.5) 45%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0) 75%)',
+          WebkitMaskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.85) 25%, rgba(0,0,0,0.5) 45%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0) 75%)',
         }}
       />
 
