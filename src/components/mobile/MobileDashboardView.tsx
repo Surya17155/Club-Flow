@@ -94,7 +94,7 @@ export function MobileDashboardView({
         {/* Top row: spacer, app name center, circular profile avatar right */}
         <div className="flex items-center justify-between mb-2">
           <div className="w-9" />
-          <h1 className="text-lg font-bold font-display text-foreground">Club</h1>
+          <h1 className="text-lg font-bold font-display text-foreground">IILM Club</h1>
           <ProfileDropdown viewMode={viewMode} />
         </div>
 
