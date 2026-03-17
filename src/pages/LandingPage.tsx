@@ -43,7 +43,7 @@ const LandingPage = () => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-6 py-5"
+        className="relative z-10 mx-auto flex max-w-7xl items-center justify-center sm:justify-start px-6 py-5"
       >
         <div className="glass-card flex items-center gap-3 rounded-2xl px-5 py-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[hsl(36,72%,48%)] to-[hsl(30,85%,55%)]">
@@ -51,12 +51,6 @@ const LandingPage = () => {
           </div>
           <span className="font-display text-xl font-bold text-foreground">ClubSync</span>
         </div>
-        <button
-          onClick={() => navigate("/login")}
-          className="glass-card cursor-pointer rounded-2xl px-6 py-3 font-display text-sm font-semibold text-primary transition-all hover:shadow-gold"
-        >
-          Contact Support
-        </button>
       </motion.nav>
 
       {/* Hero Section */}
@@ -137,6 +131,21 @@ const LandingPage = () => {
               </div>
             </motion.div>
           ))}
+        </motion.div>
+
+        {/* Contact Support — bottom of page */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 1.5 }}
+          className="mt-20"
+        >
+          <button
+            onClick={() => navigate("/login")}
+            className="glass-card cursor-pointer rounded-2xl px-6 py-3 font-display text-sm font-semibold text-primary transition-all hover:shadow-gold"
+          >
+            Contact Support
+          </button>
         </motion.div>
       </div>
     </div>
