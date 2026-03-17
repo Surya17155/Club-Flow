@@ -90,7 +90,7 @@ export function MobileDashboardView({
       </div>
 
       {/* Top header with mode toggle */}
-      <header className="fixed top-0 left-0 right-0 z-40 px-4 pt-4 pb-3 safe-area-top bg-background/80 backdrop-blur-lg">
+      <header className="fixed top-0 left-0 right-0 z-40 px-4 pt-4 pb-3 safe-area-top">
         {/* Top row: spacer, app name center, circular profile avatar right */}
         <div className="flex items-center justify-between mb-2">
           <div className="w-9" />
