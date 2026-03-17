@@ -132,6 +132,21 @@ const LandingPage = () => {
             </motion.div>
           ))}
         </motion.div>
+
+        {/* Contact Support — bottom of page */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 1.5 }}
+          className="mt-20"
+        >
+          <button
+            onClick={() => navigate("/login")}
+            className="glass-card cursor-pointer rounded-2xl px-6 py-3 font-display text-sm font-semibold text-primary transition-all hover:shadow-gold"
+          >
+            Contact Support
+          </button>
+        </motion.div>
       </div>
     </div>
   );
