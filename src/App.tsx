@@ -53,6 +53,7 @@ const App = () => (
               <Route path="/super-admin" element={<SuperAdminDashboard />} />
               <Route path="/global-reports" element={<GlobalReports />} />
               <Route path="/discover" element={<DiscoverClubs />} />
+              <Route path="/calendar" element={<MobileCalendar />} />
               <Route path="/scan" element={<Events />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

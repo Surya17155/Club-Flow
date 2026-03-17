@@ -24,13 +24,13 @@ export function MobileBottomNav() {
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pb-4 px-4 safe-area-bottom md:hidden pointer-events-none">
+    <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pb-5 px-4 safe-area-bottom md:hidden pointer-events-none">
       <nav
         className="relative flex items-center justify-evenly pointer-events-auto"
         style={{
           width: "100%",
           maxWidth: "380px",
-          height: "60px",
+          height: "52px",
           borderRadius: "36px",
           background: "rgba(255, 255, 255, 0.18)",
           backdropFilter: "blur(18px)",
