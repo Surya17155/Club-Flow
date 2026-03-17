@@ -88,7 +88,7 @@ export function MobileProfileCard({
       {/* Layer 3: Content Layer */}
       <div
         className="absolute bottom-0 left-0 right-0 px-5 pb-5 flex flex-col justify-end"
-        style={{ zIndex: 3, height: "45%" }}
+        style={{ zIndex: 3, height: "35%" }}
       >
         {/* Name */}
         <h2 className="text-xl font-bold font-display text-white drop-shadow-md">{fullName}</h2>
