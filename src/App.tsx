@@ -21,6 +21,7 @@ import CreateEvent from "./pages/CreateEvent";
 import SuperAdminDashboard from "./pages/SuperAdminDashboard";
 import GlobalReports from "./pages/GlobalReports";
 import DiscoverClubs from "./pages/DiscoverClubs";
+import MobileCalendar from "./pages/MobileCalendar";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -52,6 +53,7 @@ const App = () => (
               <Route path="/super-admin" element={<SuperAdminDashboard />} />
               <Route path="/global-reports" element={<GlobalReports />} />
               <Route path="/discover" element={<DiscoverClubs />} />
+              <Route path="/calendar" element={<MobileCalendar />} />
               <Route path="/scan" element={<Events />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

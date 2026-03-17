@@ -201,7 +201,7 @@ export function MobileDashboardView({
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-base font-bold font-display text-foreground">Upcoming Events</h3>
             <button
-              onClick={() => navigate('/events')}
+              onClick={() => navigate('/calendar')}
               className="text-xs font-semibold text-primary flex items-center"
             >
               View Full Calendar <ChevronRight className="w-3 h-3 ml-0.5" />

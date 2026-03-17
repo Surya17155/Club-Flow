@@ -24,13 +24,13 @@ export function MobileBottomNav() {
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pb-4 px-4 safe-area-bottom md:hidden pointer-events-none">
+    <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pb-5 px-4 safe-area-bottom md:hidden pointer-events-none">
       <nav
         className="relative flex items-center justify-evenly pointer-events-auto"
         style={{
           width: "100%",
           maxWidth: "380px",
-          height: "60px",
+          height: "52px",
           borderRadius: "36px",
           background: "rgba(255, 255, 255, 0.18)",
           backdropFilter: "blur(18px)",
@@ -71,10 +71,10 @@ export function MobileBottomNav() {
         {canCreateEvent ? (
           <button
             onClick={() => navigate("/create-event")}
-            className="relative -mt-7 flex items-center justify-center transition-transform duration-200 active:scale-95"
+            className="relative -mt-6 flex items-center justify-center transition-transform duration-200 active:scale-95"
             style={{
-              width: "56px",
-              height: "56px",
+              width: "50px",
+              height: "50px",
               borderRadius: "50%",
               background: "hsl(var(--primary))",
               boxShadow: "0px 8px 20px hsla(var(--primary) / 0.45)",
