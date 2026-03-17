@@ -76,7 +76,7 @@ export function MobileDashboardView({
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen pb-20 dashboard-corner-gradient">
+    <div className="min-h-screen pb-20 dashboard-corner-gradient overflow-x-hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
       {/* Fixed background blobs */}
       <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
         <div
