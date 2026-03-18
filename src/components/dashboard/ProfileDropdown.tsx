@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useClub } from '@/contexts/ClubContext';
 import { useProfile } from '@/hooks/useProfile';
 import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { ChevronDown, User, Settings, LogOut, ArrowRightLeft, Check, ChevronRight, Shield, Crown, Settings2, Bot } from 'lucide-react';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator,
@@ -32,6 +33,7 @@ const ProfileDropdown = ({ viewMode = 'personal' }: { viewMode?: 'personal' | 'c
   const { profile } = useProfile();
   const { activeClub, clubs, switchClub } = useClub();
   const { isPresident, hasPower } = useDelegatedPowers();
+  const isMobile = useIsMobile();
   const [showClubs, setShowClubs] = useState(false);
   const [showPowersModal, setShowPowersModal] = useState(false);
   const [showClubSettings, setShowClubSettings] = useState(false);
@@ -87,7 +89,13 @@ const ProfileDropdown = ({ viewMode = 'personal' }: { viewMode?: 'personal' | 'c
             )}
 
             {showChatOption && (
-              <DropdownMenuItem onClick={() => setShowChat(true)}>
+              <DropdownMenuItem onClick={() => {
+                if (isMobile) {
+                  navigate('/chat');
+                } else {
+                  setShowChat(true);
+                }
+              }}>
                 <Bot className="mr-2 h-4 w-4 text-primary" /> AI Chatbot
               </DropdownMenuItem>
             )}
