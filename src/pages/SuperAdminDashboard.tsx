@@ -51,7 +51,7 @@ const SuperAdminDashboard = () => {
     section: '',
     year: '',
     rollNo: '',
-    phone: '',
+    phone: ''
   });
   const { toast } = useToast();
 
@@ -61,11 +61,11 @@ const SuperAdminDashboard = () => {
   useEffect(() => {
     if (!user) return;
     const checkAdmin = async () => {
-      const { data } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id)
-      .eq('role', 'admin');
+      const { data } = await supabase.
+      from('user_roles').
+      select('role').
+      eq('user_id', user.id).
+      eq('role', 'admin');
       setIsAdmin(data && data.length > 0);
     };
     checkAdmin();
@@ -96,10 +96,10 @@ const SuperAdminDashboard = () => {
 
   const handleChangeRole = async () => {
     if (!selectedRoleMember || !newRole) return;
-    await supabase
-    .from('club_members')
-    .update({ role: newRole as any })
-    .eq('id', selectedRoleMember.membership_id);
+    await supabase.
+    from('club_members').
+    update({ role: newRole as any }).
+    eq('id', selectedRoleMember.membership_id);
     setRoleDialogOpen(false);
     setSelectedRoleMember(null);
     setNewRole('');
@@ -116,7 +116,7 @@ const SuperAdminDashboard = () => {
     const { data: clubData, error: clubError } = await supabase.from('clubs').insert({
       name: newClubName.trim(),
       description: newClubDescription.trim() || null,
-      created_by: user!.id,
+      created_by: user!.id
     }).select('id').single();
 
     if (clubError || !clubData) {
@@ -135,8 +135,8 @@ const SuperAdminDashboard = () => {
         roll_no: presidentForm.rollNo.trim(),
         phone: presidentForm.phone.trim(),
         club_id: clubData.id,
-        role: 'president',
-      },
+        role: 'president'
+      }
     });
 
     if (fnError || fnData?.error) {
@@ -147,9 +147,9 @@ const SuperAdminDashboard = () => {
     }
 
     const action = fnData?.action;
-    const presidentMsg = action === 'added_existing' 
-      ? `${presidentForm.fullName} (existing user) has been assigned as President.`
-      : `${presidentForm.fullName} has been added as President. They can log in using "Forgot Password" to set their credentials.`;
+    const presidentMsg = action === 'added_existing' ?
+    `${presidentForm.fullName} (existing user) has been assigned as President.` :
+    `${presidentForm.fullName} has been added as President. They can log in using "Forgot Password" to set their credentials.`;
     toast({ title: 'Club created!', description: `${newClubName} has been created. ${presidentMsg}` });
     setCreateClubOpen(false);
     setNewClubName('');
@@ -172,8 +172,8 @@ const SuperAdminDashboard = () => {
 
   const filteredClubs = clubs.filter((c) => c.name.toLowerCase().includes(searchQuery.toLowerCase()));
   const filteredMembers = members.filter((m) =>
-    m.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    m.club_name.toLowerCase().includes(searchQuery.toLowerCase())
+  m.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  m.club_name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const uniqueMembers = Array.from(
@@ -184,16 +184,16 @@ const SuperAdminDashboard = () => {
   );
 
   const statsCards = [
-    { label: 'Total Active Clubs', value: totalClubs, icon: Building2, path: 'M0,25 C30,25 30,10 50,10 S70,20 100,5' },
-    { label: 'Global Member Count', value: globalMembers, icon: Users, path: 'M0,25 C20,28 40,5 60,15 S80,5 100,10' },
-    { label: 'Total Events Managed', value: totalEvents, icon: Calendar, path: 'M0,20 C30,20 40,25 60,10 S90,5 100,5' },
-  ];
+  { label: 'Total Active Clubs', value: totalClubs, icon: Building2, path: 'M0,25 C30,25 30,10 50,10 S70,20 100,5' },
+  { label: 'Global Member Count', value: globalMembers, icon: Users, path: 'M0,25 C20,28 40,5 60,15 S80,5 100,10' },
+  { label: 'Total Events Managed', value: totalEvents, icon: Calendar, path: 'M0,20 C30,20 40,25 60,10 S90,5 100,5' }];
+
 
   const statIcons = [Building2, Users, Calendar];
 
   // ──── Shared dialogs (used by both mobile & desktop) ────
-  const renderDialogs = () => (
-    <>
+  const renderDialogs = () =>
+  <>
       {/* View Profile Dialog */}
       <Dialog open={profileDialogOpen} onOpenChange={setProfileDialogOpen}>
         <DialogContent className="max-w-md">
@@ -202,7 +202,7 @@ const SuperAdminDashboard = () => {
             <DialogDescription>Full details for this member</DialogDescription>
           </DialogHeader>
           {selectedMember &&
-          <div className="space-y-3">
+        <div className="space-y-3">
               <div className="flex items-center gap-4 mb-4">
                 <Avatar className="w-16 h-16">
                   <AvatarImage src={selectedMember.avatar_url || undefined} />
@@ -226,7 +226,7 @@ const SuperAdminDashboard = () => {
                 {selectedMember.phone && <><span className="text-muted-foreground">Phone:</span><span>{selectedMember.phone}</span></>}
               </div>
             </div>
-          }
+        }
         </DialogContent>
       </Dialog>
 
@@ -246,13 +246,13 @@ const SuperAdminDashboard = () => {
               </SelectTrigger>
               <SelectContent>
                 {Object.entries(roleLabelMap).filter(([k]) => k !== 'admin').map(([key, label]) =>
-                <SelectItem key={key} value={key}>{label}</SelectItem>
-                )}
+              <SelectItem key={key} value={key}>{label}</SelectItem>
+              )}
               </SelectContent>
             </Select>
             <button
-              onClick={handleChangeRole}
-              className="w-full py-2 rounded-lg gradient-gold text-primary-foreground font-medium text-sm">
+            onClick={handleChangeRole}
+            className="w-full py-2 rounded-lg gradient-gold text-primary-foreground font-medium text-sm">
               Save Role
             </button>
           </div>
@@ -288,55 +288,55 @@ const SuperAdminDashboard = () => {
               <div className="grid grid-cols-2 gap-3">
                 <div className="col-span-2">
                   <Label>Full Name <span className="text-destructive">*</span></Label>
-                  <Input value={presidentForm.fullName} onChange={(e) => setPresidentForm(p => ({ ...p, fullName: e.target.value }))} placeholder="President's full name" className="mt-1" />
+                  <Input value={presidentForm.fullName} onChange={(e) => setPresidentForm((p) => ({ ...p, fullName: e.target.value }))} placeholder="President's full name" className="mt-1" />
                 </div>
                 <div className="col-span-2">
                   <Label>Email <span className="text-destructive">*</span></Label>
-                  <Input type="email" value={presidentForm.email} onChange={(e) => setPresidentForm(p => ({ ...p, email: e.target.value }))} placeholder="president@example.com" className="mt-1" />
+                  <Input type="email" value={presidentForm.email} onChange={(e) => setPresidentForm((p) => ({ ...p, email: e.target.value }))} placeholder="president@example.com" className="mt-1" />
                 </div>
                 <div>
                   <Label>Programme <span className="text-destructive">*</span></Label>
-                  <Input value={presidentForm.programme} onChange={(e) => setPresidentForm(p => ({ ...p, programme: e.target.value }))} placeholder="e.g. BCA, BBA" className="mt-1" />
+                  <Input value={presidentForm.programme} onChange={(e) => setPresidentForm((p) => ({ ...p, programme: e.target.value }))} placeholder="e.g. BCA, BBA" className="mt-1" />
                 </div>
                 <div>
                   <Label>Year <span className="text-destructive">*</span></Label>
-                  <Input value={presidentForm.year} onChange={(e) => setPresidentForm(p => ({ ...p, year: e.target.value }))} placeholder="e.g. 2nd Year" className="mt-1" />
+                  <Input value={presidentForm.year} onChange={(e) => setPresidentForm((p) => ({ ...p, year: e.target.value }))} placeholder="e.g. 2nd Year" className="mt-1" />
                 </div>
                 <div>
                   <Label>Section</Label>
-                  <Input value={presidentForm.section} onChange={(e) => setPresidentForm(p => ({ ...p, section: e.target.value }))} placeholder="e.g. A" className="mt-1" />
+                  <Input value={presidentForm.section} onChange={(e) => setPresidentForm((p) => ({ ...p, section: e.target.value }))} placeholder="e.g. A" className="mt-1" />
                 </div>
                 <div>
                   <Label>Roll No</Label>
-                  <Input value={presidentForm.rollNo} onChange={(e) => setPresidentForm(p => ({ ...p, rollNo: e.target.value }))} placeholder="e.g. 2301234" className="mt-1" />
+                  <Input value={presidentForm.rollNo} onChange={(e) => setPresidentForm((p) => ({ ...p, rollNo: e.target.value }))} placeholder="e.g. 2301234" className="mt-1" />
                 </div>
                 <div className="col-span-2">
                   <Label>Phone</Label>
-                  <Input value={presidentForm.phone} onChange={(e) => setPresidentForm(p => ({ ...p, phone: e.target.value }))} placeholder="e.g. 9876543210" className="mt-1" />
+                  <Input value={presidentForm.phone} onChange={(e) => setPresidentForm((p) => ({ ...p, phone: e.target.value }))} placeholder="e.g. 9876543210" className="mt-1" />
                 </div>
               </div>
             </div>
 
             <button
-              onClick={handleCreateClub}
-              disabled={creatingClub || !newClubName.trim() || !presidentForm.fullName.trim() || !presidentForm.email.trim() || !presidentForm.programme.trim() || !presidentForm.year.trim()}
-              className="w-full py-2.5 rounded-lg gradient-gold text-primary-foreground font-medium text-sm disabled:opacity-50"
-            >
+            onClick={handleCreateClub}
+            disabled={creatingClub || !newClubName.trim() || !presidentForm.fullName.trim() || !presidentForm.email.trim() || !presidentForm.programme.trim() || !presidentForm.year.trim()}
+            className="w-full py-2.5 rounded-lg gradient-gold text-primary-foreground font-medium text-sm disabled:opacity-50">
+            
               {creatingClub ? 'Creating Club & President...' : 'Create Club with President'}
             </button>
           </div>
         </DialogContent>
       </Dialog>
-    </>
-  );
+    </>;
+
 
   // ──── MOBILE VIEW ────
   if (isMobile) {
     return (
       <div
         className="min-h-screen pb-24 dashboard-corner-gradient overflow-x-hidden"
-        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-      >
+        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+        
         <style>{`div::-webkit-scrollbar { display: none; }`}</style>
 
         {/* Background blobs */}
@@ -352,7 +352,7 @@ const SuperAdminDashboard = () => {
             <h1 className="text-lg font-bold font-display text-foreground">IILM Club</h1>
             <ProfileDropdown viewMode="personal" />
           </div>
-          <p className="text-center text-sm text-muted-foreground mb-1">
+          <p className="text-center text-muted-foreground mb-1 text-base font-mono font-extrabold">
             Super Admin <span className="text-gradient-gold font-semibold">Command Center</span>
           </p>
         </header>
@@ -368,22 +368,22 @@ const SuperAdminDashboard = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search clubs, members..."
-              className="glass-input rounded-full py-2.5 pl-10 pr-4 w-full focus:outline-none focus:ring-2 focus:ring-ring text-sm"
-            />
+              className="glass-input rounded-full py-2.5 pl-10 pr-4 w-full focus:outline-none focus:ring-2 focus:ring-ring text-sm" />
+            
           </div>
 
           {/* Quick actions row */}
           <div className="flex gap-2">
             <button
               onClick={() => navigate('/global-reports')}
-              className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-full gradient-gold text-primary-foreground text-xs font-semibold shadow-gold"
-            >
+              className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-full gradient-gold text-primary-foreground text-xs font-semibold shadow-gold">
+              
               <FileText className="w-3.5 h-3.5" /> Global Reports
             </button>
             <button
               onClick={() => setCreateClubOpen(true)}
-              className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-full glass-card text-foreground text-xs font-semibold"
-            >
+              className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-full glass-card text-foreground text-xs font-semibold">
+              
               <Plus className="w-3.5 h-3.5" /> Add Club
             </button>
           </div>
@@ -399,8 +399,8 @@ const SuperAdminDashboard = () => {
                   <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mt-0.5">
                     {stat.label}
                   </p>
-                </div>
-              );
+                </div>);
+
             })}
           </div>
 
@@ -410,31 +410,31 @@ const SuperAdminDashboard = () => {
               <h3 className="text-base font-bold font-display text-foreground">Club Management</h3>
               <button
                 onClick={() => setCreateClubOpen(true)}
-                className="text-xs font-semibold text-primary flex items-center"
-              >
+                className="text-xs font-semibold text-primary flex items-center">
+                
                 Add New <ChevronRight className="w-3 h-3 ml-0.5" />
               </button>
             </div>
             <div className="space-y-3">
-              {loading ? (
-                <div className="glass-card p-6 text-center">
+              {loading ?
+              <div className="glass-card p-6 text-center">
                   <p className="text-sm text-muted-foreground">Loading clubs...</p>
-                </div>
-              ) : filteredClubs.length === 0 ? (
-                <div className="glass-card p-6 text-center">
+                </div> :
+              filteredClubs.length === 0 ?
+              <div className="glass-card p-6 text-center">
                   <Building2 className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
                   <p className="text-sm text-muted-foreground">No clubs found</p>
-                </div>
-              ) : (
-                filteredClubs.map((club) => (
-                  <div key={club.id} className="glass-card p-4">
+                </div> :
+
+              filteredClubs.map((club) =>
+              <div key={club.id} className="glass-card p-4">
                     <div className="flex items-center gap-3 mb-3">
                       <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                        {club.logo_url ? (
-                          <img src={club.logo_url} alt={club.name} className="w-7 h-7 rounded-lg object-cover" />
-                        ) : (
-                          <span className="text-primary font-bold text-lg">{club.name[0]}</span>
-                        )}
+                        {club.logo_url ?
+                    <img src={club.logo_url} alt={club.name} className="w-7 h-7 rounded-lg object-cover" /> :
+
+                    <span className="text-primary font-bold text-lg">{club.name[0]}</span>
+                    }
                       </div>
                       <div className="flex-1 min-w-0">
                         <h4 className="text-sm font-bold text-foreground truncate">{club.name}</h4>
@@ -448,23 +448,23 @@ const SuperAdminDashboard = () => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-40">
                           <DropdownMenuItem
-                            onClick={() => handleDeleteClub(club.id, club.name)}
-                            className="text-destructive focus:text-destructive"
-                          >
+                        onClick={() => handleDeleteClub(club.id, club.name)}
+                        className="text-destructive focus:text-destructive">
+                        
                             <Trash2 className="mr-2 h-4 w-4" /> Delete Club
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
                     <button
-                      onClick={() => navigate(`/club/${club.id}`, { state: { from: 'super-admin' } })}
-                      className="w-full text-center text-xs px-3 py-2 rounded-xl font-medium transition-colors bg-accent hover:bg-accent/80 text-accent-foreground"
-                    >
+                  onClick={() => navigate(`/club/${club.id}`, { state: { from: 'super-admin' } })}
+                  className="w-full text-center text-xs px-3 py-2 rounded-xl font-medium transition-colors bg-accent hover:bg-accent/80 text-accent-foreground">
+                  
                       View More
                     </button>
                   </div>
-                ))
-              )}
+              )
+              }
             </div>
           </section>
 
@@ -475,22 +475,22 @@ const SuperAdminDashboard = () => {
           <section>
             <h3 className="text-base font-bold font-display text-foreground mb-3">Global Event Feed</h3>
             <div className="space-y-3">
-              {loading ? (
-                <div className="glass-card p-6 text-center">
+              {loading ?
+              <div className="glass-card p-6 text-center">
                   <p className="text-sm text-muted-foreground">Loading events...</p>
-                </div>
-              ) : upcomingEvents.length === 0 ? (
-                <div className="glass-card p-6 text-center">
+                </div> :
+              upcomingEvents.length === 0 ?
+              <div className="glass-card p-6 text-center">
                   <Calendar className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
                   <p className="text-sm text-muted-foreground">No upcoming events</p>
-                </div>
-              ) : (
-                upcomingEvents.slice(0, 8).map((event) => {
-                  const d = new Date(event.event_date);
-                  const month = d.toLocaleDateString('en-US', { month: 'short' }).toUpperCase();
-                  const day = d.getDate();
-                  return (
-                    <div key={event.id} className="glass-card p-4 flex items-center gap-3">
+                </div> :
+
+              upcomingEvents.slice(0, 8).map((event) => {
+                const d = new Date(event.event_date);
+                const month = d.toLocaleDateString('en-US', { month: 'short' }).toUpperCase();
+                const day = d.getDate();
+                return (
+                  <div key={event.id} className="glass-card p-4 flex items-center gap-3">
                       <div className="flex flex-col items-center justify-center w-12 h-14 rounded-2xl bg-primary/10 shrink-0">
                         <span className="text-[10px] font-bold uppercase tracking-wider text-primary">{month}</span>
                         <span className="text-xl font-bold leading-none text-primary">{day}</span>
@@ -505,18 +505,18 @@ const SuperAdminDashboard = () => {
                         </p>
                       </div>
                       <div className="w-2 h-2 rounded-full bg-primary/60 shrink-0" />
-                    </div>
-                  );
-                })
-              )}
+                    </div>);
+
+              })
+              }
             </div>
           </section>
         </main>
 
         <MobileBottomNav />
         {renderDialogs()}
-      </div>
-    );
+      </div>);
+
   }
 
   // ──── DESKTOP VIEW (unchanged) ────
@@ -579,8 +579,8 @@ const SuperAdminDashboard = () => {
             <h2 className="text-lg font-semibold text-foreground">Club Management</h2>
             <button
               onClick={() => setCreateClubOpen(true)}
-              className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg font-medium transition-colors gradient-gold text-primary-foreground shadow-gold"
-            >
+              className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg font-medium transition-colors gradient-gold text-primary-foreground shadow-gold">
+              
               <Plus className="w-3.5 h-3.5" /> Add Club
             </button>
           </div>
@@ -606,9 +606,9 @@ const SuperAdminDashboard = () => {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-40">
                         <DropdownMenuItem
-                          onClick={() => handleDeleteClub(club.id, club.name)}
-                          className="text-destructive focus:text-destructive"
-                        >
+                      onClick={() => handleDeleteClub(club.id, club.name)}
+                      className="text-destructive focus:text-destructive">
+                      
                           <Trash2 className="mr-2 h-4 w-4" /> Delete Club
                         </DropdownMenuItem>
                       </DropdownMenuContent>
