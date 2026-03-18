@@ -1,4 +1,5 @@
 import { Badge } from '@/components/ui/badge';
+import { Instagram, Linkedin } from 'lucide-react';
 
 interface MobileClubProfileCardProps {
   clubName: string;
