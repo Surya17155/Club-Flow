@@ -126,6 +126,7 @@ export function MobileDashboardView({
             className="absolute bottom-[20%] right-[-10%] w-[250px] h-[250px] rounded-full mix-blend-multiply filter blur-[80px] opacity-50 animate-blob animation-delay-2000"
             style={{ backgroundColor: 'hsl(25 80% 82% / 0.8)' }}
           />
+        </div>
 
         <main className="px-4 py-4 space-y-5">
         {/* Profile Card */}
