@@ -352,7 +352,7 @@ const SuperAdminDashboard = () => {
             <h1 className="text-lg font-bold font-display text-foreground">IILM Club</h1>
             <ProfileDropdown viewMode="personal" />
           </div>
-          <p className="text-center text-muted-foreground mb-1 text-base font-mono font-extrabold">
+          <p className="text-center text-muted-foreground mb-1 text-base font-extrabold font-sans">
             Super Admin <span className="text-gradient-gold font-semibold">Command Center</span>
           </p>
         </header>
