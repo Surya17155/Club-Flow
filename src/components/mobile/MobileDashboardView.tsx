@@ -75,6 +75,7 @@ export function MobileDashboardView({
   socialGmail
 }: MobileDashboardViewProps) {
   const navigate = useNavigate();
+  const [expandedClubId, setExpandedClubId] = useState<string | null>(null);
 
   return (
     <>
