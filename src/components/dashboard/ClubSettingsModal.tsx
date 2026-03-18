@@ -189,6 +189,19 @@ const ClubSettingsModal = ({ open, onOpenChange }: ClubSettingsModalProps) => {
               </div>
             </div>
 
+            {/* Social Media Links */}
+            <div className="space-y-3">
+              <Label className="text-sm font-semibold">Social Media <span className="text-xs text-muted-foreground">(optional)</span></Label>
+              <div className="flex items-center gap-2">
+                <Instagram className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                <Input value={form.social_instagram} onChange={e => setForm(f => ({ ...f, social_instagram: e.target.value }))} placeholder="Instagram username or URL" className="flex-1" />
+              </div>
+              <div className="flex items-center gap-2">
+                <Linkedin className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                <Input value={form.social_linkedin} onChange={e => setForm(f => ({ ...f, social_linkedin: e.target.value }))} placeholder="LinkedIn page URL" className="flex-1" />
+              </div>
+            </div>
+
             <Button onClick={handleSave} disabled={saving || !form.name.trim()} className="w-full rounded-full gradient-gold text-primary-foreground">
               {saving ? 'Saving...' : 'Save Changes'}
             </Button>
