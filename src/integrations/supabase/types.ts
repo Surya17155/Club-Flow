@@ -184,6 +184,8 @@ export type Database = {
           id: string
           logo_url: string | null
           name: string
+          social_instagram: string | null
+          social_linkedin: string | null
           tagline: string | null
           updated_at: string
         }
@@ -197,6 +199,8 @@ export type Database = {
           id?: string
           logo_url?: string | null
           name: string
+          social_instagram?: string | null
+          social_linkedin?: string | null
           tagline?: string | null
           updated_at?: string
         }
@@ -210,6 +214,8 @@ export type Database = {
           id?: string
           logo_url?: string | null
           name?: string
+          social_instagram?: string | null
+          social_linkedin?: string | null
           tagline?: string | null
           updated_at?: string
         }
