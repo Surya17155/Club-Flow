@@ -22,6 +22,8 @@ export function MobileClubProfileCard({
   clubLogo,
   clubAbout,
   postHolders = [],
+  socialInstagram,
+  socialLinkedin,
 }: MobileClubProfileCardProps) {
   const initials = clubName
     .split(' ')
