@@ -387,7 +387,7 @@ const ClubDashboard = () => {
           <section className="mb-6"><ClubStatsRow stats={statsItems} /></section>
           <main className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <div className="lg:col-span-3">
-              <ClubProfileSidebar clubId={clubId} clubName={clubName} clubAbout={clubDetails.about} clubLogo={clubDetails.logo_url} />
+              <ClubProfileSidebar clubId={clubId} clubName={clubName} clubAbout={clubDetails.about} clubLogo={clubDetails.logo_url} socialInstagram={clubDetails.social_instagram} socialLinkedin={clubDetails.social_linkedin} />
             </div>
             <div className="lg:col-span-6 space-y-6">
               <div className="glass-card p-6">
