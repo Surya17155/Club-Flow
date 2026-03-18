@@ -41,7 +41,7 @@ const ClubSettingsModal = ({ open, onOpenChange }: ClubSettingsModalProps) => {
       setLoading(true);
       const { data } = await supabase
         .from('clubs')
-        .select('name, tagline, description, about, category, club_type, logo_url')
+        .select('name, tagline, description, about, category, club_type, logo_url, social_instagram, social_linkedin')
         .eq('id', activeClub.club_id)
         .maybeSingle();
       if (data) {
@@ -53,6 +53,8 @@ const ClubSettingsModal = ({ open, onOpenChange }: ClubSettingsModalProps) => {
           category: (data as any).category || '',
           club_type: (data as any).club_type || '',
           logo_url: data.logo_url || null,
+          social_instagram: (data as any).social_instagram || '',
+          social_linkedin: (data as any).social_linkedin || '',
         });
       }
       setLoading(false);
