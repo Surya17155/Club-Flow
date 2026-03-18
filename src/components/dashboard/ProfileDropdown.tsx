@@ -33,6 +33,7 @@ const ProfileDropdown = ({ viewMode = 'personal' }: { viewMode?: 'personal' | 'c
   const { profile } = useProfile();
   const { activeClub, clubs, switchClub } = useClub();
   const { isPresident, hasPower } = useDelegatedPowers();
+  const isMobile = useIsMobile();
   const [showClubs, setShowClubs] = useState(false);
   const [showPowersModal, setShowPowersModal] = useState(false);
   const [showClubSettings, setShowClubSettings] = useState(false);
