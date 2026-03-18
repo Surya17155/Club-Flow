@@ -258,6 +258,8 @@ const ClubDashboard = () => {
                 clubLogo={clubDetails.logo_url}
                 clubAbout={clubDetails.about}
                 postHolders={postHolders}
+                socialInstagram={clubDetails.social_instagram}
+                socialLinkedin={clubDetails.social_linkedin}
               />
 
               {/* Stats Row */}
