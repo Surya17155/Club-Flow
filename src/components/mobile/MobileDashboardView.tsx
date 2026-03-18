@@ -78,41 +78,44 @@ export function MobileDashboardView({
   return (
     <>
       {/* Fixed header — rendered OUTSIDE scrollable container */}
-      <header className="fixed top-0 left-0 right-0 z-40 px-4 pt-4 pb-3 safe-area-top pointer-events-auto">
-        {/* Top row: spacer, app name center, circular profile avatar right */}
-        <div className="flex items-center justify-between mb-2">
-          <div className="w-9" />
+      <header className="fixed top-0 left-0 right-0 z-40 px-4 pb-3 backdrop-blur-md bg-background/70" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}>
+        {/* Top row: centered app name, profile avatar pinned right */}
+        <div className="relative flex items-center justify-center mb-2">
           <h1 className="text-lg font-bold font-display text-foreground">IILM Club</h1>
-          <ProfileDropdown viewMode={viewMode} />
+          <div className="absolute right-0 top-1">
+            <ProfileDropdown viewMode={viewMode} />
+          </div>
         </div>
 
         {/* Greeting */}
-        <p className="text-center text-sm text-muted-foreground mb-3">
+        <p className="text-center text-base text-muted-foreground mb-4">
           Hi, <span className="font-semibold text-foreground">{fullName?.split(' ')[0] || 'there'}</span> 👋
         </p>
 
         {/* Mode toggle pill */}
-        <div className="glass-card flex p-1 rounded-full max-w-[240px] mx-auto">
-          <button
-            onClick={() => setViewMode('personal')}
-            className={`flex-1 py-2 px-4 rounded-full text-sm font-semibold transition-all duration-300 ${
-              isPersonal ? 'bg-white shadow-sm text-primary' : 'text-muted-foreground'
-            }`}
-          >
-            Personal
-          </button>
-          <button
-            onClick={() => setViewMode('club')}
-            className={`flex-1 py-2 px-4 rounded-full text-sm font-semibold transition-all duration-300 ${
-              !isPersonal ? 'bg-white shadow-sm text-primary' : 'text-muted-foreground'
-            }`}
-          >
-            Club
-          </button>
+        <div className="mt-2 mb-4">
+          <div className="glass-card flex p-1 rounded-full max-w-[240px] mx-auto">
+            <button
+              onClick={() => setViewMode('personal')}
+              className={`flex-1 py-2 px-4 rounded-full text-sm font-semibold transition-all duration-300 ${
+                isPersonal ? 'bg-white shadow-sm text-primary' : 'text-muted-foreground'
+              }`}
+            >
+              Personal
+            </button>
+            <button
+              onClick={() => setViewMode('club')}
+              className={`flex-1 py-2 px-4 rounded-full text-sm font-semibold transition-all duration-300 ${
+                !isPersonal ? 'bg-white shadow-sm text-primary' : 'text-muted-foreground'
+              }`}
+            >
+              Club
+            </button>
+          </div>
         </div>
       </header>
 
-      <div className="min-h-screen pb-20 dashboard-corner-gradient overflow-x-hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+      <div className="min-h-screen pb-20 dashboard-corner-gradient overflow-x-hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', paddingTop: '180px' }}>
         {/* Fixed background blobs */}
         <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
           <div
@@ -124,9 +127,6 @@ export function MobileDashboardView({
             style={{ backgroundColor: 'hsl(25 80% 82% / 0.8)' }}
           />
         </div>
-
-        {/* Spacer for fixed header */}
-        <div className="h-[160px] safe-area-top" />
 
         <main className="px-4 py-4 space-y-5">
         {/* Profile Card */}
