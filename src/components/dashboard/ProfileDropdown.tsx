@@ -89,7 +89,13 @@ const ProfileDropdown = ({ viewMode = 'personal' }: { viewMode?: 'personal' | 'c
             )}
 
             {showChatOption && (
-              <DropdownMenuItem onClick={() => setShowChat(true)}>
+              <DropdownMenuItem onClick={() => {
+                if (isMobile) {
+                  navigate('/chat');
+                } else {
+                  setShowChat(true);
+                }
+              }}>
                 <Bot className="mr-2 h-4 w-4 text-primary" /> AI Chatbot
               </DropdownMenuItem>
             )}
