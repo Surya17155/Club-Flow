@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { Instagram, Linkedin } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 
 interface PostHolder {
   user_id: string;
