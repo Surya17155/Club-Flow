@@ -77,43 +77,43 @@ export function MobileDashboardView({
 
   return (
     <>
-      {/* Fixed header — rendered OUTSIDE scrollable container */}
-      <header className="fixed top-0 left-0 right-0 z-40 px-4 pb-3 backdrop-blur-md bg-transparent" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}>
-        {/* Top row: centered app name, profile avatar pinned right */}
-        <div className="relative flex items-center justify-center mb-2">
-          <h1 className="text-lg font-bold font-display text-foreground">IILM Club</h1>
-          <div className="absolute right-0 top-1">
-            <ProfileDropdown viewMode={viewMode} />
+      {/* Fixed top elements — no header bar, elements pinned individually */}
+      <div className="fixed top-0 left-0 right-0 z-40 px-4 pb-3 pointer-events-none" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}>
+        <div className="pointer-events-auto">
+          {/* Top row: centered app name, profile avatar pinned right */}
+          <div className="relative flex items-center justify-center mb-2">
+            <h1 className="text-lg font-bold font-display text-foreground">IILM Club</h1>
+            <div className="absolute right-0 top-1">
+              <ProfileDropdown viewMode={viewMode} />
+            </div>
+          </div>
+
+          {/* Greeting */}
+          <p className="text-center text-base text-muted-foreground mb-4">
+            Hi, <span className="font-semibold text-foreground">{fullName?.split(' ')[0] || 'there'}</span> 👋
+          </p>
+
+          {/* Mode toggle pill */}
+          <div className="mt-2 mb-4">
+            <div className="glass-card flex p-1 rounded-full max-w-[240px] mx-auto">
+              <button
+                onClick={() => setViewMode('personal')}
+                className={`flex-1 py-2 px-4 rounded-full text-sm font-semibold transition-all duration-300 ${
+                isPersonal ? 'bg-white shadow-sm text-primary' : 'text-muted-foreground'}`
+                }>
+                Personal
+              </button>
+              <button
+                onClick={() => setViewMode('club')}
+                className={`flex-1 py-2 px-4 rounded-full text-sm font-semibold transition-all duration-300 ${
+                !isPersonal ? 'bg-white shadow-sm text-primary' : 'text-muted-foreground'}`
+                }>
+                Club
+              </button>
+            </div>
           </div>
         </div>
-
-        {/* Greeting */}
-        <p className="text-center text-base text-muted-foreground mb-4">
-          Hi, <span className="font-semibold text-foreground">{fullName?.split(' ')[0] || 'there'}</span> 👋
-        </p>
-
-        {/* Mode toggle pill */}
-        <div className="mt-2 mb-4">
-          <div className="glass-card flex p-1 rounded-full max-w-[240px] mx-auto">
-            <button
-              onClick={() => setViewMode('personal')}
-              className={`flex-1 py-2 px-4 rounded-full text-sm font-semibold transition-all duration-300 ${
-              isPersonal ? 'bg-white shadow-sm text-primary' : 'text-muted-foreground'}`
-              }>
-              
-              Personal
-            </button>
-            <button
-              onClick={() => setViewMode('club')}
-              className={`flex-1 py-2 px-4 rounded-full text-sm font-semibold transition-all duration-300 ${
-              !isPersonal ? 'bg-white shadow-sm text-primary' : 'text-muted-foreground'}`
-              }>
-              
-              Club
-            </button>
-          </div>
-        </div>
-      </header>
+      </div>
 
       <div className="min-h-screen pb-20 dashboard-corner-gradient overflow-x-hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', paddingTop: '180px' }}>
         {/* Fixed background blobs */}
