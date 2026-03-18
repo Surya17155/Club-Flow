@@ -25,6 +25,8 @@ interface Props {
   clubName: string;
   clubAbout?: string | null;
   clubLogo?: string | null;
+  socialInstagram?: string | null;
+  socialLinkedin?: string | null;
 }
 
 const ClubProfileSidebar = ({ clubId, clubName, clubAbout, clubLogo }: Props) => {
