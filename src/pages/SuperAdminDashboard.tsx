@@ -664,7 +664,7 @@ const SuperAdminDashboard = () => {
       </section>
 
       {renderDialogs()}
-      <FloatingChatWidget />
+      
     </div>);
 };
 
