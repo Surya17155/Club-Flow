@@ -182,7 +182,7 @@ const MobileChat = () => {
       </div>
 
       {/* Input */}
-      <div className="px-3 pt-3 pb-6 border-t border-border bg-card/80 backdrop-blur-sm safe-area-bottom shrink-0">
+      <div className="px-3 pt-3 border-t border-border bg-card/80 backdrop-blur-sm shrink-0" style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)" }}>
         <div className="flex gap-2 items-end">
           <Textarea
             ref={textareaRef}
