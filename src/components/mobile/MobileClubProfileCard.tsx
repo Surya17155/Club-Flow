@@ -6,6 +6,8 @@ interface MobileClubProfileCardProps {
   clubLogo?: string | null;
   clubAbout?: string | null;
   postHolders?: { role: string; full_name: string }[];
+  socialInstagram?: string | null;
+  socialLinkedin?: string | null;
 }
 
 const roleLabelMap: Record<string, string> = {
