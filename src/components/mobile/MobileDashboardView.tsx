@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { ClubDetailOverlay } from './ClubDetailOverlay';
 import { useNavigate } from 'react-router-dom';
 import { MobileProfileCard } from './MobileProfileCard';
 import { MobileBottomNav } from './MobileBottomNav';
