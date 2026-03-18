@@ -515,7 +515,6 @@ const SuperAdminDashboard = () => {
 
         <MobileBottomNav />
         {renderDialogs()}
-        <FloatingChatWidget />
       </div>
     );
   }
