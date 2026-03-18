@@ -79,7 +79,7 @@ export function MobileBottomNav() {
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pb-5 px-4 safe-area-bottom md:hidden pointer-events-none">
+    <div className="fixed left-0 right-0 z-50 flex justify-center px-4 md:hidden pointer-events-none" style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 12px)" }}>
       <nav
         className="relative flex items-center justify-evenly pointer-events-auto"
         style={{
