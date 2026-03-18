@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { supabase } from '@/integrations/supabase/client';
 import { useClub } from '@/contexts/ClubContext';
 import { toast } from 'sonner';
-import { Settings, Upload, Loader2 } from 'lucide-react';
+import { Settings, Upload, Loader2, Instagram, Linkedin } from 'lucide-react';
 
 interface ClubSettingsModalProps {
   open: boolean;
