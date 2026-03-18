@@ -48,7 +48,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { FloatingChatWidget } from "@/components/chat/FloatingChatWidget";
+
 import { MobileDashboardView } from "@/components/mobile/MobileDashboardView";
 
 const roleLabelMap: Record<string, string> = {
@@ -683,13 +683,6 @@ const AdminDashboard = () => {
         </DialogContent>
       </Dialog>
       <ManageEventsModal open={manageEventsOpen} onOpenChange={setManageEventsOpen} />
-      <FloatingChatWidget
-        visible={
-          viewMode === "club" &&
-          (activeClub?.role === "president" || activeClub?.role === "admin" || hasPower("use_chatbot"))
-        }
-        activeClubId={activeClub?.club_id}
-      />
     </div>
   );
 };

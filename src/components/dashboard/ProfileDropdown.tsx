@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useClub } from '@/contexts/ClubContext';
 import { useProfile } from '@/hooks/useProfile';
 import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
-import { ChevronDown, User, Settings, LogOut, ArrowRightLeft, Check, ChevronRight, Shield, Crown, Settings2 } from 'lucide-react';
+import { ChevronDown, User, Settings, LogOut, ArrowRightLeft, Check, ChevronRight, Shield, Crown, Settings2, Bot } from 'lucide-react';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -12,6 +12,7 @@ import {
 import { Switch } from '@/components/ui/switch';
 import AssignPowersModal from './AssignPowersModal';
 import ClubSettingsModal from './ClubSettingsModal';
+import { ChatPanel } from '@/components/chat/ChatPanel';
 
 const SUPER_ADMIN_EMAIL = 'suryakant.gnbba2029@iilm.edu';
 
@@ -30,13 +31,17 @@ const ProfileDropdown = ({ viewMode = 'personal' }: { viewMode?: 'personal' | 'c
   const { user, signOut } = useAuth();
   const { profile } = useProfile();
   const { activeClub, clubs, switchClub } = useClub();
-  const { isPresident } = useDelegatedPowers();
+  const { isPresident, hasPower } = useDelegatedPowers();
   const [showClubs, setShowClubs] = useState(false);
   const [showPowersModal, setShowPowersModal] = useState(false);
   const [showClubSettings, setShowClubSettings] = useState(false);
+  const [showChat, setShowChat] = useState(false);
 
   const isSuperAdminEmail = user?.email === SUPER_ADMIN_EMAIL;
   const isSuperAdminMode = location.pathname === '/super-admin' || location.pathname === '/global-reports' || location.pathname.startsWith('/club/');
+
+  // Show chatbot in Super Admin mode OR in Club mode if president/admin/has power
+  const showChatOption = isSuperAdminMode || (viewMode === 'club' && hasPower('use_chatbot'));
 
   const handleSuperAdminToggle = (checked: boolean) => {
     if (checked) {
@@ -78,6 +83,12 @@ const ProfileDropdown = ({ viewMode = 'personal' }: { viewMode?: 'personal' | 'c
                   <span className="text-xs text-muted-foreground truncate max-w-[100px]">{activeClub.club_name}</span>
                 )}
                 <ChevronRight className="ml-1 h-3 w-3 text-muted-foreground" />
+              </DropdownMenuItem>
+            )}
+
+            {showChatOption && (
+              <DropdownMenuItem onClick={() => setShowChat(true)}>
+                <Bot className="mr-2 h-4 w-4 text-primary" /> AI Chatbot
               </DropdownMenuItem>
             )}
 
@@ -148,6 +159,11 @@ const ProfileDropdown = ({ viewMode = 'personal' }: { viewMode?: 'personal' | 'c
     </DropdownMenu>
     <AssignPowersModal open={showPowersModal} onOpenChange={setShowPowersModal} />
     <ClubSettingsModal open={showClubSettings} onOpenChange={setShowClubSettings} />
+    <ChatPanel
+      open={showChat}
+      onClose={() => setShowChat(false)}
+      activeClubId={activeClub?.club_id}
+    />
     </>
   );
 };

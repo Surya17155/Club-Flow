@@ -16,7 +16,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import ProfileDropdown from '@/components/dashboard/ProfileDropdown';
 import SuperAdminCalendar from '@/components/dashboard/SuperAdminCalendar';
 import { useToast } from '@/hooks/use-toast';
-import { FloatingChatWidget } from '@/components/chat/FloatingChatWidget';
+
 import { useIsMobile } from '@/hooks/use-mobile';
 import { MobileBottomNav } from '@/components/mobile/MobileBottomNav';
 
@@ -515,7 +515,6 @@ const SuperAdminDashboard = () => {
 
         <MobileBottomNav />
         {renderDialogs()}
-        <FloatingChatWidget />
       </div>
     );
   }
@@ -665,7 +664,7 @@ const SuperAdminDashboard = () => {
       </section>
 
       {renderDialogs()}
-      <FloatingChatWidget />
+      
     </div>);
 };
 
