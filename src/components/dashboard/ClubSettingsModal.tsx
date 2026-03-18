@@ -31,6 +31,8 @@ const ClubSettingsModal = ({ open, onOpenChange }: ClubSettingsModalProps) => {
     category: '',
     club_type: '',
     logo_url: '' as string | null,
+    social_instagram: '',
+    social_linkedin: '',
   });
 
   useEffect(() => {
