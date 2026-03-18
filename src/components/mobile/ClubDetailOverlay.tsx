@@ -1,26 +1,23 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Instagram, Linkedin, Mail, Phone, Users, Tag } from 'lucide-react';
+import { X, Instagram, Linkedin, Phone, Tag } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 
 interface PostHolder {
   role: string;
   full_name: string;
-  email: string | null;
   phone: string | null;
-  social_instagram: string | null;
-  social_linkedin: string | null;
+  programme: string | null;
+  year: string | null;
 }
 
 interface ClubDetail {
-  id: string;
   name: string;
   about: string | null;
   description: string | null;
   category: string | null;
   club_type: string | null;
-  logo_url: string | null;
   social_instagram: string | null;
   social_linkedin: string | null;
   postHolders: PostHolder[];
@@ -36,7 +33,6 @@ const roleLabelMap: Record<string, string> = {
   vice_president: 'Vice President',
   secretary: 'Secretary',
   social_media_head: 'Social Media Head',
-  member: 'Member',
 };
 
 const rolePriority: Record<string, number> = {
@@ -44,7 +40,6 @@ const rolePriority: Record<string, number> = {
   vice_president: 1,
   secretary: 2,
   social_media_head: 3,
-  member: 4,
 };
 
 export function ClubDetailOverlay({ clubId, onClose }: ClubDetailOverlayProps) {
@@ -53,11 +48,11 @@ export function ClubDetailOverlay({ clubId, onClose }: ClubDetailOverlayProps) {
 
   useEffect(() => {
     if (!clubId) { setDetail(null); return; }
-    const fetch = async () => {
+    const fetchData = async () => {
       setLoading(true);
       const [{ data: club }, { data: members }] = await Promise.all([
-        supabase.from('clubs').select('id, name, about, description, category, club_type, logo_url, social_instagram, social_linkedin').eq('id', clubId).single(),
-        supabase.from('club_members').select('role, user_id, profiles(full_name, email, phone, social_instagram, social_linkedin)').eq('club_id', clubId),
+        supabase.from('clubs').select('name, about, description, category, club_type, social_instagram, social_linkedin').eq('id', clubId).single(),
+        supabase.from('club_members').select('role, profiles(full_name, phone, programme, year)').eq('club_id', clubId),
       ]);
 
       if (club) {
@@ -66,10 +61,9 @@ export function ClubDetailOverlay({ clubId, onClose }: ClubDetailOverlayProps) {
           .map((m: any) => ({
             role: m.role,
             full_name: m.profiles?.full_name ?? 'Unknown',
-            email: m.profiles?.email ?? null,
             phone: m.profiles?.phone ?? null,
-            social_instagram: m.profiles?.social_instagram ?? null,
-            social_linkedin: m.profiles?.social_linkedin ?? null,
+            programme: m.profiles?.programme ?? null,
+            year: m.profiles?.year ?? null,
           }))
           .sort((a: PostHolder, b: PostHolder) => (rolePriority[a.role] ?? 99) - (rolePriority[b.role] ?? 99));
 
@@ -77,15 +71,11 @@ export function ClubDetailOverlay({ clubId, onClose }: ClubDetailOverlayProps) {
       }
       setLoading(false);
     };
-    fetch();
+    fetchData();
   }, [clubId]);
 
-  const initials = detail?.name
-    ?.split(' ')
-    .map(n => n[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase() ?? '';
+  const president = detail?.postHolders.find(p => p.role === 'president');
+  const otherHolders = detail?.postHolders.filter(p => p.role !== 'president') ?? [];
 
   return (
     <AnimatePresence>
@@ -101,7 +91,7 @@ export function ClubDetailOverlay({ clubId, onClose }: ClubDetailOverlayProps) {
             onClick={onClose}
           />
 
-          {/* Card */}
+          {/* Card container */}
           <motion.div
             className="fixed inset-0 z-[61] flex items-center justify-center p-5 pointer-events-none"
             initial={{ opacity: 0 }}
@@ -110,26 +100,21 @@ export function ClubDetailOverlay({ clubId, onClose }: ClubDetailOverlayProps) {
             transition={{ duration: 0.3 }}
           >
             <motion.div
-              className="pointer-events-auto w-full max-w-[360px] max-h-[80vh] overflow-y-auto rounded-[22px] bg-card border border-border"
+              className="pointer-events-auto relative w-full max-w-[360px] max-h-[80vh] overflow-y-auto rounded-[20px] bg-card border border-border"
               style={{
                 boxShadow: '0 25px 60px -12px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.05)',
               }}
               initial={{ scale: 0.85, y: 40, opacity: 0 }}
               animate={{ scale: 1, y: 0, opacity: 1 }}
               exit={{ scale: 0.85, y: 40, opacity: 0 }}
-              transition={{
-                type: 'spring',
-                damping: 30,
-                stiffness: 350,
-                mass: 0.8,
-              }}
+              transition={{ type: 'spring', damping: 30, stiffness: 350, mass: 0.8 }}
             >
               {loading || !detail ? (
                 <div className="flex items-center justify-center py-16">
                   <div className="w-7 h-7 border-[3px] border-primary/30 border-t-primary rounded-full animate-spin" />
                 </div>
               ) : (
-                <>
+                <div className="px-5 py-5 space-y-4">
                   {/* Close button */}
                   <button
                     onClick={onClose}
@@ -138,132 +123,115 @@ export function ClubDetailOverlay({ clubId, onClose }: ClubDetailOverlayProps) {
                     <X className="w-4 h-4" />
                   </button>
 
-                  {/* Logo / Header */}
-                  <div className="relative w-full overflow-hidden" style={{ margin: '10px 10px 0 10px', width: 'calc(100% - 20px)', aspectRatio: '16 / 9', borderRadius: '16px' }}>
-                    {detail.logo_url ? (
-                      <img src={detail.logo_url} alt={detail.name} className="w-full h-full object-cover" />
-                    ) : (
-                      <div
-                        className="w-full h-full flex items-center justify-center text-4xl font-bold"
-                        style={{ background: 'linear-gradient(145deg, hsl(var(--primary) / 0.15), hsl(var(--primary) / 0.25))', color: 'hsl(var(--primary))' }}
-                      >
-                        {initials}
+                  {/* Club Name + Category */}
+                  <div className="pr-8">
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-lg font-bold font-display text-foreground">{detail.name}</h2>
+                      <div className="w-[18px] h-[18px] rounded-full flex items-center justify-center shrink-0" style={{ background: 'hsl(var(--primary))' }}>
+                        <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                          <path d="M2.5 5L4.5 7L7.5 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
                       </div>
-                    )}
+                    </div>
+                    <div className="flex flex-wrap gap-1.5 mt-1.5">
+                      {detail.category && (
+                        <Badge variant="secondary" className="text-[10px]">
+                          <Tag className="w-3 h-3 mr-1" />{detail.category}
+                        </Badge>
+                      )}
+                      {detail.club_type && (
+                        <Badge variant="outline" className="text-[10px]">{detail.club_type}</Badge>
+                      )}
+                    </div>
                   </div>
 
-                  {/* Content */}
-                  <div className="px-5 pt-4 pb-5 space-y-4">
-                    {/* Name + badges */}
+                  {/* About */}
+                  {(detail.about || detail.description) && (
                     <div>
-                      <div className="flex items-center gap-2">
-                        <h2 className="text-lg font-bold font-display text-foreground">{detail.name}</h2>
-                        <div className="w-[18px] h-[18px] rounded-full flex items-center justify-center shrink-0" style={{ background: 'hsl(var(--primary))' }}>
-                          <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                            <path d="M2.5 5L4.5 7L7.5 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
+                      <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">About</h3>
+                      <p className="text-sm text-foreground leading-relaxed">{detail.about || detail.description}</p>
+                    </div>
+                  )}
+
+                  {/* Club Social */}
+                  {(detail.social_instagram || detail.social_linkedin) && (
+                    <div className="flex gap-4">
+                      {detail.social_instagram && (
+                        <a
+                          href={detail.social_instagram.startsWith('http') ? detail.social_instagram : `https://instagram.com/${detail.social_instagram}`}
+                          target="_blank" rel="noopener noreferrer"
+                          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          <Instagram className="w-3.5 h-3.5" />Instagram
+                        </a>
+                      )}
+                      {detail.social_linkedin && (
+                        <a
+                          href={detail.social_linkedin.startsWith('http') ? detail.social_linkedin : `https://linkedin.com/company/${detail.social_linkedin}`}
+                          target="_blank" rel="noopener noreferrer"
+                          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          <Linkedin className="w-3.5 h-3.5" />LinkedIn
+                        </a>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Divider */}
+                  <div className="border-t border-border" />
+
+                  {/* President */}
+                  {president && (
+                    <div>
+                      <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">President</h3>
+                      <div className="rounded-xl bg-primary/5 border border-primary/10 p-3 space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-semibold text-foreground">{president.full_name}</span>
+                          <Badge variant="secondary" className="text-[10px] bg-primary/10 text-primary border-0">President</Badge>
                         </div>
-                      </div>
-                      <div className="flex flex-wrap gap-1.5 mt-2">
-                        {detail.category && (
-                          <Badge variant="secondary" className="text-[10px]">
-                            <Tag className="w-3 h-3 mr-1" />{detail.category}
-                          </Badge>
+                        {(president.programme || president.year) && (
+                          <p className="text-xs text-muted-foreground">
+                            {[president.programme, president.year].filter(Boolean).join(' • ')}
+                          </p>
                         )}
-                        {detail.club_type && (
-                          <Badge variant="outline" className="text-[10px]">{detail.club_type}</Badge>
+                        {president.phone && (
+                          <a href={`tel:${president.phone}`} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors pt-0.5">
+                            <Phone className="w-3 h-3" />{president.phone}
+                          </a>
                         )}
                       </div>
                     </div>
+                  )}
 
-                    {/* About */}
-                    {(detail.about || detail.description) && (
-                      <div>
-                        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">About</h3>
-                        <p className="text-sm text-foreground leading-relaxed">
-                          {detail.about || detail.description}
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Post Holders */}
-                    {detail.postHolders.length > 0 && (
-                      <div>
-                        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Post Holders</h3>
-                        <div className="space-y-3">
-                          {detail.postHolders.map((ph, i) => (
-                            <div key={i} className="rounded-xl bg-muted/40 p-3 space-y-1.5">
-                              <div className="flex items-center justify-between">
-                                <span className="text-sm font-semibold text-foreground">{ph.full_name}</span>
-                                <Badge variant="secondary" className="text-[10px] bg-primary/10 text-primary border-0">
-                                  {roleLabelMap[ph.role] ?? ph.role}
-                                </Badge>
-                              </div>
-                              <div className="flex flex-wrap gap-2">
-                                {ph.email && (
-                                  <a href={`mailto:${ph.email}`} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors">
-                                    <Mail className="w-3 h-3" />{ph.email}
-                                  </a>
-                                )}
-                                {ph.phone && (
-                                  <a href={`tel:${ph.phone}`} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors">
-                                    <Phone className="w-3 h-3" />{ph.phone}
-                                  </a>
-                                )}
-                              </div>
-                              {(ph.social_instagram || ph.social_linkedin) && (
-                                <div className="flex gap-3 pt-0.5">
-                                  {ph.social_instagram && (
-                                    <a
-                                      href={ph.social_instagram.startsWith('http') ? ph.social_instagram : `https://instagram.com/${ph.social_instagram}`}
-                                      target="_blank" rel="noopener noreferrer"
-                                      className="text-muted-foreground hover:text-foreground transition-colors"
-                                    >
-                                      <Instagram className="w-3.5 h-3.5" />
-                                    </a>
-                                  )}
-                                  {ph.social_linkedin && (
-                                    <a
-                                      href={ph.social_linkedin.startsWith('http') ? ph.social_linkedin : `https://linkedin.com/in/${ph.social_linkedin}`}
-                                      target="_blank" rel="noopener noreferrer"
-                                      className="text-muted-foreground hover:text-foreground transition-colors"
-                                    >
-                                      <Linkedin className="w-3.5 h-3.5" />
-                                    </a>
-                                  )}
-                                </div>
-                              )}
+                  {/* Other Post Holders */}
+                  {otherHolders.length > 0 && (
+                    <div>
+                      <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Post Holders</h3>
+                      <div className="space-y-2">
+                        {otherHolders.map((ph, i) => (
+                          <div key={i} className="rounded-xl bg-muted/40 p-3 space-y-1">
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-semibold text-foreground">{ph.full_name}</span>
+                              <Badge variant="secondary" className="text-[10px] bg-primary/10 text-primary border-0">
+                                {roleLabelMap[ph.role] ?? ph.role}
+                              </Badge>
                             </div>
-                          ))}
-                        </div>
+                            {(ph.programme || ph.year) && (
+                              <p className="text-xs text-muted-foreground">
+                                {[ph.programme, ph.year].filter(Boolean).join(' • ')}
+                              </p>
+                            )}
+                            {ph.phone && (
+                              <a href={`tel:${ph.phone}`} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors pt-0.5">
+                                <Phone className="w-3 h-3" />{ph.phone}
+                              </a>
+                            )}
+                          </div>
+                        ))}
                       </div>
-                    )}
-
-                    {/* Club Social Links */}
-                    {(detail.social_instagram || detail.social_linkedin) && (
-                      <div className="flex justify-center gap-5 pt-1 border-t border-border pt-3">
-                        {detail.social_instagram && (
-                          <a
-                            href={detail.social_instagram.startsWith('http') ? detail.social_instagram : `https://instagram.com/${detail.social_instagram}`}
-                            target="_blank" rel="noopener noreferrer"
-                            className="text-muted-foreground hover:text-foreground transition-colors"
-                          >
-                            <Instagram className="w-5 h-5" />
-                          </a>
-                        )}
-                        {detail.social_linkedin && (
-                          <a
-                            href={detail.social_linkedin.startsWith('http') ? detail.social_linkedin : `https://linkedin.com/company/${detail.social_linkedin}`}
-                            target="_blank" rel="noopener noreferrer"
-                            className="text-muted-foreground hover:text-foreground transition-colors"
-                          >
-                            <Linkedin className="w-5 h-5" />
-                          </a>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </>
+                    </div>
+                  )}
+                </div>
               )}
             </motion.div>
           </motion.div>
