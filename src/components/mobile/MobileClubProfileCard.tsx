@@ -127,6 +127,31 @@ export function MobileClubProfileCard({
             )}
           </div>
         )}
+        {/* Social Links */}
+        {(socialInstagram || socialLinkedin) && (
+          <div className="flex justify-center gap-4 pt-1">
+            {socialInstagram && (
+              <a
+                href={socialInstagram.startsWith('http') ? socialInstagram : `https://instagram.com/${socialInstagram}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <Instagram className="w-4 h-4" />
+              </a>
+            )}
+            {socialLinkedin && (
+              <a
+                href={socialLinkedin.startsWith('http') ? socialLinkedin : `https://linkedin.com/company/${socialLinkedin}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <Linkedin className="w-4 h-4" />
+              </a>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
