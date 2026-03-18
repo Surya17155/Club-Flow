@@ -91,10 +91,10 @@ const ClubDashboard = () => {
   }, [user?.id]);
 
   // Club details
-  const [clubDetails, setClubDetails] = useState<{ about: string | null; logo_url: string | null }>({ about: null, logo_url: null });
+  const [clubDetails, setClubDetails] = useState<{ about: string | null; logo_url: string | null; social_instagram: string | null; social_linkedin: string | null }>({ about: null, logo_url: null, social_instagram: null, social_linkedin: null });
   useEffect(() => {
     if (!clubId) return;
-    supabase.from('clubs').select('about, logo_url').eq('id', clubId).maybeSingle().then(({ data }) => {
+    supabase.from('clubs').select('about, logo_url, social_instagram, social_linkedin').eq('id', clubId).maybeSingle().then(({ data }: any) => {
       if (data) setClubDetails(data);
     });
   }, [clubId]);
