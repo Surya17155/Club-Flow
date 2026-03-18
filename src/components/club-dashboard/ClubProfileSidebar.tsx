@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
+import { Instagram, Linkedin } from 'lucide-react';
 
 interface PostHolder {
   user_id: string;
@@ -23,9 +24,11 @@ interface Props {
   clubName: string;
   clubAbout?: string | null;
   clubLogo?: string | null;
+  socialInstagram?: string | null;
+  socialLinkedin?: string | null;
 }
 
-const ClubProfileSidebar = ({ clubId, clubName, clubAbout, clubLogo }: Props) => {
+const ClubProfileSidebar = ({ clubId, clubName, clubAbout, clubLogo, socialInstagram, socialLinkedin }: Props) => {
   const [postHolders, setPostHolders] = useState<PostHolder[]>([]);
 
   useEffect(() => {
@@ -109,6 +112,35 @@ const ClubProfileSidebar = ({ clubId, clubName, clubAbout, clubLogo }: Props) =>
           )}
         </div>
       </div>
+
+      {/* Social Links */}
+      {(socialInstagram || socialLinkedin) && (
+        <>
+          <hr className="border-border/30" />
+          <div className="flex justify-center gap-4">
+            {socialInstagram && (
+              <a
+                href={socialInstagram.startsWith('http') ? socialInstagram : `https://instagram.com/${socialInstagram}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <Instagram className="w-5 h-5" />
+              </a>
+            )}
+            {socialLinkedin && (
+              <a
+                href={socialLinkedin.startsWith('http') ? socialLinkedin : `https://linkedin.com/company/${socialLinkedin}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <Linkedin className="w-5 h-5" />
+              </a>
+            )}
+          </div>
+        </>
+      )}
 
       <div className="mt-auto" />
     </div>

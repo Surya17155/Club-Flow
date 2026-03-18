@@ -91,10 +91,10 @@ const ClubDashboard = () => {
   }, [user?.id]);
 
   // Club details
-  const [clubDetails, setClubDetails] = useState<{ about: string | null; logo_url: string | null }>({ about: null, logo_url: null });
+  const [clubDetails, setClubDetails] = useState<{ about: string | null; logo_url: string | null; social_instagram: string | null; social_linkedin: string | null }>({ about: null, logo_url: null, social_instagram: null, social_linkedin: null });
   useEffect(() => {
     if (!clubId) return;
-    supabase.from('clubs').select('about, logo_url').eq('id', clubId).maybeSingle().then(({ data }) => {
+    supabase.from('clubs').select('about, logo_url, social_instagram, social_linkedin').eq('id', clubId).maybeSingle().then(({ data }: any) => {
       if (data) setClubDetails(data);
     });
   }, [clubId]);
@@ -258,6 +258,8 @@ const ClubDashboard = () => {
                 clubLogo={clubDetails.logo_url}
                 clubAbout={clubDetails.about}
                 postHolders={postHolders}
+                socialInstagram={clubDetails.social_instagram}
+                socialLinkedin={clubDetails.social_linkedin}
               />
 
               {/* Stats Row */}
@@ -385,7 +387,7 @@ const ClubDashboard = () => {
           <section className="mb-6"><ClubStatsRow stats={statsItems} /></section>
           <main className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <div className="lg:col-span-3">
-              <ClubProfileSidebar clubId={clubId} clubName={clubName} clubAbout={clubDetails.about} clubLogo={clubDetails.logo_url} />
+              <ClubProfileSidebar clubId={clubId} clubName={clubName} clubAbout={clubDetails.about} clubLogo={clubDetails.logo_url} socialInstagram={clubDetails.social_instagram} socialLinkedin={clubDetails.social_linkedin} />
             </div>
             <div className="lg:col-span-6 space-y-6">
               <div className="glass-card p-6">

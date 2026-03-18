@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { supabase } from '@/integrations/supabase/client';
 import { useClub } from '@/contexts/ClubContext';
 import { toast } from 'sonner';
-import { Settings, Upload, Loader2 } from 'lucide-react';
+import { Settings, Upload, Loader2, Instagram, Linkedin } from 'lucide-react';
 
 interface ClubSettingsModalProps {
   open: boolean;
@@ -31,6 +31,8 @@ const ClubSettingsModal = ({ open, onOpenChange }: ClubSettingsModalProps) => {
     category: '',
     club_type: '',
     logo_url: '' as string | null,
+    social_instagram: '',
+    social_linkedin: '',
   });
 
   useEffect(() => {
@@ -39,7 +41,7 @@ const ClubSettingsModal = ({ open, onOpenChange }: ClubSettingsModalProps) => {
       setLoading(true);
       const { data } = await supabase
         .from('clubs')
-        .select('name, tagline, description, about, category, club_type, logo_url')
+        .select('name, tagline, description, about, category, club_type, logo_url, social_instagram, social_linkedin')
         .eq('id', activeClub.club_id)
         .maybeSingle();
       if (data) {
@@ -51,6 +53,8 @@ const ClubSettingsModal = ({ open, onOpenChange }: ClubSettingsModalProps) => {
           category: (data as any).category || '',
           club_type: (data as any).club_type || '',
           logo_url: data.logo_url || null,
+          social_instagram: (data as any).social_instagram || '',
+          social_linkedin: (data as any).social_linkedin || '',
         });
       }
       setLoading(false);
@@ -90,6 +94,8 @@ const ClubSettingsModal = ({ open, onOpenChange }: ClubSettingsModalProps) => {
         tagline: form.tagline.trim() || null,
         category: form.category || null,
         club_type: form.club_type || null,
+        social_instagram: form.social_instagram.trim() || null,
+        social_linkedin: form.social_linkedin.trim() || null,
       } as any)
       .eq('id', activeClub.club_id);
     setSaving(false);
@@ -180,6 +186,19 @@ const ClubSettingsModal = ({ open, onOpenChange }: ClubSettingsModalProps) => {
                     {CLUB_TYPES.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
                   </SelectContent>
                 </Select>
+              </div>
+            </div>
+
+            {/* Social Media Links */}
+            <div className="space-y-3">
+              <Label className="text-sm font-semibold">Social Media <span className="text-xs text-muted-foreground">(optional)</span></Label>
+              <div className="flex items-center gap-2">
+                <Instagram className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                <Input value={form.social_instagram} onChange={e => setForm(f => ({ ...f, social_instagram: e.target.value }))} placeholder="Instagram username or URL" className="flex-1" />
+              </div>
+              <div className="flex items-center gap-2">
+                <Linkedin className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                <Input value={form.social_linkedin} onChange={e => setForm(f => ({ ...f, social_linkedin: e.target.value }))} placeholder="LinkedIn page URL" className="flex-1" />
               </div>
             </div>
 

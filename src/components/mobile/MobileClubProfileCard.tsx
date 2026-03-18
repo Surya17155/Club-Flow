@@ -1,10 +1,13 @@
 import { Badge } from '@/components/ui/badge';
+import { Instagram, Linkedin } from 'lucide-react';
 
 interface MobileClubProfileCardProps {
   clubName: string;
   clubLogo?: string | null;
   clubAbout?: string | null;
   postHolders?: { role: string; full_name: string }[];
+  socialInstagram?: string | null;
+  socialLinkedin?: string | null;
 }
 
 const roleLabelMap: Record<string, string> = {
@@ -19,6 +22,8 @@ export function MobileClubProfileCard({
   clubLogo,
   clubAbout,
   postHolders = [],
+  socialInstagram,
+  socialLinkedin,
 }: MobileClubProfileCardProps) {
   const initials = clubName
     .split(' ')
@@ -119,6 +124,31 @@ export function MobileClubProfileCard({
               >
                 +{postHolders.length - 3}
               </Badge>
+            )}
+          </div>
+        )}
+        {/* Social Links */}
+        {(socialInstagram || socialLinkedin) && (
+          <div className="flex justify-center gap-4 pt-1">
+            {socialInstagram && (
+              <a
+                href={socialInstagram.startsWith('http') ? socialInstagram : `https://instagram.com/${socialInstagram}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <Instagram className="w-4 h-4" />
+              </a>
+            )}
+            {socialLinkedin && (
+              <a
+                href={socialLinkedin.startsWith('http') ? socialLinkedin : `https://linkedin.com/company/${socialLinkedin}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <Linkedin className="w-4 h-4" />
+              </a>
             )}
           </div>
         )}
