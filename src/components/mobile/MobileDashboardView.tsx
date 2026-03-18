@@ -252,7 +252,7 @@ export function MobileDashboardView({
             <h3 className="text-base font-bold font-display text-foreground mb-3">My Clubs</h3>
             <div className="space-y-2">
               {clubs.map((club) =>
-              <div key={club.club_id} className="glass-card p-4 flex items-center gap-3">
+              <div key={club.club_id} className="glass-card p-4 flex items-center gap-3 cursor-pointer active:scale-[0.98] transition-transform duration-150" onClick={() => setExpandedClubId(club.club_id)}>
                   <div className="w-10 h-10 rounded-xl bg-white/50 border border-border flex items-center justify-center shrink-0">
                     {club.logo_url ?
                   <img src={club.logo_url} alt={club.club_name} className="w-7 h-7 rounded object-cover" /> :
