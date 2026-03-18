@@ -273,6 +273,7 @@ export function MobileDashboardView({
       </main>
 
       <MobileBottomNav />
+      <ClubDetailOverlay clubId={expandedClubId} onClose={() => setExpandedClubId(null)} />
     </div>
     </>);
 
