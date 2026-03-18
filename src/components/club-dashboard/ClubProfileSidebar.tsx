@@ -29,7 +29,7 @@ interface Props {
   socialLinkedin?: string | null;
 }
 
-const ClubProfileSidebar = ({ clubId, clubName, clubAbout, clubLogo }: Props) => {
+const ClubProfileSidebar = ({ clubId, clubName, clubAbout, clubLogo, socialInstagram, socialLinkedin }: Props) => {
   const [postHolders, setPostHolders] = useState<PostHolder[]>([]);
 
   useEffect(() => {
