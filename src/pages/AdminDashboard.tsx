@@ -48,7 +48,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { FloatingChatWidget } from "@/components/chat/FloatingChatWidget";
+
 import { MobileDashboardView } from "@/components/mobile/MobileDashboardView";
 
 const roleLabelMap: Record<string, string> = {
