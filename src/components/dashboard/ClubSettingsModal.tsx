@@ -94,6 +94,8 @@ const ClubSettingsModal = ({ open, onOpenChange }: ClubSettingsModalProps) => {
         tagline: form.tagline.trim() || null,
         category: form.category || null,
         club_type: form.club_type || null,
+        social_instagram: form.social_instagram.trim() || null,
+        social_linkedin: form.social_linkedin.trim() || null,
       } as any)
       .eq('id', activeClub.club_id);
     setSaving(false);
