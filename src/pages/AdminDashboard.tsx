@@ -368,7 +368,7 @@ const AdminDashboard = () => {
             key={i}
             className={`glass-card p-6 flex flex-col justify-between h-32 relative overflow-hidden group hover:bg-white/50 transition-colors ${'clickable' in stat && stat.clickable ? 'cursor-pointer ring-primary/20 hover:ring-2' : ''}`}
             onClick={() => {
-              if ('clickable' in stat && stat.clickable) setAttendanceHistoryOpen(true);
+              if ('clickAction' in stat && stat.clickAction) setActiveStatModal(stat.clickAction);
             }}
           >
             <div>
