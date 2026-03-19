@@ -50,6 +50,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { MobileDashboardView } from "@/components/mobile/MobileDashboardView";
+import { AttendanceHistoryModal } from "@/components/mobile/AttendanceHistoryModal";
 
 const roleLabelMap: Record<string, string> = {
   admin: "Admin",
