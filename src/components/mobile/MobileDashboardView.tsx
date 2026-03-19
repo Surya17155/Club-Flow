@@ -30,9 +30,10 @@ interface MobileDashboardViewProps {
   isPersonal: boolean;
   viewMode: 'personal' | 'club';
   setViewMode: (m: 'personal' | 'club') => void;
-  statsCards: {label: string;value: string;}[];
+  statsCards: {label: string;value: string;clickable?: boolean;}[];
   upcomingEvents: any[];
   clubs: {club_id: string;club_name: string;role: string;logo_url?: string;}[];
+  attendanceRecords?: any[];
   onEventClick: (event: any) => void;
   canManageClub: boolean;
   canManageEvents: boolean;
