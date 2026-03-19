@@ -680,6 +680,9 @@ const AdminDashboard = () => {
       <Dialog open={eventDialogOpen} onOpenChange={setEventDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
+            {selectedEvent?.club_name && (
+              <p className="text-xs font-semibold text-primary uppercase tracking-wider">{selectedEvent.club_name}</p>
+            )}
             <DialogTitle className="text-lg font-bold">{selectedEvent?.name}</DialogTitle>
           </DialogHeader>
           {selectedEvent && (
@@ -690,11 +693,7 @@ const AdminDashboard = () => {
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Clock className="w-4 h-4 text-primary" />
-                <span>{selectedEvent.time}</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Users className="w-4 h-4 text-primary" />
-                <span>{selectedEvent.club_name}</span>
+                <span>{selectedEvent.time}{selectedEvent.end_time ? ` – ${selectedEvent.end_time}` : ''}</span>
               </div>
               <div className="flex flex-wrap gap-2">
                 {selectedEvent.event_type && (
@@ -703,15 +702,10 @@ const AdminDashboard = () => {
                     {selectedEvent.event_type}
                   </Badge>
                 )}
-                {selectedEvent.category && (
-                  <Badge variant="outline" className="text-xs">
-                    {selectedEvent.category}
-                  </Badge>
-                )}
                 {selectedEvent.access_type && (
                   <Badge variant="outline" className="text-xs">
                     <Shield className="w-3 h-3 mr-1" />
-                    {selectedEvent.access_type}
+                    {selectedEvent.access_type === 'open' ? 'Open for All' : 'Only for Club Members'}
                   </Badge>
                 )}
                 {selectedEvent.attendance_given !== undefined && (
@@ -722,10 +716,8 @@ const AdminDashboard = () => {
                 )}
               </div>
               {selectedEvent.description && (
-                <div>
-                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
-                    Description
-                  </h4>
+                <div className="border-t border-border/30 pt-3">
+                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Description</h4>
                   <p className="text-sm text-foreground/80 leading-relaxed">{selectedEvent.description}</p>
                 </div>
               )}
