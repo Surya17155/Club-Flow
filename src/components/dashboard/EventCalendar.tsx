@@ -78,6 +78,7 @@ const EventCalendar = ({ mode }: Props) => {
           category: e.category,
           access_type: e.access_type,
           club_id: e.club_id,
+          attendance_given: e.attendance_given,
           club_name: e.clubs?.name,
         }))
       );
