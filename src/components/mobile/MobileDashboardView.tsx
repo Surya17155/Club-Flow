@@ -160,7 +160,7 @@ export function MobileDashboardView({
                 <div
                   key={i}
                   className={`glass-card p-4 text-center ${isClickable ? 'cursor-pointer ring-primary/20 active:scale-[0.97] transition-transform' : ''}`}
-                  onClick={() => { if (isClickable) setAttendanceHistoryOpen(true); }}
+                  onClick={() => { if (isClickable && stat.clickAction) setActiveStatModal(stat.clickAction); }}
                 >
                 <Icon className="w-5 h-5 text-primary mx-auto mb-1.5" />
                 <h3 className="text-2xl font-bold text-primary">{stat.value}</h3>
