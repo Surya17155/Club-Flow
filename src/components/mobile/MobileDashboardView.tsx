@@ -244,7 +244,11 @@ export function MobileDashboardView({
                     </p>
                   </div>
 
-                  <div className="w-2 h-2 rounded-full bg-primary/60 shrink-0" />
+                  {event.attendance_given && (
+                    <Badge variant="outline" className="text-[9px] bg-success/15 text-success border-success/20 shrink-0 px-1.5">
+                      ✓ Att.
+                    </Badge>
+                  )}
                 </div>
               ) :
 
