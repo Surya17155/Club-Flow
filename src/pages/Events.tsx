@@ -65,7 +65,7 @@ const Events = () => {
 
     let query = supabase
       .from('events')
-      .select('id, name, event_type, category, event_date, end_date, access_type, description, qr_token, club_id, clubs(name)')
+      .select('id, name, event_type, category, event_date, end_date, access_type, description, qr_token, club_id, attendance_given, clubs(name)')
       .order('event_date', { ascending: true });
 
     if (viewMode === 'personal') {
