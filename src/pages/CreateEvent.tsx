@@ -328,7 +328,22 @@ const CreateEvent = () => {
               <Switch
                 checked={clubMembersOnly}
                 onCheckedChange={(val) => {setClubMembersOnly(val);if (val) setOpenToAll(false);}} />
-              
+            </div>
+
+            {/* Attendance Will Be Given */}
+            <div className="pt-3 border-t border-border/30">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-sm font-medium text-foreground">Attendance Will Be Given</span>
+                  <p className="text-xs text-muted-foreground mt-0.5">Students will see if attendance is recorded</p>
+                </div>
+                <Switch
+                  checked={attendanceGiven === true}
+                  onCheckedChange={(val) => setAttendanceGiven(val)} />
+              </div>
+              {attendanceGiven === null && (
+                <p className="text-xs text-destructive mt-1.5">* This field is mandatory</p>
+              )}
             </div>
 
             <div className="space-y-1.5">
