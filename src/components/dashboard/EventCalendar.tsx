@@ -56,7 +56,7 @@ const EventCalendar = ({ mode }: Props) => {
 
       let query = supabase
         .from('events')
-        .select('id, name, event_date, end_date, description, event_type, category, access_type, club_id, clubs(name)')
+        .select('id, name, event_date, end_date, description, event_type, category, access_type, attendance_given, club_id, clubs(name)')
         .gte('event_date', startOfMonth)
         .lte('event_date', endOfMonth)
         .order('event_date');
