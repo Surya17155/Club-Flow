@@ -173,6 +173,11 @@ const Events = () => {
                           <Badge className={`text-xs ${event.category === 'Mandatory' ? 'bg-destructive/10 text-destructive border-destructive/20' : 'bg-success/10 text-success border-success/20'}`} variant="outline">
                             {event.category}
                           </Badge>
+                          {event.attendance_given && (
+                            <Badge className="text-xs bg-success/15 text-success border-success/20" variant="outline">
+                              <CheckCircle className="w-3 h-3 mr-0.5" /> Attendance
+                            </Badge>
+                          )}
                         </div>
                       </div>
                       <Badge variant={status === 'upcoming' ? 'default' : 'secondary'} className={`shrink-0 ${status === 'upcoming' ? 'gradient-gold text-primary-foreground border-0' : ''}`}>
