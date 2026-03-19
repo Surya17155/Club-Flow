@@ -25,6 +25,7 @@ interface EventRow {
   description: string | null;
   qr_token: string | null;
   club_id: string;
+  attendance_given?: boolean;
   clubs?: { name: string } | null;
 }
 
