@@ -16,6 +16,7 @@ interface CalendarEvent {
   event_type?: string;
   category?: string;
   access_type?: string;
+  attendance_given?: boolean;
   club_id: string;
   club_name?: string;
 }
