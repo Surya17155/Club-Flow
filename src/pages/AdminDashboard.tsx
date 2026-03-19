@@ -698,6 +698,13 @@ const AdminDashboard = () => {
         </DialogContent>
       </Dialog>
       <ManageEventsModal open={manageEventsOpen} onOpenChange={setManageEventsOpen} />
+      {isPersonal && (
+        <AttendanceHistoryModal
+          open={attendanceHistoryOpen}
+          onClose={() => setAttendanceHistoryOpen(false)}
+          records={personalStats.attendanceRecords}
+        />
+      )}
     </div>
   );
 };
