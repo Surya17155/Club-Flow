@@ -212,6 +212,7 @@ const AdminDashboard = () => {
           socialLinkedin={profile?.social_linkedin || undefined}
           socialInstagram={profile?.social_instagram || undefined}
           socialGmail={profile?.social_gmail || undefined}
+          attendanceRecords={personalStats.attendanceRecords}
         />
         <Dialog open={eventDialogOpen} onOpenChange={setEventDialogOpen}>
           <DialogContent className="max-w-[95vw] rounded-2xl">
