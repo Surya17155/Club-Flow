@@ -678,6 +678,12 @@ const AdminDashboard = () => {
                     {selectedEvent.access_type}
                   </Badge>
                 )}
+                {selectedEvent.attendance_given !== undefined && (
+                  <Badge className={`text-xs ${selectedEvent.attendance_given ? 'bg-success/15 text-success border-success/20' : 'bg-muted text-muted-foreground border-border'}`} variant="outline">
+                    <CheckCircle className="w-3 h-3 mr-1" />
+                    {selectedEvent.attendance_given ? 'Attendance Given' : 'No Attendance'}
+                  </Badge>
+                )}
               </div>
               {selectedEvent.description && (
                 <div>
