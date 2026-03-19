@@ -89,14 +89,14 @@ const CreateEvent = () => {
       const { error } = await supabase.from('events').insert({
         name: eventName.trim(),
         event_type: eventType.toLowerCase().replace(/\s+/g, '_'),
-        
         event_date: dateTime,
         end_date: endDateTime,
         club_id: activeClub.club_id,
         created_by: user.id,
         description: description.trim() || null,
         access_type: accessType,
-        qr_token: qrToken
+        qr_token: qrToken,
+        attendance_given: attendanceGiven ?? false,
       });
 
       if (error) throw error;
