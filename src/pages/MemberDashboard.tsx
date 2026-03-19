@@ -131,7 +131,7 @@ const MemberDashboard = () => {
             <div className="grid grid-cols-3 gap-2 sm:gap-3">
               <StatCard title="Clubs Joined" value={personalStats.clubCount} icon={Users} />
               <StatCard title="Events Attended" value={personalStats.eventsAttended} icon={CheckCircle} />
-              <StatCard title="Total Events" value={personalStats.totalEvents} icon={ListTodo} />
+              <StatCard title="Total Events Attendance" value={personalStats.totalEventsAttendance} icon={ListTodo} />
             </div>
 
             {/* Calendar */}
