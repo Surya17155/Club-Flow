@@ -2,7 +2,7 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Clock, Eye, QrCode, Trash2, Plus, MessageSquare } from 'lucide-react';
+import { Calendar, Clock, Eye, QrCode, Trash2, Plus, MessageSquare, CheckCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
@@ -25,6 +25,7 @@ interface EventRow {
   description: string | null;
   qr_token: string | null;
   club_id: string;
+  attendance_given?: boolean;
   clubs?: { name: string } | null;
 }
 
@@ -64,7 +65,7 @@ const Events = () => {
 
     let query = supabase
       .from('events')
-      .select('id, name, event_type, category, event_date, end_date, access_type, description, qr_token, club_id, clubs(name)')
+      .select('id, name, event_type, category, event_date, end_date, access_type, description, qr_token, club_id, attendance_given, clubs(name)')
       .order('event_date', { ascending: true });
 
     if (viewMode === 'personal') {
@@ -172,6 +173,11 @@ const Events = () => {
                           <Badge className={`text-xs ${event.category === 'Mandatory' ? 'bg-destructive/10 text-destructive border-destructive/20' : 'bg-success/10 text-success border-success/20'}`} variant="outline">
                             {event.category}
                           </Badge>
+                          {event.attendance_given && (
+                            <Badge className="text-xs bg-success/15 text-success border-success/20" variant="outline">
+                              <CheckCircle className="w-3 h-3 mr-0.5" /> Attendance
+                            </Badge>
+                          )}
                         </div>
                       </div>
                       <Badge variant={status === 'upcoming' ? 'default' : 'secondary'} className={`shrink-0 ${status === 'upcoming' ? 'gradient-gold text-primary-foreground border-0' : ''}`}>
@@ -247,6 +253,7 @@ const Events = () => {
                 <p><strong>End:</strong> {new Date(selectedEvent.end_date).toLocaleString()}</p>
               )}
               <p><strong>Attendees:</strong> {attendanceCounts[selectedEvent.id] || 0}</p>
+              <p><strong>Attendance:</strong> {selectedEvent.attendance_given ? '✓ Will be given' : '✗ Not given'}</p>
               {selectedEvent.description && <p><strong>Description:</strong> {selectedEvent.description}</p>}
             </div>
           )}

@@ -50,6 +50,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { MobileDashboardView } from "@/components/mobile/MobileDashboardView";
+import { AttendanceHistoryModal } from "@/components/mobile/AttendanceHistoryModal";
 
 const roleLabelMap: Record<string, string> = {
   admin: "Admin",
@@ -84,13 +85,14 @@ const AdminDashboard = () => {
   const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
   const [manageEventsOpen, setManageEventsOpen] = useState(false);
+  const [attendanceHistoryOpen, setAttendanceHistoryOpen] = useState(false);
 
   useEffect(() => {
     const fetchUpcoming = async () => {
       const now = new Date().toISOString();
       const { data } = await supabase
         .from("events")
-        .select("id, name, event_date, end_date, description, event_type, category, access_type, clubs(name)")
+        .select("id, name, event_date, end_date, description, event_type, category, access_type, attendance_given, clubs(name)")
         .gte("event_date", now)
         .order("event_date", { ascending: true })
         .limit(10);
@@ -158,9 +160,10 @@ const AdminDashboard = () => {
           path: "M0,25 C20,28 40,5 60,15 S80,5 100,10",
         },
         {
-          label: "Total Events:",
-          value: String(personalStats.totalEvents),
+          label: "Total Events Attendance:",
+          value: String(personalStats.totalEventsAttendance),
           path: "M0,20 C30,20 40,25 60,10 S90,5 100,5",
+          clickable: true,
         },
         { label: "Attendance Rate:", value: `${personalStats.attendanceRate}%`, path: "M0,28 L30,20 L60,10 L100,2" },
       ]
@@ -209,6 +212,7 @@ const AdminDashboard = () => {
           socialLinkedin={profile?.social_linkedin || undefined}
           socialInstagram={profile?.social_instagram || undefined}
           socialGmail={profile?.social_gmail || undefined}
+          attendanceRecords={personalStats.attendanceRecords}
         />
         <Dialog open={eventDialogOpen} onOpenChange={setEventDialogOpen}>
           <DialogContent className="max-w-[95vw] rounded-2xl">
@@ -322,7 +326,10 @@ const AdminDashboard = () => {
         {statsCards.map((stat, i) => (
           <div
             key={i}
-            className="glass-card p-6 flex flex-col justify-between h-32 relative overflow-hidden group hover:bg-white/50 transition-colors"
+            className={`glass-card p-6 flex flex-col justify-between h-32 relative overflow-hidden group hover:bg-white/50 transition-colors ${'clickable' in stat && stat.clickable ? 'cursor-pointer ring-primary/20 hover:ring-2' : ''}`}
+            onClick={() => {
+              if ('clickable' in stat && stat.clickable) setAttendanceHistoryOpen(true);
+            }}
           >
             <div>
               <p className="text-sm mb-1 text-muted-foreground">{stat.label}</p>
@@ -334,6 +341,9 @@ const AdminDashboard = () => {
                   </svg>
                 )}
               </div>
+              {'clickable' in stat && stat.clickable && (
+                <p className="text-[10px] text-primary font-medium mt-1">Click to view details →</p>
+              )}
             </div>
             <svg
               className="absolute bottom-4 right-4 w-24 h-12 text-primary/50"
@@ -669,6 +679,12 @@ const AdminDashboard = () => {
                     {selectedEvent.access_type}
                   </Badge>
                 )}
+                {selectedEvent.attendance_given !== undefined && (
+                  <Badge className={`text-xs ${selectedEvent.attendance_given ? 'bg-success/15 text-success border-success/20' : 'bg-muted text-muted-foreground border-border'}`} variant="outline">
+                    <CheckCircle className="w-3 h-3 mr-1" />
+                    {selectedEvent.attendance_given ? 'Attendance Given' : 'No Attendance'}
+                  </Badge>
+                )}
               </div>
               {selectedEvent.description && (
                 <div>
@@ -683,6 +699,13 @@ const AdminDashboard = () => {
         </DialogContent>
       </Dialog>
       <ManageEventsModal open={manageEventsOpen} onOpenChange={setManageEventsOpen} />
+      {isPersonal && (
+        <AttendanceHistoryModal
+          open={attendanceHistoryOpen}
+          onClose={() => setAttendanceHistoryOpen(false)}
+          records={personalStats.attendanceRecords}
+        />
+      )}
     </div>
   );
 };

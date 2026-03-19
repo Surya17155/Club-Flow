@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ClubDetailOverlay } from './ClubDetailOverlay';
+import { AttendanceHistoryModal } from './AttendanceHistoryModal';
 import { useNavigate } from 'react-router-dom';
 import { MobileProfileCard } from './MobileProfileCard';
 import { MobileBottomNav } from './MobileBottomNav';
@@ -29,9 +30,10 @@ interface MobileDashboardViewProps {
   isPersonal: boolean;
   viewMode: 'personal' | 'club';
   setViewMode: (m: 'personal' | 'club') => void;
-  statsCards: {label: string;value: string;}[];
+  statsCards: {label: string;value: string;clickable?: boolean;}[];
   upcomingEvents: any[];
   clubs: {club_id: string;club_name: string;role: string;logo_url?: string;}[];
+  attendanceRecords?: any[];
   onEventClick: (event: any) => void;
   canManageClub: boolean;
   canManageEvents: boolean;
@@ -72,10 +74,12 @@ export function MobileDashboardView({
   onManageEventsOpen,
   socialLinkedin,
   socialInstagram,
-  socialGmail
+  socialGmail,
+  attendanceRecords = [],
 }: MobileDashboardViewProps) {
   const navigate = useNavigate();
   const [expandedClubId, setExpandedClubId] = useState<string | null>(null);
+  const [attendanceHistoryOpen, setAttendanceHistoryOpen] = useState(false);
 
   return (
     <>
@@ -151,13 +155,21 @@ export function MobileDashboardView({
         <div className="grid grid-cols-2 gap-3">
           {statsCards.map((stat, i) => {
               const Icon = statIcons[i % statIcons.length];
+              const isClickable = stat.clickable;
               return (
-                <div key={i} className="glass-card p-4 text-center">
+                <div
+                  key={i}
+                  className={`glass-card p-4 text-center ${isClickable ? 'cursor-pointer ring-primary/20 active:scale-[0.97] transition-transform' : ''}`}
+                  onClick={() => { if (isClickable) setAttendanceHistoryOpen(true); }}
+                >
                 <Icon className="w-5 h-5 text-primary mx-auto mb-1.5" />
                 <h3 className="text-2xl font-bold text-primary">{stat.value}</h3>
                 <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mt-0.5">
                   {stat.label.replace(':', '')}
                 </p>
+                {isClickable && (
+                  <p className="text-[9px] text-primary font-medium mt-1">Tap to view →</p>
+                )}
               </div>);
 
             })}
@@ -234,7 +246,11 @@ export function MobileDashboardView({
                     </p>
                   </div>
 
-                  <div className="w-2 h-2 rounded-full bg-primary/60 shrink-0" />
+                  {event.attendance_given && (
+                    <Badge variant="outline" className="text-[9px] bg-success/15 text-success border-success/20 shrink-0 px-1.5">
+                      ✓ Att.
+                    </Badge>
+                  )}
                 </div>
               ) :
 
@@ -274,6 +290,11 @@ export function MobileDashboardView({
 
       <MobileBottomNav />
       <ClubDetailOverlay clubId={expandedClubId} onClose={() => setExpandedClubId(null)} />
+      <AttendanceHistoryModal
+        open={attendanceHistoryOpen}
+        onClose={() => setAttendanceHistoryOpen(false)}
+        records={attendanceRecords}
+      />
     </div>
     </>);
 

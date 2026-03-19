@@ -326,6 +326,7 @@ export type Database = {
       events: {
         Row: {
           access_type: string
+          attendance_given: boolean
           category: string
           club_id: string
           created_at: string
@@ -342,6 +343,7 @@ export type Database = {
         }
         Insert: {
           access_type?: string
+          attendance_given?: boolean
           category?: string
           club_id: string
           created_at?: string
@@ -358,6 +360,7 @@ export type Database = {
         }
         Update: {
           access_type?: string
+          attendance_given?: boolean
           category?: string
           club_id?: string
           created_at?: string

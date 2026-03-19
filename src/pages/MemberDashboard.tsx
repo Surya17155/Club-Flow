@@ -131,7 +131,7 @@ const MemberDashboard = () => {
             <div className="grid grid-cols-3 gap-2 sm:gap-3">
               <StatCard title="Clubs Joined" value={personalStats.clubCount} icon={Users} />
               <StatCard title="Events Attended" value={personalStats.eventsAttended} icon={CheckCircle} />
-              <StatCard title="Total Events" value={personalStats.totalEvents} icon={ListTodo} />
+              <StatCard title="Total Events Attendance" value={personalStats.totalEventsAttendance} icon={ListTodo} />
             </div>
 
             {/* Calendar */}
@@ -262,7 +262,7 @@ const MemberDashboard = () => {
                 </div>
                 <div className="p-3 rounded-lg bg-muted/50 space-y-1.5">
                   <p className="text-sm font-medium">Events Attended</p>
-                  <Badge className="text-xs bg-info text-primary-foreground">{personalStats.eventsAttended} / {personalStats.totalEvents}</Badge>
+                  <Badge className="text-xs bg-info text-primary-foreground">{personalStats.eventsAttended} / {personalStats.totalEventsAttendance}</Badge>
                 </div>
               </CardContent>
             </Card>
