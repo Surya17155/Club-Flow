@@ -732,11 +732,67 @@ const AdminDashboard = () => {
       </Dialog>
       <ManageEventsModal open={manageEventsOpen} onOpenChange={setManageEventsOpen} />
       {isPersonal && (
-        <AttendanceHistoryModal
-          open={attendanceHistoryOpen}
-          onClose={() => setAttendanceHistoryOpen(false)}
-          records={personalStats.attendanceRecords}
-        />
+        <>
+          <AttendanceHistoryModal
+            open={activeStatModal === 'attendance_history'}
+            onClose={() => setActiveStatModal(null)}
+            records={personalStats.attendanceRecords}
+          />
+          {/* Clubs Joined Modal */}
+          <Dialog open={activeStatModal === 'clubs_joined'} onOpenChange={(open) => { if (!open) setActiveStatModal(null); }}>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>My Clubs</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-3 max-h-[60vh] overflow-y-auto">
+                {clubs.length > 0 ? clubs.map((club) => (
+                  <div key={club.club_id} className="flex items-center gap-3 p-3 rounded-xl bg-muted/50">
+                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                      {club.logo_url ? (
+                        <img src={club.logo_url} alt={club.club_name} className="w-7 h-7 rounded object-cover" />
+                      ) : (
+                        <Award className="w-5 h-5 text-primary" />
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">{club.club_name}</p>
+                      <p className="text-xs text-muted-foreground">{roleLabelMap[club.role] ?? club.role}</p>
+                    </div>
+                  </div>
+                )) : (
+                  <p className="text-sm text-muted-foreground italic text-center py-6">No clubs joined yet</p>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
+          {/* Events Attended Modal */}
+          <Dialog open={activeStatModal === 'events_attended'} onOpenChange={(open) => { if (!open) setActiveStatModal(null); }}>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Events Attended ({personalStats.eventsAttended})</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-2 max-h-[60vh] overflow-y-auto">
+                {personalStats.attendanceRecords.length > 0 ? personalStats.attendanceRecords.map((rec) => (
+                  <div key={rec.id} className="flex items-center gap-3 p-3 rounded-xl bg-muted/50">
+                    <div className="flex flex-col items-center justify-center w-10 h-12 rounded-lg bg-primary/10 shrink-0">
+                      <span className="text-[9px] font-bold uppercase text-primary">
+                        {new Date(rec.event_date).toLocaleString('default', { month: 'short' })}
+                      </span>
+                      <span className="text-sm font-bold text-primary">{new Date(rec.event_date).getDate()}</span>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-foreground truncate">{rec.event_name}</p>
+                      <p className="text-xs text-muted-foreground">{rec.club_name}</p>
+                    </div>
+                    <Badge variant="outline" className="shrink-0 text-[10px] bg-success/15 text-success border-success/20">✓ Present</Badge>
+                  </div>
+                )) : (
+                  <p className="text-sm text-muted-foreground italic text-center py-6">No events attended yet</p>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
+        </>
       )}
     </div>
   );
