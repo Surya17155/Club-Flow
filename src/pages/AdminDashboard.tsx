@@ -91,7 +91,7 @@ const AdminDashboard = () => {
       const now = new Date().toISOString();
       const { data } = await supabase
         .from("events")
-        .select("id, name, event_date, end_date, description, event_type, category, access_type, clubs(name)")
+        .select("id, name, event_date, end_date, description, event_type, category, access_type, attendance_given, clubs(name)")
         .gte("event_date", now)
         .order("event_date", { ascending: true })
         .limit(10);
