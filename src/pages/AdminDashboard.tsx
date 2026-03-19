@@ -155,17 +155,22 @@ const AdminDashboard = () => {
           label: "Clubs Joined:",
           value: String(personalStats.clubCount),
           path: "M0,25 C30,25 30,10 50,10 S70,20 100,5",
+          clickable: true,
+          clickAction: "clubs_joined" as const,
         },
         {
           label: "Events Attended:",
           value: String(personalStats.eventsAttended),
           path: "M0,25 C20,28 40,5 60,15 S80,5 100,10",
+          clickable: true,
+          clickAction: "events_attended" as const,
         },
         {
           label: "Total Events Attendance:",
           value: String(personalStats.totalEventsAttendance),
           path: "M0,20 C30,20 40,25 60,10 S90,5 100,5",
           clickable: true,
+          clickAction: "attendance_history" as const,
         },
         { label: "Attendance Rate:", value: `${personalStats.attendanceRate}%`, path: "M0,28 L30,20 L60,10 L100,2" },
       ]
