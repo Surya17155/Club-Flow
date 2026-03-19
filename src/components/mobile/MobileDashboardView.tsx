@@ -79,7 +79,7 @@ export function MobileDashboardView({
 }: MobileDashboardViewProps) {
   const navigate = useNavigate();
   const [expandedClubId, setExpandedClubId] = useState<string | null>(null);
-  const [attendanceHistoryOpen, setAttendanceHistoryOpen] = useState(false);
+  const [activeStatModal, setActiveStatModal] = useState<string | null>(null);
 
   return (
     <>
