@@ -273,7 +273,7 @@ export function MobileDashboardView({
 
         {/* My Clubs (personal mode) */}
         {isPersonal && clubs.length > 0 &&
-          <section>
+          <section id="mobile-my-clubs">
             <h3 className="text-base font-bold font-display text-foreground mb-3">My Clubs</h3>
             <div className="space-y-2">
               {clubs.map((club) =>
