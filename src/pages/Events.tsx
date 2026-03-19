@@ -241,20 +241,32 @@ const Events = () => {
       <Dialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
+            {selectedEvent && (selectedEvent as any).clubs?.name && (
+              <p className="text-xs font-semibold text-primary uppercase tracking-wider">{(selectedEvent as any).clubs.name}</p>
+            )}
             <DialogTitle>{selectedEvent?.name}</DialogTitle>
           </DialogHeader>
           {selectedEvent && (
             <div className="space-y-3 text-sm">
-              <p><strong>Type:</strong> {selectedEvent.event_type}</p>
-              <p><strong>Category:</strong> {selectedEvent.category}</p>
-              <p><strong>Access:</strong> {selectedEvent.access_type}</p>
-              <p><strong>Start:</strong> {new Date(selectedEvent.event_date).toLocaleString()}</p>
-              {selectedEvent.end_date && (
-                <p><strong>End:</strong> {new Date(selectedEvent.end_date).toLocaleString()}</p>
+              <p><strong>Date:</strong> {new Date(selectedEvent.event_date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+              <p><strong>Time:</strong> {new Date(selectedEvent.event_date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}{selectedEvent.end_date ? ` – ${new Date(selectedEvent.end_date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}` : ''}</p>
+              <div className="flex flex-wrap gap-2">
+                {selectedEvent.event_type && (
+                  <Badge variant="secondary" className="text-xs">{selectedEvent.event_type}</Badge>
+                )}
+                <Badge variant="outline" className="text-xs">
+                  {selectedEvent.access_type === 'open' ? 'Open for All' : 'Only for Club Members'}
+                </Badge>
+                <Badge className={`text-xs ${selectedEvent.attendance_given ? 'bg-success/15 text-success border-success/20' : 'bg-muted text-muted-foreground border-border'}`} variant="outline">
+                  {selectedEvent.attendance_given ? '✓ Attendance' : 'No Attendance'}
+                </Badge>
+              </div>
+              {selectedEvent.description && (
+                <div className="border-t border-border/30 pt-3">
+                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Description</h4>
+                  <p className="text-foreground/80 leading-relaxed">{selectedEvent.description}</p>
+                </div>
               )}
-              <p><strong>Attendees:</strong> {attendanceCounts[selectedEvent.id] || 0}</p>
-              <p><strong>Attendance:</strong> {selectedEvent.attendance_given ? '✓ Will be given' : '✗ Not given'}</p>
-              {selectedEvent.description && <p><strong>Description:</strong> {selectedEvent.description}</p>}
             </div>
           )}
         </DialogContent>
