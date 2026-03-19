@@ -100,6 +100,7 @@ const AdminDashboard = () => {
         setUpcomingEvents(
           data.map((e: any) => {
             const d = new Date(e.event_date);
+            const endD = e.end_date ? new Date(e.end_date) : null;
             return {
               ...e,
               month: d.toLocaleString("default", { month: "short" }).toUpperCase(),
@@ -112,6 +113,7 @@ const AdminDashboard = () => {
                 day: "numeric",
               }),
               time: d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }),
+              end_time: endD ? endD.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }) : null,
             };
           }),
         );
