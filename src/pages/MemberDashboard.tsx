@@ -262,7 +262,7 @@ const MemberDashboard = () => {
                 </div>
                 <div className="p-3 rounded-lg bg-muted/50 space-y-1.5">
                   <p className="text-sm font-medium">Events Attended</p>
-                  <Badge className="text-xs bg-info text-primary-foreground">{personalStats.eventsAttended} / {personalStats.totalEvents}</Badge>
+                  <Badge className="text-xs bg-info text-primary-foreground">{personalStats.eventsAttended} / {personalStats.totalEventsAttendance}</Badge>
                 </div>
               </CardContent>
             </Card>
