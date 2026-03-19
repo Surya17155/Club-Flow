@@ -219,13 +219,46 @@ const AdminDashboard = () => {
         <Dialog open={eventDialogOpen} onOpenChange={setEventDialogOpen}>
           <DialogContent className="max-w-[95vw] rounded-2xl">
             <DialogHeader>
+              {selectedEvent?.club_name && (
+                <p className="text-xs font-semibold text-primary uppercase tracking-wider">{selectedEvent.club_name}</p>
+              )}
               <DialogTitle className="text-lg font-bold">{selectedEvent?.name}</DialogTitle>
             </DialogHeader>
             {selectedEvent && (
               <div className="space-y-3 pt-2 text-sm">
-                <p className="text-muted-foreground">{selectedEvent.full_date} • {selectedEvent.time}</p>
-                <p className="text-muted-foreground">{selectedEvent.club_name}</p>
-                {selectedEvent.description && <p className="text-foreground/80">{selectedEvent.description}</p>}
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Calendar className="w-4 h-4 text-primary" />
+                  <span>{selectedEvent.full_date}</span>
+                </div>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Clock className="w-4 h-4 text-primary" />
+                  <span>{selectedEvent.time}{selectedEvent.end_time ? ` – ${selectedEvent.end_time}` : ''}</span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {selectedEvent.event_type && (
+                    <Badge variant="secondary" className="text-xs">
+                      <Tag className="w-3 h-3 mr-1" />{selectedEvent.event_type}
+                    </Badge>
+                  )}
+                  {selectedEvent.access_type && (
+                    <Badge variant="outline" className="text-xs">
+                      <Shield className="w-3 h-3 mr-1" />
+                      {selectedEvent.access_type === 'open' ? 'Open for All' : 'Only for Club Members'}
+                    </Badge>
+                  )}
+                  {selectedEvent.attendance_given !== undefined && (
+                    <Badge className={`text-xs ${selectedEvent.attendance_given ? 'bg-success/15 text-success border-success/20' : 'bg-muted text-muted-foreground border-border'}`} variant="outline">
+                      <CheckCircle className="w-3 h-3 mr-1" />
+                      {selectedEvent.attendance_given ? 'Attendance Given' : 'No Attendance'}
+                    </Badge>
+                  )}
+                </div>
+                {selectedEvent.description && (
+                  <div className="border-t border-border/30 pt-3">
+                    <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Description</h4>
+                    <p className="text-foreground/80 leading-relaxed">{selectedEvent.description}</p>
+                  </div>
+                )}
               </div>
             )}
           </DialogContent>
