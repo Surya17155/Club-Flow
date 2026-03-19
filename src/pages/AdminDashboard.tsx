@@ -85,7 +85,7 @@ const AdminDashboard = () => {
   const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
   const [manageEventsOpen, setManageEventsOpen] = useState(false);
-  const [attendanceHistoryOpen, setAttendanceHistoryOpen] = useState(false);
+  const [activeStatModal, setActiveStatModal] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchUpcoming = async () => {
