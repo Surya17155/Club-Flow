@@ -153,13 +153,21 @@ export function MobileDashboardView({
         <div className="grid grid-cols-2 gap-3">
           {statsCards.map((stat, i) => {
               const Icon = statIcons[i % statIcons.length];
+              const isClickable = stat.clickable;
               return (
-                <div key={i} className="glass-card p-4 text-center">
+                <div
+                  key={i}
+                  className={`glass-card p-4 text-center ${isClickable ? 'cursor-pointer ring-primary/20 active:scale-[0.97] transition-transform' : ''}`}
+                  onClick={() => { if (isClickable) setAttendanceHistoryOpen(true); }}
+                >
                 <Icon className="w-5 h-5 text-primary mx-auto mb-1.5" />
                 <h3 className="text-2xl font-bold text-primary">{stat.value}</h3>
                 <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mt-0.5">
                   {stat.label.replace(':', '')}
                 </p>
+                {isClickable && (
+                  <p className="text-[9px] text-primary font-medium mt-1">Tap to view →</p>
+                )}
               </div>);
 
             })}
