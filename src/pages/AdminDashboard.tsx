@@ -158,9 +158,10 @@ const AdminDashboard = () => {
           path: "M0,25 C20,28 40,5 60,15 S80,5 100,10",
         },
         {
-          label: "Total Events:",
-          value: String(personalStats.totalEvents),
+          label: "Total Events Attendance:",
+          value: String(personalStats.totalEventsAttendance),
           path: "M0,20 C30,20 40,25 60,10 S90,5 100,5",
+          clickable: true,
         },
         { label: "Attendance Rate:", value: `${personalStats.attendanceRate}%`, path: "M0,28 L30,20 L60,10 L100,2" },
       ]
