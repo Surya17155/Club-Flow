@@ -325,7 +325,10 @@ const AdminDashboard = () => {
         {statsCards.map((stat, i) => (
           <div
             key={i}
-            className="glass-card p-6 flex flex-col justify-between h-32 relative overflow-hidden group hover:bg-white/50 transition-colors"
+            className={`glass-card p-6 flex flex-col justify-between h-32 relative overflow-hidden group hover:bg-white/50 transition-colors ${'clickable' in stat && stat.clickable ? 'cursor-pointer ring-primary/20 hover:ring-2' : ''}`}
+            onClick={() => {
+              if ('clickable' in stat && stat.clickable) setAttendanceHistoryOpen(true);
+            }}
           >
             <div>
               <p className="text-sm mb-1 text-muted-foreground">{stat.label}</p>
@@ -337,6 +340,9 @@ const AdminDashboard = () => {
                   </svg>
                 )}
               </div>
+              {'clickable' in stat && stat.clickable && (
+                <p className="text-[10px] text-primary font-medium mt-1">Click to view details →</p>
+              )}
             </div>
             <svg
               className="absolute bottom-4 right-4 w-24 h-12 text-primary/50"
