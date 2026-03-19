@@ -74,10 +74,12 @@ export function MobileDashboardView({
   onManageEventsOpen,
   socialLinkedin,
   socialInstagram,
-  socialGmail
+  socialGmail,
+  attendanceRecords = [],
 }: MobileDashboardViewProps) {
   const navigate = useNavigate();
   const [expandedClubId, setExpandedClubId] = useState<string | null>(null);
+  const [attendanceHistoryOpen, setAttendanceHistoryOpen] = useState(false);
 
   return (
     <>
