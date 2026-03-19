@@ -16,6 +16,7 @@ interface CalendarEvent {
   event_type?: string;
   category?: string;
   access_type?: string;
+  attendance_given?: boolean;
   club_id: string;
   club_name?: string;
 }
@@ -56,7 +57,7 @@ const EventCalendar = ({ mode }: Props) => {
 
       let query = supabase
         .from('events')
-        .select('id, name, event_date, end_date, description, event_type, category, access_type, club_id, clubs(name)')
+        .select('id, name, event_date, end_date, description, event_type, category, access_type, attendance_given, club_id, clubs(name)')
         .gte('event_date', startOfMonth)
         .lte('event_date', endOfMonth)
         .order('event_date');
@@ -77,6 +78,7 @@ const EventCalendar = ({ mode }: Props) => {
           category: e.category,
           access_type: e.access_type,
           club_id: e.club_id,
+          attendance_given: e.attendance_given,
           club_name: e.clubs?.name,
         }))
       );
@@ -209,25 +211,24 @@ const EventCalendar = ({ mode }: Props) => {
               const colorIdx = clubColorMap.get(ev.club_id) ?? 0;
               const color = EVENT_COLORS[colorIdx];
               return (
-                <div key={ev.id} className={`rounded-xl border border-border/50 p-4 space-y-3 ${color.bg}/20`}>
-                  <div>
-                    <h4 className="font-semibold text-foreground text-base">{ev.name}</h4>
-                    {ev.club_name && (
-                      <p className="text-xs text-muted-foreground mt-0.5">by {ev.club_name}</p>
-                    )}
-                  </div>
+              <div key={ev.id} className={`rounded-xl border border-border/50 p-4 space-y-3 ${color.bg}/20`}>
+                  {ev.club_name && (
+                    <p className="text-xs font-semibold text-primary uppercase tracking-wider">{ev.club_name}</p>
+                  )}
+                  <h4 className="font-semibold text-foreground text-base">{ev.name}</h4>
 
-                  <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="space-y-1.5 text-xs">
+                    <div className="flex items-center gap-1.5 text-muted-foreground">
+                      <Calendar className="w-3.5 h-3.5 text-primary" />
+                      <span>{format(new Date(ev.event_date), 'EEEE, MMMM d, yyyy')}</span>
+                    </div>
                     <div className="flex items-center gap-1.5 text-muted-foreground">
                       <Clock className="w-3.5 h-3.5 text-primary" />
-                      <span>Start: {format(new Date(ev.event_date), 'MMM d, yyyy h:mm a')}</span>
+                      <span>
+                        {format(new Date(ev.event_date), 'h:mm a')}
+                        {ev.end_date ? ` – ${format(new Date(ev.end_date), 'h:mm a')}` : ''}
+                      </span>
                     </div>
-                    {ev.end_date && (
-                      <div className="flex items-center gap-1.5 text-muted-foreground">
-                        <Clock className="w-3.5 h-3.5 text-primary" />
-                        <span>End: {format(new Date(ev.end_date), 'MMM d, yyyy h:mm a')}</span>
-                      </div>
-                    )}
                   </div>
 
                   <div className="flex flex-wrap gap-1.5">
@@ -237,23 +238,24 @@ const EventCalendar = ({ mode }: Props) => {
                         {ev.event_type}
                       </Badge>
                     )}
-                    {ev.category && (
-                      <Badge variant="outline" className="text-[10px]">
-                        {ev.category}
-                      </Badge>
-                    )}
                     {ev.access_type && (
                       <Badge variant="outline" className="text-[10px]">
                         <Shield className="w-3 h-3 mr-1" />
-                        {ev.access_type}
+                        {ev.access_type === 'open' ? 'Open for All' : 'Only for Club Members'}
+                      </Badge>
+                    )}
+                    {ev.attendance_given !== undefined && (
+                      <Badge className={`text-[10px] ${ev.attendance_given ? 'bg-success/15 text-success border-success/20' : 'bg-muted text-muted-foreground border-border'}`} variant="outline">
+                        {ev.attendance_given ? '✓ Attendance' : 'No Attendance'}
                       </Badge>
                     )}
                   </div>
 
                   {ev.description && (
-                    <p className="text-xs text-muted-foreground leading-relaxed border-t border-border/30 pt-2">
-                      {ev.description}
-                    </p>
+                    <div className="border-t border-border/30 pt-2">
+                      <h5 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1">Description</h5>
+                      <p className="text-xs text-muted-foreground leading-relaxed">{ev.description}</p>
+                    </div>
                   )}
                 </div>
               );

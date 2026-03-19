@@ -30,7 +30,7 @@ interface MobileDashboardViewProps {
   isPersonal: boolean;
   viewMode: 'personal' | 'club';
   setViewMode: (m: 'personal' | 'club') => void;
-  statsCards: {label: string;value: string;clickable?: boolean;}[];
+  statsCards: {label: string;value: string;clickable?: boolean;clickAction?: string;}[];
   upcomingEvents: any[];
   clubs: {club_id: string;club_name: string;role: string;logo_url?: string;}[];
   attendanceRecords?: any[];
@@ -79,7 +79,7 @@ export function MobileDashboardView({
 }: MobileDashboardViewProps) {
   const navigate = useNavigate();
   const [expandedClubId, setExpandedClubId] = useState<string | null>(null);
-  const [attendanceHistoryOpen, setAttendanceHistoryOpen] = useState(false);
+  const [activeStatModal, setActiveStatModal] = useState<string | null>(null);
 
   return (
     <>
@@ -160,7 +160,16 @@ export function MobileDashboardView({
                 <div
                   key={i}
                   className={`glass-card p-4 text-center ${isClickable ? 'cursor-pointer ring-primary/20 active:scale-[0.97] transition-transform' : ''}`}
-                  onClick={() => { if (isClickable) setAttendanceHistoryOpen(true); }}
+                  onClick={() => {
+                    if (isClickable && stat.clickAction) {
+                      if (stat.clickAction === 'clubs_joined') {
+                        // Scroll to clubs section
+                        document.getElementById('mobile-my-clubs')?.scrollIntoView({ behavior: 'smooth' });
+                      } else {
+                        setActiveStatModal(stat.clickAction);
+                      }
+                    }
+                  }}
                 >
                 <Icon className="w-5 h-5 text-primary mx-auto mb-1.5" />
                 <h3 className="text-2xl font-bold text-primary">{stat.value}</h3>
@@ -264,7 +273,7 @@ export function MobileDashboardView({
 
         {/* My Clubs (personal mode) */}
         {isPersonal && clubs.length > 0 &&
-          <section>
+          <section id="mobile-my-clubs">
             <h3 className="text-base font-bold font-display text-foreground mb-3">My Clubs</h3>
             <div className="space-y-2">
               {clubs.map((club) =>
@@ -291,8 +300,8 @@ export function MobileDashboardView({
       <MobileBottomNav />
       <ClubDetailOverlay clubId={expandedClubId} onClose={() => setExpandedClubId(null)} />
       <AttendanceHistoryModal
-        open={attendanceHistoryOpen}
-        onClose={() => setAttendanceHistoryOpen(false)}
+        open={activeStatModal === 'attendance_history' || activeStatModal === 'events_attended'}
+        onClose={() => setActiveStatModal(null)}
         records={attendanceRecords}
       />
     </div>

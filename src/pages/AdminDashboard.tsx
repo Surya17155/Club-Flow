@@ -85,7 +85,7 @@ const AdminDashboard = () => {
   const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
   const [manageEventsOpen, setManageEventsOpen] = useState(false);
-  const [attendanceHistoryOpen, setAttendanceHistoryOpen] = useState(false);
+  const [activeStatModal, setActiveStatModal] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchUpcoming = async () => {
@@ -100,6 +100,7 @@ const AdminDashboard = () => {
         setUpcomingEvents(
           data.map((e: any) => {
             const d = new Date(e.event_date);
+            const endD = e.end_date ? new Date(e.end_date) : null;
             return {
               ...e,
               month: d.toLocaleString("default", { month: "short" }).toUpperCase(),
@@ -112,6 +113,7 @@ const AdminDashboard = () => {
                 day: "numeric",
               }),
               time: d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }),
+              end_time: endD ? endD.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }) : null,
             };
           }),
         );
@@ -153,17 +155,22 @@ const AdminDashboard = () => {
           label: "Clubs Joined:",
           value: String(personalStats.clubCount),
           path: "M0,25 C30,25 30,10 50,10 S70,20 100,5",
+          clickable: true,
+          clickAction: "clubs_joined" as const,
         },
         {
           label: "Events Attended:",
           value: String(personalStats.eventsAttended),
           path: "M0,25 C20,28 40,5 60,15 S80,5 100,10",
+          clickable: true,
+          clickAction: "events_attended" as const,
         },
         {
           label: "Total Events Attendance:",
           value: String(personalStats.totalEventsAttendance),
           path: "M0,20 C30,20 40,25 60,10 S90,5 100,5",
           clickable: true,
+          clickAction: "attendance_history" as const,
         },
         { label: "Attendance Rate:", value: `${personalStats.attendanceRate}%`, path: "M0,28 L30,20 L60,10 L100,2" },
       ]
@@ -217,13 +224,46 @@ const AdminDashboard = () => {
         <Dialog open={eventDialogOpen} onOpenChange={setEventDialogOpen}>
           <DialogContent className="max-w-[95vw] rounded-2xl">
             <DialogHeader>
+              {selectedEvent?.club_name && (
+                <p className="text-xs font-semibold text-primary uppercase tracking-wider">{selectedEvent.club_name}</p>
+              )}
               <DialogTitle className="text-lg font-bold">{selectedEvent?.name}</DialogTitle>
             </DialogHeader>
             {selectedEvent && (
               <div className="space-y-3 pt-2 text-sm">
-                <p className="text-muted-foreground">{selectedEvent.full_date} • {selectedEvent.time}</p>
-                <p className="text-muted-foreground">{selectedEvent.club_name}</p>
-                {selectedEvent.description && <p className="text-foreground/80">{selectedEvent.description}</p>}
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Calendar className="w-4 h-4 text-primary" />
+                  <span>{selectedEvent.full_date}</span>
+                </div>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Clock className="w-4 h-4 text-primary" />
+                  <span>{selectedEvent.time}{selectedEvent.end_time ? ` – ${selectedEvent.end_time}` : ''}</span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {selectedEvent.event_type && (
+                    <Badge variant="secondary" className="text-xs">
+                      <Tag className="w-3 h-3 mr-1" />{selectedEvent.event_type}
+                    </Badge>
+                  )}
+                  {selectedEvent.access_type && (
+                    <Badge variant="outline" className="text-xs">
+                      <Shield className="w-3 h-3 mr-1" />
+                      {selectedEvent.access_type === 'open' ? 'Open for All' : 'Only for Club Members'}
+                    </Badge>
+                  )}
+                  {selectedEvent.attendance_given !== undefined && (
+                    <Badge className={`text-xs ${selectedEvent.attendance_given ? 'bg-success/15 text-success border-success/20' : 'bg-muted text-muted-foreground border-border'}`} variant="outline">
+                      <CheckCircle className="w-3 h-3 mr-1" />
+                      {selectedEvent.attendance_given ? 'Attendance Given' : 'No Attendance'}
+                    </Badge>
+                  )}
+                </div>
+                {selectedEvent.description && (
+                  <div className="border-t border-border/30 pt-3">
+                    <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Description</h4>
+                    <p className="text-foreground/80 leading-relaxed">{selectedEvent.description}</p>
+                  </div>
+                )}
               </div>
             )}
           </DialogContent>
@@ -328,7 +368,7 @@ const AdminDashboard = () => {
             key={i}
             className={`glass-card p-6 flex flex-col justify-between h-32 relative overflow-hidden group hover:bg-white/50 transition-colors ${'clickable' in stat && stat.clickable ? 'cursor-pointer ring-primary/20 hover:ring-2' : ''}`}
             onClick={() => {
-              if ('clickable' in stat && stat.clickable) setAttendanceHistoryOpen(true);
+              if ('clickAction' in stat && stat.clickAction) setActiveStatModal(stat.clickAction);
             }}
           >
             <div>
@@ -645,6 +685,9 @@ const AdminDashboard = () => {
       <Dialog open={eventDialogOpen} onOpenChange={setEventDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
+            {selectedEvent?.club_name && (
+              <p className="text-xs font-semibold text-primary uppercase tracking-wider">{selectedEvent.club_name}</p>
+            )}
             <DialogTitle className="text-lg font-bold">{selectedEvent?.name}</DialogTitle>
           </DialogHeader>
           {selectedEvent && (
@@ -655,11 +698,7 @@ const AdminDashboard = () => {
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Clock className="w-4 h-4 text-primary" />
-                <span>{selectedEvent.time}</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Users className="w-4 h-4 text-primary" />
-                <span>{selectedEvent.club_name}</span>
+                <span>{selectedEvent.time}{selectedEvent.end_time ? ` – ${selectedEvent.end_time}` : ''}</span>
               </div>
               <div className="flex flex-wrap gap-2">
                 {selectedEvent.event_type && (
@@ -668,15 +707,10 @@ const AdminDashboard = () => {
                     {selectedEvent.event_type}
                   </Badge>
                 )}
-                {selectedEvent.category && (
-                  <Badge variant="outline" className="text-xs">
-                    {selectedEvent.category}
-                  </Badge>
-                )}
                 {selectedEvent.access_type && (
                   <Badge variant="outline" className="text-xs">
                     <Shield className="w-3 h-3 mr-1" />
-                    {selectedEvent.access_type}
+                    {selectedEvent.access_type === 'open' ? 'Open for All' : 'Only for Club Members'}
                   </Badge>
                 )}
                 {selectedEvent.attendance_given !== undefined && (
@@ -687,10 +721,8 @@ const AdminDashboard = () => {
                 )}
               </div>
               {selectedEvent.description && (
-                <div>
-                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
-                    Description
-                  </h4>
+                <div className="border-t border-border/30 pt-3">
+                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Description</h4>
                   <p className="text-sm text-foreground/80 leading-relaxed">{selectedEvent.description}</p>
                 </div>
               )}
@@ -700,11 +732,67 @@ const AdminDashboard = () => {
       </Dialog>
       <ManageEventsModal open={manageEventsOpen} onOpenChange={setManageEventsOpen} />
       {isPersonal && (
-        <AttendanceHistoryModal
-          open={attendanceHistoryOpen}
-          onClose={() => setAttendanceHistoryOpen(false)}
-          records={personalStats.attendanceRecords}
-        />
+        <>
+          <AttendanceHistoryModal
+            open={activeStatModal === 'attendance_history'}
+            onClose={() => setActiveStatModal(null)}
+            records={personalStats.attendanceRecords}
+          />
+          {/* Clubs Joined Modal */}
+          <Dialog open={activeStatModal === 'clubs_joined'} onOpenChange={(open) => { if (!open) setActiveStatModal(null); }}>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>My Clubs</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-3 max-h-[60vh] overflow-y-auto">
+                {clubs.length > 0 ? clubs.map((club) => (
+                  <div key={club.club_id} className="flex items-center gap-3 p-3 rounded-xl bg-muted/50">
+                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                      {club.logo_url ? (
+                        <img src={club.logo_url} alt={club.club_name} className="w-7 h-7 rounded object-cover" />
+                      ) : (
+                        <Award className="w-5 h-5 text-primary" />
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">{club.club_name}</p>
+                      <p className="text-xs text-muted-foreground">{roleLabelMap[club.role] ?? club.role}</p>
+                    </div>
+                  </div>
+                )) : (
+                  <p className="text-sm text-muted-foreground italic text-center py-6">No clubs joined yet</p>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
+          {/* Events Attended Modal */}
+          <Dialog open={activeStatModal === 'events_attended'} onOpenChange={(open) => { if (!open) setActiveStatModal(null); }}>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Events Attended ({personalStats.eventsAttended})</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-2 max-h-[60vh] overflow-y-auto">
+                {personalStats.attendanceRecords.length > 0 ? personalStats.attendanceRecords.map((rec) => (
+                  <div key={rec.id} className="flex items-center gap-3 p-3 rounded-xl bg-muted/50">
+                    <div className="flex flex-col items-center justify-center w-10 h-12 rounded-lg bg-primary/10 shrink-0">
+                      <span className="text-[9px] font-bold uppercase text-primary">
+                        {new Date(rec.event_date).toLocaleString('default', { month: 'short' })}
+                      </span>
+                      <span className="text-sm font-bold text-primary">{new Date(rec.event_date).getDate()}</span>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-foreground truncate">{rec.event_name}</p>
+                      <p className="text-xs text-muted-foreground">{rec.club_name}</p>
+                    </div>
+                    <Badge variant="outline" className="shrink-0 text-[10px] bg-success/15 text-success border-success/20">✓ Present</Badge>
+                  </div>
+                )) : (
+                  <p className="text-sm text-muted-foreground italic text-center py-6">No events attended yet</p>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
+        </>
       )}
     </div>
   );
