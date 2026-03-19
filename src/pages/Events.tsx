@@ -253,6 +253,7 @@ const Events = () => {
                 <p><strong>End:</strong> {new Date(selectedEvent.end_date).toLocaleString()}</p>
               )}
               <p><strong>Attendees:</strong> {attendanceCounts[selectedEvent.id] || 0}</p>
+              <p><strong>Attendance:</strong> {selectedEvent.attendance_given ? '✓ Will be given' : '✗ Not given'}</p>
               {selectedEvent.description && <p><strong>Description:</strong> {selectedEvent.description}</p>}
             </div>
           )}
