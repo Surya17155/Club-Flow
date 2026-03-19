@@ -291,8 +291,8 @@ export function MobileDashboardView({
       <MobileBottomNav />
       <ClubDetailOverlay clubId={expandedClubId} onClose={() => setExpandedClubId(null)} />
       <AttendanceHistoryModal
-        open={attendanceHistoryOpen}
-        onClose={() => setAttendanceHistoryOpen(false)}
+        open={activeStatModal === 'attendance_history'}
+        onClose={() => setActiveStatModal(null)}
         records={attendanceRecords}
       />
     </div>
