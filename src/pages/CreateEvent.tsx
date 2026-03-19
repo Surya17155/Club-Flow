@@ -32,6 +32,7 @@ const CreateEvent = () => {
   const [description, setDescription] = useState('');
   const [openToAll, setOpenToAll] = useState(true);
   const [clubMembersOnly, setClubMembersOnly] = useState(false);
+  const [attendanceGiven, setAttendanceGiven] = useState<boolean | null>(null);
   const [capacity, setCapacity] = useState('');
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
   
