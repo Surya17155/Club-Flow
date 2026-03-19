@@ -60,6 +60,7 @@ const CreateEvent = () => {
     if (!startTime) { toast.error('Start time is required'); return false; }
     if (!endTime) { toast.error('End time is required'); return false; }
     if (startTime && endTime && startTime >= endTime) { toast.error('End time must be after start time'); return false; }
+    if (attendanceGiven === null) { toast.error('Please specify whether attendance will be given'); return false; }
     return true;
   };
 
