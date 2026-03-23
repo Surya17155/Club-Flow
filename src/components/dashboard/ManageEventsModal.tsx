@@ -254,6 +254,14 @@ const ManageEventsModal = ({ open, onOpenChange }: { open: boolean; onOpenChange
 
               {/* Action buttons */}
               <div className="flex flex-wrap gap-2 mb-4">
+                {selectedEvent.qr_token && (
+                  <button
+                    onClick={() => setQrViewOpen(true)}
+                    className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg font-medium transition-colors bg-primary text-primary-foreground hover:bg-primary/90"
+                  >
+                    <QrCode className="w-3.5 h-3.5" /> View QR Code
+                  </button>
+                )}
                 {attendees.length > 0 && (
                   <button
                     onClick={handleExport}
