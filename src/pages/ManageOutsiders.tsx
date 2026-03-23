@@ -43,6 +43,10 @@ const ManageOutsiders = () => {
   const [selectedOutsider, setSelectedOutsider] = useState<Outsider | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [editMode, setEditMode] = useState(false);
+  const [editData, setEditData] = useState({
+    fullName: '', programme: '', section: '', year: '', rollNo: '', phone: '',
+  });
 
   const [formData, setFormData] = useState({
     email: '',
