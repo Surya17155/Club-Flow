@@ -4,7 +4,8 @@ import { useClub } from '@/contexts/ClubContext';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Users, Clock, ChevronRight, ArrowLeft, Tag, Shield, Trash2, Download, UserPlus, MessageSquare } from 'lucide-react';
+import { Calendar, Users, Clock, ChevronRight, ArrowLeft, Tag, Shield, Trash2, Download, UserPlus, MessageSquare, QrCode, Share2 } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import { toast } from 'sonner';
 import { exportAttendanceXLSX } from '@/utils/exportAttendance';
 import ManualAttendanceModal from './ManualAttendanceModal';
@@ -35,6 +36,7 @@ interface ClubEvent {
   access_type: string;
   club_id: string;
   attendee_count: number;
+  qr_token: string | null;
 }
 
 const ManageEventsModal = ({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) => {
@@ -49,13 +51,14 @@ const ManageEventsModal = ({ open, onOpenChange }: { open: boolean; onOpenChange
   const [deleting, setDeleting] = useState(false);
   const [manualAttendanceOpen, setManualAttendanceOpen] = useState(false);
   const [feedbackStats, setFeedbackStats] = useState<{ avg: number; count: number } | null>(null);
+  const [qrViewOpen, setQrViewOpen] = useState(false);
 
   const fetchEvents = async () => {
     if (!activeClub) return;
     setLoading(true);
     const { data, error } = await supabase
       .from('events')
-      .select('id, name, event_date, end_date, description, event_type, category, access_type, club_id')
+      .select('id, name, event_date, end_date, description, event_type, category, access_type, club_id, qr_token')
       .eq('club_id', activeClub.club_id)
       .order('event_date', { ascending: false });
 
@@ -251,6 +254,14 @@ const ManageEventsModal = ({ open, onOpenChange }: { open: boolean; onOpenChange
 
               {/* Action buttons */}
               <div className="flex flex-wrap gap-2 mb-4">
+                {selectedEvent.qr_token && (
+                  <button
+                    onClick={() => setQrViewOpen(true)}
+                    className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg font-medium transition-colors bg-primary text-primary-foreground hover:bg-primary/90"
+                  >
+                    <QrCode className="w-3.5 h-3.5" /> View QR Code
+                  </button>
+                )}
                 {attendees.length > 0 && (
                   <button
                     onClick={handleExport}
@@ -328,6 +339,74 @@ const ManageEventsModal = ({ open, onOpenChange }: { open: boolean; onOpenChange
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* QR Code View Dialog */}
+      {selectedEvent?.qr_token && (
+        <Dialog open={qrViewOpen} onOpenChange={setQrViewOpen}>
+          <DialogContent className="sm:max-w-sm">
+            <DialogHeader>
+              <DialogTitle className="text-base font-bold text-center">QR Code — {selectedEvent.name}</DialogTitle>
+            </DialogHeader>
+            <div className="flex flex-col items-center gap-4 py-4">
+              <div className="bg-white p-4 rounded-xl shadow-sm" id="qr-code-container">
+                <QRCodeSVG
+                  value={`${window.location.origin}/mark-attendance/${selectedEvent.qr_token}`}
+                  size={220}
+                  level="H"
+                />
+              </div>
+              <p className="text-xs text-muted-foreground text-center max-w-[250px]">
+                Scan this QR code to mark attendance for this event
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    const svg = document.querySelector('#qr-code-container svg');
+                    if (!svg) return;
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const svgData = new XMLSerializer().serializeToString(svg);
+                    const img = new Image();
+                    img.onload = () => {
+                      canvas.width = img.width * 2;
+                      canvas.height = img.height * 2;
+                      ctx!.fillStyle = 'white';
+                      ctx!.fillRect(0, 0, canvas.width, canvas.height);
+                      ctx!.drawImage(img, 0, 0, canvas.width, canvas.height);
+                      const a = document.createElement('a');
+                      a.download = `${selectedEvent.name}-QR.png`;
+                      a.href = canvas.toDataURL('image/png');
+                      a.click();
+                      toast.success('QR code downloaded!');
+                    };
+                    img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+                  }}
+                  className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg font-medium transition-colors gradient-gold text-primary-foreground shadow-gold"
+                >
+                  <Download className="w-3.5 h-3.5" /> Download
+                </button>
+                <button
+                  onClick={async () => {
+                    const url = `${window.location.origin}/mark-attendance/${selectedEvent.qr_token}`;
+                    if (navigator.share) {
+                      try {
+                        await navigator.share({ title: `${selectedEvent.name} - Attendance QR`, url });
+                        toast.success('Shared successfully!');
+                      } catch { /* user cancelled */ }
+                    } else {
+                      await navigator.clipboard.writeText(url);
+                      toast.success('Attendance link copied!');
+                    }
+                  }}
+                  className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg font-medium transition-colors bg-accent hover:bg-accent/80 text-accent-foreground"
+                >
+                  <Share2 className="w-3.5 h-3.5" /> Share
+                </button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
 
       {selectedEvent && (
         <ManualAttendanceModal
