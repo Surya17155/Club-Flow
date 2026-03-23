@@ -111,6 +111,12 @@ const ProfileDropdown = ({ viewMode = 'personal' }: { viewMode?: 'personal' | 'c
               </>
             )}
 
+            {isSuperAdminEmail && isSuperAdminMode && (
+              <DropdownMenuItem onClick={() => navigate('/manage-outsiders')}>
+                <Users className="mr-2 h-4 w-4 text-primary" /> Manage Outsiders
+              </DropdownMenuItem>
+            )}
+
             {isSuperAdminEmail && (
               <DropdownMenuItem
                 onSelect={(e) => e.preventDefault()}

@@ -58,6 +58,7 @@ const App = () => (
               <Route path="/calendar" element={<MobileCalendar />} />
               <Route path="/chat" element={<MobileChat />} />
               <Route path="/scan" element={<Events />} />
+              <Route path="/manage-outsiders" element={<ManageOutsiders />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
