@@ -263,12 +263,12 @@ const ManageOutsiders = () => {
       </div>
 
       {/* Detail Dialog */}
-      <Dialog open={!!selectedOutsider} onOpenChange={(v) => !v && setSelectedOutsider(null)}>
+      <Dialog open={!!selectedOutsider} onOpenChange={(v) => { if (!v) { setSelectedOutsider(null); setEditMode(false); } }}>
         <DialogContent className="max-w-md max-h-[85vh] overflow-auto">
           <DialogHeader>
             <DialogTitle className="text-lg font-display">Outsider Profile</DialogTitle>
           </DialogHeader>
-          {selectedOutsider && (
+          {selectedOutsider && !editMode && (
             <div className="space-y-4">
               <div className="flex items-center gap-3">
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
@@ -350,21 +350,80 @@ const ManageOutsiders = () => {
                 Added on {new Date(selectedOutsider.created_at).toLocaleDateString()}
               </p>
 
-              <Button
-                variant="destructive"
-                className="w-full"
-                onClick={() => handleDelete(selectedOutsider.id)}
-                disabled={deleting === selectedOutsider.id}
-              >
-                {deleting === selectedOutsider.id ? (
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                ) : (
-                  <>
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Remove Outsider
-                  </>
-                )}
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => startEdit(selectedOutsider)}
+                >
+                  <Pencil className="w-4 h-4 mr-2" />
+                  Edit Details
+                </Button>
+                <Button
+                  variant="destructive"
+                  className="flex-1"
+                  onClick={() => handleDelete(selectedOutsider.id)}
+                  disabled={deleting === selectedOutsider.id}
+                >
+                  {deleting === selectedOutsider.id ? (
+                    <div className="w-4 h-4 border-2 border-destructive-foreground/30 border-t-destructive-foreground rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Remove
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {selectedOutsider && editMode && (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Full Name</Label>
+                <Input value={editData.fullName} onChange={e => setEditData(p => ({ ...p, fullName: e.target.value }))} />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label>Programme</Label>
+                  <Select value={editData.programme} onValueChange={v => setEditData(p => ({ ...p, programme: v }))}>
+                    <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                    <SelectContent>
+                      {PROGRAMMES.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Year</Label>
+                  <Select value={editData.year} onValueChange={v => setEditData(p => ({ ...p, year: v }))}>
+                    <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                    <SelectContent>
+                      {YEARS.map(y => <SelectItem key={y} value={y}>{y}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label>Section</Label>
+                  <Input value={editData.section} onChange={e => setEditData(p => ({ ...p, section: e.target.value }))} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Roll No</Label>
+                  <Input value={editData.rollNo} onChange={e => setEditData(p => ({ ...p, rollNo: e.target.value }))} />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Phone</Label>
+                <Input value={editData.phone} onChange={e => setEditData(p => ({ ...p, phone: e.target.value }))} />
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" className="flex-1" onClick={() => setEditMode(false)}>Cancel</Button>
+                <Button className="flex-1 gradient-gold text-primary-foreground" onClick={handleUpdate} disabled={submitting}>
+                  {submitting ? <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" /> : 'Save Changes'}
+                </Button>
+              </div>
             </div>
           )}
         </DialogContent>
