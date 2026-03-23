@@ -65,9 +65,8 @@ export const useDelegatedPowers = (overrideClubId?: string) => {
   };
 
   const hasPower = (power: string): boolean => {
-    if (!user || !activeClub) return false;
-    // Presidents and admins always have all powers
-    if (activeClub.role === 'admin' || activeClub.role === 'president') return true;
+    if (!user || !effectiveClubId) return false;
+    if (activeClub?.role === 'admin' || activeClub?.role === 'president') return true;
     return powers.some(p => p.user_id === user.id && p.power === power);
   };
 
