@@ -25,11 +25,13 @@ const roleLabelMap: Record<string, string> = {
 interface AssignPowersModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  clubId?: string;
 }
 
-const AssignPowersModal = ({ open, onOpenChange }: AssignPowersModalProps) => {
+const AssignPowersModal = ({ open, onOpenChange, clubId }: AssignPowersModalProps) => {
   const { activeClub } = useClub();
-  const { powers, grantPower, revokePower, loading: powersLoading } = useDelegatedPowers();
+  const effectiveClubId = clubId || activeClub?.club_id;
+  const { powers, grantPower, revokePower, loading: powersLoading } = useDelegatedPowers(effectiveClubId);
   const [members, setMembers] = useState<ClubMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [toggling, setToggling] = useState<string | null>(null);
