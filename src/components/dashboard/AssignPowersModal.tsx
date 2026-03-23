@@ -56,7 +56,7 @@ const AssignPowersModal = ({ open, onOpenChange, clubId }: AssignPowersModalProp
       setLoading(false);
     };
     fetchMembers();
-  }, [open, activeClub?.club_id]);
+  }, [open, effectiveClubId]);
 
   const hasPower = (userId: string, power: string) =>
     powers.some(p => p.user_id === userId && p.power === power);
