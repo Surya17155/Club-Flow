@@ -170,31 +170,56 @@ const MemberManagement = ({ clubId }: Props) => {
 
   const fetchMembers = async () => {
     setLoading(true);
-    const { data } = await supabase
+    const { data: memberRows, error: memberError } = await supabase
       .from('club_members')
-      .select('id, user_id, role, joined_at, profiles(full_name, email, programme, roll_no, avatar_url, phone, year, section, about, social_linkedin, social_instagram, social_gmail)')
-      .eq('club_id', clubId);
+      .select('id, user_id, role, joined_at')
+      .eq('club_id', clubId)
+      .order('joined_at', { ascending: true });
 
-    if (data) {
-      setMembers((data as any[]).map(m => ({
-        id: m.id,
-        user_id: m.user_id,
-        role: m.role,
-        joined_at: m.joined_at,
-        full_name: m.profiles?.full_name ?? 'Unknown',
-        email: m.profiles?.email ?? null,
-        programme: m.profiles?.programme ?? null,
-        roll_no: m.profiles?.roll_no ?? null,
-        avatar_url: m.profiles?.avatar_url ?? null,
-        phone: m.profiles?.phone ?? null,
-        year: m.profiles?.year ?? null,
-        section: m.profiles?.section ?? null,
-        about: m.profiles?.about ?? null,
-        social_linkedin: m.profiles?.social_linkedin ?? null,
-        social_instagram: m.profiles?.social_instagram ?? null,
-        social_gmail: m.profiles?.social_gmail ?? null,
-      })));
+    if (memberError) {
+      toast.error('Failed to load members');
+      setMembers([]);
+      setLoading(false);
+      return;
     }
+
+    const userIds = (memberRows ?? []).map((member) => member.user_id);
+    let profilesByUserId = new Map<string, any>();
+
+    if (userIds.length > 0) {
+      const { data: profileRows, error: profileError } = await supabase
+        .from('profiles')
+        .select('user_id, full_name, email, programme, roll_no, avatar_url, phone, year, section, about, social_linkedin, social_instagram, social_gmail')
+        .in('user_id', userIds);
+
+      if (profileError) {
+        toast.error('Failed to load member details');
+      } else {
+        profilesByUserId = new Map((profileRows ?? []).map((profile) => [profile.user_id, profile]));
+      }
+    }
+
+    setMembers((memberRows ?? []).map((member) => {
+      const profile = profilesByUserId.get(member.user_id);
+      return {
+        id: member.id,
+        user_id: member.user_id,
+        role: member.role,
+        joined_at: member.joined_at,
+        full_name: profile?.full_name ?? 'Unknown',
+        email: profile?.email ?? null,
+        programme: profile?.programme ?? null,
+        roll_no: profile?.roll_no ?? null,
+        avatar_url: profile?.avatar_url ?? null,
+        phone: profile?.phone ?? null,
+        year: profile?.year ?? null,
+        section: profile?.section ?? null,
+        about: profile?.about ?? null,
+        social_linkedin: profile?.social_linkedin ?? null,
+        social_instagram: profile?.social_instagram ?? null,
+        social_gmail: profile?.social_gmail ?? null,
+      };
+    }));
     setLoading(false);
   };
 
