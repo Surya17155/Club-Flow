@@ -36,6 +36,7 @@ interface ClubEvent {
   access_type: string;
   club_id: string;
   attendee_count: number;
+  qr_token: string | null;
 }
 
 const ManageEventsModal = ({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) => {
