@@ -97,16 +97,18 @@ const MarkAttendance = () => {
         });
 
       if (insertError) {
+        console.error('Attendance insert error:', insertError);
         setStatus('error');
-        setMessage('Failed to mark attendance. Please try again.');
+        setMessage(`Failed to mark attendance: ${insertError.message}`);
         return;
       }
 
       setStatus('success');
       setMessage(`Attendance marked for "${event.name}"!`);
-    } catch (err) {
+    } catch (err: any) {
+      console.error('Attendance catch error:', err);
       setStatus('error');
-      setMessage('Something went wrong. Please try again.');
+      setMessage(`Something went wrong: ${err?.message || 'Unknown error'}`);
     }
   };
 
