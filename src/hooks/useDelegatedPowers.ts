@@ -53,11 +53,11 @@ export const useDelegatedPowers = (overrideClubId?: string) => {
   };
 
   const revokePower = async (userId: string, power: string) => {
-    if (!activeClub) return;
+    if (!effectiveClubId) return;
     const { error } = await supabase
       .from('delegated_powers')
       .delete()
-      .eq('club_id', activeClub.club_id)
+      .eq('club_id', effectiveClubId)
       .eq('user_id', userId)
       .eq('power', power);
     if (!error) await fetchPowers();
