@@ -40,18 +40,32 @@ const AssignPowersModal = ({ open, onOpenChange, clubId }: AssignPowersModalProp
     if (!open || !effectiveClubId) return;
     const fetchMembers = async () => {
       setLoading(true);
-      const { data, error } = await supabase
+      const { data: memberRows, error: memberError } = await supabase
         .from('club_members')
-        .select('user_id, role, profiles(full_name)')
+        .select('user_id, role')
         .eq('club_id', effectiveClubId)
         .neq('role', 'president');
 
-      if (!error && data) {
-        setMembers(data.map((m: any) => ({
-          user_id: m.user_id,
-          role: m.role,
-          full_name: m.profiles?.full_name ?? 'Unknown',
+      if (!memberError && memberRows) {
+        const userIds = memberRows.map((member) => member.user_id);
+        let profileMap = new Map<string, { full_name: string | null }>();
+
+        if (userIds.length > 0) {
+          const { data: profileRows } = await supabase
+            .from('profiles')
+            .select('user_id, full_name')
+            .in('user_id', userIds);
+
+          profileMap = new Map((profileRows ?? []).map((profile) => [profile.user_id, profile]));
+        }
+
+        setMembers(memberRows.map((member) => ({
+          user_id: member.user_id,
+          role: member.role,
+          full_name: profileMap.get(member.user_id)?.full_name ?? 'Unknown',
         })));
+      } else {
+        setMembers([]);
       }
       setLoading(false);
     };
