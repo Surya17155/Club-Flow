@@ -41,9 +41,9 @@ export const useDelegatedPowers = (overrideClubId?: string) => {
   useEffect(() => { fetchPowers(); }, [fetchPowers]);
 
   const grantPower = async (userId: string, power: string) => {
-    if (!activeClub || !user) return;
+    if (!effectiveClubId || !user) return;
     const { error } = await supabase.from('delegated_powers').insert({
-      club_id: activeClub.club_id,
+      club_id: effectiveClubId,
       user_id: userId,
       power,
       granted_by: user.id,
