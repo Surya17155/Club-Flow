@@ -5,7 +5,7 @@ import { useClub } from '@/contexts/ClubContext';
 import { useProfile } from '@/hooks/useProfile';
 import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { ChevronDown, User, Settings, LogOut, ArrowRightLeft, Check, ChevronRight, Shield, Crown, Settings2, Bot } from 'lucide-react';
+import { ChevronDown, User, Settings, LogOut, ArrowRightLeft, Check, ChevronRight, Shield, Crown, Settings2, Bot, Users } from 'lucide-react';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -109,6 +109,12 @@ const ProfileDropdown = ({ viewMode = 'personal' }: { viewMode?: 'personal' | 'c
                   <Settings2 className="mr-2 h-4 w-4" /> Club Settings
                 </DropdownMenuItem>
               </>
+            )}
+
+            {isSuperAdminEmail && isSuperAdminMode && (
+              <DropdownMenuItem onClick={() => navigate('/manage-outsiders')}>
+                <Users className="mr-2 h-4 w-4 text-primary" /> Manage Outsiders
+              </DropdownMenuItem>
             )}
 
             {isSuperAdminEmail && (

@@ -23,6 +23,7 @@ import GlobalReports from "./pages/GlobalReports";
 import DiscoverClubs from "./pages/DiscoverClubs";
 import MobileCalendar from "./pages/MobileCalendar";
 import MobileChat from "./pages/MobileChat";
+import ManageOutsiders from "./pages/ManageOutsiders";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -57,6 +58,7 @@ const App = () => (
               <Route path="/calendar" element={<MobileCalendar />} />
               <Route path="/chat" element={<MobileChat />} />
               <Route path="/scan" element={<Events />} />
+              <Route path="/manage-outsiders" element={<ManageOutsiders />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
