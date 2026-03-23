@@ -137,6 +137,47 @@ const ManageOutsiders = () => {
     }
   };
 
+  const handleUpdate = async () => {
+    if (!selectedOutsider) return;
+    setSubmitting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('manage-outsider', {
+        body: {
+          action: 'update',
+          user_id: selectedOutsider.id,
+          full_name: editData.fullName,
+          programme: editData.programme,
+          section: editData.section,
+          year: editData.year,
+          roll_no: editData.rollNo,
+          phone: editData.phone,
+        },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast({ title: 'Updated!', description: 'Outsider details have been updated.' });
+      setEditMode(false);
+      setSelectedOutsider(null);
+      fetchOutsiders();
+    } catch (err: any) {
+      toast({ title: 'Failed to update', description: err.message, variant: 'destructive' });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const startEdit = (outsider: Outsider) => {
+    setEditData({
+      fullName: outsider.full_name,
+      programme: outsider.programme,
+      section: outsider.section,
+      year: outsider.year,
+      rollNo: outsider.roll_no,
+      phone: outsider.phone,
+    });
+    setEditMode(true);
+  };
+
   const roleLabelMap: Record<string, string> = {
     admin: 'Admin',
     president: 'President',
