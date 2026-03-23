@@ -23,6 +23,7 @@ import GlobalReports from "./pages/GlobalReports";
 import DiscoverClubs from "./pages/DiscoverClubs";
 import MobileCalendar from "./pages/MobileCalendar";
 import MobileChat from "./pages/MobileChat";
+import ManageOutsiders from "./pages/ManageOutsiders";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
