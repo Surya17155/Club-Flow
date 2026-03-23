@@ -97,8 +97,9 @@ const MarkAttendance = () => {
         });
 
       if (insertError) {
+        console.error('Attendance insert error:', insertError);
         setStatus('error');
-        setMessage('Failed to mark attendance. Please try again.');
+        setMessage(`Failed to mark attendance: ${insertError.message}`);
         return;
       }
 
