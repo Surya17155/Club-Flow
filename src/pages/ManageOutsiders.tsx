@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Plus, Trash2, User, Mail, Phone, GraduationCap, Building2, ChevronRight, X, UserPlus } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, User, Mail, Phone, GraduationCap, Building2, ChevronRight, X, UserPlus, Pencil } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const PROGRAMMES = ['B.Tech (CS)', 'B.Tech (IT)', 'BBA', 'MBA', 'B.Com', 'BA (Hons)', 'BCA', 'MCA'];
