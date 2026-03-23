@@ -37,13 +37,13 @@ const AssignPowersModal = ({ open, onOpenChange, clubId }: AssignPowersModalProp
   const [toggling, setToggling] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!open || !activeClub) return;
+    if (!open || !effectiveClubId) return;
     const fetchMembers = async () => {
       setLoading(true);
       const { data, error } = await supabase
         .from('club_members')
         .select('user_id, role, profiles(full_name)')
-        .eq('club_id', activeClub.club_id)
+        .eq('club_id', effectiveClubId)
         .neq('role', 'president');
 
       if (!error && data) {
