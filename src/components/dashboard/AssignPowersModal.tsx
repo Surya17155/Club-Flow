@@ -87,7 +87,7 @@ const AssignPowersModal = ({ open, onOpenChange, clubId }: AssignPowersModalProp
             Assign Powers
           </DialogTitle>
           <p className="text-xs text-muted-foreground mt-1">
-            Delegate specific abilities to club post holders for <span className="font-medium text-foreground">{activeClub?.club_name}</span>
+            Delegate specific abilities to club post holders
           </p>
         </DialogHeader>
 

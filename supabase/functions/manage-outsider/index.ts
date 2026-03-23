@@ -112,6 +112,38 @@ Deno.serve(async (req) => {
       const body = await req.json();
       const action = body.action;
 
+      if (action === "update") {
+        const { user_id, full_name, programme, section, year, roll_no, phone } = body;
+        if (!user_id) {
+          return new Response(JSON.stringify({ error: "Missing user_id" }), {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+        const updates: Record<string, string> = {};
+        if (full_name !== undefined) updates.full_name = full_name;
+        if (programme !== undefined) updates.programme = programme;
+        if (section !== undefined) updates.section = section;
+        if (year !== undefined) updates.year = year;
+        if (roll_no !== undefined) updates.roll_no = roll_no;
+        if (phone !== undefined) updates.phone = phone;
+
+        const { error: updateError } = await adminClient
+          .from("profiles")
+          .update(updates)
+          .eq("user_id", user_id);
+        if (updateError) {
+          return new Response(JSON.stringify({ error: updateError.message }), {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+        return new Response(JSON.stringify({ success: true, action: "updated" }), {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
       if (action === "delete") {
         const { user_id } = body;
         if (!user_id) {
