@@ -58,7 +58,7 @@ const ManageEventsModal = ({ open, onOpenChange }: { open: boolean; onOpenChange
     setLoading(true);
     const { data, error } = await supabase
       .from('events')
-      .select('id, name, event_date, end_date, description, event_type, category, access_type, club_id')
+      .select('id, name, event_date, end_date, description, event_type, category, access_type, club_id, qr_token')
       .eq('club_id', activeClub.club_id)
       .order('event_date', { ascending: false });
 
