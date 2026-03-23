@@ -1,12 +1,99 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, XCircle, GraduationCap, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { motion } from 'framer-motion';
+
+// Animated green checkmark
+const AnimatedCheck = () => (
+  <svg width="80" height="80" viewBox="0 0 80 80" fill="none" className="mx-auto">
+    <motion.circle
+      cx="40" cy="40" r="36"
+      stroke="hsl(var(--success, 142 71% 45%))"
+      strokeWidth="3"
+      fill="none"
+      initial={{ pathLength: 0, opacity: 0 }}
+      animate={{ pathLength: 1, opacity: 1 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+    />
+    <motion.path
+      d="M24 42 L34 52 L56 30"
+      stroke="hsl(var(--success, 142 71% 45%))"
+      strokeWidth="4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+      initial={{ pathLength: 0, opacity: 0 }}
+      animate={{ pathLength: 1, opacity: 1 }}
+      transition={{ duration: 0.4, delay: 0.4, ease: "easeOut" }}
+    />
+  </svg>
+);
+
+// Animated red cross
+const AnimatedCross = ({ color = "hsl(var(--destructive))" }: { color?: string }) => (
+  <svg width="80" height="80" viewBox="0 0 80 80" fill="none" className="mx-auto">
+    <motion.circle
+      cx="40" cy="40" r="36"
+      stroke={color}
+      strokeWidth="3"
+      fill="none"
+      initial={{ pathLength: 0, opacity: 0 }}
+      animate={{ pathLength: 1, opacity: 1 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+    />
+    <motion.path
+      d="M28 28 L52 52"
+      stroke={color}
+      strokeWidth="4"
+      strokeLinecap="round"
+      fill="none"
+      initial={{ pathLength: 0, opacity: 0 }}
+      animate={{ pathLength: 1, opacity: 1 }}
+      transition={{ duration: 0.3, delay: 0.4, ease: "easeOut" }}
+    />
+    <motion.path
+      d="M52 28 L28 52"
+      stroke={color}
+      strokeWidth="4"
+      strokeLinecap="round"
+      fill="none"
+      initial={{ pathLength: 0, opacity: 0 }}
+      animate={{ pathLength: 1, opacity: 1 }}
+      transition={{ duration: 0.3, delay: 0.55, ease: "easeOut" }}
+    />
+  </svg>
+);
+
+// Animated blue checkmark (already recorded)
+const AnimatedBlueCheck = () => (
+  <svg width="80" height="80" viewBox="0 0 80 80" fill="none" className="mx-auto">
+    <motion.circle
+      cx="40" cy="40" r="36"
+      stroke="hsl(217 91% 60%)"
+      strokeWidth="3"
+      fill="none"
+      initial={{ pathLength: 0, opacity: 0 }}
+      animate={{ pathLength: 1, opacity: 1 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+    />
+    <motion.path
+      d="M24 42 L34 52 L56 30"
+      stroke="hsl(217 91% 60%)"
+      strokeWidth="4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+      initial={{ pathLength: 0, opacity: 0 }}
+      animate={{ pathLength: 1, opacity: 1 }}
+      transition={{ duration: 0.4, delay: 0.4, ease: "easeOut" }}
+    />
+  </svg>
+);
 
 const MarkAttendance = () => {
   const { token } = useParams<{ token: string }>();
@@ -15,23 +102,26 @@ const MarkAttendance = () => {
   const { toast } = useToast();
   const [status, setStatus] = useState<'loading' | 'success' | 'error' | 'expired' | 'already'>('loading');
   const [message, setMessage] = useState('');
+  const hasRun = useRef(false);
 
   useEffect(() => {
     if (authLoading) return;
 
     if (!user) {
-      // Redirect to login, preserve the return URL
       toast({ title: 'Please log in first', description: 'You need to be logged in to mark attendance.' });
       navigate(`/?redirect=/mark-attendance/${token}`);
       return;
     }
+
+    // Guard against double execution (React strict mode / auth re-renders)
+    if (hasRun.current) return;
+    hasRun.current = true;
 
     markAttendance();
   }, [user, authLoading, token]);
 
   const markAttendance = async () => {
     try {
-      // Find event by QR token
       const { data: event, error: eventError } = await supabase
         .from('events')
         .select('*')
@@ -87,7 +177,7 @@ const MarkAttendance = () => {
         return;
       }
 
-      // Mark attendance
+      // Mark attendance — handle duplicate constraint gracefully
       const { error: insertError } = await supabase
         .from('attendance')
         .insert({
@@ -97,6 +187,12 @@ const MarkAttendance = () => {
         });
 
       if (insertError) {
+        // If it's a duplicate key error, treat as "already marked"
+        if (insertError.message.includes('duplicate') || insertError.code === '23505') {
+          setStatus('already');
+          setMessage('Your attendance has already been recorded for this event.');
+          return;
+        }
         console.error('Attendance insert error:', insertError);
         setStatus('error');
         setMessage(`Failed to mark attendance: ${insertError.message}`);
@@ -114,10 +210,10 @@ const MarkAttendance = () => {
 
   const iconMap = {
     loading: <Loader2 className="w-16 h-16 text-primary animate-spin" />,
-    success: <CheckCircle className="w-16 h-16 text-success" />,
-    error: <XCircle className="w-16 h-16 text-destructive" />,
-    expired: <XCircle className="w-16 h-16 text-warning" />,
-    already: <CheckCircle className="w-16 h-16 text-info" />,
+    success: <AnimatedCheck />,
+    error: <AnimatedCross />,
+    expired: <AnimatedCross color="hsl(38 92% 50%)" />,
+    already: <AnimatedBlueCheck />,
   };
 
   const titleMap = {
