@@ -25,23 +25,25 @@ const roleLabelMap: Record<string, string> = {
 interface AssignPowersModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  clubId?: string;
 }
 
-const AssignPowersModal = ({ open, onOpenChange }: AssignPowersModalProps) => {
+const AssignPowersModal = ({ open, onOpenChange, clubId }: AssignPowersModalProps) => {
   const { activeClub } = useClub();
-  const { powers, grantPower, revokePower, loading: powersLoading } = useDelegatedPowers();
+  const effectiveClubId = clubId || activeClub?.club_id;
+  const { powers, grantPower, revokePower, loading: powersLoading } = useDelegatedPowers(effectiveClubId);
   const [members, setMembers] = useState<ClubMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [toggling, setToggling] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!open || !activeClub) return;
+    if (!open || !effectiveClubId) return;
     const fetchMembers = async () => {
       setLoading(true);
       const { data, error } = await supabase
         .from('club_members')
         .select('user_id, role, profiles(full_name)')
-        .eq('club_id', activeClub.club_id)
+        .eq('club_id', effectiveClubId)
         .neq('role', 'president');
 
       if (!error && data) {
@@ -54,7 +56,7 @@ const AssignPowersModal = ({ open, onOpenChange }: AssignPowersModalProps) => {
       setLoading(false);
     };
     fetchMembers();
-  }, [open, activeClub?.club_id]);
+  }, [open, effectiveClubId]);
 
   const hasPower = (userId: string, power: string) =>
     powers.some(p => p.user_id === userId && p.power === power);
@@ -85,7 +87,7 @@ const AssignPowersModal = ({ open, onOpenChange }: AssignPowersModalProps) => {
             Assign Powers
           </DialogTitle>
           <p className="text-xs text-muted-foreground mt-1">
-            Delegate specific abilities to club post holders for <span className="font-medium text-foreground">{activeClub?.club_name}</span>
+            Delegate specific abilities to club post holders
           </p>
         </DialogHeader>
 

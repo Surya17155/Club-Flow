@@ -20,29 +20,30 @@ export const AVAILABLE_POWERS = [
 
 export type PowerKey = typeof AVAILABLE_POWERS[number]['key'];
 
-export const useDelegatedPowers = () => {
+export const useDelegatedPowers = (overrideClubId?: string) => {
   const { user } = useAuth();
   const { activeClub } = useClub();
+  const effectiveClubId = overrideClubId || activeClub?.club_id;
   const [powers, setPowers] = useState<DelegatedPower[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchPowers = useCallback(async () => {
-    if (!user || !activeClub) { setPowers([]); setLoading(false); return; }
+    if (!user || !effectiveClubId) { setPowers([]); setLoading(false); return; }
     setLoading(true);
     const { data, error } = await supabase
       .from('delegated_powers')
       .select('*')
-      .eq('club_id', activeClub.club_id);
+      .eq('club_id', effectiveClubId);
     if (!error && data) setPowers(data as DelegatedPower[]);
     setLoading(false);
-  }, [user?.id, activeClub?.club_id]);
+  }, [user?.id, effectiveClubId]);
 
   useEffect(() => { fetchPowers(); }, [fetchPowers]);
 
   const grantPower = async (userId: string, power: string) => {
-    if (!activeClub || !user) return;
+    if (!effectiveClubId || !user) return;
     const { error } = await supabase.from('delegated_powers').insert({
-      club_id: activeClub.club_id,
+      club_id: effectiveClubId,
       user_id: userId,
       power,
       granted_by: user.id,
@@ -52,11 +53,11 @@ export const useDelegatedPowers = () => {
   };
 
   const revokePower = async (userId: string, power: string) => {
-    if (!activeClub) return;
+    if (!effectiveClubId) return;
     const { error } = await supabase
       .from('delegated_powers')
       .delete()
-      .eq('club_id', activeClub.club_id)
+      .eq('club_id', effectiveClubId)
       .eq('user_id', userId)
       .eq('power', power);
     if (!error) await fetchPowers();
@@ -64,9 +65,8 @@ export const useDelegatedPowers = () => {
   };
 
   const hasPower = (power: string): boolean => {
-    if (!user || !activeClub) return false;
-    // Presidents and admins always have all powers
-    if (activeClub.role === 'admin' || activeClub.role === 'president') return true;
+    if (!user || !effectiveClubId) return false;
+    if (activeClub?.role === 'admin' || activeClub?.role === 'president') return true;
     return powers.some(p => p.user_id === user.id && p.power === power);
   };
 

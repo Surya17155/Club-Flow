@@ -218,7 +218,7 @@ const Events = () => {
                           <MessageSquare className="w-3.5 h-3.5" />
                         </Button>
                       )}
-                      {event.qr_token && (
+                      {canManageEvents && event.qr_token && (
                         <Button variant="outline" size="sm" onClick={() => { setSelectedEvent(event); setQrDialogOpen(true); }}>
                           <QrCode className="w-3.5 h-3.5" />
                         </Button>
