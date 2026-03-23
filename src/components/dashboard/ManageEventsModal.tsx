@@ -340,6 +340,74 @@ const ManageEventsModal = ({ open, onOpenChange }: { open: boolean; onOpenChange
         </AlertDialogContent>
       </AlertDialog>
 
+      {/* QR Code View Dialog */}
+      {selectedEvent?.qr_token && (
+        <Dialog open={qrViewOpen} onOpenChange={setQrViewOpen}>
+          <DialogContent className="sm:max-w-sm">
+            <DialogHeader>
+              <DialogTitle className="text-base font-bold text-center">QR Code — {selectedEvent.name}</DialogTitle>
+            </DialogHeader>
+            <div className="flex flex-col items-center gap-4 py-4">
+              <div className="bg-white p-4 rounded-xl shadow-sm" id="qr-code-container">
+                <QRCodeSVG
+                  value={`${window.location.origin}/mark-attendance/${selectedEvent.qr_token}`}
+                  size={220}
+                  level="H"
+                />
+              </div>
+              <p className="text-xs text-muted-foreground text-center max-w-[250px]">
+                Scan this QR code to mark attendance for this event
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    const svg = document.querySelector('#qr-code-container svg');
+                    if (!svg) return;
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const svgData = new XMLSerializer().serializeToString(svg);
+                    const img = new Image();
+                    img.onload = () => {
+                      canvas.width = img.width * 2;
+                      canvas.height = img.height * 2;
+                      ctx!.fillStyle = 'white';
+                      ctx!.fillRect(0, 0, canvas.width, canvas.height);
+                      ctx!.drawImage(img, 0, 0, canvas.width, canvas.height);
+                      const a = document.createElement('a');
+                      a.download = `${selectedEvent.name}-QR.png`;
+                      a.href = canvas.toDataURL('image/png');
+                      a.click();
+                      toast.success('QR code downloaded!');
+                    };
+                    img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+                  }}
+                  className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg font-medium transition-colors gradient-gold text-primary-foreground shadow-gold"
+                >
+                  <Download className="w-3.5 h-3.5" /> Download
+                </button>
+                <button
+                  onClick={async () => {
+                    const url = `${window.location.origin}/mark-attendance/${selectedEvent.qr_token}`;
+                    if (navigator.share) {
+                      try {
+                        await navigator.share({ title: `${selectedEvent.name} - Attendance QR`, url });
+                        toast.success('Shared successfully!');
+                      } catch { /* user cancelled */ }
+                    } else {
+                      await navigator.clipboard.writeText(url);
+                      toast.success('Attendance link copied!');
+                    }
+                  }}
+                  className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg font-medium transition-colors bg-accent hover:bg-accent/80 text-accent-foreground"
+                >
+                  <Share2 className="w-3.5 h-3.5" /> Share
+                </button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
       {selectedEvent && (
         <ManualAttendanceModal
           open={manualAttendanceOpen}
