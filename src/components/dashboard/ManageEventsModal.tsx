@@ -51,6 +51,7 @@ const ManageEventsModal = ({ open, onOpenChange }: { open: boolean; onOpenChange
   const [deleting, setDeleting] = useState(false);
   const [manualAttendanceOpen, setManualAttendanceOpen] = useState(false);
   const [feedbackStats, setFeedbackStats] = useState<{ avg: number; count: number } | null>(null);
+  const [qrViewOpen, setQrViewOpen] = useState(false);
 
   const fetchEvents = async () => {
     if (!activeClub) return;
