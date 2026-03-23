@@ -20,22 +20,23 @@ export const AVAILABLE_POWERS = [
 
 export type PowerKey = typeof AVAILABLE_POWERS[number]['key'];
 
-export const useDelegatedPowers = () => {
+export const useDelegatedPowers = (overrideClubId?: string) => {
   const { user } = useAuth();
   const { activeClub } = useClub();
+  const effectiveClubId = overrideClubId || activeClub?.club_id;
   const [powers, setPowers] = useState<DelegatedPower[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchPowers = useCallback(async () => {
-    if (!user || !activeClub) { setPowers([]); setLoading(false); return; }
+    if (!user || !effectiveClubId) { setPowers([]); setLoading(false); return; }
     setLoading(true);
     const { data, error } = await supabase
       .from('delegated_powers')
       .select('*')
-      .eq('club_id', activeClub.club_id);
+      .eq('club_id', effectiveClubId);
     if (!error && data) setPowers(data as DelegatedPower[]);
     setLoading(false);
-  }, [user?.id, activeClub?.club_id]);
+  }, [user?.id, effectiveClubId]);
 
   useEffect(() => { fetchPowers(); }, [fetchPowers]);
 
