@@ -105,9 +105,10 @@ const MarkAttendance = () => {
 
       setStatus('success');
       setMessage(`Attendance marked for "${event.name}"!`);
-    } catch (err) {
+    } catch (err: any) {
+      console.error('Attendance catch error:', err);
       setStatus('error');
-      setMessage('Something went wrong. Please try again.');
+      setMessage(`Something went wrong: ${err?.message || 'Unknown error'}`);
     }
   };
 
