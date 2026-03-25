@@ -335,6 +335,14 @@ const SuperAdminDashboard = () => {
                 {selectedMember.semester && <><span className="text-muted-foreground">Semester:</span><span>{selectedMember.semester}</span></>}
                 {selectedMember.phone && <><span className="text-muted-foreground">Phone:</span><span>{selectedMember.phone}</span></>}
               </div>
+              <div className="flex gap-2 mt-2">
+                <button onClick={() => handleEditProfile(selectedMember)} className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors">
+                  <Pencil className="w-3.5 h-3.5" /> Edit Profile
+                </button>
+                <button onClick={() => { setSelectedRoleMember(selectedMember); setNewRole(selectedMember.role); setRoleDialogOpen(true); }} className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-accent text-accent-foreground text-sm font-medium hover:bg-accent/80 transition-colors">
+                  <Shield className="w-3.5 h-3.5" /> Change Role
+                </button>
+              </div>
             </div>
         }
         </DialogContent>
@@ -433,6 +441,51 @@ const SuperAdminDashboard = () => {
             className="w-full py-2.5 rounded-lg gradient-gold text-primary-foreground font-medium text-sm disabled:opacity-50">
             
               {creatingClub ? 'Creating Club & President...' : 'Create Club with President'}
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
+
+      {/* Edit Profile Dialog */}
+      <Dialog open={editProfileOpen} onOpenChange={setEditProfileOpen}>
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Member Profile</DialogTitle>
+            <DialogDescription>Update details for {selectedMember?.full_name}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div><Label>Full Name</Label><Input value={editProfileData.full_name} onChange={e => setEditProfileData(p => ({ ...p, full_name: e.target.value }))} className="mt-1" /></div>
+            <div><Label>Programme</Label><Input value={editProfileData.programme} onChange={e => setEditProfileData(p => ({ ...p, programme: e.target.value }))} className="mt-1" /></div>
+            <div className="grid grid-cols-2 gap-3">
+              <div><Label>Section</Label><Input value={editProfileData.section} onChange={e => setEditProfileData(p => ({ ...p, section: e.target.value }))} className="mt-1" /></div>
+              <div><Label>Year</Label><Input value={editProfileData.year} onChange={e => setEditProfileData(p => ({ ...p, year: e.target.value }))} className="mt-1" /></div>
+            </div>
+            <div><Label>Roll No</Label><Input value={editProfileData.roll_no} onChange={e => setEditProfileData(p => ({ ...p, roll_no: e.target.value }))} className="mt-1" /></div>
+            <div><Label>Phone</Label><Input value={editProfileData.phone} onChange={e => setEditProfileData(p => ({ ...p, phone: e.target.value }))} className="mt-1" /></div>
+            <button onClick={handleSaveProfile} disabled={savingProfile} className="w-full py-2.5 rounded-lg gradient-gold text-primary-foreground font-medium text-sm disabled:opacity-50">
+              {savingProfile ? 'Saving...' : 'Save Changes'}
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Club Dialog */}
+      <Dialog open={editClubOpen} onOpenChange={setEditClubOpen}>
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Club</DialogTitle>
+            <DialogDescription>Update club details</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div><Label>Name</Label><Input value={editClubData.name} onChange={e => setEditClubData(p => ({ ...p, name: e.target.value }))} className="mt-1" /></div>
+            <div><Label>Description</Label><Textarea value={editClubData.description} onChange={e => setEditClubData(p => ({ ...p, description: e.target.value }))} className="mt-1" rows={2} /></div>
+            <div><Label>About</Label><Textarea value={editClubData.about} onChange={e => setEditClubData(p => ({ ...p, about: e.target.value }))} className="mt-1" rows={2} /></div>
+            <div><Label>Category</Label><Input value={editClubData.category} onChange={e => setEditClubData(p => ({ ...p, category: e.target.value }))} className="mt-1" /></div>
+            <div><Label>Instagram</Label><Input value={editClubData.social_instagram} onChange={e => setEditClubData(p => ({ ...p, social_instagram: e.target.value }))} className="mt-1" placeholder="@handle or URL" /></div>
+            <div><Label>LinkedIn</Label><Input value={editClubData.social_linkedin} onChange={e => setEditClubData(p => ({ ...p, social_linkedin: e.target.value }))} className="mt-1" placeholder="company slug or URL" /></div>
+            <button onClick={handleSaveClub} disabled={savingClub || !editClubData.name.trim()} className="w-full py-2.5 rounded-lg gradient-gold text-primary-foreground font-medium text-sm disabled:opacity-50">
+              {savingClub ? 'Saving...' : 'Save Changes'}
             </button>
           </div>
         </DialogContent>
