@@ -6,6 +6,7 @@ import { useClub } from '@/contexts/ClubContext';
 import { useDelegatedPowers, AVAILABLE_POWERS } from '@/hooks/useDelegatedPowers';
 import { toast } from 'sonner';
 import { Shield, Loader2 } from 'lucide-react';
+import VerifiedBadge, { getRoleBadgeVariant } from '@/components/ui/VerifiedBadge';
 
 interface ClubMember {
   user_id: string;
@@ -117,7 +118,7 @@ const AssignPowersModal = ({ open, onOpenChange, clubId }: AssignPowersModalProp
               <div key={member.user_id} className="glass-input rounded-xl p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-semibold text-foreground">{member.full_name}</p>
+                    <p className="text-sm font-semibold text-foreground inline-flex items-center">{member.full_name}{getRoleBadgeVariant(member.role) && <VerifiedBadge variant={getRoleBadgeVariant(member.role)!} size={14} />}</p>
                     <p className="text-xs text-muted-foreground">{roleLabelMap[member.role] ?? member.role}</p>
                   </div>
                 </div>

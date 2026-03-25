@@ -3,7 +3,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useSuperAdminStats } from '@/hooks/useSuperAdminStats';
-import { Search, Plus, Settings, TrendingUp, Users, Calendar, Building2, Clock, ChevronDown, Eye, UserCog, Shield, FileText, MoreVertical, Trash2, ChevronRight } from 'lucide-react';
+import { Search, Plus, Settings, TrendingUp, Users, Calendar, Building2, Clock, ChevronDown, Eye, UserCog, Shield, FileText, MoreVertical, Trash2, ChevronRight, Pencil, Download } from 'lucide-react';
+import VerifiedBadge, { getRoleBadgeVariant } from '@/components/ui/VerifiedBadge';
+import * as XLSX from 'xlsx';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -54,6 +56,19 @@ const SuperAdminDashboard = () => {
     phone: ''
   });
   const { toast } = useToast();
+
+  // Edit profile state
+  const [editProfileOpen, setEditProfileOpen] = useState(false);
+  const [editProfileData, setEditProfileData] = useState({ full_name: '', programme: '', section: '', year: '', roll_no: '', phone: '' });
+  const [savingProfile, setSavingProfile] = useState(false);
+
+  // Edit club state
+  const [editClubOpen, setEditClubOpen] = useState(false);
+  const [editClubData, setEditClubData] = useState({ id: '', name: '', description: '', about: '', category: '', social_instagram: '', social_linkedin: '' });
+  const [savingClub, setSavingClub] = useState(false);
+
+  // Export state
+  const [exporting, setExporting] = useState(false);
 
   const { totalClubs, globalMembers, totalEvents, clubs, members, upcomingEvents, growthData, loading } = useSuperAdminStats();
 
@@ -170,6 +185,101 @@ const SuperAdminDashboard = () => {
     }
   };
 
+  const handleEditProfile = (member: any) => {
+    setEditProfileData({
+      full_name: member.full_name || '',
+      programme: member.programme || '',
+      section: member.section || '',
+      year: member.year || '',
+      roll_no: member.roll_no || '',
+      phone: member.phone || '',
+    });
+    setSelectedMember(member);
+    setEditProfileOpen(true);
+  };
+
+  const handleSaveProfile = async () => {
+    if (!selectedMember) return;
+    setSavingProfile(true);
+    const { error } = await supabase.functions.invoke('manage-outsider', {
+      body: { action: 'update', user_id: selectedMember.user_id, ...editProfileData },
+    });
+    if (error) {
+      toast({ title: 'Error', description: 'Failed to update profile', variant: 'destructive' });
+    } else {
+      toast({ title: 'Profile updated' });
+      setEditProfileOpen(false);
+      setProfileDialogOpen(false);
+      window.location.reload();
+    }
+    setSavingProfile(false);
+  };
+
+  const handleEditClub = (club: any) => {
+    setEditClubData({
+      id: club.id,
+      name: club.name || '',
+      description: club.description || '',
+      about: club.about || '',
+      category: club.category || '',
+      social_instagram: club.social_instagram || '',
+      social_linkedin: club.social_linkedin || '',
+    });
+    setEditClubOpen(true);
+  };
+
+  const handleSaveClub = async () => {
+    setSavingClub(true);
+    const { id, ...updates } = editClubData;
+    const { error } = await supabase.from('clubs').update({
+      name: updates.name,
+      description: updates.description || null,
+      about: updates.about || null,
+      category: updates.category || null,
+      social_instagram: updates.social_instagram || null,
+      social_linkedin: updates.social_linkedin || null,
+    }).eq('id', id);
+    if (error) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    } else {
+      toast({ title: 'Club updated' });
+      setEditClubOpen(false);
+      window.location.reload();
+    }
+    setSavingClub(false);
+  };
+
+  const handleExportData = async () => {
+    setExporting(true);
+    try {
+      const wb = XLSX.utils.book_new();
+
+      // Clubs sheet
+      const clubRows = clubs.map(c => ({ Name: c.name, Members: c.memberCount, Events: c.eventCount }));
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(clubRows), 'Clubs');
+
+      // Members sheet
+      const memberRows = members.map(m => ({
+        Name: m.full_name, Email: m.email, Club: m.club_name, Role: roleLabelMap[m.role] || m.role,
+        Programme: m.programme || '', Year: m.year || '', 'Roll No': m.roll_no || '', Phone: m.phone || '',
+      }));
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(memberRows), 'All Members');
+
+      // Events sheet
+      const eventRows = upcomingEvents.map(e => ({
+        Name: e.name, Club: e.club_name, Date: new Date(e.event_date).toLocaleDateString(),
+        Participants: e.participant_count,
+      }));
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(eventRows), 'Events');
+
+      XLSX.writeFile(wb, `IILM_Club_Data_${new Date().toISOString().slice(0, 10)}.xlsx`);
+      toast({ title: 'Export complete', description: 'Data downloaded as Excel file' });
+    } catch (err: any) {
+      toast({ title: 'Export failed', description: err.message, variant: 'destructive' });
+    }
+    setExporting(false);
+  };
+
   const filteredClubs = clubs.filter((c) => c.name.toLowerCase().includes(searchQuery.toLowerCase()));
   const filteredMembers = members.filter((m) =>
   m.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -211,7 +321,7 @@ const SuperAdminDashboard = () => {
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <h3 className="font-bold text-lg">{selectedMember.full_name}</h3>
+                  <h3 className="font-bold text-lg inline-flex items-center">{selectedMember.full_name}{getRoleBadgeVariant(selectedMember.role) && <VerifiedBadge variant={getRoleBadgeVariant(selectedMember.role)!} />}</h3>
                   <Badge variant="secondary">{roleLabelMap[selectedMember.role] || selectedMember.role}</Badge>
                   <p className="text-xs text-muted-foreground mt-1">{selectedMember.club_name}</p>
                 </div>
@@ -224,6 +334,14 @@ const SuperAdminDashboard = () => {
                 {selectedMember.year && <><span className="text-muted-foreground">Year:</span><span>{selectedMember.year}</span></>}
                 {selectedMember.semester && <><span className="text-muted-foreground">Semester:</span><span>{selectedMember.semester}</span></>}
                 {selectedMember.phone && <><span className="text-muted-foreground">Phone:</span><span>{selectedMember.phone}</span></>}
+              </div>
+              <div className="flex gap-2 mt-2">
+                <button onClick={() => handleEditProfile(selectedMember)} className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors">
+                  <Pencil className="w-3.5 h-3.5" /> Edit Profile
+                </button>
+                <button onClick={() => { setSelectedRoleMember(selectedMember); setNewRole(selectedMember.role); setRoleDialogOpen(true); }} className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-accent text-accent-foreground text-sm font-medium hover:bg-accent/80 transition-colors">
+                  <Shield className="w-3.5 h-3.5" /> Change Role
+                </button>
               </div>
             </div>
         }
@@ -327,8 +445,52 @@ const SuperAdminDashboard = () => {
           </div>
         </DialogContent>
       </Dialog>
-    </>;
+    
 
+      {/* Edit Profile Dialog */}
+      <Dialog open={editProfileOpen} onOpenChange={setEditProfileOpen}>
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Member Profile</DialogTitle>
+            <DialogDescription>Update details for {selectedMember?.full_name}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div><Label>Full Name</Label><Input value={editProfileData.full_name} onChange={e => setEditProfileData(p => ({ ...p, full_name: e.target.value }))} className="mt-1" /></div>
+            <div><Label>Programme</Label><Input value={editProfileData.programme} onChange={e => setEditProfileData(p => ({ ...p, programme: e.target.value }))} className="mt-1" /></div>
+            <div className="grid grid-cols-2 gap-3">
+              <div><Label>Section</Label><Input value={editProfileData.section} onChange={e => setEditProfileData(p => ({ ...p, section: e.target.value }))} className="mt-1" /></div>
+              <div><Label>Year</Label><Input value={editProfileData.year} onChange={e => setEditProfileData(p => ({ ...p, year: e.target.value }))} className="mt-1" /></div>
+            </div>
+            <div><Label>Roll No</Label><Input value={editProfileData.roll_no} onChange={e => setEditProfileData(p => ({ ...p, roll_no: e.target.value }))} className="mt-1" /></div>
+            <div><Label>Phone</Label><Input value={editProfileData.phone} onChange={e => setEditProfileData(p => ({ ...p, phone: e.target.value }))} className="mt-1" /></div>
+            <button onClick={handleSaveProfile} disabled={savingProfile} className="w-full py-2.5 rounded-lg gradient-gold text-primary-foreground font-medium text-sm disabled:opacity-50">
+              {savingProfile ? 'Saving...' : 'Save Changes'}
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Club Dialog */}
+      <Dialog open={editClubOpen} onOpenChange={setEditClubOpen}>
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Club</DialogTitle>
+            <DialogDescription>Update club details</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div><Label>Name</Label><Input value={editClubData.name} onChange={e => setEditClubData(p => ({ ...p, name: e.target.value }))} className="mt-1" /></div>
+            <div><Label>Description</Label><Textarea value={editClubData.description} onChange={e => setEditClubData(p => ({ ...p, description: e.target.value }))} className="mt-1" rows={2} /></div>
+            <div><Label>About</Label><Textarea value={editClubData.about} onChange={e => setEditClubData(p => ({ ...p, about: e.target.value }))} className="mt-1" rows={2} /></div>
+            <div><Label>Category</Label><Input value={editClubData.category} onChange={e => setEditClubData(p => ({ ...p, category: e.target.value }))} className="mt-1" /></div>
+            <div><Label>Instagram</Label><Input value={editClubData.social_instagram} onChange={e => setEditClubData(p => ({ ...p, social_instagram: e.target.value }))} className="mt-1" placeholder="@handle or URL" /></div>
+            <div><Label>LinkedIn</Label><Input value={editClubData.social_linkedin} onChange={e => setEditClubData(p => ({ ...p, social_linkedin: e.target.value }))} className="mt-1" placeholder="company slug or URL" /></div>
+            <button onClick={handleSaveClub} disabled={savingClub || !editClubData.name.trim()} className="w-full py-2.5 rounded-lg gradient-gold text-primary-foreground font-medium text-sm disabled:opacity-50">
+              {savingClub ? 'Saving...' : 'Save Changes'}
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>;
 
   // ──── MOBILE VIEW ────
   if (isMobile) {
@@ -377,14 +539,18 @@ const SuperAdminDashboard = () => {
             <button
               onClick={() => navigate('/global-reports')}
               className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-full gradient-gold text-primary-foreground text-xs font-semibold shadow-gold">
-              
               <FileText className="w-3.5 h-3.5" /> Global Reports
             </button>
             <button
               onClick={() => setCreateClubOpen(true)}
               className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-full glass-card text-foreground text-xs font-semibold">
-              
               <Plus className="w-3.5 h-3.5" /> Add Club
+            </button>
+            <button
+              onClick={handleExportData}
+              disabled={exporting}
+              className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-full glass-card text-foreground text-xs font-semibold">
+              <Download className="w-3.5 h-3.5" /> {exporting ? '...' : 'Export'}
             </button>
           </div>
 
@@ -446,7 +612,10 @@ const SuperAdminDashboard = () => {
                         <DropdownMenuTrigger className="p-1.5 rounded-lg hover:bg-accent/50 transition-colors outline-none">
                           <MoreVertical className="w-4 h-4 text-muted-foreground" />
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-40">
+                          <DropdownMenuContent align="end" className="w-40">
+                          <DropdownMenuItem onClick={() => handleEditClub(club)}>
+                            <Pencil className="mr-2 h-4 w-4" /> Edit Club
+                          </DropdownMenuItem>
                           <DropdownMenuItem
                         onClick={() => handleDeleteClub(club.id, club.name)}
                         className="text-destructive focus:text-destructive">
@@ -550,6 +719,12 @@ const SuperAdminDashboard = () => {
             className="px-4 py-2 rounded-full font-medium flex items-center gap-2 text-sm bg-primary hover:bg-primary/90 text-primary-foreground transition-colors">
             <FileText className="w-4 h-4" /> Global Reports
           </button>
+          <button
+            onClick={handleExportData}
+            disabled={exporting}
+            className="px-4 py-2 rounded-full font-medium flex items-center gap-2 text-sm bg-accent hover:bg-accent/80 text-accent-foreground transition-colors">
+            <Download className="w-4 h-4" /> {exporting ? 'Exporting...' : 'Export Data'}
+          </button>
           <ProfileDropdown viewMode="personal" />
         </div>
       </header>
@@ -604,7 +779,10 @@ const SuperAdminDashboard = () => {
                       <DropdownMenuTrigger className="p-1 rounded-lg hover:bg-accent/50 transition-colors outline-none">
                         <MoreVertical className="w-4 h-4 text-muted-foreground" />
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-40">
+                        <DropdownMenuContent align="end" className="w-40">
+                        <DropdownMenuItem onClick={() => handleEditClub(club)}>
+                          <Pencil className="mr-2 h-4 w-4" /> Edit Club
+                        </DropdownMenuItem>
                         <DropdownMenuItem
                       onClick={() => handleDeleteClub(club.id, club.name)}
                       className="text-destructive focus:text-destructive">

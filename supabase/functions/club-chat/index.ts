@@ -61,9 +61,23 @@ serve(async (req) => {
       clubIds = []; // will fetch all
     } else if (active_club_id) {
       // Verify user is actually a member of this club
-      const isMember = (userClubs || []).some((c: any) => c.club_id === active_club_id);
-      if (!isMember) {
+      const membership = (userClubs || []).find((c: any) => c.club_id === active_club_id);
+      if (!membership) {
         return new Response(JSON.stringify({ error: "You are not a member of this club" }), { status: 403, headers: corsHeaders });
+      }
+      // Check chatbot permission: president gets auto access, others need use_chatbot power
+      const memberRole = membership.role;
+      if (memberRole !== 'president' && memberRole !== 'admin') {
+        const { data: powerData } = await adminClient
+          .from('delegated_powers')
+          .select('id')
+          .eq('club_id', active_club_id)
+          .eq('user_id', userId)
+          .eq('power', 'use_chatbot')
+          .maybeSingle();
+        if (!powerData) {
+          return new Response(JSON.stringify({ error: "You don't have chatbot access for this club" }), { status: 403, headers: corsHeaders });
+        }
       }
       clubIds = [active_club_id];
     } else {
@@ -130,6 +144,21 @@ serve(async (req) => {
         return { name: p?.full_name || "Unknown", email: p?.email, role: m.role, programme: p?.programme, year: p?.year, phone: p?.phone, instagram: p?.social_instagram, linkedin: p?.social_linkedin, gmail: p?.social_gmail };
       });
 
+      // Per-event attendee names
+      const eventDetails = clubEvents.slice(0, 10).map((e: any) => {
+        const eventAttendees = attendanceData
+          .filter((a: any) => a.event_id === e.id)
+          .map((a: any) => {
+            const p = profiles.find((pr: any) => pr.user_id === a.student_id);
+            return p?.full_name || "Unknown";
+          });
+        return {
+          name: e.name, date: e.event_date, type: e.event_type, category: e.category,
+          attendance_count: eventAttendees.length,
+          attendees: eventAttendees.slice(0, 50),
+        };
+      });
+
       return {
         name: club.name,
         description: club.description,
@@ -138,10 +167,7 @@ serve(async (req) => {
         members_by_role: clubMembers.reduce((acc: any, m: any) => { acc[m.role] = (acc[m.role] || 0) + 1; return acc; }, {}),
         member_list: memberDetails,
         total_events: clubEvents.length,
-        recent_events: clubEvents.slice(0, 10).map((e: any) => ({
-          name: e.name, date: e.event_date, type: e.event_type, category: e.category,
-          attendance_count: clubAttendance.filter((a: any) => a.event_id === e.id).length,
-        })),
+        recent_events: eventDetails,
         total_attendance_records: clubAttendance.length,
       };
     });

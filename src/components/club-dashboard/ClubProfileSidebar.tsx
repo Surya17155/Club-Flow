@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { Instagram, Linkedin } from 'lucide-react';
+import VerifiedBadge, { getRoleBadgeVariant } from '@/components/ui/VerifiedBadge';
 
 interface PostHolder {
   user_id: string;
@@ -105,7 +106,7 @@ const ClubProfileSidebar = ({ clubId, clubName, clubAbout, clubLogo, socialInsta
           {postHolders.length > 0 ? postHolders.map(ph => (
             <div key={ph.user_id} className="bg-white/30 rounded-xl p-3 flex justify-between items-center text-sm">
               <span className="font-medium text-muted-foreground">{roleLabelMap[ph.role] ?? ph.role}</span>
-              <span className="font-semibold text-foreground">{ph.full_name}</span>
+              <span className="font-semibold text-foreground inline-flex items-center">{ph.full_name}{getRoleBadgeVariant(ph.role) && <VerifiedBadge variant={getRoleBadgeVariant(ph.role)!} size={14} />}</span>
             </div>
           )) : (
             <p className="text-sm text-muted-foreground italic">No post-holders assigned</p>
