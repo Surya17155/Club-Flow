@@ -490,7 +490,7 @@ const SuperAdminDashboard = () => {
           </div>
         </DialogContent>
       </Dialog>
-    </>);
+    </>;
 
   // ──── MOBILE VIEW ────
   if (isMobile) {
