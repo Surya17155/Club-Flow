@@ -144,7 +144,7 @@ const CreateEvent = () => {
         {/* Main 3-column grid */}
         <main className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Column 1: Event Details */}
-          <section className="glass-card rounded-3xl p-6 flex flex-col gap-5">
+          <section className="glass-card rounded-3xl p-6 flex flex-col gap-5 overflow-visible relative z-10">
             <h2 className="text-lg font-bold text-foreground mb-1">Event Details</h2>
 
             <div className="space-y-1.5">
