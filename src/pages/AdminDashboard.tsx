@@ -420,7 +420,12 @@ const AdminDashboard = () => {
                 </div>
               )}
             </div>
-            <h2 className="text-xl font-bold text-foreground">{fullName}</h2>
+            <h2 className="text-xl font-bold text-foreground flex items-center justify-center gap-0.5">
+              {fullName}
+              {!isPersonal && activeClub && getRoleBadgeVariant(activeClub.role) && (
+                <VerifiedBadge variant={getRoleBadgeVariant(activeClub.role)!} size={18} />
+              )}
+            </h2>
 
             {isPersonal ? (
               <span

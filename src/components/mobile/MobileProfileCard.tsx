@@ -1,4 +1,5 @@
 import { Instagram, Linkedin, Mail } from "lucide-react";
+import VerifiedBadge, { getRoleBadgeVariant } from "@/components/ui/VerifiedBadge";
 
 interface MobileProfileCardProps {
   fullName: string;
@@ -13,6 +14,7 @@ interface MobileProfileCardProps {
   socialLinkedin?: string;
   socialInstagram?: string;
   socialGmail?: string;
+  role?: string;
 }
 
 export function MobileProfileCard({
@@ -28,6 +30,7 @@ export function MobileProfileCard({
   socialLinkedin,
   socialInstagram,
   socialGmail,
+  role,
 }: MobileProfileCardProps) {
   const initials = fullName
     .split(" ")
@@ -91,7 +94,12 @@ export function MobileProfileCard({
         style={{ zIndex: 3, height: "35%" }}
       >
         {/* Name */}
-        <h2 className="text-xl font-bold font-display text-white drop-shadow-md">{fullName}</h2>
+        <h2 className="text-xl font-bold font-display text-white drop-shadow-md flex items-center">
+          {fullName}
+          {role && getRoleBadgeVariant(role) && (
+            <VerifiedBadge variant={getRoleBadgeVariant(role)!} size={18} />
+          )}
+        </h2>
 
         {/* Role */}
         <p className="text-sm font-medium text-white/75 mt-0.5">
