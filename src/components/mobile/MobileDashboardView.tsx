@@ -150,7 +150,8 @@ export function MobileDashboardView({
             viewMode={viewMode}
             socialLinkedin={socialLinkedin}
             socialInstagram={socialInstagram}
-            socialGmail={socialGmail} />
+            socialGmail={socialGmail}
+            role={role} />
           
 
         {/* Stats Row */}
