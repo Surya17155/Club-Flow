@@ -32,7 +32,7 @@ const CreateEvent = () => {
   const [description, setDescription] = useState('');
   const [openToAll, setOpenToAll] = useState(true);
   const [clubMembersOnly, setClubMembersOnly] = useState(false);
-  const [attendanceGiven, setAttendanceGiven] = useState<boolean | null>(null);
+  const [attendanceGiven, setAttendanceGiven] = useState<boolean>(false);
   const [capacity, setCapacity] = useState('');
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
   
@@ -60,7 +60,7 @@ const CreateEvent = () => {
     if (!startTime) { toast.error('Start time is required'); return false; }
     if (!endTime) { toast.error('End time is required'); return false; }
     if (startTime && endTime && startTime >= endTime) { toast.error('End time must be after start time'); return false; }
-    if (attendanceGiven === null) { toast.error('Please specify whether attendance will be given'); return false; }
+    
     return true;
   };
 
@@ -96,7 +96,7 @@ const CreateEvent = () => {
         description: description.trim() || null,
         access_type: accessType,
         qr_token: qrToken,
-        attendance_given: attendanceGiven ?? false,
+        attendance_given: attendanceGiven,
       });
 
       if (error) throw error;
@@ -272,7 +272,7 @@ const CreateEvent = () => {
               </button>
               {showLocationDropdown && (
                 <div
-                  className="absolute z-50 w-full mt-1 rounded-xl overflow-hidden shadow-lg border border-border/30"
+                   className="absolute z-[100] w-full mt-1 rounded-xl overflow-hidden shadow-lg border border-border/30"
                   style={{ background: 'rgba(255, 255, 255, 0.75)', backdropFilter: 'blur(32px) saturate(1.3)', WebkitBackdropFilter: 'blur(32px) saturate(1.3)' }}>
                   <div className="p-1 space-y-0.5">
                     {LOCATIONS.map((loc) => (
@@ -338,12 +338,9 @@ const CreateEvent = () => {
                   <p className="text-xs text-muted-foreground mt-0.5">Students will see if attendance is recorded</p>
                 </div>
                 <Switch
-                  checked={attendanceGiven === true}
+                  checked={attendanceGiven}
                   onCheckedChange={(val) => setAttendanceGiven(val)} />
               </div>
-              {attendanceGiven === null && (
-                <p className="text-xs text-destructive mt-1.5">* This field is mandatory</p>
-              )}
             </div>
 
             <div className="space-y-1.5">
