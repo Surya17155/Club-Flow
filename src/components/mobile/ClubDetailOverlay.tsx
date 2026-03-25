@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Instagram, Linkedin, Phone, Tag } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
+import VerifiedBadge, { getRoleBadgeVariant } from '@/components/ui/VerifiedBadge';
 
 interface PostHolder {
   role: string;
@@ -186,7 +187,7 @@ export function ClubDetailOverlay({ clubId, onClose }: ClubDetailOverlayProps) {
                       <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">President</h3>
                       <div className="rounded-xl bg-primary/5 border border-primary/10 p-3 space-y-1">
                         <div className="flex items-center justify-between">
-                          <span className="text-sm font-semibold text-foreground">{president.full_name}</span>
+                          <span className="text-sm font-semibold text-foreground inline-flex items-center">{president.full_name}<VerifiedBadge variant="purple" size={14} /></span>
                           <Badge variant="secondary" className="text-[10px] bg-primary/10 text-primary border-0">President</Badge>
                         </div>
                         {(president.programme || president.year) && (
@@ -211,7 +212,7 @@ export function ClubDetailOverlay({ clubId, onClose }: ClubDetailOverlayProps) {
                         {otherHolders.map((ph, i) => (
                           <div key={i} className="rounded-xl bg-muted/40 p-3 space-y-1">
                             <div className="flex items-center justify-between">
-                              <span className="text-sm font-semibold text-foreground">{ph.full_name}</span>
+                              <span className="text-sm font-semibold text-foreground inline-flex items-center">{ph.full_name}{getRoleBadgeVariant(ph.role) && <VerifiedBadge variant={getRoleBadgeVariant(ph.role)!} size={14} />}</span>
                               <Badge variant="secondary" className="text-[10px] bg-primary/10 text-primary border-0">
                                 {roleLabelMap[ph.role] ?? ph.role}
                               </Badge>

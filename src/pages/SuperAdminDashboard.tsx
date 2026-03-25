@@ -3,7 +3,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useSuperAdminStats } from '@/hooks/useSuperAdminStats';
-import { Search, Plus, Settings, TrendingUp, Users, Calendar, Building2, Clock, ChevronDown, Eye, UserCog, Shield, FileText, MoreVertical, Trash2, ChevronRight } from 'lucide-react';
+import { Search, Plus, Settings, TrendingUp, Users, Calendar, Building2, Clock, ChevronDown, Eye, UserCog, Shield, FileText, MoreVertical, Trash2, ChevronRight, Pencil, Download } from 'lucide-react';
+import VerifiedBadge, { getRoleBadgeVariant } from '@/components/ui/VerifiedBadge';
+import * as XLSX from 'xlsx';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -211,7 +213,7 @@ const SuperAdminDashboard = () => {
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <h3 className="font-bold text-lg">{selectedMember.full_name}</h3>
+                  <h3 className="font-bold text-lg inline-flex items-center">{selectedMember.full_name}{getRoleBadgeVariant(selectedMember.role) && <VerifiedBadge variant={getRoleBadgeVariant(selectedMember.role)!} />}</h3>
                   <Badge variant="secondary">{roleLabelMap[selectedMember.role] || selectedMember.role}</Badge>
                   <p className="text-xs text-muted-foreground mt-1">{selectedMember.club_name}</p>
                 </div>

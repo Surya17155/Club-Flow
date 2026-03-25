@@ -11,6 +11,7 @@ import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import { UserPlus, Trash2, Eye, Loader2, Search, Users, MoreVertical, ShieldCheck, Upload, FileSpreadsheet, CheckCircle2, XCircle, AlertCircle, ChevronRight } from 'lucide-react';
 import * as XLSX from 'xlsx';
+import VerifiedBadge, { getRoleBadgeVariant } from '@/components/ui/VerifiedBadge';
 
 interface SearchedUser {
   user_id: string;
@@ -658,7 +659,7 @@ const MemberManagement = ({ clubId }: Props) => {
                 )}
               </div>
               <div>
-                <h3 className="text-lg font-bold text-foreground">{viewMember.full_name}</h3>
+                <h3 className="text-lg font-bold text-foreground inline-flex items-center">{viewMember.full_name}{getRoleBadgeVariant(viewMember.role) && <VerifiedBadge variant={getRoleBadgeVariant(viewMember.role)!} />}</h3>
                 <Badge className={`mt-1 ${roleColors[viewMember.role] || roleColors.member}`}>
                   {roleLabelMap[viewMember.role] ?? viewMember.role}
                 </Badge>
@@ -833,7 +834,7 @@ const MemberRow = ({ member, onView, onRemove, onChangeRole, removing }: { membe
         )}
       </div>
       <div>
-        <p className="text-sm font-semibold text-foreground">{member.full_name}</p>
+        <p className="text-sm font-semibold text-foreground inline-flex items-center">{member.full_name}{getRoleBadgeVariant(member.role) && <VerifiedBadge variant={getRoleBadgeVariant(member.role)!} size={14} />}</p>
         <p className="text-xs text-muted-foreground">{member.email || member.roll_no || ''}</p>
       </div>
     </div>
