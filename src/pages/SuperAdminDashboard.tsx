@@ -445,7 +445,7 @@ const SuperAdminDashboard = () => {
           </div>
         </DialogContent>
       </Dialog>
-    </>
+    
 
       {/* Edit Profile Dialog */}
       <Dialog open={editProfileOpen} onOpenChange={setEditProfileOpen}>
