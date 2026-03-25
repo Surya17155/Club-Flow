@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
+import VerifiedBadge, { getRoleBadgeVariant } from "@/components/ui/VerifiedBadge";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuth } from "@/contexts/AuthContext";
 import { useClub } from "@/contexts/ClubContext";
@@ -198,6 +199,7 @@ const AdminDashboard = () => {
         <MobileDashboardView
           fullName={fullName}
           roleLabel={roleLabel}
+          role={activeClub?.role}
           clubName={clubName}
           avatarUrl={profile?.avatar_url || undefined}
           programme={programme}
