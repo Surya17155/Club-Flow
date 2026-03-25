@@ -41,6 +41,7 @@ interface MobileDashboardViewProps {
   socialLinkedin?: string;
   socialInstagram?: string;
   socialGmail?: string;
+  role?: string;
 }
 
 const roleLabelMap: Record<string, string> = {
@@ -76,6 +77,7 @@ export function MobileDashboardView({
   socialInstagram,
   socialGmail,
   attendanceRecords = [],
+  role,
 }: MobileDashboardViewProps) {
   const navigate = useNavigate();
   const [expandedClubId, setExpandedClubId] = useState<string | null>(null);
@@ -148,7 +150,8 @@ export function MobileDashboardView({
             viewMode={viewMode}
             socialLinkedin={socialLinkedin}
             socialInstagram={socialInstagram}
-            socialGmail={socialGmail} />
+            socialGmail={socialGmail}
+            role={role} />
           
 
         {/* Stats Row */}

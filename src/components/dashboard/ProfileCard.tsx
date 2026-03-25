@@ -2,10 +2,12 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Github, Linkedin, Twitter } from 'lucide-react';
+import VerifiedBadge, { getRoleBadgeVariant } from '@/components/ui/VerifiedBadge';
 
 interface ProfileCardProps {
   name: string;
   role: string;
+  rawRole?: string;
   avatarUrl?: string;
   about?: string;
   className?: string;
@@ -19,6 +21,7 @@ interface ProfileCardProps {
 export function ProfileCard({
   name,
   role,
+  rawRole,
   avatarUrl,
   about,
   programme,
@@ -37,7 +40,12 @@ export function ProfileCard({
           <AvatarImage src={avatarUrl} />
           <AvatarFallback className="text-lg font-display font-bold bg-primary/10 text-primary">{initials}</AvatarFallback>
         </Avatar>
-        <h3 className="text-lg font-display font-bold text-foreground">{name}</h3>
+        <h3 className="text-lg font-display font-bold text-foreground flex items-center justify-center">
+          {name}
+          {rawRole && getRoleBadgeVariant(rawRole) && (
+            <VerifiedBadge variant={getRoleBadgeVariant(rawRole)!} size={16} />
+          )}
+        </h3>
         <Badge variant="secondary" className="mt-1 bg-primary/10 text-primary border-0 font-medium">
           {role}
         </Badge>

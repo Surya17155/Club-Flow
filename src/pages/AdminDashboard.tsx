@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
+import VerifiedBadge, { getRoleBadgeVariant } from "@/components/ui/VerifiedBadge";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuth } from "@/contexts/AuthContext";
 import { useClub } from "@/contexts/ClubContext";
@@ -198,6 +199,7 @@ const AdminDashboard = () => {
         <MobileDashboardView
           fullName={fullName}
           roleLabel={roleLabel}
+          role={activeClub?.role}
           clubName={clubName}
           avatarUrl={profile?.avatar_url || undefined}
           programme={programme}
@@ -420,7 +422,12 @@ const AdminDashboard = () => {
                 </div>
               )}
             </div>
-            <h2 className="text-xl font-bold text-foreground">{fullName}</h2>
+            <h2 className="text-xl font-bold text-foreground flex items-center justify-center gap-0.5">
+              {fullName}
+              {!isPersonal && activeClub && getRoleBadgeVariant(activeClub.role) && (
+                <VerifiedBadge variant={getRoleBadgeVariant(activeClub.role)!} size={18} />
+              )}
+            </h2>
 
             {isPersonal ? (
               <span
