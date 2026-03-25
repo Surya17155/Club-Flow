@@ -539,14 +539,18 @@ const SuperAdminDashboard = () => {
             <button
               onClick={() => navigate('/global-reports')}
               className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-full gradient-gold text-primary-foreground text-xs font-semibold shadow-gold">
-              
               <FileText className="w-3.5 h-3.5" /> Global Reports
             </button>
             <button
               onClick={() => setCreateClubOpen(true)}
               className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-full glass-card text-foreground text-xs font-semibold">
-              
               <Plus className="w-3.5 h-3.5" /> Add Club
+            </button>
+            <button
+              onClick={handleExportData}
+              disabled={exporting}
+              className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-full glass-card text-foreground text-xs font-semibold">
+              <Download className="w-3.5 h-3.5" /> {exporting ? '...' : 'Export'}
             </button>
           </div>
 
