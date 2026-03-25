@@ -719,6 +719,12 @@ const SuperAdminDashboard = () => {
             className="px-4 py-2 rounded-full font-medium flex items-center gap-2 text-sm bg-primary hover:bg-primary/90 text-primary-foreground transition-colors">
             <FileText className="w-4 h-4" /> Global Reports
           </button>
+          <button
+            onClick={handleExportData}
+            disabled={exporting}
+            className="px-4 py-2 rounded-full font-medium flex items-center gap-2 text-sm bg-accent hover:bg-accent/80 text-accent-foreground transition-colors">
+            <Download className="w-4 h-4" /> {exporting ? 'Exporting...' : 'Export Data'}
+          </button>
           <ProfileDropdown viewMode="personal" />
         </div>
       </header>
