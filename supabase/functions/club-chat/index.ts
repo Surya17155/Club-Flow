@@ -61,9 +61,23 @@ serve(async (req) => {
       clubIds = []; // will fetch all
     } else if (active_club_id) {
       // Verify user is actually a member of this club
-      const isMember = (userClubs || []).some((c: any) => c.club_id === active_club_id);
-      if (!isMember) {
+      const membership = (userClubs || []).find((c: any) => c.club_id === active_club_id);
+      if (!membership) {
         return new Response(JSON.stringify({ error: "You are not a member of this club" }), { status: 403, headers: corsHeaders });
+      }
+      // Check chatbot permission: president gets auto access, others need use_chatbot power
+      const memberRole = membership.role;
+      if (memberRole !== 'president' && memberRole !== 'admin') {
+        const { data: powerData } = await adminClient
+          .from('delegated_powers')
+          .select('id')
+          .eq('club_id', active_club_id)
+          .eq('user_id', userId)
+          .eq('power', 'use_chatbot')
+          .maybeSingle();
+        if (!powerData) {
+          return new Response(JSON.stringify({ error: "You don't have chatbot access for this club" }), { status: 403, headers: corsHeaders });
+        }
       }
       clubIds = [active_club_id];
     } else {
