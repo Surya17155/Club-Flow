@@ -185,6 +185,101 @@ const SuperAdminDashboard = () => {
     }
   };
 
+  const handleEditProfile = (member: any) => {
+    setEditProfileData({
+      full_name: member.full_name || '',
+      programme: member.programme || '',
+      section: member.section || '',
+      year: member.year || '',
+      roll_no: member.roll_no || '',
+      phone: member.phone || '',
+    });
+    setSelectedMember(member);
+    setEditProfileOpen(true);
+  };
+
+  const handleSaveProfile = async () => {
+    if (!selectedMember) return;
+    setSavingProfile(true);
+    const { error } = await supabase.functions.invoke('manage-outsider', {
+      body: { action: 'update', user_id: selectedMember.user_id, ...editProfileData },
+    });
+    if (error) {
+      toast({ title: 'Error', description: 'Failed to update profile', variant: 'destructive' });
+    } else {
+      toast({ title: 'Profile updated' });
+      setEditProfileOpen(false);
+      setProfileDialogOpen(false);
+      window.location.reload();
+    }
+    setSavingProfile(false);
+  };
+
+  const handleEditClub = (club: any) => {
+    setEditClubData({
+      id: club.id,
+      name: club.name || '',
+      description: club.description || '',
+      about: club.about || '',
+      category: club.category || '',
+      social_instagram: club.social_instagram || '',
+      social_linkedin: club.social_linkedin || '',
+    });
+    setEditClubOpen(true);
+  };
+
+  const handleSaveClub = async () => {
+    setSavingClub(true);
+    const { id, ...updates } = editClubData;
+    const { error } = await supabase.from('clubs').update({
+      name: updates.name,
+      description: updates.description || null,
+      about: updates.about || null,
+      category: updates.category || null,
+      social_instagram: updates.social_instagram || null,
+      social_linkedin: updates.social_linkedin || null,
+    }).eq('id', id);
+    if (error) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    } else {
+      toast({ title: 'Club updated' });
+      setEditClubOpen(false);
+      window.location.reload();
+    }
+    setSavingClub(false);
+  };
+
+  const handleExportData = async () => {
+    setExporting(true);
+    try {
+      const wb = XLSX.utils.book_new();
+
+      // Clubs sheet
+      const clubRows = clubs.map(c => ({ Name: c.name, Members: c.memberCount, Events: c.eventCount }));
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(clubRows), 'Clubs');
+
+      // Members sheet
+      const memberRows = members.map(m => ({
+        Name: m.full_name, Email: m.email, Club: m.club_name, Role: roleLabelMap[m.role] || m.role,
+        Programme: m.programme || '', Year: m.year || '', 'Roll No': m.roll_no || '', Phone: m.phone || '',
+      }));
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(memberRows), 'All Members');
+
+      // Events sheet
+      const eventRows = upcomingEvents.map(e => ({
+        Name: e.name, Club: e.club_name, Date: new Date(e.event_date).toLocaleDateString(),
+        Participants: e.participant_count,
+      }));
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(eventRows), 'Events');
+
+      XLSX.writeFile(wb, `IILM_Club_Data_${new Date().toISOString().slice(0, 10)}.xlsx`);
+      toast({ title: 'Export complete', description: 'Data downloaded as Excel file' });
+    } catch (err: any) {
+      toast({ title: 'Export failed', description: err.message, variant: 'destructive' });
+    }
+    setExporting(false);
+  };
+
   const filteredClubs = clubs.filter((c) => c.name.toLowerCase().includes(searchQuery.toLowerCase()));
   const filteredMembers = members.filter((m) =>
   m.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
