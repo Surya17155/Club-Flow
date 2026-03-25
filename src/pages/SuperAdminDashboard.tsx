@@ -57,6 +57,19 @@ const SuperAdminDashboard = () => {
   });
   const { toast } = useToast();
 
+  // Edit profile state
+  const [editProfileOpen, setEditProfileOpen] = useState(false);
+  const [editProfileData, setEditProfileData] = useState({ full_name: '', programme: '', section: '', year: '', roll_no: '', phone: '' });
+  const [savingProfile, setSavingProfile] = useState(false);
+
+  // Edit club state
+  const [editClubOpen, setEditClubOpen] = useState(false);
+  const [editClubData, setEditClubData] = useState({ id: '', name: '', description: '', about: '', category: '', social_instagram: '', social_linkedin: '' });
+  const [savingClub, setSavingClub] = useState(false);
+
+  // Export state
+  const [exporting, setExporting] = useState(false);
+
   const { totalClubs, globalMembers, totalEvents, clubs, members, upcomingEvents, growthData, loading } = useSuperAdminStats();
 
   // Check admin role
