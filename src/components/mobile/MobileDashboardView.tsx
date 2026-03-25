@@ -41,6 +41,7 @@ interface MobileDashboardViewProps {
   socialLinkedin?: string;
   socialInstagram?: string;
   socialGmail?: string;
+  role?: string;
 }
 
 const roleLabelMap: Record<string, string> = {
@@ -76,6 +77,7 @@ export function MobileDashboardView({
   socialInstagram,
   socialGmail,
   attendanceRecords = [],
+  role,
 }: MobileDashboardViewProps) {
   const navigate = useNavigate();
   const [expandedClubId, setExpandedClubId] = useState<string | null>(null);
