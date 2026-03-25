@@ -1,60 +1,120 @@
 
 
-## Plan: Fix Outsider Editing, Member Visibility, QR Code Access, and Assign Powers
+## Plan: Verified Tick Badges, Delegated Powers Verification, Super Admin Editing, AI Chatbot Scoping, and Data Export
 
-### Problem Summary
+### Overview
 
-1. **Outsider Profile Edit**: The manage-outsider edge function only supports list/create/delete — no edit action. Super Admin needs to edit outsider details.
-2. **Members Not Reflecting**: Members exist in the database but the `AssignPowersModal` fetches members using `activeClub.club_id` from context, which may not match when navigating via Super Admin routes. The MemberManagement component works correctly (it receives `clubId` as a prop), but the issue is likely that the `create-member` edge function works but the UI doesn't refresh or the context isn't synced.
-3. **QR Code Visible to Normal Users**: In `Events.tsx`, the QR code button shows for ALL users if `event.qr_token` exists — it should only show for presidents/post-holders of that club.
-4. **Assign Powers**: The modal filters out presidents but shows members. The `AVAILABLE_POWERS` list is limited to 3 powers — needs review to ensure all relevant powers are included.
+This plan implements the approved features plus the new verified tick badge feature. The ticks will appear as small, 3D-styled badges next to names — purple for President/VP, blue for post-holders (Secretary, Social Media Head).
 
-### Changes
+---
 
-#### 1. Add Edit Outsider Support
+### 1. Verified Tick Badge Component
 
-**Edge Function** (`supabase/functions/manage-outsider/index.ts`):
-- Add an `action: "update"` handler in the POST block
-- Accept `user_id` + editable fields (full_name, programme, section, year, roll_no, phone)
-- Update the profile via admin client
+**New file**: `src/components/ui/VerifiedBadge.tsx`
 
-**Frontend** (`src/pages/ManageOutsiders.tsx`):
-- Add an "Edit" button in the outsider profile dialog
-- Toggle between view and edit mode within the same dialog
-- Pre-populate form fields with current outsider data
-- Call the edge function with `action: "update"` on save
-- Refresh the outsider list after successful update
+Create a reusable SVG component that renders the starburst-checkmark icon (like Instagram/X verified badges):
+- Props: `variant: 'purple' | 'blue'`, `size?: number` (default ~16px)
+- Purple variant: gradient fill from `#9b59b6` to `#8e44ad` with white checkmark, subtle drop shadow for 3D effect
+- Blue variant: gradient fill from `#3498db` to `#2980b9` with white checkmark, same 3D shadow
+- Uses SVG `<defs>` for gradient + filter for the shiny/3D look
+- Small inline element that sits right next to the name text
 
-#### 2. Fix Members Not Reflecting
+**Where to display the tick** (next to member names, based on role):
 
-**Root Cause Investigation**: The `MemberManagement` component and `AssignPowersModal` both query `club_members` — the data IS in the database. The likely issue is:
-- `AssignPowersModal` uses `activeClub.club_id` from `ClubContext`, which relies on `useUserClubs` — this only returns clubs where the **current user** is a member. When Super Admin navigates to a club they don't belong to via route params, `activeClub` doesn't match.
-- Fix: Pass `clubId` prop to `AssignPowersModal` instead of relying on context, matching how `MemberManagement` works.
+| Role | Tick Color |
+|------|-----------|
+| `president` | Purple |
+| `vice_president` | Purple |
+| `secretary` | Blue |
+| `social_media_head` | Blue |
+| `member` | None |
 
-**Files**: `src/components/dashboard/AssignPowersModal.tsx`, `src/hooks/useDelegatedPowers.ts`
-- Update `AssignPowersModal` to accept an optional `clubId` prop and use it over `activeClub.club_id`
-- Ensure `fetchMembers` in the modal uses the correct club ID
+**Files to update** (add `<VerifiedBadge>` next to name spans):
+- `src/components/club-dashboard/MemberManagement.tsx` — member list rows and view profile dialog
+- `src/components/club-dashboard/ClubProfileSidebar.tsx` — post-holders list
+- `src/components/mobile/ClubDetailOverlay.tsx` — post-holders in expanded club card
+- `src/pages/SuperAdminDashboard.tsx` — member profile dialog
+- `src/components/dashboard/AssignPowersModal.tsx` — member list
+- `src/components/dashboard/ProfileDropdown.tsx` — club list (role display)
 
-#### 3. Remove QR Code Button for Normal Users
+Logic: Check `role` value, render `<VerifiedBadge variant="purple" />` for president/VP, `<VerifiedBadge variant="blue" />` for secretary/social_media_head, nothing for member.
 
-**File**: `src/pages/Events.tsx`
-- The QR code button currently renders for any event with a `qr_token` (line 221-225)
-- Add a permission check: only show the QR button when `canManageEvents` is true (president/post-holder in club mode)
-- This prevents normal attendees from viewing/screenshotting QR codes
+---
 
-#### 4. Verify Assign Powers Options
+### 2. Verify Delegated Powers Work End-to-End
 
-The current `AVAILABLE_POWERS` in `useDelegatedPowers.ts` has:
-- `create_event` — Create Event
-- `manage_club` — Official Dashboard access
-- `use_chatbot` — ClubBot Access
+**Audit these files** for proper `hasPower()` checks:
+- `src/pages/CreateEvent.tsx` — verify `hasPower('create_event')` gates access
+- `src/pages/ClubDashboard.tsx` — verify `hasPower('manage_club')` gates dashboard access
+- `src/components/dashboard/ProfileDropdown.tsx` — verify chatbot option checks `hasPower('use_chatbot')`
 
-These cover the main delegatable powers. No changes needed here unless you want additional powers added.
+**Fix if needed**: Ensure that when a president grants a power via AssignPowersModal, the target user's UI immediately reflects the change on next login/navigation.
 
-### Technical Details
+---
 
-- **Edge function update**: The edit handler will use `adminClient.from('profiles').update(...)` with the outsider's `user_id`
-- **QR restriction**: Simply wrap the existing QR button with `{canManageEvents && ...}`
-- **AssignPowersModal fix**: Accept `clubId` as prop, fallback to `activeClub?.club_id`
-- No database schema changes needed
+### 3. Super Admin Enhanced Editing
+
+**File**: `src/pages/SuperAdminDashboard.tsx`
+
+- Add "Edit Profile" button in the member profile dialog (alongside existing "Change Role")
+- Open inline edit form for: full_name, programme, section, year, roll_no, phone
+- Call `manage-outsider` edge function with `action: "update"` (already supports this)
+- Add "Edit Club" option in club card dropdown menu
+- Open dialog to edit: name, description, about, category, social_instagram, social_linkedin
+- Direct Supabase update via `supabase.from('clubs').update(...)`
+
+---
+
+### 4. AI Chatbot Strict Scoping Verification
+
+**File**: `supabase/functions/club-chat/index.ts`
+
+The backend already enforces scoping correctly:
+- Super Admin: `clubIds = []` → fetches ALL data
+- Non-admin with `active_club_id`: verifies membership, scopes to that club only
+- System prompt explicitly forbids cross-club data for non-admins
+
+**Enhancement**: Add `use_chatbot` power check for non-president post-holders:
+- Before processing, verify the user is either a president of the active club OR has `use_chatbot` in `delegated_powers`
+- Return 403 if unauthorized
+
+**Enhancement**: Add per-event attendee names to context (currently only counts):
+- For each event, include list of attendee names from profiles table
+- This enables the chatbot to answer "who attended X event?"
+
+---
+
+### 5. CSV/Excel Export for Super Admin
+
+**File**: `src/pages/SuperAdminDashboard.tsx`
+
+- Add "Export Data" button in the header area
+- Generate downloadable Excel file using the existing `xlsx` library (already imported in MemberManagement)
+- Sheets: Clubs summary, All Members (with club + role), All Events, Attendance records
+- Each club gets member + event data in organized sheets
+- Client-side generation, no new edge function needed
+
+---
+
+### Implementation Order
+
+1. Create `VerifiedBadge` component and add to all relevant locations
+2. Audit and fix delegated powers gating
+3. Add Super Admin edit member/club capabilities
+4. Strengthen chatbot scoping + add attendee details to context
+5. Add CSV export feature
+
+### Files to Create
+- `src/components/ui/VerifiedBadge.tsx`
+
+### Files to Modify
+- `src/components/club-dashboard/MemberManagement.tsx`
+- `src/components/club-dashboard/ClubProfileSidebar.tsx`
+- `src/components/mobile/ClubDetailOverlay.tsx`
+- `src/pages/SuperAdminDashboard.tsx`
+- `src/components/dashboard/AssignPowersModal.tsx`
+- `src/components/dashboard/ProfileDropdown.tsx`
+- `supabase/functions/club-chat/index.ts`
+- `src/pages/CreateEvent.tsx` (audit)
+- `src/pages/ClubDashboard.tsx` (audit)
 
