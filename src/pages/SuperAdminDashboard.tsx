@@ -608,7 +608,10 @@ const SuperAdminDashboard = () => {
                         <DropdownMenuTrigger className="p-1.5 rounded-lg hover:bg-accent/50 transition-colors outline-none">
                           <MoreVertical className="w-4 h-4 text-muted-foreground" />
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-40">
+                          <DropdownMenuContent align="end" className="w-40">
+                          <DropdownMenuItem onClick={() => handleEditClub(club)}>
+                            <Pencil className="mr-2 h-4 w-4" /> Edit Club
+                          </DropdownMenuItem>
                           <DropdownMenuItem
                         onClick={() => handleDeleteClub(club.id, club.name)}
                         className="text-destructive focus:text-destructive">
@@ -766,7 +769,10 @@ const SuperAdminDashboard = () => {
                       <DropdownMenuTrigger className="p-1 rounded-lg hover:bg-accent/50 transition-colors outline-none">
                         <MoreVertical className="w-4 h-4 text-muted-foreground" />
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-40">
+                        <DropdownMenuContent align="end" className="w-40">
+                        <DropdownMenuItem onClick={() => handleEditClub(club)}>
+                          <Pencil className="mr-2 h-4 w-4" /> Edit Club
+                        </DropdownMenuItem>
                         <DropdownMenuItem
                       onClick={() => handleDeleteClub(club.id, club.name)}
                       className="text-destructive focus:text-destructive">
