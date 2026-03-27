@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
-import ReactMarkdown from 'react-markdown';
+import { ChatResponseRenderer } from './ChatResponseRenderer';
 
 type Msg = { role: 'user' | 'assistant'; content: string };
 
@@ -143,17 +143,7 @@ export function ChatPanel({ open, onClose, activeClubId }: ChatPanelProps) {
               }`}
             >
               {msg.role === 'assistant' ? (
-                <div className="prose prose-sm dark:prose-invert max-w-none [&>p]:m-0 [&>ul]:my-1 [&>ol]:my-1">
-                  <ReactMarkdown
-                    components={{
-                      a: ({ href, children }) => (
-                        <a href={href} target="_blank" rel="noopener noreferrer" className="text-primary underline hover:text-primary/80">
-                          {children}
-                        </a>
-                      ),
-                    }}
-                  >{msg.content}</ReactMarkdown>
-                </div>
+                <ChatResponseRenderer content={msg.content} />
               ) : (
                 msg.content
               )}

@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/contexts/AuthContext';
 import { useClub } from '@/contexts/ClubContext';
 import { toast } from '@/hooks/use-toast';
-import ReactMarkdown from 'react-markdown';
+import { ChatResponseRenderer } from '@/components/chat/ChatResponseRenderer';
 
 type Msg = { role: 'user' | 'assistant'; content: string };
 
@@ -149,17 +149,7 @@ const MobileChat = () => {
               }`}
             >
               {msg.role === 'assistant' ? (
-                <div className="prose prose-sm dark:prose-invert max-w-none [&>p]:m-0 [&>ul]:my-1 [&>ol]:my-1">
-                  <ReactMarkdown
-                    components={{
-                      a: ({ href, children }) => (
-                        <a href={href} target="_blank" rel="noopener noreferrer" className="text-primary underline hover:text-primary/80">
-                          {children}
-                        </a>
-                      ),
-                    }}
-                  >{msg.content}</ReactMarkdown>
-                </div>
+                <ChatResponseRenderer content={msg.content} />
               ) : (
                 msg.content
               )}
