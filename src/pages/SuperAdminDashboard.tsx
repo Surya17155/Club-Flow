@@ -580,6 +580,94 @@ const SuperAdminDashboard = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Manage President Dialog */}
+      <Dialog open={presidentDialogOpen} onOpenChange={setPresidentDialogOpen}>
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2"><Crown className="w-5 h-5 text-amber-500" /> Manage President</DialogTitle>
+            <DialogDescription>{presidentClub?.name}</DialogDescription>
+          </DialogHeader>
+
+          {presidentMode === 'view' && presidentClub?.president && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200/50">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white font-bold">
+                  {presidentClub.president.full_name?.[0]?.toUpperCase() || '?'}
+                </div>
+                <div>
+                  <p className="font-semibold text-sm">{presidentClub.president.full_name}</p>
+                  <p className="text-xs text-muted-foreground">{presidentClub.president.email || 'No email'}</p>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <button onClick={() => { setPresidentMode('edit'); setPresidentFormData({ fullName: presidentClub.president.full_name, email: '', programme: '', section: '', year: '', rollNo: '', phone: '' }); }} className="flex-1 py-2 rounded-lg bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors flex items-center justify-center gap-1.5">
+                  <Pencil className="w-3.5 h-3.5" /> Edit Details
+                </button>
+                <button onClick={() => { setPresidentMode('replace'); setPresidentFormData({ fullName: '', email: '', programme: '', section: '', year: '', rollNo: '', phone: '' }); }} className="flex-1 py-2 rounded-lg bg-accent text-accent-foreground text-sm font-medium hover:bg-accent/80 transition-colors flex items-center justify-center gap-1.5">
+                  <UserCog className="w-3.5 h-3.5" /> Replace
+                </button>
+              </div>
+              <button onClick={handleRemovePresident} disabled={savingPresident} className="w-full py-2 rounded-lg border border-destructive/30 text-destructive text-sm font-medium hover:bg-destructive/10 transition-colors">
+                Remove President (Demote to Member)
+              </button>
+            </div>
+          )}
+
+          {presidentMode === 'edit' && (
+            <div className="space-y-3">
+              <p className="text-xs text-muted-foreground">Edit the current president's profile details.</p>
+              <div><Label>Full Name</Label><Input value={presidentFormData.fullName} onChange={e => setPresidentFormData(p => ({ ...p, fullName: e.target.value }))} className="mt-1" /></div>
+              <div className="grid grid-cols-2 gap-3">
+                <div><Label>Programme</Label><Input value={presidentFormData.programme} onChange={e => setPresidentFormData(p => ({ ...p, programme: e.target.value }))} className="mt-1" /></div>
+                <div><Label>Year</Label><Input value={presidentFormData.year} onChange={e => setPresidentFormData(p => ({ ...p, year: e.target.value }))} className="mt-1" /></div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div><Label>Section</Label><Input value={presidentFormData.section} onChange={e => setPresidentFormData(p => ({ ...p, section: e.target.value }))} className="mt-1" /></div>
+                <div><Label>Roll No</Label><Input value={presidentFormData.rollNo} onChange={e => setPresidentFormData(p => ({ ...p, rollNo: e.target.value }))} className="mt-1" /></div>
+              </div>
+              <div><Label>Phone</Label><Input value={presidentFormData.phone} onChange={e => setPresidentFormData(p => ({ ...p, phone: e.target.value }))} className="mt-1" /></div>
+              <div className="flex gap-2">
+                <button onClick={() => setPresidentMode('view')} className="flex-1 py-2 rounded-lg border border-border text-sm font-medium">Cancel</button>
+                <button onClick={handleEditPresidentDetails} disabled={savingPresident} className="flex-1 py-2 rounded-lg gradient-gold text-primary-foreground text-sm font-medium disabled:opacity-50">
+                  {savingPresident ? 'Saving...' : 'Save'}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {(presidentMode === 'add' || presidentMode === 'replace') && (
+            <div className="space-y-3">
+              <p className="text-xs text-muted-foreground">
+                {presidentMode === 'add' ? 'No president assigned. Add one below.' : 'Enter the new president\'s details.'}
+              </p>
+              {presidentMode === 'replace' && (
+                <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
+                  <input type="checkbox" checked={removeOnReplace} onChange={e => setRemoveOnReplace(e.target.checked)} className="rounded" />
+                  Remove old president from club entirely (otherwise demoted to member)
+                </label>
+              )}
+              <div><Label>Full Name <span className="text-destructive">*</span></Label><Input value={presidentFormData.fullName} onChange={e => setPresidentFormData(p => ({ ...p, fullName: e.target.value }))} className="mt-1" placeholder="President's full name" /></div>
+              <div><Label>Email <span className="text-destructive">*</span></Label><Input type="email" value={presidentFormData.email} onChange={e => setPresidentFormData(p => ({ ...p, email: e.target.value }))} className="mt-1" placeholder="president@example.com" /></div>
+              <div className="grid grid-cols-2 gap-3">
+                <div><Label>Programme</Label><Input value={presidentFormData.programme} onChange={e => setPresidentFormData(p => ({ ...p, programme: e.target.value }))} className="mt-1" /></div>
+                <div><Label>Year</Label><Input value={presidentFormData.year} onChange={e => setPresidentFormData(p => ({ ...p, year: e.target.value }))} className="mt-1" /></div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div><Label>Section</Label><Input value={presidentFormData.section} onChange={e => setPresidentFormData(p => ({ ...p, section: e.target.value }))} className="mt-1" /></div>
+                <div><Label>Roll No</Label><Input value={presidentFormData.rollNo} onChange={e => setPresidentFormData(p => ({ ...p, rollNo: e.target.value }))} className="mt-1" /></div>
+              </div>
+              <div><Label>Phone</Label><Input value={presidentFormData.phone} onChange={e => setPresidentFormData(p => ({ ...p, phone: e.target.value }))} className="mt-1" /></div>
+              <div className="flex gap-2">
+                {presidentMode === 'replace' && <button onClick={() => setPresidentMode('view')} className="flex-1 py-2 rounded-lg border border-border text-sm font-medium">Cancel</button>}
+                <button onClick={handleAddOrReplacePresident} disabled={savingPresident || !presidentFormData.fullName.trim() || !presidentFormData.email.trim()} className="flex-1 py-2 rounded-lg gradient-gold text-primary-foreground text-sm font-medium disabled:opacity-50">
+                  {savingPresident ? 'Saving...' : presidentMode === 'add' ? 'Add President' : 'Replace President'}
+                </button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </>;
 
   // ──── MOBILE VIEW ────
