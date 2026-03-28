@@ -142,7 +142,11 @@ const AssignPowersModal = ({ open, onOpenChange, clubId }: AssignPowersModalProp
                         {member.full_name}
                         {badgeVariant && <VerifiedBadge variant={badgeVariant} size={14} />}
                       </p>
-                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full border font-medium ${getRoleColor(member.role)}`}>
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full border font-medium ${
+                        member.role === 'president' || member.role === 'vice_president'
+                          ? 'text-purple-700 bg-purple-100 border-purple-200'
+                          : 'text-blue-700 bg-blue-100 border-blue-200'
+                      }`}>
                         {roleLabelMap[member.role] ?? member.role}
                       </span>
                     </div>
