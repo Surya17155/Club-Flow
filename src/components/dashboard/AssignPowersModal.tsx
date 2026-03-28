@@ -132,7 +132,7 @@ const AssignPowersModal = ({ open, onOpenChange, clubId }: AssignPowersModalProp
                   <button
                     type="button"
                     onClick={() => setExpandedId(isExpanded ? null : member.user_id)}
-                    className="flex items-center gap-3 w-full p-3 text-left hover:bg-white/5 transition-colors"
+                    className="flex items-center gap-3 w-full p-3 text-left hover:bg-muted/50 transition-colors"
                   >
                     <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary text-xs font-bold shrink-0">
                       {member.full_name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
