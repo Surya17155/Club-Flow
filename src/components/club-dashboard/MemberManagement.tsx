@@ -87,9 +87,10 @@ const YEARS = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
 
 interface Props {
   clubId: string;
+  isSuperAdmin?: boolean;
 }
 
-const MemberManagement = ({ clubId }: Props) => {
+const MemberManagement = ({ clubId, isSuperAdmin = false }: Props) => {
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
