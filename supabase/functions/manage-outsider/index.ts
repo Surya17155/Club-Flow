@@ -36,8 +36,15 @@ Deno.serve(async (req) => {
     }
 
     // Only super admin can manage outsiders
-    if (caller.email !== SUPER_ADMIN_EMAIL) {
-      return new Response(JSON.stringify({ error: "Only Super Admin can manage outsiders" }), {
+    const { data: roleData } = await adminClient
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", caller.id)
+      .eq("role", "admin");
+    const isSuperAdmin = !!(roleData && roleData.length > 0);
+
+    if (!isSuperAdmin) {
+      return new Response(JSON.stringify({ error: "Only Super Admin can perform this action" }), {
         status: 403,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

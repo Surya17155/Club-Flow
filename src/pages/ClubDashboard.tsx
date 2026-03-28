@@ -321,7 +321,7 @@ const ClubDashboard = () => {
               </section>
             </>
           ) : activeTab === 'members' ? (
-            <MemberManagement clubId={clubId} />
+            <MemberManagement clubId={clubId} isSuperAdmin={isSuperAdmin} />
           ) : (
             <div className="glass-card p-4">
               <h2 className="text-base font-bold text-foreground mb-3">Pending Join Requests</h2>
@@ -434,7 +434,7 @@ const ClubDashboard = () => {
           </main>
         </>
       ) : activeTab === 'members' ? (
-        <MemberManagement clubId={clubId} />
+        <MemberManagement clubId={clubId} isSuperAdmin={isSuperAdmin} />
       ) : (
         <div className="glass-card p-6">
           <h2 className="text-lg font-bold text-foreground mb-4">Pending Join Requests</h2>

@@ -9,7 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
-import { UserPlus, Trash2, Eye, Loader2, Search, Users, MoreVertical, ShieldCheck, Upload, FileSpreadsheet, CheckCircle2, XCircle, AlertCircle, ChevronRight } from 'lucide-react';
+import { UserPlus, Trash2, Eye, Loader2, Search, Users, MoreVertical, ShieldCheck, Upload, FileSpreadsheet, CheckCircle2, XCircle, AlertCircle, ChevronRight, Pencil } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import VerifiedBadge, { getRoleBadgeVariant } from '@/components/ui/VerifiedBadge';
 
@@ -87,9 +87,10 @@ const YEARS = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
 
 interface Props {
   clubId: string;
+  isSuperAdmin?: boolean;
 }
 
-const MemberManagement = ({ clubId }: Props) => {
+const MemberManagement = ({ clubId, isSuperAdmin = false }: Props) => {
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -105,6 +106,56 @@ const MemberManagement = ({ clubId }: Props) => {
   const [importing, setImporting] = useState(false);
   const [importResults, setImportResults] = useState<{ summary: any; results: any[] } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Edit member state (Super Admin only)
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editTarget, setEditTarget] = useState<Member | null>(null);
+  const [editForm, setEditForm] = useState({ full_name: '', programme: '', section: '', year: '', roll_no: '', phone: '' });
+  const [saving, setSaving] = useState(false);
+
+  const openEditDialog = (member: Member) => {
+    setEditTarget(member);
+    setEditForm({
+      full_name: member.full_name || '',
+      programme: member.programme || '',
+      section: member.section || '',
+      year: member.year || '',
+      roll_no: member.roll_no || '',
+      phone: member.phone || '',
+    });
+    setEditDialogOpen(true);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editTarget) return;
+    setSaving(true);
+    try {
+      const response = await supabase.functions.invoke('manage-outsider', {
+        body: {
+          action: 'update',
+          user_id: editTarget.user_id,
+          full_name: editForm.full_name,
+          programme: editForm.programme,
+          section: editForm.section,
+          year: editForm.year,
+          roll_no: editForm.roll_no,
+          phone: editForm.phone,
+        },
+      });
+      if (response.error || response.data?.error) {
+        toast.error(response.data?.error || 'Failed to update profile');
+      } else {
+        toast.success(`${editForm.full_name}'s profile updated`);
+        setEditDialogOpen(false);
+        setEditTarget(null);
+        setViewMember(null);
+        await fetchMembers();
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to update');
+    }
+    setSaving(false);
+  };
 
   // Search existing users state
   const [userSearchQuery, setUserSearchQuery] = useState('');
@@ -426,7 +477,7 @@ const MemberManagement = ({ clubId }: Props) => {
               <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Post-holders ({postHolders.length})</h4>
               <div className="space-y-2">
                 {postHolders.map(m => (
-                  <MemberRow key={m.id} member={m} onView={() => setViewMember(m)} onRemove={() => handleRemoveMember(m)} onChangeRole={() => openRoleDialog(m)} removing={removing === m.id} />
+                  <MemberRow key={m.id} member={m} onView={() => setViewMember(m)} onRemove={() => handleRemoveMember(m)} onChangeRole={() => openRoleDialog(m)} removing={removing === m.id} isSuperAdmin={isSuperAdmin} onEdit={() => openEditDialog(m)} />
                 ))}
               </div>
             </div>
@@ -436,7 +487,7 @@ const MemberManagement = ({ clubId }: Props) => {
             <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Members ({regularMembers.length})</h4>
             <div className="space-y-2">
               {regularMembers.length > 0 ? regularMembers.map(m => (
-                <MemberRow key={m.id} member={m} onView={() => setViewMember(m)} onRemove={() => handleRemoveMember(m)} onChangeRole={() => openRoleDialog(m)} removing={removing === m.id} />
+                <MemberRow key={m.id} member={m} onView={() => setViewMember(m)} onRemove={() => handleRemoveMember(m)} onChangeRole={() => openRoleDialog(m)} removing={removing === m.id} isSuperAdmin={isSuperAdmin} onEdit={() => openEditDialog(m)} />
               )) : (
                 <p className="text-sm text-muted-foreground italic text-center py-4">No members found</p>
               )}
@@ -712,6 +763,81 @@ const MemberManagement = ({ clubId }: Props) => {
                   {viewMember.social_gmail && <InfoRow label="Gmail" value={viewMember.social_gmail} />}
                 </div>
               )}
+              {isSuperAdmin && viewMember && (
+                <Button onClick={() => { openEditDialog(viewMember); }} variant="outline" className="w-full rounded-full gap-2 mt-2">
+                  <Pencil className="w-4 h-4" /> Edit Profile
+                </Button>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Profile Dialog (Super Admin) */}
+      <Dialog open={editDialogOpen} onOpenChange={(open) => { setEditDialogOpen(open); if (!open) setEditTarget(null); }}>
+        <DialogContent className="glass-card border-white/20 max-w-md max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-display text-lg">Edit Member Profile</DialogTitle>
+          </DialogHeader>
+          {editTarget && (
+            <div className="space-y-4 mt-2">
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-white/20">
+                <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white/40 shrink-0">
+                  {editTarget.avatar_url ? (
+                    <img src={editTarget.avatar_url} alt={editTarget.full_name} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-primary/20 flex items-center justify-center text-sm font-bold text-primary">
+                      {editTarget.full_name[0]}
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-foreground">{editTarget.full_name}</p>
+                  <p className="text-xs text-muted-foreground">{editTarget.email}</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5 sm:col-span-2">
+                  <Label>Full Name</Label>
+                  <Input value={editForm.full_name} onChange={e => setEditForm(p => ({ ...p, full_name: e.target.value }))} className="bg-white/30" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Programme</Label>
+                  <Select value={editForm.programme} onValueChange={v => setEditForm(p => ({ ...p, programme: v }))}>
+                    <SelectTrigger className="bg-white/30"><SelectValue placeholder="Select" /></SelectTrigger>
+                    <SelectContent>
+                      {PROGRAMMES.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Year</Label>
+                  <Select value={editForm.year} onValueChange={v => setEditForm(p => ({ ...p, year: v }))}>
+                    <SelectTrigger className="bg-white/30"><SelectValue placeholder="Select" /></SelectTrigger>
+                    <SelectContent>
+                      {YEARS.map(y => <SelectItem key={y} value={y}>{y}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Section</Label>
+                  <Input value={editForm.section} onChange={e => setEditForm(p => ({ ...p, section: e.target.value }))} className="bg-white/30" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Roll No</Label>
+                  <Input value={editForm.roll_no} onChange={e => setEditForm(p => ({ ...p, roll_no: e.target.value }))} className="bg-white/30" />
+                </div>
+                <div className="space-y-1.5 sm:col-span-2">
+                  <Label>Phone</Label>
+                  <Input value={editForm.phone} onChange={e => setEditForm(p => ({ ...p, phone: e.target.value }))} className="bg-white/30" />
+                </div>
+              </div>
+
+              <Button onClick={handleSaveEdit} disabled={saving || !editForm.full_name.trim()} className="w-full rounded-full">
+                {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Pencil className="w-4 h-4 mr-2" />}
+                Save Changes
+              </Button>
             </div>
           )}
         </DialogContent>
@@ -843,7 +969,7 @@ const InfoRow = ({ label, value }: { label: string; value: string }) => (
   </div>
 );
 
-const MemberRow = ({ member, onView, onRemove, onChangeRole, removing }: { member: Member; onView: () => void; onRemove: () => void; onChangeRole: () => void; removing: boolean }) => (
+const MemberRow = ({ member, onView, onRemove, onChangeRole, removing, isSuperAdmin, onEdit }: { member: Member; onView: () => void; onRemove: () => void; onChangeRole: () => void; removing: boolean; isSuperAdmin?: boolean; onEdit?: () => void }) => (
   <div className="flex items-center gap-3 p-3 rounded-xl bg-white/20 hover:bg-white/30 transition-colors cursor-pointer overflow-hidden" onClick={onView}>
     {/* Avatar */}
     <div className="w-9 h-9 rounded-full overflow-hidden border-2 border-white/40 shrink-0">
@@ -881,6 +1007,11 @@ const MemberRow = ({ member, onView, onRemove, onChangeRole, removing }: { membe
           <DropdownMenuItem onClick={onView}>
             <Eye className="w-4 h-4 mr-2" /> View Details
           </DropdownMenuItem>
+          {isSuperAdmin && onEdit && (
+            <DropdownMenuItem onClick={onEdit}>
+              <Pencil className="w-4 h-4 mr-2" /> Edit Profile
+            </DropdownMenuItem>
+          )}
           {member.role !== 'president' && (
             <>
               <DropdownMenuItem onClick={onChangeRole}>
