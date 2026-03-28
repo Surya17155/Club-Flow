@@ -49,7 +49,7 @@ const LandingPage = () => {
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[hsl(36,72%,48%)] to-[hsl(30,85%,55%)]">
             <span className="font-display text-sm font-bold text-white">CS</span>
           </div>
-          <span className="font-display text-xl font-bold text-foreground">​IILM Club  </span>
+          <span className="font-display text-xl font-bold text-foreground">IILM Club</span>
         </div>
       </motion.nav>
 

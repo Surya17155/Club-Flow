@@ -69,7 +69,7 @@ export function ProfileCard({
         <div className="mt-4 w-full text-left space-y-1">
             {year &&
           <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">​Year</span>
+                <span className="text-muted-foreground">Year</span>
                 <span className="font-medium">{year}</span>
               </div>
           }
