@@ -257,6 +257,88 @@ const SuperAdminDashboard = () => {
     setSavingClub(false);
   };
 
+  // ── President Management ──
+  const handleOpenPresidentDialog = (club: any) => {
+    setPresidentClub(club);
+    setPresidentFormData({ fullName: '', email: '', programme: '', section: '', year: '', rollNo: '', phone: '' });
+    setRemoveOnReplace(false);
+    setPresidentMode(club.president ? 'view' : 'add');
+    setPresidentDialogOpen(true);
+  };
+
+  const handleAddOrReplacePresident = async () => {
+    if (!presidentClub || !presidentFormData.fullName.trim() || !presidentFormData.email.trim()) return;
+    setSavingPresident(true);
+
+    // If replacing, demote or remove the old president first
+    if (presidentMode === 'replace' && presidentClub.president) {
+      if (removeOnReplace) {
+        await supabase.from('club_members').delete().eq('user_id', presidentClub.president.user_id).eq('club_id', presidentClub.id);
+      } else {
+        await supabase.from('club_members').update({ role: 'member' as any }).eq('user_id', presidentClub.president.user_id).eq('club_id', presidentClub.id);
+      }
+    }
+
+    const { data: fnData, error: fnError } = await supabase.functions.invoke('create-member', {
+      body: {
+        email: presidentFormData.email.trim(),
+        full_name: presidentFormData.fullName.trim(),
+        programme: presidentFormData.programme.trim(),
+        section: presidentFormData.section.trim(),
+        year: presidentFormData.year.trim(),
+        roll_no: presidentFormData.rollNo.trim(),
+        phone: presidentFormData.phone.trim(),
+        club_id: presidentClub.id,
+        role: 'president',
+      },
+    });
+
+    if (fnError || fnData?.error) {
+      toast({ title: 'Error', description: fnData?.error || fnError?.message || 'Failed', variant: 'destructive' });
+    } else {
+      toast({ title: 'President updated', description: `${presidentFormData.fullName} is now President of ${presidentClub.name}` });
+      setPresidentDialogOpen(false);
+      window.location.reload();
+    }
+    setSavingPresident(false);
+  };
+
+  const handleEditPresidentDetails = async () => {
+    if (!presidentClub?.president) return;
+    setSavingPresident(true);
+    const { error } = await supabase.functions.invoke('manage-outsider', {
+      body: {
+        action: 'update',
+        user_id: presidentClub.president.user_id,
+        full_name: presidentFormData.fullName || undefined,
+        programme: presidentFormData.programme || undefined,
+        section: presidentFormData.section || undefined,
+        year: presidentFormData.year || undefined,
+        roll_no: presidentFormData.rollNo || undefined,
+        phone: presidentFormData.phone || undefined,
+      },
+    });
+    if (error) {
+      toast({ title: 'Error', description: 'Failed to update president details', variant: 'destructive' });
+    } else {
+      toast({ title: 'President details updated' });
+      setPresidentDialogOpen(false);
+      window.location.reload();
+    }
+    setSavingPresident(false);
+  };
+
+  const handleRemovePresident = async () => {
+    if (!presidentClub?.president) return;
+    if (!confirm(`Remove ${presidentClub.president.full_name} as President? They will be demoted to member.`)) return;
+    setSavingPresident(true);
+    await supabase.from('club_members').update({ role: 'member' as any }).eq('user_id', presidentClub.president.user_id).eq('club_id', presidentClub.id);
+    toast({ title: 'President removed', description: `${presidentClub.president.full_name} has been demoted to member.` });
+    setPresidentDialogOpen(false);
+    window.location.reload();
+    setSavingPresident(false);
+  };
+
   const handleExportData = async () => {
     setExporting(true);
     try {
