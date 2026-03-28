@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/contexts/AuthContext';
 import { useClub } from '@/contexts/ClubContext';
+import { useLocation } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
 import { ChatResponseRenderer } from '@/components/chat/ChatResponseRenderer';
 
@@ -12,10 +13,16 @@ type Msg = { role: 'user' | 'assistant'; content: string };
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/club-chat`;
 
+const SUPER_ADMIN_EMAIL = 'suryakant.gnbba2029@iilm.edu';
+
 const MobileChat = () => {
   const navigate = useNavigate();
-  const { session } = useAuth();
+  const location = useLocation();
+  const { session, user } = useAuth();
   const { activeClub } = useClub();
+  const isSuperAdminMode = location.state?.superAdmin === true;
+  const isSuperAdmin = user?.email === SUPER_ADMIN_EMAIL && isSuperAdminMode;
+  const effectiveClubId = isSuperAdmin ? undefined : activeClub?.club_id;
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -65,7 +72,7 @@ const MobileChat = () => {
         body: JSON.stringify({
           message: text,
           conversation_history: messages.map(m => ({ role: m.role, content: m.content })),
-          active_club_id: activeClub?.club_id || undefined,
+          active_club_id: effectiveClubId || undefined,
         }),
       });
 
