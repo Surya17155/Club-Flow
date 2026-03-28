@@ -106,9 +106,8 @@ const AssignPowersModal = ({ open, onOpenChange, clubId }: AssignPowersModalProp
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="border-border max-w-md max-h-[80vh] overflow-y-auto p-4 sm:p-6 rounded-2xl">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 font-display gradient-gold bg-clip-text text-transparent text-lg">
-            <Shield className="w-5 h-5 text-primary" />
+        <DialogHeader className="text-center sm:text-center">
+          <DialogTitle className="text-lg font-semibold text-foreground text-center">
             Assign Powers
           </DialogTitle>
           <p className="text-xs text-muted-foreground mt-1">
