@@ -474,17 +474,39 @@ export const ChatResponseRenderer = memo(function ChatResponseRenderer({ content
           return (
             <motion.div
               key={i}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: 8, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
               className="rounded-2xl p-4 border border-emerald-400/40 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 backdrop-blur-xl"
             >
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-7 h-7 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                  <span className="text-emerald-600 text-xs font-bold">✓</span>
-                </div>
+              <div className="flex items-center gap-3 mb-2">
+                <motion.div
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 15, delay: 0.2 }}
+                  className="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center shadow-lg"
+                >
+                  <motion.svg
+                    width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    initial={{ pathLength: 0 }}
+                    animate={{ pathLength: 1 }}
+                    transition={{ delay: 0.5, duration: 0.4 }}
+                  >
+                    <motion.path
+                      d="M5 13l4 4L19 7"
+                      stroke="white"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      initial={{ pathLength: 0 }}
+                      animate={{ pathLength: 1 }}
+                      transition={{ delay: 0.5, duration: 0.4 }}
+                    />
+                  </motion.svg>
+                </motion.div>
                 <div>
-                  <p className="font-semibold text-sm text-foreground">{d.title || 'Action Completed'}</p>
-                  <p className="text-xs text-muted-foreground">{d.summary}</p>
+                  <p className="font-semibold text-sm text-foreground">{d.title || 'Task Successfully Completed'}</p>
+                  <p className="text-xs text-muted-foreground">{d.summary || 'Your task has been successfully completed.'}</p>
                 </div>
               </div>
               {d.details && (
