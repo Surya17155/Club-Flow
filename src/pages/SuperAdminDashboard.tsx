@@ -3,7 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useSuperAdminStats } from '@/hooks/useSuperAdminStats';
-import { Search, Plus, Settings, TrendingUp, Users, Calendar, Building2, Clock, ChevronDown, Eye, UserCog, Shield, FileText, MoreVertical, Trash2, ChevronRight, Pencil, Download } from 'lucide-react';
+import { Search, Plus, Settings, TrendingUp, Users, Calendar, Building2, Clock, ChevronDown, Eye, UserCog, Shield, FileText, MoreVertical, Trash2, ChevronRight, Pencil, Download, Crown } from 'lucide-react';
 import VerifiedBadge, { getRoleBadgeVariant } from '@/components/ui/VerifiedBadge';
 import * as XLSX from 'xlsx';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -69,6 +69,14 @@ const SuperAdminDashboard = () => {
 
   // Export state
   const [exporting, setExporting] = useState(false);
+
+  // President management state
+  const [presidentDialogOpen, setPresidentDialogOpen] = useState(false);
+  const [presidentClub, setPresidentClub] = useState<any>(null);
+  const [presidentMode, setPresidentMode] = useState<'view' | 'add' | 'edit' | 'replace'>('view');
+  const [presidentFormData, setPresidentFormData] = useState({ fullName: '', email: '', programme: '', section: '', year: '', rollNo: '', phone: '' });
+  const [savingPresident, setSavingPresident] = useState(false);
+  const [removeOnReplace, setRemoveOnReplace] = useState(false);
 
   const { totalClubs, globalMembers, totalEvents, clubs, members, upcomingEvents, growthData, loading } = useSuperAdminStats();
 
