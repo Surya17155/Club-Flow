@@ -3,6 +3,7 @@ import * as XLSX from 'xlsx';
 interface AttendeeRow {
   full_name: string;
   roll_no: string | null;
+  phone: string | null;
   programme: string | null;
   section: string | null;
   year?: string | null;
@@ -20,9 +21,10 @@ export const exportAttendanceXLSX = (
     'S.No': i + 1,
     'Student Name': a.full_name,
     'Roll No': a.roll_no || '—',
+    'Phone': a.phone || '—',
     'Programme': a.programme || '—',
-    'Section': a.section || '—',
     'Year': a.year || '—',
+    'Section': a.section || '—',
     'Scan Time': new Date(a.scanned_at).toLocaleString(),
     'Status': a.status === 'present' ? 'Present' : a.status,
     'Method': a.manually_added ? 'Manual' : 'QR Scan',
