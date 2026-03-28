@@ -74,6 +74,10 @@ export const useSuperAdminStats = () => {
       const profilesList = profilesData || [];
       const participantsList = participantsData || [];
 
+      // Build lookup maps first
+      const profileMap = new Map(profilesList.map(p => [p.user_id, p]));
+      const clubMap = new Map(clubsList.map(c => [c.id, c.name]));
+
       // Stats
       setTotalClubs(clubsList.length);
       const uniqueMembers = new Set(membersList.map(m => m.user_id));
