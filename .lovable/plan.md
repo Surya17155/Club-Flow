@@ -1,13 +1,40 @@
-## Completed: Verified Tick Badges, Delegated Powers, Super Admin Editing, AI Chatbot Scoping, Data Export
 
-All features implemented:
 
-1. **Verified Badges** — Purple 3D tick for President/VP, Blue for Secretary/Social Media Head. Added to MemberManagement, ClubProfileSidebar, ClubDetailOverlay, SuperAdminDashboard, AssignPowersModal.
+## Plan: Strict Club Scoping for ClubBot
 
-2. **Delegated Powers Audit** — Verified `hasPower()` checks in CreateEvent (create_event), ClubDashboard (manage_club), ProfileDropdown (use_chatbot). All correct.
+### Problem
+When a user selects a specific club and opens ClubBot, it returns data from all clubs instead of only the selected one. This happens because:
+1. If the user has `admin` role in `user_roles`, the edge function sets `isSuperAdmin = true` and fetches **all** clubs' data with no filtering
+2. Even for super admins, when `active_club_id` is provided, the bot should scope to that club only
 
-3. **Super Admin Editing** — Edit Profile button in member profile dialog (uses manage-outsider edge function). Edit Club option in club dropdown menu (direct Supabase update). Both mobile and desktop.
+### Solution
+Modify the edge function (`supabase/functions/club-chat/index.ts`) to respect `active_club_id` even for super admins. The "gate" logic:
+- If `active_club_id` is provided → scope to that club only, regardless of role
+- If no `active_club_id` and user is super admin → show all clubs (current behavior)
+- If no `active_club_id` and user is regular member → show only their clubs
 
-4. **AI Chatbot Strict Scoping** — Added `use_chatbot` power check for non-president members. Per-event attendee names added to context for richer responses.
+### Changes
 
-5. **Excel Export** — Export Data button on Super Admin dashboard (mobile + desktop). Generates Excel with Clubs, Members, and Events sheets.
+**File: `supabase/functions/club-chat/index.ts`**
+
+Move the `active_club_id` check **before** the super admin bypass:
+
+```text
+Current flow:
+  isSuperAdmin? → clubIds = [] (all clubs)
+  active_club_id? → scope to one club
+  else → user's clubs
+
+New flow:
+  active_club_id provided? → scope to one club (for ALL users)
+  isSuperAdmin (no active club)? → clubIds = [] (all clubs)
+  else → user's clubs
+```
+
+Specifically:
+- Check `active_club_id` first. If provided, set `clubIds = [active_club_id]` for everyone (super admin or not)
+- Skip chatbot permission check for super admins even when scoped to a club
+- Update the system prompt: when scoped to a club, always enforce the security rule that restricts answers to that club only — even for super admins
+
+This is a single-file change in the edge function (~15 lines modified).
+
