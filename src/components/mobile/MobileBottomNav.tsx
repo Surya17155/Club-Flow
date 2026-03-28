@@ -131,3 +131,5 @@ function MobileBottomNavInner() {
     </div>
   );
 }
+
+export const MobileBottomNav = memo(MobileBottomNavInner);
