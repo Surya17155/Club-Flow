@@ -13,10 +13,16 @@ type Msg = { role: 'user' | 'assistant'; content: string };
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/club-chat`;
 
+const SUPER_ADMIN_EMAIL = 'suryakant.gnbba2029@iilm.edu';
+
 const MobileChat = () => {
   const navigate = useNavigate();
-  const { session } = useAuth();
+  const location = useLocation();
+  const { session, user } = useAuth();
   const { activeClub } = useClub();
+  const isSuperAdminMode = location.state?.superAdmin === true;
+  const isSuperAdmin = user?.email === SUPER_ADMIN_EMAIL && isSuperAdminMode;
+  const effectiveClubId = isSuperAdmin ? undefined : activeClub?.club_id;
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
