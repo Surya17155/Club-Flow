@@ -383,8 +383,9 @@ const MemberManagement = ({ clubId }: Props) => {
   const regularMembers = filtered.filter(m => m.role === 'member');
 
   return (
-    <div className="glass-card p-6">
-      <div className="flex items-center justify-between mb-6">
+    <div className="glass-card p-4 sm:p-6">
+      {/* Header - centered on mobile, row on desktop */}
+      <div className="flex flex-col items-center sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 gap-3">
         <div className="flex items-center gap-2">
           <Users className="w-5 h-5 text-primary" />
           <h3 className="font-bold text-lg text-foreground">Members ({members.length})</h3>
@@ -843,26 +844,33 @@ const InfoRow = ({ label, value }: { label: string; value: string }) => (
 );
 
 const MemberRow = ({ member, onView, onRemove, onChangeRole, removing }: { member: Member; onView: () => void; onRemove: () => void; onChangeRole: () => void; removing: boolean }) => (
-  <div className="flex items-center justify-between p-3 rounded-xl bg-white/20 hover:bg-white/30 transition-colors cursor-pointer" onClick={onView}>
-    <div className="flex items-center gap-3">
-      <div className="w-9 h-9 rounded-full overflow-hidden border-2 border-white/40 shrink-0">
-        {member.avatar_url ? (
-          <img src={member.avatar_url} alt={member.full_name} className="w-full h-full object-cover" />
-        ) : (
-          <div className="w-full h-full bg-primary/20 flex items-center justify-center text-xs font-bold text-primary">
-            {member.full_name[0]}
-          </div>
-        )}
-      </div>
-      <div>
-        <p className="text-sm font-semibold text-foreground inline-flex items-center">{member.full_name}{getRoleBadgeVariant(member.role) && getRoleBadgeVariant(member.role) !== 'gray' && <VerifiedBadge variant={getRoleBadgeVariant(member.role)!} size={14} />}</p>
-        <p className="text-xs text-muted-foreground">{member.email || member.roll_no || ''}</p>
-      </div>
+  <div className="flex items-center gap-3 p-3 rounded-xl bg-white/20 hover:bg-white/30 transition-colors cursor-pointer overflow-hidden" onClick={onView}>
+    {/* Avatar */}
+    <div className="w-9 h-9 rounded-full overflow-hidden border-2 border-white/40 shrink-0">
+      {member.avatar_url ? (
+        <img src={member.avatar_url} alt={member.full_name} className="w-full h-full object-cover" />
+      ) : (
+        <div className="w-full h-full bg-primary/20 flex items-center justify-center text-xs font-bold text-primary">
+          {member.full_name[0]}
+        </div>
+      )}
     </div>
-    <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
-      <Badge variant="outline" className={`text-xs ${roleColors[member.role] || ''}`}>
+
+    {/* Name + role tag underneath */}
+    <div className="flex-1 min-w-0">
+      <p className="text-sm font-semibold text-foreground truncate inline-flex items-center gap-1">
+        {member.full_name}
+        {getRoleBadgeVariant(member.role) && getRoleBadgeVariant(member.role) !== 'gray' && (
+          <VerifiedBadge variant={getRoleBadgeVariant(member.role)!} size={14} />
+        )}
+      </p>
+      <Badge variant="outline" className={`text-[10px] px-1.5 py-0 mt-0.5 block w-fit ${roleColors[member.role] || ''}`}>
         {roleLabelMap[member.role] ?? member.role}
       </Badge>
+    </div>
+
+    {/* Actions */}
+    <div className="shrink-0" onClick={e => e.stopPropagation()}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon" className="h-8 w-8">
