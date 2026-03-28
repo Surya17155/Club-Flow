@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/contexts/AuthContext';
 import { useClub } from '@/contexts/ClubContext';
+import { useLocation } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
 import { ChatResponseRenderer } from '@/components/chat/ChatResponseRenderer';
 
