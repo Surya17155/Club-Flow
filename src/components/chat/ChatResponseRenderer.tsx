@@ -458,11 +458,56 @@ export const ChatResponseRenderer = memo(function ChatResponseRenderer({ content
             </div>
           );
         }
-        return (
-          <div key={i} className="prose prose-sm dark:prose-invert max-w-none [&>p]:m-0 [&>ul]:my-1 [&>ol]:my-1">
-            <ReactMarkdown components={markdownComponents}>{block.content}</ReactMarkdown>
-          </div>
-        );
+        if (block.type === 'tool-result') {
+          const d = block.data;
+          return (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="rounded-2xl p-4 border border-emerald-400/40 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 backdrop-blur-xl"
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-7 h-7 rounded-full bg-emerald-500/20 flex items-center justify-center">
+                  <span className="text-emerald-600 text-xs font-bold">✓</span>
+                </div>
+                <div>
+                  <p className="font-semibold text-sm text-foreground">{d.title || 'Action Completed'}</p>
+                  <p className="text-xs text-muted-foreground">{d.summary}</p>
+                </div>
+              </div>
+              {d.details && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {Object.entries(d.details).map(([key, val]) => (
+                    <span key={key} className="text-[11px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-400/20 font-medium">
+                      {key}: {val}
+                    </span>
+                  ))}
+                </div>
+              )}
+              {d.items && d.items.length > 0 && (
+                <div className="mt-2 max-h-32 overflow-y-auto space-y-0.5">
+                  {d.items.slice(0, 20).map((item, j) => (
+                    <div key={j} className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <span className={`w-1.5 h-1.5 rounded-full ${item.status === 'added' ? 'bg-emerald-500' : item.status === 'failed' ? 'bg-destructive' : 'bg-muted-foreground/40'}`} />
+                      <span className="truncate">{item.name}</span>
+                      <span className="text-[10px] opacity-70">{item.status}</span>
+                    </div>
+                  ))}
+                  {d.items.length > 20 && <p className="text-[10px] text-muted-foreground">+{d.items.length - 20} more</p>}
+                </div>
+              )}
+            </motion.div>
+          );
+        }
+        if (block.type === 'markdown') {
+          return (
+            <div key={i} className="prose prose-sm dark:prose-invert max-w-none [&>p]:m-0 [&>ul]:my-1 [&>ol]:my-1">
+              <ReactMarkdown components={markdownComponents}>{block.content}</ReactMarkdown>
+            </div>
+          );
+        }
+        return null;
       })}
     </div>
   );
