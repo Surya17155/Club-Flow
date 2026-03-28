@@ -8,6 +8,7 @@ interface ClubWithStats {
   description: string | null;
   memberCount: number;
   eventCount: number;
+  president?: { user_id: string; full_name: string; email: string | null } | null;
 }
 
 interface MemberWithProfile {
@@ -80,14 +81,23 @@ export const useSuperAdminStats = () => {
       setTotalEvents(eventsList.length);
 
       // Clubs with stats
-      const clubsWithStats: ClubWithStats[] = clubsList.map(club => ({
-        id: club.id,
-        name: club.name,
-        logo_url: club.logo_url,
-        description: club.description,
-        memberCount: membersList.filter(m => m.club_id === club.id).length,
-        eventCount: eventsList.filter(e => e.club_id === club.id).length,
-      }));
+      const clubsWithStats: ClubWithStats[] = clubsList.map(club => {
+        const presidentMember = membersList.find(m => m.club_id === club.id && m.role === 'president');
+        const presidentProfile = presidentMember ? profileMap.get(presidentMember.user_id) : null;
+        return {
+          id: club.id,
+          name: club.name,
+          logo_url: club.logo_url,
+          description: club.description,
+          memberCount: membersList.filter(m => m.club_id === club.id).length,
+          eventCount: eventsList.filter(e => e.club_id === club.id).length,
+          president: presidentMember ? {
+            user_id: presidentMember.user_id,
+            full_name: presidentProfile?.full_name || 'Unknown',
+            email: presidentProfile?.email || null,
+          } : null,
+        };
+      });
       setClubs(clubsWithStats);
 
       // Members with profiles
