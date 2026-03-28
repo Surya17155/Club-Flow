@@ -794,6 +794,9 @@ const SuperAdminDashboard = () => {
                           <DropdownMenuItem onClick={() => handleEditClub(club)}>
                             <Pencil className="mr-2 h-4 w-4" /> Edit Club
                           </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleOpenPresidentDialog(club)}>
+                            <Crown className="mr-2 h-4 w-4" /> Manage President
+                          </DropdownMenuItem>
                           <DropdownMenuItem
                         onClick={() => handleDeleteClub(club.id, club.name)}
                         className="text-destructive focus:text-destructive">
@@ -960,6 +963,9 @@ const SuperAdminDashboard = () => {
                         <DropdownMenuContent align="end" className="w-40">
                         <DropdownMenuItem onClick={() => handleEditClub(club)}>
                           <Pencil className="mr-2 h-4 w-4" /> Edit Club
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleOpenPresidentDialog(club)}>
+                          <Crown className="mr-2 h-4 w-4" /> Manage President
                         </DropdownMenuItem>
                         <DropdownMenuItem
                       onClick={() => handleDeleteClub(club.id, club.name)}
