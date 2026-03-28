@@ -105,8 +105,6 @@ export const useSuperAdminStats = () => {
       setClubs(clubsWithStats);
 
       // Members with profiles
-      const profileMap = new Map(profilesList.map(p => [p.user_id, p]));
-      const clubMap = new Map(clubsList.map(c => [c.id, c.name]));
       const membersWithProfiles: MemberWithProfile[] = membersList.map(m => {
         const profile = profileMap.get(m.user_id);
         return {
