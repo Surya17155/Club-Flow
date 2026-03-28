@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
-import { X, Send, Bot, User } from 'lucide-react';
+import { X, Send, Bot, User, Paperclip, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 import { ChatResponseRenderer } from './ChatResponseRenderer';
+import { useChatFileUpload } from '@/hooks/useChatFileUpload';
 
 type Msg = { role: 'user' | 'assistant'; content: string };
 
@@ -22,10 +23,12 @@ export function ChatPanel({ open, onClose, activeClubId }: ChatPanelProps) {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const { file, uploading, inputRef, openPicker, handleFileSelect, clearFile, acceptedTypes } = useChatFileUpload();
 
   useEffect(() => {
     setMessages([]);
     setInput('');
+    clearFile();
   }, [activeClubId]);
 
   useEffect(() => {
@@ -36,9 +39,10 @@ export function ChatPanel({ open, onClose, activeClubId }: ChatPanelProps) {
 
   const send = async () => {
     const text = input.trim();
-    if (!text || loading || !session?.access_token) return;
+    if ((!text && !file) || loading || !session?.access_token) return;
 
-    const userMsg: Msg = { role: 'user', content: text };
+    const displayText = file ? `${text || 'Process this file'} 📎 ${file.name}` : text;
+    const userMsg: Msg = { role: 'user', content: displayText };
     const history = [...messages, userMsg];
     setMessages(history);
     setInput('');
@@ -58,17 +62,27 @@ export function ChatPanel({ open, onClose, activeClubId }: ChatPanelProps) {
     };
 
     try {
+      const body: any = {
+        message: text || 'Process this file',
+        conversation_history: messages.map(m => ({ role: m.role, content: m.content })),
+        active_club_id: activeClubId || undefined,
+      };
+      if (file?.parsedData) {
+        body.file_data = file.parsedData;
+        body.file_name = file.name;
+      } else if (file?.storageUrl) {
+        body.file_urls = [file.storageUrl];
+        body.file_name = file.name;
+      }
+      clearFile();
+
       const resp = await fetch(CHAT_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${session.access_token}`,
         },
-        body: JSON.stringify({
-          message: text,
-          conversation_history: messages.map(m => ({ role: m.role, content: m.content })),
-          active_club_id: activeClubId || undefined,
-        }),
+        body: JSON.stringify(body),
       });
 
       if (!resp.ok) {
@@ -130,6 +144,7 @@ export function ChatPanel({ open, onClose, activeClubId }: ChatPanelProps) {
           <div className="text-center text-muted-foreground text-sm mt-8">
             <Bot className="w-10 h-10 mx-auto mb-2 opacity-40" />
             <p>Hi! I'm ClubBot. Ask me anything about your club — members, events, attendance, and more.</p>
+            <p className="text-xs mt-2 opacity-70">📎 You can also upload Excel, PDF, or image files</p>
           </div>
         )}
         {messages.map((msg, i) => (
@@ -165,7 +180,24 @@ export function ChatPanel({ open, onClose, activeClubId }: ChatPanelProps) {
         )}
       </div>
 
+      {/* File preview */}
+      {file && (
+        <div className="px-3 pt-2 flex items-center gap-2">
+          <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-primary/10 text-primary text-xs flex-1 min-w-0">
+            <FileText className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">{file.name}</span>
+          </div>
+          <button onClick={clearFile} className="p-1 rounded hover:bg-muted">
+            <X className="w-3.5 h-3.5 text-muted-foreground" />
+          </button>
+        </div>
+      )}
+
       <div className="p-3 border-t border-border flex gap-2">
+        <input ref={inputRef} type="file" accept={acceptedTypes} onChange={handleFileSelect} className="hidden" />
+        <Button variant="ghost" size="icon" className="shrink-0 h-10 w-10" onClick={openPicker} disabled={uploading || loading}>
+          <Paperclip className="w-4 h-4" />
+        </Button>
         <Input
           value={input}
           onChange={e => setInput(e.target.value)}
@@ -174,7 +206,7 @@ export function ChatPanel({ open, onClose, activeClubId }: ChatPanelProps) {
           disabled={loading}
           className="text-sm"
         />
-        <Button size="icon" onClick={send} disabled={loading || !input.trim()}>
+        <Button size="icon" onClick={send} disabled={loading || (!input.trim() && !file)}>
           <Send className="w-4 h-4" />
         </Button>
       </div>
