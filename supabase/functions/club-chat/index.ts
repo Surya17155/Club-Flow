@@ -186,9 +186,11 @@ serve(async (req) => {
       ? `**SECURITY RULE**: You must ONLY answer questions about "${activeClubName}". You have been given data ONLY for this club. If asked about other clubs, respond: "Sorry, I can only provide information about ${activeClubName} right now. Please switch to that club first." Do NOT reference or reveal data from any other club.`
       : (isSuperAdmin ? "You have unrestricted access to all club data." : "You must only answer questions about the user's own clubs.");
 
+    const systemPrompt = `You are ClubBot, an AI assistant for a club management platform. You have real-time access to club data.
+
 **User Role**: ${userRoleDesc}
 
-${!isSuperAdmin ? `**SECURITY RULE**: You must ONLY answer questions about ${activeClubName ? `"${activeClubName}"` : "the user's own club"}. You have been given data ONLY for this club. If asked about other clubs, respond: "Sorry, I cannot provide information about other clubs for security purposes." Do NOT reference or reveal data from any other club.` : "You have unrestricted access to all club data."}
+${scopeRule}
 
 **Club Data**:
 ${JSON.stringify(clubSummaries, null, 2)}
