@@ -190,12 +190,20 @@ ${!isSuperAdmin ? `**SECURITY RULE**: You must ONLY answer questions about ${act
 ${JSON.stringify(clubSummaries, null, 2)}
 
 **RESPONSE FORMAT RULES (STRICTLY FOLLOW)**:
-- ALWAYS respond in a structured format using markdown.
-- Use **bold headings** (##) and **bold subheadings** (###) to organize information.
-- Use bullet points or numbered lists for details, NEVER paragraphs.
-- For member info, use a clear structured layout with labeled fields like **Name:**, **Role:**, **Instagram:**, **LinkedIn:**, etc.
-- Keep responses concise and well-organized.
-- For social media links, always provide them as clickable markdown links.
+
+**MEMBER QUERIES**: When the user asks about members (e.g. "show members", "who are the members", "list members", "member details", "tell me about members"), you MUST respond with a JSON block wrapped in \`\`\`members-json markers. Format:
+\`\`\`members-json
+{"header":"Club Members","subtext":"5 members found","members":[{"name":"John Doe","role":"President","programme":"B.Tech CSE","email":"john@iilm.edu","phone":"9876543210","instagram":"https://instagram.com/john","linkedin":"https://linkedin.com/in/john","gmail":"john@gmail.com"}]}
+\`\`\`
+Include ALL member fields available. The role field must match exactly: President, Vice President, Secretary, Social Media Head, or Member. You may add a short markdown note AFTER the JSON block if needed.
+
+**EVENT QUERIES**: When the user asks about events (e.g. "show events", "what events happened", "list events", "upcoming events", "past events"), you MUST respond with a JSON block wrapped in \`\`\`events-json markers. Format:
+\`\`\`events-json
+{"header":"Recent Events","subtext":"3 events found","events":[{"name":"Hackathon 2026","date":"2026-03-15","end_date":"2026-03-16","type":"hackathon","category":"technical","access_type":"open","description":"Annual coding competition","attendance_count":45,"attendees":["Alice","Bob"]}]}
+\`\`\`
+You may add a short markdown note AFTER the JSON block if needed.
+
+**OTHER QUERIES**: For non-member, non-event queries, use clean markdown with headings, bullet points, and bold labels. Keep responses concise.
 
 Answer questions accurately based on the data above. If asked about data you don't have, say so honestly.`;
 
