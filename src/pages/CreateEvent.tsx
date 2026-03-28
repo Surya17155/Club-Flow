@@ -272,7 +272,7 @@ const CreateEvent = () => {
               </button>
               {showLocationDropdown && (
                 <div
-                  className="absolute z-[100] w-full mt-1 rounded-xl overflow-hidden shadow-lg border border-border/30 bg-background"
+                  className="absolute z-[100] w-full mt-1 rounded-xl overflow-hidden shadow-lg border border-border/30 bg-card"
                   style={{ background: 'rgba(255, 255, 255, 0.75)', backdropFilter: 'blur(32px) saturate(1.3)', WebkitBackdropFilter: 'blur(32px) saturate(1.3)' }}>
                   <div className="p-1 space-y-0.5">
                     {LOCATIONS.map((loc) => (
