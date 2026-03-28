@@ -15,11 +15,12 @@ interface ClubMember {
 }
 
 const roleLabelMap: Record<string, string> = {
-  admin: 'Admin',
-  president: 'President',
-  vice_president: 'Vice President',
-  secretary: 'Secretary',
-  social_media_head: 'Social Media Head',
+  admin: 'Admin', president: 'President', vice_president: 'Vice President',
+  social_media_head: 'Social Media Head', social_media_coordinator: 'Social Media Coordinator',
+  technical_pr_head: 'Technical & PR Head', technical_pr_coordinator: 'Technical & PR Coordinator',
+  general_secretary: 'General Secretary', secretary: 'Secretary',
+  deputy_secretary: 'Deputy Secretary', treasurer: 'Treasurer',
+  deputy_treasurer: 'Deputy Treasurer', assistant_treasurer: 'Assistant Treasurer',
   member: 'Member',
 };
 

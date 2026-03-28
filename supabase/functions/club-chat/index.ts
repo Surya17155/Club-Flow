@@ -7,7 +7,7 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const VALID_ROLES = ["president", "vice_president", "secretary", "social_media_head", "member"];
+const VALID_ROLES = ["president", "vice_president", "general_secretary", "secretary", "deputy_secretary", "social_media_head", "social_media_coordinator", "technical_pr_head", "technical_pr_coordinator", "treasurer", "deputy_treasurer", "assistant_treasurer", "member"];
 
 // ── Tool definitions ──
 const agentTools = [

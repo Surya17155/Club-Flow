@@ -108,14 +108,14 @@ function parseResponse(content: string): ParsedContent {
 }
 
 function tryLegacyMemberParse(content: string): ParsedContent['blocks'][0] | null {
-  const memberPattern = /\d+\.\s*\*{0,2}(President|Vice President|Secretary|Social Media Head|Member|General Member)\*{0,2}/i;
+  const memberPattern = /\d+\.\s*\*{0,2}(President|Vice President|General Secretary|Secretary|Deputy Secretary|Social Media Head|Social Media Coordinator|Technical (?:&|and) PR Head|Technical (?:&|and) PR Coordinator|Treasurer|Deputy Treasurer|Assistant Treasurer|Member|General Member)\*{0,2}/i;
   if (!memberPattern.test(content)) return null;
 
   const members: MemberCard[] = [];
   const sections = content.split(/(?=\d+\.\s)/);
   for (const section of sections) {
     if (!section.trim()) continue;
-    const roleMatch = section.match(/\d+\.\s*\*{0,2}(President|Vice President|Secretary|Social Media Head|Member|General Member)\*{0,2}/i);
+    const roleMatch = section.match(/\d+\.\s*\*{0,2}(President|Vice President|General Secretary|Secretary|Deputy Secretary|Social Media Head|Social Media Coordinator|Technical (?:&|and) PR Head|Technical (?:&|and) PR Coordinator|Treasurer|Deputy Treasurer|Assistant Treasurer|Member|General Member)\*{0,2}/i);
     if (!roleMatch) continue;
 
     const getValue = (key: string): string => {
@@ -150,7 +150,11 @@ function getRoleColor(role: string): string {
   const r = role.toLowerCase();
   if (r === 'president') return 'from-amber-500/20 to-orange-500/20 border-amber-400/40';
   if (r === 'vice president') return 'from-purple-500/20 to-violet-500/20 border-purple-400/40';
-  if (r.includes('secretary') || r.includes('social media')) return 'from-blue-500/20 to-cyan-500/20 border-blue-400/40';
+  if (r.includes('secretary')) return 'from-blue-500/20 to-cyan-500/20 border-blue-400/40';
+  if (r.includes('social media')) return 'from-pink-500/20 to-rose-500/20 border-pink-400/40';
+  if (r.includes('technical') || r.includes('pr')) return 'from-indigo-500/20 to-violet-500/20 border-indigo-400/40';
+  if (r.includes('treasurer')) return 'from-emerald-500/20 to-teal-500/20 border-emerald-400/40';
+  if (r === 'member') return 'from-gray-500/10 to-slate-500/10 border-gray-300/40';
   return 'from-slate-500/10 to-gray-500/10 border-slate-300/40';
 }
 
@@ -158,7 +162,11 @@ function getRoleBadgeColor(role: string): string {
   const r = role.toLowerCase();
   if (r === 'president') return 'bg-amber-500/20 text-amber-700 dark:text-amber-300 border-amber-400/30';
   if (r === 'vice president') return 'bg-purple-500/20 text-purple-700 dark:text-purple-300 border-purple-400/30';
-  if (r.includes('secretary') || r.includes('social media')) return 'bg-blue-500/20 text-blue-700 dark:text-blue-300 border-blue-400/30';
+  if (r.includes('secretary')) return 'bg-blue-500/20 text-blue-700 dark:text-blue-300 border-blue-400/30';
+  if (r.includes('social media')) return 'bg-pink-500/20 text-pink-700 dark:text-pink-300 border-pink-400/30';
+  if (r.includes('technical') || r.includes('pr')) return 'bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border-indigo-400/30';
+  if (r.includes('treasurer')) return 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-400/30';
+  if (r === 'member') return 'bg-gray-500/10 text-gray-600 dark:text-gray-300 border-gray-300/30';
   return 'bg-slate-500/10 text-slate-600 dark:text-slate-300 border-slate-300/30';
 }
 
@@ -172,7 +180,10 @@ function getAvatarGradient(role: string): string {
   const r = role.toLowerCase();
   if (r === 'president') return 'from-amber-400 to-orange-500';
   if (r === 'vice president') return 'from-purple-400 to-violet-500';
-  if (r.includes('secretary') || r.includes('social media')) return 'from-blue-400 to-cyan-500';
+  if (r.includes('secretary')) return 'from-blue-400 to-cyan-500';
+  if (r.includes('social media')) return 'from-pink-400 to-rose-500';
+  if (r.includes('technical') || r.includes('pr')) return 'from-indigo-400 to-violet-500';
+  if (r.includes('treasurer')) return 'from-emerald-400 to-teal-500';
   return 'from-slate-400 to-gray-500';
 }
 
