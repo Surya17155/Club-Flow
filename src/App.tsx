@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -5,28 +6,45 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ClubProvider } from "@/contexts/ClubContext";
+
+// Eager-load critical routes
 import LandingPage from "./pages/LandingPage";
 import Login from "./pages/Login";
-import Signup from "./pages/Signup";
-import ResetPassword from "./pages/ResetPassword";
-import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
-import ClubDashboard from "./pages/ClubDashboard";
-import MemberDashboard from "./pages/MemberDashboard";
-import Events from "./pages/Events";
-import MarkAttendance from "./pages/MarkAttendance";
-import Profile from "./pages/Profile";
-import Settings from "./pages/Settings";
-import CreateEvent from "./pages/CreateEvent";
-import SuperAdminDashboard from "./pages/SuperAdminDashboard";
-import GlobalReports from "./pages/GlobalReports";
-import DiscoverClubs from "./pages/DiscoverClubs";
-import MobileCalendar from "./pages/MobileCalendar";
-import MobileChat from "./pages/MobileChat";
-import ManageOutsiders from "./pages/ManageOutsiders";
-import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
+// Lazy-load non-critical routes
+const Signup = lazy(() => import("./pages/Signup"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const ClubDashboard = lazy(() => import("./pages/ClubDashboard"));
+const MemberDashboard = lazy(() => import("./pages/MemberDashboard"));
+const Events = lazy(() => import("./pages/Events"));
+const MarkAttendance = lazy(() => import("./pages/MarkAttendance"));
+const Profile = lazy(() => import("./pages/Profile"));
+const Settings = lazy(() => import("./pages/Settings"));
+const CreateEvent = lazy(() => import("./pages/CreateEvent"));
+const SuperAdminDashboard = lazy(() => import("./pages/SuperAdminDashboard"));
+const GlobalReports = lazy(() => import("./pages/GlobalReports"));
+const DiscoverClubs = lazy(() => import("./pages/DiscoverClubs"));
+const MobileCalendar = lazy(() => import("./pages/MobileCalendar"));
+const MobileChat = lazy(() => import("./pages/MobileChat"));
+const ManageOutsiders = lazy(() => import("./pages/ManageOutsiders"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 2, // 2 min stale time to reduce refetches
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
+const PageFallback = () => (
+  <div className="min-h-screen flex items-center justify-center bg-background">
+    <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin" />
+  </div>
+);
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -36,32 +54,34 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <ClubProvider>
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="/club/:id" element={<ClubDashboard />} />
-              <Route path="/clubs" element={<ClubDashboard />} />
-              <Route path="/member" element={<MemberDashboard />} />
-              <Route path="/members" element={<MemberDashboard />} />
-              <Route path="/events" element={<Events />} />
-              <Route path="/mark-attendance/:token" element={<MarkAttendance />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/create-event" element={<CreateEvent />} />
-              <Route path="/super-admin" element={<SuperAdminDashboard />} />
-              <Route path="/global-reports" element={<GlobalReports />} />
-              <Route path="/discover" element={<DiscoverClubs />} />
-              <Route path="/calendar" element={<MobileCalendar />} />
-              <Route path="/chat" element={<MobileChat />} />
-              <Route path="/scan" element={<Events />} />
-              <Route path="/manage-outsiders" element={<ManageOutsiders />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            <Suspense fallback={<PageFallback />}>
+              <Routes>
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/club/:id" element={<ClubDashboard />} />
+                <Route path="/clubs" element={<ClubDashboard />} />
+                <Route path="/member" element={<MemberDashboard />} />
+                <Route path="/members" element={<MemberDashboard />} />
+                <Route path="/events" element={<Events />} />
+                <Route path="/mark-attendance/:token" element={<MarkAttendance />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/create-event" element={<CreateEvent />} />
+                <Route path="/super-admin" element={<SuperAdminDashboard />} />
+                <Route path="/global-reports" element={<GlobalReports />} />
+                <Route path="/discover" element={<DiscoverClubs />} />
+                <Route path="/calendar" element={<MobileCalendar />} />
+                <Route path="/chat" element={<MobileChat />} />
+                <Route path="/scan" element={<Events />} />
+                <Route path="/manage-outsiders" element={<ManageOutsiders />} />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
           </ClubProvider>
         </AuthProvider>
       </BrowserRouter>

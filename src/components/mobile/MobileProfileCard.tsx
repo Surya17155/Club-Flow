@@ -1,5 +1,5 @@
+import { memo } from "react";
 import { Instagram, Linkedin, Mail } from "lucide-react";
-import VerifiedBadge, { getRoleBadgeVariant } from "@/components/ui/VerifiedBadge";
 
 interface MobileProfileCardProps {
   fullName: string;
@@ -17,7 +17,9 @@ interface MobileProfileCardProps {
   role?: string;
 }
 
-export function MobileProfileCard({
+import VerifiedBadge, { getRoleBadgeVariant } from "@/components/ui/VerifiedBadge";
+
+export const MobileProfileCard = memo(function MobileProfileCard({
   fullName,
   roleLabel,
   clubName,
@@ -58,6 +60,8 @@ export function MobileProfileCard({
         <img
           src={avatarUrl}
           alt={fullName}
+          loading="lazy"
+          decoding="async"
           className="absolute inset-0 w-full h-full"
           style={{ objectFit: "cover", objectPosition: "center", zIndex: 1 }}
         />
@@ -153,4 +157,4 @@ export function MobileProfileCard({
       </div>
     </div>
   );
-}
+});

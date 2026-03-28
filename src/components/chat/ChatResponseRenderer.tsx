@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, memo, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, User, Mail, Phone, Instagram, Linkedin, GraduationCap, Shield, Calendar, Clock, Users, Tag, MapPin, ChevronDown } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
@@ -167,7 +167,7 @@ function getAvatarGradient(role: string): string {
 
 // ── Member Card Component ──
 
-function MemberCardComponent({ member, index }: { member: MemberCard; index: number }) {
+const MemberCardComponent = memo(function MemberCardComponent({ member, index }: { member: MemberCard; index: number }) {
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -259,11 +259,11 @@ function MemberCardComponent({ member, index }: { member: MemberCard; index: num
       </AnimatePresence>
     </>
   );
-}
+});
 
 // ── Event Card Component ──
 
-function EventCardComponent({ event, index }: { event: EventCard; index: number }) {
+const EventCardComponent = memo(function EventCardComponent({ event, index }: { event: EventCard; index: number }) {
   const [expanded, setExpanded] = useState(false);
 
   const formatDate = (d: string) => {
@@ -386,8 +386,7 @@ function EventCardComponent({ event, index }: { event: EventCard; index: number 
       </AnimatePresence>
     </>
   );
-}
-
+});
 // ── Shared Detail Row ──
 
 function DetailRow({ icon, label, value, href }: { icon: React.ReactNode; label: string; value: string; href?: string }) {
@@ -416,8 +415,8 @@ const markdownComponents = {
 
 // ── Main Renderer ──
 
-export function ChatResponseRenderer({ content }: { content: string }) {
-  const { blocks } = parseResponse(content);
+export const ChatResponseRenderer = memo(function ChatResponseRenderer({ content }: { content: string }) {
+  const { blocks } = useMemo(() => parseResponse(content), [content]);
 
   return (
     <div className="space-y-3">
@@ -456,4 +455,4 @@ export function ChatResponseRenderer({ content }: { content: string }) {
       })}
     </div>
   );
-}
+});

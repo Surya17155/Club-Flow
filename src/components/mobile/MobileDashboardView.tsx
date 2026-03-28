@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback, memo } from 'react';
 import { ClubDetailOverlay } from './ClubDetailOverlay';
 import { AttendanceHistoryModal } from './AttendanceHistoryModal';
 import { useNavigate } from 'react-router-dom';
@@ -83,10 +83,20 @@ export function MobileDashboardView({
   const [expandedClubId, setExpandedClubId] = useState<string | null>(null);
   const [activeStatModal, setActiveStatModal] = useState<string | null>(null);
 
+  const handleStatClick = useCallback((stat: typeof statsCards[0]) => {
+    if (stat.clickable && stat.clickAction) {
+      if (stat.clickAction === 'clubs_joined') {
+        document.getElementById('mobile-my-clubs')?.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        setActiveStatModal(stat.clickAction);
+      }
+    }
+  }, []);
+
   return (
     <>
-      {/* Fixed top elements — no header bar, elements pinned individually */}
-      <div className="fixed top-0 left-0 right-0 z-40 px-4 pb-3 pointer-events-none" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}>
+      {/* Fixed top elements — GPU-accelerated */}
+      <div className="fixed top-0 left-0 right-0 z-40 px-4 pb-3 pointer-events-none gpu-fixed" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}>
         <div className="pointer-events-auto">
           {/* Top row: centered app name, profile avatar pinned right */}
           <div className="relative flex items-center justify-center mb-2">
@@ -123,9 +133,9 @@ export function MobileDashboardView({
         </div>
       </div>
 
-      <div className="min-h-screen pb-20 dashboard-corner-gradient overflow-x-hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', paddingTop: '180px' }}>
-        {/* Fixed background blobs */}
-        <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
+      <div className="min-h-screen pb-20 dashboard-corner-gradient overflow-x-hidden gpu-scroll" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', paddingTop: '180px' }}>
+        {/* Background blobs — GPU layer */}
+        <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden gpu-fixed">
           <div
             className="absolute top-[-8%] left-[-8%] w-[300px] h-[300px] rounded-full mix-blend-multiply filter blur-[80px] opacity-60 animate-blob"
             style={{ backgroundColor: 'hsl(45 90% 85% / 0.9)' }} />
@@ -163,16 +173,7 @@ export function MobileDashboardView({
                 <div
                   key={i}
                   className={`glass-card p-4 text-center ${isClickable ? 'cursor-pointer ring-primary/20 active:scale-[0.97] transition-transform' : ''}`}
-                  onClick={() => {
-                    if (isClickable && stat.clickAction) {
-                      if (stat.clickAction === 'clubs_joined') {
-                        // Scroll to clubs section
-                        document.getElementById('mobile-my-clubs')?.scrollIntoView({ behavior: 'smooth' });
-                      } else {
-                        setActiveStatModal(stat.clickAction);
-                      }
-                    }
-                  }}
+                  onClick={() => handleStatClick(stat)}
                 >
                 <Icon className="w-5 h-5 text-primary mx-auto mb-1.5" />
                 <h3 className="text-2xl font-bold text-primary">{stat.value}</h3>
