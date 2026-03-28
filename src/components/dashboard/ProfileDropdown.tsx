@@ -91,7 +91,7 @@ const ProfileDropdown = ({ viewMode = 'personal' }: { viewMode?: 'personal' | 'c
             {showChatOption && (
               <DropdownMenuItem onClick={() => {
                 if (isMobile) {
-                  navigate('/chat');
+                  navigate('/chat', { state: { superAdmin: isSuperAdminEmail && isSuperAdminMode } });
                 } else {
                   setShowChat(true);
                 }
