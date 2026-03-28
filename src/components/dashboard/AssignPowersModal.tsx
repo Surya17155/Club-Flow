@@ -167,7 +167,7 @@ const AssignPowersModal = ({ open, onOpenChange, clubId }: AssignPowersModalProp
                         transition={{ duration: 0.25, ease: 'easeInOut' }}
                         className="overflow-hidden"
                       >
-                        <div className="px-3 pb-3 space-y-2 border-t border-white/10 pt-2">
+                        <div className="px-3 pb-3 space-y-2 border-t border-border pt-2">
                           {AVAILABLE_POWERS.map(power => {
                             const has = hasPower(member.user_id, power.key);
                             const isToggling = toggling === `${member.user_id}-${power.key}`;
