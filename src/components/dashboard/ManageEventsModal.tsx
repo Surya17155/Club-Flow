@@ -23,6 +23,7 @@ interface Attendee {
   programme: string | null;
   section: string | null;
   year: string | null;
+  phone: string | null;
 }
 
 interface ClubEvent {
@@ -110,7 +111,7 @@ const ManageEventsModal = ({ open, onOpenChange }: { open: boolean; onOpenChange
       const studentIds = data.map((a: any) => a.student_id);
       const { data: profiles } = await supabase
         .from('profiles')
-        .select('user_id, full_name, roll_no, programme, section, year')
+        .select('user_id, full_name, roll_no, programme, section, year, phone')
         .in('user_id', studentIds);
 
       const profileMap: Record<string, any> = {};
@@ -123,6 +124,7 @@ const ManageEventsModal = ({ open, onOpenChange }: { open: boolean; onOpenChange
         programme: profileMap[a.student_id]?.programme || null,
         section: profileMap[a.student_id]?.section || null,
         year: profileMap[a.student_id]?.year || null,
+        phone: profileMap[a.student_id]?.phone || null,
       })));
     } else {
       setAttendees([]);
@@ -173,7 +175,7 @@ const ManageEventsModal = ({ open, onOpenChange }: { open: boolean; onOpenChange
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogContent className="w-[calc(100vw-2rem)] max-w-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-lg font-bold flex items-center gap-2">
               {selectedEvent ? (
@@ -202,38 +204,42 @@ const ManageEventsModal = ({ open, onOpenChange }: { open: boolean; onOpenChange
                   const d = new Date(event.event_date);
                   const isPast = d < new Date();
                   return (
-                    <div key={event.id} className="flex items-center gap-4 p-4 rounded-xl border border-border/50 bg-white/40 hover:bg-white/70 cursor-pointer transition-colors group">
-                      <div onClick={() => viewAttendance(event)} className="flex items-center gap-4 flex-1 min-w-0">
-                        <div className="rounded-lg shadow-sm w-12 h-12 flex flex-col items-center justify-center border border-border bg-white shrink-0">
-                          <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
+                    <div
+                      key={event.id}
+                      className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 p-3 sm:p-4 rounded-xl border border-border/50 bg-white/40 hover:bg-white/70 cursor-pointer transition-colors group"
+                      onClick={() => viewAttendance(event)}
+                    >
+                      <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+                        <div className="rounded-lg shadow-sm w-10 h-10 sm:w-12 sm:h-12 flex flex-col items-center justify-center border border-border bg-white shrink-0">
+                          <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
                             {d.toLocaleString('default', { month: 'short' }).toUpperCase()}
                           </span>
-                          <span className="text-lg font-bold leading-none text-foreground">{d.getDate()}</span>
+                          <span className="text-sm sm:text-lg font-bold leading-none text-foreground">{d.getDate()}</span>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h4 className="text-sm font-bold text-foreground truncate">{event.name}</h4>
-                          <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
+                          <h4 className="text-xs sm:text-sm font-bold text-foreground truncate">{event.name}</h4>
+                          <div className="flex items-center gap-2 sm:gap-3 text-[10px] sm:text-xs text-muted-foreground mt-0.5">
                             <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{formatTime(event.event_date)}{event.end_date ? ` – ${formatTime(event.end_date)}` : ''}</span>
                             <span className="flex items-center gap-1"><Tag className="w-3 h-3" />{event.event_type}</span>
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3 shrink-0">
+                      <div className="flex items-center gap-2 sm:gap-3 shrink-0 pl-13 sm:pl-0">
                         <div className="text-center">
-                          <p className="text-lg font-bold text-foreground">{event.attendee_count}</p>
-                          <p className="text-[10px] text-muted-foreground">Attended</p>
+                          <p className="text-sm sm:text-lg font-bold text-foreground">{event.attendee_count}</p>
+                          <p className="text-[9px] sm:text-[10px] text-muted-foreground">Attended</p>
                         </div>
-                        <Badge variant={isPast ? 'secondary' : 'default'} className="text-[10px]">
+                        <Badge variant={isPast ? 'secondary' : 'default'} className="text-[9px] sm:text-[10px]">
                           {isPast ? 'Past' : 'Upcoming'}
                         </Badge>
                         <button
                           onClick={(e) => { e.stopPropagation(); setDeleteTarget(event); }}
-                          className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors opacity-0 group-hover:opacity-100"
+                          className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors sm:opacity-0 sm:group-hover:opacity-100"
                           title="Delete event"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         </button>
-                        <ChevronRight onClick={() => viewAttendance(event)} className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+                        <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
                       </div>
                     </div>
                   );
@@ -287,28 +293,34 @@ const ManageEventsModal = ({ open, onOpenChange }: { open: boolean; onOpenChange
               ) : attendees.length === 0 ? (
                 <p className="text-sm text-muted-foreground italic text-center py-8">No attendance records for this event</p>
               ) : (
-                <div className="border border-border/50 rounded-xl overflow-hidden">
-                  <table className="w-full text-sm">
+                <div className="border border-border/50 rounded-xl overflow-x-auto">
+                  <table className="w-full text-sm min-w-[600px]">
                     <thead>
-                      <tr className="bg-muted/50 text-muted-foreground text-xs uppercase tracking-wider">
-                        <th className="text-left px-4 py-2.5">#</th>
-                        <th className="text-left px-4 py-2.5">Name</th>
-                        <th className="text-left px-4 py-2.5">Roll No</th>
-                        <th className="text-left px-4 py-2.5">Programme</th>
-                        <th className="text-left px-4 py-2.5">Scanned At</th>
-                        <th className="text-left px-4 py-2.5">Method</th>
+                      <tr className="bg-muted/50 text-muted-foreground text-[10px] sm:text-xs uppercase tracking-wider">
+                        <th className="text-left px-2 sm:px-4 py-2">#</th>
+                        <th className="text-left px-2 sm:px-4 py-2">Name</th>
+                        <th className="text-left px-2 sm:px-4 py-2">Roll No</th>
+                        <th className="text-left px-2 sm:px-4 py-2">Phone</th>
+                        <th className="text-left px-2 sm:px-4 py-2">Programme</th>
+                        <th className="text-left px-2 sm:px-4 py-2">Year</th>
+                        <th className="text-left px-2 sm:px-4 py-2">Section</th>
+                        <th className="text-left px-2 sm:px-4 py-2">Scan Time</th>
+                        <th className="text-left px-2 sm:px-4 py-2">Method</th>
                       </tr>
                     </thead>
                     <tbody>
                       {attendees.map((a, i) => (
                         <tr key={a.id} className="border-t border-border/30 hover:bg-white/50">
-                          <td className="px-4 py-2.5 text-muted-foreground">{i + 1}</td>
-                          <td className="px-4 py-2.5 font-medium text-foreground">{a.full_name}</td>
-                          <td className="px-4 py-2.5 text-muted-foreground">{a.roll_no || '—'}</td>
-                          <td className="px-4 py-2.5 text-muted-foreground">{a.programme || '—'}{a.section ? ` (${a.section})` : ''}</td>
-                          <td className="px-4 py-2.5 text-muted-foreground">{formatTime(a.scanned_at)}</td>
-                          <td className="px-4 py-2.5">
-                            <Badge variant={a.manually_added ? 'outline' : 'secondary'} className="text-[10px]">
+                          <td className="px-2 sm:px-4 py-2 text-muted-foreground text-xs">{i + 1}</td>
+                          <td className="px-2 sm:px-4 py-2 font-medium text-foreground text-xs sm:text-sm whitespace-nowrap">{a.full_name}</td>
+                          <td className="px-2 sm:px-4 py-2 text-muted-foreground text-xs">{a.roll_no || '—'}</td>
+                          <td className="px-2 sm:px-4 py-2 text-muted-foreground text-xs">{a.phone || '—'}</td>
+                          <td className="px-2 sm:px-4 py-2 text-muted-foreground text-xs">{a.programme || '—'}</td>
+                          <td className="px-2 sm:px-4 py-2 text-muted-foreground text-xs">{a.year || '—'}</td>
+                          <td className="px-2 sm:px-4 py-2 text-muted-foreground text-xs">{a.section || '—'}</td>
+                          <td className="px-2 sm:px-4 py-2 text-muted-foreground text-xs whitespace-nowrap">{formatTime(a.scanned_at)}</td>
+                          <td className="px-2 sm:px-4 py-2">
+                            <Badge variant={a.manually_added ? 'outline' : 'secondary'} className="text-[9px] sm:text-[10px]">
                               {a.manually_added ? 'Manual' : 'QR'}
                             </Badge>
                           </td>
