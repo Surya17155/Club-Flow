@@ -128,7 +128,7 @@ const AssignPowersModal = ({ open, onOpenChange, clubId }: AssignPowersModalProp
               const isExpanded = expandedId === member.user_id;
               const badgeVariant = getRoleBadgeVariant(member.role);
               return (
-                <div key={member.user_id} className="rounded-xl overflow-hidden bg-white/10 border border-white/10">
+                <div key={member.user_id} className="rounded-xl overflow-hidden bg-background border border-border shadow-sm">
                   <button
                     type="button"
                     onClick={() => setExpandedId(isExpanded ? null : member.user_id)}
