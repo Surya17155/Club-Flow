@@ -5,8 +5,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useClub } from '@/contexts/ClubContext';
 import { useDelegatedPowers, AVAILABLE_POWERS } from '@/hooks/useDelegatedPowers';
 import { toast } from 'sonner';
-import { Shield, Loader2 } from 'lucide-react';
+import { Shield, Loader2, ChevronDown } from 'lucide-react';
 import VerifiedBadge, { getRoleBadgeVariant } from '@/components/ui/VerifiedBadge';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface ClubMember {
   user_id: string;
@@ -37,6 +38,7 @@ const AssignPowersModal = ({ open, onOpenChange, clubId }: AssignPowersModalProp
   const [members, setMembers] = useState<ClubMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [toggling, setToggling] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!open || !effectiveClubId) return;
@@ -46,10 +48,12 @@ const AssignPowersModal = ({ open, onOpenChange, clubId }: AssignPowersModalProp
         .from('club_members')
         .select('user_id, role')
         .eq('club_id', effectiveClubId)
-        .neq('role', 'president');
+        .neq('role', 'president')
+        .neq('role', 'member')
+        .neq('role', 'admin');
 
       if (!memberError && memberRows) {
-        const userIds = memberRows.map((member) => member.user_id);
+        const userIds = memberRows.map((m) => m.user_id);
         let profileMap = new Map<string, { full_name: string | null }>();
 
         if (userIds.length > 0) {
@@ -57,14 +61,13 @@ const AssignPowersModal = ({ open, onOpenChange, clubId }: AssignPowersModalProp
             .from('profiles')
             .select('user_id, full_name')
             .in('user_id', userIds);
-
-          profileMap = new Map((profileRows ?? []).map((profile) => [profile.user_id, profile]));
+          profileMap = new Map((profileRows ?? []).map((p) => [p.user_id, p]));
         }
 
-        setMembers(memberRows.map((member) => ({
-          user_id: member.user_id,
-          role: member.role,
-          full_name: profileMap.get(member.user_id)?.full_name ?? 'Unknown',
+        setMembers(memberRows.map((m) => ({
+          user_id: m.user_id,
+          role: m.role,
+          full_name: profileMap.get(m.user_id)?.full_name ?? 'Unknown',
         })));
       } else {
         setMembers([]);
@@ -73,6 +76,10 @@ const AssignPowersModal = ({ open, onOpenChange, clubId }: AssignPowersModalProp
     };
     fetchMembers();
   }, [open, effectiveClubId]);
+
+  useEffect(() => {
+    if (!open) setExpandedId(null);
+  }, [open]);
 
   const hasPower = (userId: string, power: string) =>
     powers.some(p => p.user_id === userId && p.power === power);
@@ -91,19 +98,21 @@ const AssignPowersModal = ({ open, onOpenChange, clubId }: AssignPowersModalProp
     setToggling(null);
   };
 
-  // Filter to non-president, non-admin members (people who need delegation)
-  const delegatableMembers = members.filter(m => m.role !== 'admin');
+  const getRoleColor = (role: string) => {
+    if (role === 'president' || role === 'vice_president') return 'text-purple-300 bg-purple-500/20 border-purple-500/30';
+    return 'text-blue-300 bg-blue-500/20 border-blue-500/30';
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="glass-card border-white/20 max-w-lg max-h-[80vh] overflow-y-auto">
+      <DialogContent className="glass-card border-white/20 max-w-md max-h-[80vh] overflow-y-auto p-4 sm:p-6">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 font-display gradient-gold bg-clip-text text-transparent text-lg">
             <Shield className="w-5 h-5 text-primary" />
             Assign Powers
           </DialogTitle>
           <p className="text-xs text-muted-foreground mt-1">
-            Delegate specific abilities to club post holders
+            Delegate abilities to club post holders
           </p>
         </DialogHeader>
 
@@ -111,39 +120,75 @@ const AssignPowersModal = ({ open, onOpenChange, clubId }: AssignPowersModalProp
           <div className="flex items-center justify-center py-12">
             <Loader2 className="w-6 h-6 animate-spin text-primary" />
           </div>
-        ) : delegatableMembers.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-8">No members to delegate powers to.</p>
+        ) : members.length === 0 ? (
+          <p className="text-sm text-muted-foreground text-center py-8">No post holders found to delegate powers to.</p>
         ) : (
-          <div className="space-y-4 mt-2">
-            {delegatableMembers.map(member => (
-              <div key={member.user_id} className="glass-input rounded-xl p-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-semibold text-foreground inline-flex items-center">{member.full_name}{getRoleBadgeVariant(member.role) && <VerifiedBadge variant={getRoleBadgeVariant(member.role)!} size={14} />}</p>
-                    <p className="text-xs text-muted-foreground">{roleLabelMap[member.role] ?? member.role}</p>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  {AVAILABLE_POWERS.map(power => {
-                    const has = hasPower(member.user_id, power.key);
-                    const isToggling = toggling === `${member.user_id}-${power.key}`;
-                    return (
-                      <div key={power.key} className="flex items-center justify-between py-1.5 px-2 rounded-lg hover:bg-white/30 transition-colors">
-                        <div>
-                          <p className="text-sm font-medium text-foreground">{power.label}</p>
-                          <p className="text-xs text-muted-foreground">{power.description}</p>
+          <div className="space-y-2 mt-2">
+            {members.map(member => {
+              const isExpanded = expandedId === member.user_id;
+              const badgeVariant = getRoleBadgeVariant(member.role);
+              return (
+                <div key={member.user_id} className="rounded-xl overflow-hidden bg-white/10 border border-white/10">
+                  <button
+                    type="button"
+                    onClick={() => setExpandedId(isExpanded ? null : member.user_id)}
+                    className="flex items-center gap-3 w-full p-3 text-left hover:bg-white/5 transition-colors"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary text-xs font-bold shrink-0">
+                      {member.full_name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-foreground truncate flex items-center gap-1">
+                        {member.full_name}
+                        {badgeVariant && <VerifiedBadge variant={badgeVariant} size={14} />}
+                      </p>
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full border font-medium ${getRoleColor(member.role)}`}>
+                        {roleLabelMap[member.role] ?? member.role}
+                      </span>
+                    </div>
+                    <motion.div
+                      animate={{ rotate: isExpanded ? 180 : 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                    </motion.div>
+                  </button>
+
+                  <AnimatePresence initial={false}>
+                    {isExpanded && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.25, ease: 'easeInOut' }}
+                        className="overflow-hidden"
+                      >
+                        <div className="px-3 pb-3 space-y-2 border-t border-white/10 pt-2">
+                          {AVAILABLE_POWERS.map(power => {
+                            const has = hasPower(member.user_id, power.key);
+                            const isToggling = toggling === `${member.user_id}-${power.key}`;
+                            return (
+                              <div key={power.key} className="flex items-center justify-between py-1.5 px-2 rounded-lg hover:bg-white/5 transition-colors">
+                                <div className="min-w-0 flex-1">
+                                  <p className="text-sm font-medium text-foreground">{power.label}</p>
+                                  <p className="text-xs text-muted-foreground">{power.description}</p>
+                                </div>
+                                <Switch
+                                  checked={has}
+                                  onCheckedChange={() => handleToggle(member.user_id, power.key, has)}
+                                  disabled={isToggling}
+                                  className="shrink-0 ml-2"
+                                />
+                              </div>
+                            );
+                          })}
                         </div>
-                        <Switch
-                          checked={has}
-                          onCheckedChange={() => handleToggle(member.user_id, power.key, has)}
-                          disabled={isToggling}
-                        />
-                      </div>
-                    );
-                  })}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </DialogContent>
