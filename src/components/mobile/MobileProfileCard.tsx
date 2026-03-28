@@ -157,4 +157,4 @@ export const MobileProfileCard = memo(function MobileProfileCard({
       </div>
     </div>
   );
-}
+});
