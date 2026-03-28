@@ -1,5 +1,5 @@
 interface VerifiedBadgeProps {
-  variant: 'purple' | 'blue';
+  variant: 'purple' | 'blue' | 'gray';
   size?: number;
 }
 
@@ -8,6 +8,8 @@ const VerifiedBadge = ({ variant, size = 16 }: VerifiedBadgeProps) => {
   
   const colors = variant === 'purple'
     ? { start: '#a855f7', mid: '#9333ea', end: '#7e22ce', glow: '#c084fc' }
+    : variant === 'gray'
+    ? { start: '#9ca3af', mid: '#6b7280', end: '#4b5563', glow: '#d1d5db' }
     : { start: '#3b82f6', mid: '#2563eb', end: '#1d4ed8', glow: '#93c5fd' };
 
   return (
@@ -53,9 +55,15 @@ const VerifiedBadge = ({ variant, size = 16 }: VerifiedBadgeProps) => {
   );
 };
 
-export const getRoleBadgeVariant = (role: string): 'purple' | 'blue' | null => {
+export const getRoleBadgeVariant = (role: string): 'purple' | 'blue' | 'gray' | null => {
   if (role === 'president' || role === 'vice_president') return 'purple';
-  if (role === 'secretary' || role === 'social_media_head') return 'blue';
+  if (role === 'member') return 'gray';
+  if ([
+    'secretary', 'general_secretary', 'deputy_secretary',
+    'social_media_head', 'social_media_coordinator',
+    'technical_pr_head', 'technical_pr_coordinator',
+    'treasurer', 'deputy_treasurer', 'assistant_treasurer',
+  ].includes(role)) return 'blue';
   return null;
 };
 

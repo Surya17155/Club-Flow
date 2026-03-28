@@ -43,21 +43,42 @@ interface Member {
 
 const roleLabelMap: Record<string, string> = {
   admin: 'Admin', president: 'President', vice_president: 'Vice President',
-  secretary: 'Secretary', social_media_head: 'Social Media Head', member: 'Member',
+  social_media_head: 'Social Media Head', social_media_coordinator: 'Social Media Coordinator',
+  technical_pr_head: 'Technical & PR Head', technical_pr_coordinator: 'Technical & PR Coordinator',
+  general_secretary: 'General Secretary', secretary: 'Secretary',
+  deputy_secretary: 'Deputy Secretary', treasurer: 'Treasurer',
+  deputy_treasurer: 'Deputy Treasurer', assistant_treasurer: 'Assistant Treasurer',
+  member: 'Member',
 };
 
 const roleColors: Record<string, string> = {
   president: 'bg-primary/10 text-primary',
   vice_president: 'bg-purple-100 text-purple-700',
+  general_secretary: 'bg-blue-100 text-blue-700',
   secretary: 'bg-blue-100 text-blue-700',
+  deputy_secretary: 'bg-blue-100 text-blue-700',
   social_media_head: 'bg-pink-100 text-pink-700',
+  social_media_coordinator: 'bg-pink-100 text-pink-700',
+  technical_pr_head: 'bg-indigo-100 text-indigo-700',
+  technical_pr_coordinator: 'bg-indigo-100 text-indigo-700',
+  treasurer: 'bg-emerald-100 text-emerald-700',
+  deputy_treasurer: 'bg-emerald-100 text-emerald-700',
+  assistant_treasurer: 'bg-emerald-100 text-emerald-700',
   member: 'bg-muted text-muted-foreground',
 };
 
 const assignableRoles = [
   { value: 'vice_president', label: 'Vice President' },
+  { value: 'general_secretary', label: 'General Secretary' },
   { value: 'secretary', label: 'Secretary' },
+  { value: 'deputy_secretary', label: 'Deputy Secretary' },
   { value: 'social_media_head', label: 'Social Media Head' },
+  { value: 'social_media_coordinator', label: 'Social Media Coordinator' },
+  { value: 'technical_pr_head', label: 'Technical & PR Head' },
+  { value: 'technical_pr_coordinator', label: 'Technical & PR Coordinator' },
+  { value: 'treasurer', label: 'Treasurer' },
+  { value: 'deputy_treasurer', label: 'Deputy Treasurer' },
+  { value: 'assistant_treasurer', label: 'Assistant Treasurer' },
   { value: 'member', label: 'Member' },
 ];
 

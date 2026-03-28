@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { X, Send, Bot, User, Paperclip, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 import { ChatResponseRenderer } from './ChatResponseRenderer';
@@ -179,18 +180,23 @@ export function FloatingChatWidget({ visible = true, activeClubId }: FloatingCha
             </div>
           )}
 
-          <div className="p-3 border-t border-border flex gap-2">
+          <div className="p-3 border-t border-border flex gap-2 items-end">
             <input ref={inputRef} type="file" accept={acceptedTypes} onChange={handleFileSelect} className="hidden" />
             <Button variant="ghost" size="icon" className="shrink-0 h-10 w-10" onClick={openPicker} disabled={uploading || loading}>
               <Paperclip className="w-4 h-4" />
             </Button>
-            <Input
+            <Textarea
               value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && !e.shiftKey && send()}
+              onChange={e => {
+                setInput(e.target.value);
+                e.target.style.height = 'auto';
+                e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px';
+              }}
+              onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
               placeholder="Ask about your club..."
               disabled={loading}
-              className="text-sm"
+              className="text-sm min-h-[40px] max-h-[120px] resize-none rounded-xl"
+              rows={1}
             />
             <Button size="icon" onClick={send} disabled={loading || (!input.trim() && !file)}>
               <Send className="w-4 h-4" />

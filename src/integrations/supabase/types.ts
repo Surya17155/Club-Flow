@@ -488,6 +488,14 @@ export type Database = {
         | "secretary"
         | "social_media_head"
         | "member"
+        | "social_media_coordinator"
+        | "technical_pr_head"
+        | "technical_pr_coordinator"
+        | "general_secretary"
+        | "deputy_secretary"
+        | "treasurer"
+        | "deputy_treasurer"
+        | "assistant_treasurer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -622,6 +630,14 @@ export const Constants = {
         "secretary",
         "social_media_head",
         "member",
+        "social_media_coordinator",
+        "technical_pr_head",
+        "technical_pr_coordinator",
+        "general_secretary",
+        "deputy_secretary",
+        "treasurer",
+        "deputy_treasurer",
+        "assistant_treasurer",
       ],
     },
   },
