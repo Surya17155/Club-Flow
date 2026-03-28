@@ -155,12 +155,6 @@ const ClubSettingsModal = ({ open, onOpenChange }: ClubSettingsModalProps) => {
               <Input value={form.tagline} onChange={e => setForm(f => ({ ...f, tagline: e.target.value }))} placeholder="A short motto or tagline..." className="mt-1" />
             </div>
 
-            {/* Description */}
-            <div>
-              <Label>Description <span className="text-xs text-muted-foreground">(optional)</span></Label>
-              <Textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} placeholder="Brief description of the club..." className="mt-1" rows={2} />
-            </div>
-
             {/* About */}
             <div>
               <Label>About <span className="text-xs text-muted-foreground">(optional)</span></Label>
