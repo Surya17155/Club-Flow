@@ -107,6 +107,56 @@ const MemberManagement = ({ clubId, isSuperAdmin = false }: Props) => {
   const [importResults, setImportResults] = useState<{ summary: any; results: any[] } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Edit member state (Super Admin only)
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editTarget, setEditTarget] = useState<Member | null>(null);
+  const [editForm, setEditForm] = useState({ full_name: '', programme: '', section: '', year: '', roll_no: '', phone: '' });
+  const [saving, setSaving] = useState(false);
+
+  const openEditDialog = (member: Member) => {
+    setEditTarget(member);
+    setEditForm({
+      full_name: member.full_name || '',
+      programme: member.programme || '',
+      section: member.section || '',
+      year: member.year || '',
+      roll_no: member.roll_no || '',
+      phone: member.phone || '',
+    });
+    setEditDialogOpen(true);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editTarget) return;
+    setSaving(true);
+    try {
+      const response = await supabase.functions.invoke('manage-outsider', {
+        body: {
+          action: 'update',
+          user_id: editTarget.user_id,
+          full_name: editForm.full_name,
+          programme: editForm.programme,
+          section: editForm.section,
+          year: editForm.year,
+          roll_no: editForm.roll_no,
+          phone: editForm.phone,
+        },
+      });
+      if (response.error || response.data?.error) {
+        toast.error(response.data?.error || 'Failed to update profile');
+      } else {
+        toast.success(`${editForm.full_name}'s profile updated`);
+        setEditDialogOpen(false);
+        setEditTarget(null);
+        setViewMember(null);
+        await fetchMembers();
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to update');
+    }
+    setSaving(false);
+  };
+
   // Search existing users state
   const [userSearchQuery, setUserSearchQuery] = useState('');
   const [userSearchResults, setUserSearchResults] = useState<SearchedUser[]>([]);
