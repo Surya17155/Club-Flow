@@ -75,7 +75,7 @@ const ProfileDropdown = ({ viewMode = 'personal' }: { viewMode?: 'personal' | 'c
               <User className="mr-2 h-4 w-4" /> My Profile
             </DropdownMenuItem>
 
-            {clubs.length > 0 && (
+            {clubs.length > 0 && !(isSuperAdminEmail && isSuperAdminMode) && (
               <DropdownMenuItem
                 onSelect={(e) => { e.preventDefault(); setShowClubs(true); }}
               >
@@ -176,7 +176,7 @@ const ProfileDropdown = ({ viewMode = 'personal' }: { viewMode?: 'personal' | 'c
     <ChatPanel
       open={showChat}
       onClose={() => setShowChat(false)}
-      activeClubId={activeClub?.club_id}
+      activeClubId={(isSuperAdminEmail && isSuperAdminMode) ? undefined : activeClub?.club_id}
     />
     </>
   );
