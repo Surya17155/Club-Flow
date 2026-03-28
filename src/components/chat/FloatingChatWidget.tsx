@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
-import { MessageCircle, X, Send, Bot, User } from 'lucide-react';
+import { X, Send, Bot, User, Paperclip, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 import { ChatResponseRenderer } from './ChatResponseRenderer';
+import { useChatFileUpload } from '@/hooks/useChatFileUpload';
 
 type Msg = { role: 'user' | 'assistant'; content: string };
 
@@ -23,11 +23,12 @@ export function FloatingChatWidget({ visible = true, activeClubId }: FloatingCha
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const { file, uploading, inputRef, openPicker, handleFileSelect, clearFile, acceptedTypes } = useChatFileUpload();
 
-  // Clear chat when active club changes
   useEffect(() => {
     setMessages([]);
     setInput('');
+    clearFile();
   }, [activeClubId]);
 
   useEffect(() => {
@@ -38,16 +39,15 @@ export function FloatingChatWidget({ visible = true, activeClubId }: FloatingCha
 
   const send = async () => {
     const text = input.trim();
-    if (!text || loading || !session?.access_token) return;
+    if ((!text && !file) || loading || !session?.access_token) return;
 
-    const userMsg: Msg = { role: 'user', content: text };
-    const history = [...messages, userMsg];
-    setMessages(history);
+    const displayText = file ? `${text || 'Process this file'} 📎 ${file.name}` : text;
+    const userMsg: Msg = { role: 'user', content: displayText };
+    setMessages(prev => [...prev, userMsg]);
     setInput('');
     setLoading(true);
 
     let assistantSoFar = '';
-
     const upsert = (chunk: string) => {
       assistantSoFar += chunk;
       setMessages(prev => {
@@ -60,17 +60,19 @@ export function FloatingChatWidget({ visible = true, activeClubId }: FloatingCha
     };
 
     try {
+      const body: any = {
+        message: text || 'Process this file',
+        conversation_history: messages.map(m => ({ role: m.role, content: m.content })),
+        active_club_id: activeClubId || undefined,
+      };
+      if (file?.parsedData) { body.file_data = file.parsedData; body.file_name = file.name; }
+      else if (file?.storageUrl) { body.file_urls = [file.storageUrl]; body.file_name = file.name; }
+      clearFile();
+
       const resp = await fetch(CHAT_URL, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify({
-          message: text,
-          conversation_history: messages.map(m => ({ role: m.role, content: m.content })),
-          active_club_id: activeClubId || undefined,
-        }),
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+        body: JSON.stringify(body),
       });
 
       if (!resp.ok) {
@@ -81,7 +83,6 @@ export function FloatingChatWidget({ visible = true, activeClubId }: FloatingCha
       }
 
       if (!resp.body) throw new Error('No response body');
-
       const reader = resp.body.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
@@ -90,7 +91,6 @@ export function FloatingChatWidget({ visible = true, activeClubId }: FloatingCha
         const { done, value } = await reader.read();
         if (done) break;
         buffer += decoder.decode(value, { stream: true });
-
         let idx: number;
         while ((idx = buffer.indexOf('\n')) !== -1) {
           let line = buffer.slice(0, idx);
@@ -118,7 +118,6 @@ export function FloatingChatWidget({ visible = true, activeClubId }: FloatingCha
 
   return (
     <>
-      {/* Floating button */}
       {!open && (
         <button
           onClick={() => setOpen(true)}
@@ -128,10 +127,8 @@ export function FloatingChatWidget({ visible = true, activeClubId }: FloatingCha
         </button>
       )}
 
-      {/* Chat panel */}
       {open && (
         <div className="fixed bottom-6 right-6 z-50 w-[380px] h-[500px] rounded-xl border border-border bg-card shadow-2xl flex flex-col overflow-hidden">
-          {/* Header */}
           <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-primary/5">
             <Bot className="w-5 h-5 text-primary" />
             <span className="font-semibold text-sm text-foreground">ClubBot</span>
@@ -141,29 +138,19 @@ export function FloatingChatWidget({ visible = true, activeClubId }: FloatingCha
             </Button>
           </div>
 
-          {/* Messages */}
           <div ref={scrollRef} className="flex-1 overflow-y-auto p-3 space-y-3">
             {messages.length === 0 && (
               <div className="text-center text-muted-foreground text-sm mt-8">
                 <Bot className="w-10 h-10 mx-auto mb-2 opacity-40" />
                 <p>Hi! I'm ClubBot. Ask me anything about your club — members, events, attendance, and more.</p>
+                <p className="text-xs mt-2 opacity-70">📎 You can also upload Excel, PDF, or image files</p>
               </div>
             )}
             {messages.map((msg, i) => (
               <div key={i} className={`flex gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 {msg.role === 'assistant' && <Bot className="w-5 h-5 mt-1 text-primary shrink-0" />}
-                <div
-                  className={`max-w-[85%] rounded-lg px-3 py-2 text-sm ${
-                    msg.role === 'user'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted text-foreground'
-                  }`}
-                >
-                  {msg.role === 'assistant' ? (
-                    <ChatResponseRenderer content={msg.content} />
-                  ) : (
-                    msg.content
-                  )}
+                <div className={`max-w-[85%] rounded-lg px-3 py-2 text-sm ${msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground'}`}>
+                  {msg.role === 'assistant' ? <ChatResponseRenderer content={msg.content} /> : msg.content}
                 </div>
                 {msg.role === 'user' && <User className="w-5 h-5 mt-1 text-muted-foreground shrink-0" />}
               </div>
@@ -182,8 +169,21 @@ export function FloatingChatWidget({ visible = true, activeClubId }: FloatingCha
             )}
           </div>
 
-          {/* Input */}
+          {file && (
+            <div className="px-3 pt-2 flex items-center gap-2">
+              <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-primary/10 text-primary text-xs flex-1 min-w-0">
+                <FileText className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate">{file.name}</span>
+              </div>
+              <button onClick={clearFile} className="p-1 rounded hover:bg-muted"><X className="w-3.5 h-3.5 text-muted-foreground" /></button>
+            </div>
+          )}
+
           <div className="p-3 border-t border-border flex gap-2">
+            <input ref={inputRef} type="file" accept={acceptedTypes} onChange={handleFileSelect} className="hidden" />
+            <Button variant="ghost" size="icon" className="shrink-0 h-10 w-10" onClick={openPicker} disabled={uploading || loading}>
+              <Paperclip className="w-4 h-4" />
+            </Button>
             <Input
               value={input}
               onChange={e => setInput(e.target.value)}
@@ -192,7 +192,7 @@ export function FloatingChatWidget({ visible = true, activeClubId }: FloatingCha
               disabled={loading}
               className="text-sm"
             />
-            <Button size="icon" onClick={send} disabled={loading || !input.trim()}>
+            <Button size="icon" onClick={send} disabled={loading || (!input.trim() && !file)}>
               <Send className="w-4 h-4" />
             </Button>
           </div>
