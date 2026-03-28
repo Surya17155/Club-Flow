@@ -55,31 +55,32 @@ serve(async (req) => {
       .select("club_id, role, clubs(id, name, description, about)")
       .eq("user_id", userId);
 
-    // For non-super-admins, scope to the active club only
+    // Gate logic: active_club_id takes priority for ALL users (including super admins)
     let clubIds: string[];
-    if (isSuperAdmin) {
-      clubIds = []; // will fetch all
-    } else if (active_club_id) {
-      // Verify user is actually a member of this club
-      const membership = (userClubs || []).find((c: any) => c.club_id === active_club_id);
-      if (!membership) {
-        return new Response(JSON.stringify({ error: "You are not a member of this club" }), { status: 403, headers: corsHeaders });
-      }
-      // Check chatbot permission: president gets auto access, others need use_chatbot power
-      const memberRole = membership.role;
-      if (memberRole !== 'president' && memberRole !== 'admin') {
-        const { data: powerData } = await adminClient
-          .from('delegated_powers')
-          .select('id')
-          .eq('club_id', active_club_id)
-          .eq('user_id', userId)
-          .eq('power', 'use_chatbot')
-          .maybeSingle();
-        if (!powerData) {
-          return new Response(JSON.stringify({ error: "You don't have chatbot access for this club" }), { status: 403, headers: corsHeaders });
+    if (active_club_id) {
+      // If not super admin, verify membership and chatbot permission
+      if (!isSuperAdmin) {
+        const membership = (userClubs || []).find((c: any) => c.club_id === active_club_id);
+        if (!membership) {
+          return new Response(JSON.stringify({ error: "You are not a member of this club" }), { status: 403, headers: corsHeaders });
+        }
+        const memberRole = membership.role;
+        if (memberRole !== 'president' && memberRole !== 'admin') {
+          const { data: powerData } = await adminClient
+            .from('delegated_powers')
+            .select('id')
+            .eq('club_id', active_club_id)
+            .eq('user_id', userId)
+            .eq('power', 'use_chatbot')
+            .maybeSingle();
+          if (!powerData) {
+            return new Response(JSON.stringify({ error: "You don't have chatbot access for this club" }), { status: 403, headers: corsHeaders });
+          }
         }
       }
       clubIds = [active_club_id];
+    } else if (isSuperAdmin) {
+      clubIds = []; // will fetch all
     } else {
       clubIds = (userClubs || []).map((c: any) => c.club_id);
     }
@@ -172,19 +173,24 @@ serve(async (req) => {
       };
     });
 
-    const activeClubName = (!isSuperAdmin && active_club_id)
+    const scopedToClub = !!active_club_id;
+    const activeClubName = scopedToClub
       ? (clubs || []).find((c: any) => c.id === active_club_id)?.name || "your club"
       : null;
 
     const userRoleDesc = isSuperAdmin
-      ? "Super Admin with unrestricted access to all clubs"
+      ? (scopedToClub ? `Super Admin currently viewing: ${activeClubName}` : "Super Admin with unrestricted access to all clubs")
       : `Club member currently viewing: ${activeClubName || (userClubs || []).map((c: any) => `${c.clubs?.name} (${c.role})`).join(", ")}`;
+
+    const scopeRule = scopedToClub
+      ? `**SECURITY RULE**: You must ONLY answer questions about "${activeClubName}". You have been given data ONLY for this club. If asked about other clubs, respond: "Sorry, I can only provide information about ${activeClubName} right now. Please switch to that club first." Do NOT reference or reveal data from any other club.`
+      : (isSuperAdmin ? "You have unrestricted access to all club data." : "You must only answer questions about the user's own clubs.");
 
     const systemPrompt = `You are ClubBot, an AI assistant for a club management platform. You have real-time access to club data.
 
 **User Role**: ${userRoleDesc}
 
-${!isSuperAdmin ? `**SECURITY RULE**: You must ONLY answer questions about ${activeClubName ? `"${activeClubName}"` : "the user's own club"}. You have been given data ONLY for this club. If asked about other clubs, respond: "Sorry, I cannot provide information about other clubs for security purposes." Do NOT reference or reveal data from any other club.` : "You have unrestricted access to all club data."}
+${scopeRule}
 
 **Club Data**:
 ${JSON.stringify(clubSummaries, null, 2)}
