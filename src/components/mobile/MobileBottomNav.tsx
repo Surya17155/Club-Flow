@@ -1,7 +1,7 @@
+import { memo, useCallback, useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Home, Users, Calendar, User, Plus } from "lucide-react";
 import { useDelegatedPowers } from "@/hooks/useDelegatedPowers";
-import { useState, useEffect } from "react";
 
 const personalTabs = [
   { label: "Home", icon: Home, path: "/admin" },
@@ -9,19 +9,19 @@ const personalTabs = [
   { label: "Calendar", icon: Calendar, path: "/calendar" },
   { label: "Events", icon: Calendar, path: "/events" },
   { label: "Profile", icon: User, path: "/profile" },
-];
+] as const;
 
 const clubLeftTabs = [
   { label: "Home", icon: Home, path: "/admin" },
   { label: "Clubs", icon: Users, path: "/discover" },
-];
+] as const;
 
 const clubRightTabs = [
   { label: "Events", icon: Calendar, path: "/events" },
   { label: "Profile", icon: User, path: "/profile" },
-];
+] as const;
 
-export function MobileBottomNav() {
+function MobileBottomNavInner() {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -34,11 +34,11 @@ export function MobileBottomNav() {
       setViewMode((localStorage.getItem('dashboardViewMode') as 'personal' | 'club') || 'personal');
     };
     window.addEventListener('storage', handler);
-    // Also poll for same-window changes
+    // Poll at lower frequency to reduce main thread work
     const interval = setInterval(() => {
       const current = (localStorage.getItem('dashboardViewMode') as 'personal' | 'club') || 'personal';
       setViewMode(prev => prev !== current ? current : prev);
-    }, 300);
+    }, 1000);
     return () => { window.removeEventListener('storage', handler); clearInterval(interval); };
   }, []);
 
@@ -52,21 +52,23 @@ export function MobileBottomNav() {
 
   const isClubMode = viewMode === 'club';
 
-  const renderTab = ({ label, icon: Icon, path }: { label: string; icon: any; path: string }) => {
+  const handleNav = useCallback((path: string) => navigate(path), [navigate]);
+
+  const renderTab = useCallback(({ label, icon: Icon, path }: { label: string; icon: any; path: string }) => {
     const active = location.pathname === path;
     return (
       <button
         key={path + label}
-        onClick={() => navigate(path)}
-        className="flex flex-col items-center gap-0.5 px-3 py-1.5 transition-all duration-200 ease-out"
+        onClick={() => handleNav(path)}
+        className="flex flex-col items-center gap-0.5 px-3 py-1.5"
       >
         <Icon
-          className="w-5 h-5 transition-colors duration-200"
+          className="w-5 h-5"
           style={{ color: active ? "hsl(var(--primary))" : "#8A8A8A" }}
           strokeWidth={active ? 2.5 : 2}
         />
         <span
-          className="text-[10px] tracking-wide transition-colors duration-200"
+          className="text-[10px] tracking-wide"
           style={{
             color: active ? "hsl(var(--primary))" : "#8A8A8A",
             fontWeight: active ? 700 : 500,
@@ -76,10 +78,10 @@ export function MobileBottomNav() {
         </span>
       </button>
     );
-  };
+  }, [location.pathname, handleNav]);
 
   return (
-    <div className="fixed left-0 right-0 z-50 flex justify-center px-4 md:hidden pointer-events-none" style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 12px)" }}>
+    <div className="fixed left-0 right-0 z-50 flex justify-center px-4 md:hidden pointer-events-none gpu-fixed" style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 12px)" }}>
       <nav
         className="relative flex items-center justify-evenly pointer-events-auto"
         style={{
@@ -93,6 +95,7 @@ export function MobileBottomNav() {
           border: "1px solid rgba(255, 255, 255, 0.35)",
           boxShadow: "0px 10px 30px rgba(0, 0, 0, 0.15)",
           padding: "0 18px",
+          transform: "translateZ(0)",
         }}
       >
         {isClubMode ? (
