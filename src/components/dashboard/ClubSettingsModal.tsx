@@ -161,26 +161,15 @@ const ClubSettingsModal = ({ open, onOpenChange }: ClubSettingsModalProps) => {
               <Textarea value={form.about} onChange={e => setForm(f => ({ ...f, about: e.target.value }))} placeholder="Detailed about section..." className="mt-1" rows={3} />
             </div>
 
-            {/* Category & Type */}
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label>Category <span className="text-xs text-muted-foreground">(optional)</span></Label>
-                <Select value={form.category} onValueChange={v => setForm(f => ({ ...f, category: v }))}>
-                  <SelectTrigger className="mt-1"><SelectValue placeholder="Select..." /></SelectTrigger>
-                  <SelectContent>
-                    {CLUB_CATEGORIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label>Type <span className="text-xs text-muted-foreground">(optional)</span></Label>
-                <Select value={form.club_type} onValueChange={v => setForm(f => ({ ...f, club_type: v }))}>
-                  <SelectTrigger className="mt-1"><SelectValue placeholder="Select..." /></SelectTrigger>
-                  <SelectContent>
-                    {CLUB_TYPES.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
+            {/* Category */}
+            <div>
+              <Label>Category <span className="text-xs text-muted-foreground">(optional)</span></Label>
+              <Select value={form.category} onValueChange={v => setForm(f => ({ ...f, category: v }))}>
+                <SelectTrigger className="mt-1"><SelectValue placeholder="Select..." /></SelectTrigger>
+                <SelectContent>
+                  {CLUB_CATEGORIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Social Media Links */}
