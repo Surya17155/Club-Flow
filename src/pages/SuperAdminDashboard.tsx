@@ -77,6 +77,10 @@ const SuperAdminDashboard = () => {
   const [presidentFormData, setPresidentFormData] = useState({ fullName: '', email: '', programme: '', section: '', year: '', rollNo: '', phone: '' });
   const [savingPresident, setSavingPresident] = useState(false);
   const [removeOnReplace, setRemoveOnReplace] = useState(false);
+  const [presidentAddMode, setPresidentAddMode] = useState<'search' | 'manual'>('search');
+  const [presidentSearch, setPresidentSearch] = useState('');
+  const [presidentSearchResults, setPresidentSearchResults] = useState<any[]>([]);
+  const [presidentSearchLoading, setPresidentSearchLoading] = useState(false);
 
   const { totalClubs, globalMembers, totalEvents, clubs, members, upcomingEvents, growthData, loading } = useSuperAdminStats();
 
@@ -647,23 +651,115 @@ const SuperAdminDashboard = () => {
                   Remove old president from club entirely (otherwise demoted to member)
                 </label>
               )}
-              <div><Label>Full Name <span className="text-destructive">*</span></Label><Input value={presidentFormData.fullName} onChange={e => setPresidentFormData(p => ({ ...p, fullName: e.target.value }))} className="mt-1" placeholder="President's full name" /></div>
-              <div><Label>Email <span className="text-destructive">*</span></Label><Input type="email" value={presidentFormData.email} onChange={e => setPresidentFormData(p => ({ ...p, email: e.target.value }))} className="mt-1" placeholder="president@example.com" /></div>
-              <div className="grid grid-cols-2 gap-3">
-                <div><Label>Programme</Label><Input value={presidentFormData.programme} onChange={e => setPresidentFormData(p => ({ ...p, programme: e.target.value }))} className="mt-1" /></div>
-                <div><Label>Year</Label><Input value={presidentFormData.year} onChange={e => setPresidentFormData(p => ({ ...p, year: e.target.value }))} className="mt-1" /></div>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div><Label>Section</Label><Input value={presidentFormData.section} onChange={e => setPresidentFormData(p => ({ ...p, section: e.target.value }))} className="mt-1" /></div>
-                <div><Label>Roll No</Label><Input value={presidentFormData.rollNo} onChange={e => setPresidentFormData(p => ({ ...p, rollNo: e.target.value }))} className="mt-1" /></div>
-              </div>
-              <div><Label>Phone</Label><Input value={presidentFormData.phone} onChange={e => setPresidentFormData(p => ({ ...p, phone: e.target.value }))} className="mt-1" /></div>
-              <div className="flex gap-2">
-                {presidentMode === 'replace' && <button onClick={() => setPresidentMode('view')} className="flex-1 py-2 rounded-lg border border-border text-sm font-medium">Cancel</button>}
-                <button onClick={handleAddOrReplacePresident} disabled={savingPresident || !presidentFormData.fullName.trim() || !presidentFormData.email.trim()} className="flex-1 py-2 rounded-lg gradient-gold text-primary-foreground text-sm font-medium disabled:opacity-50">
-                  {savingPresident ? 'Saving...' : presidentMode === 'add' ? 'Add President' : 'Replace President'}
+
+              {/* Toggle: Search / Manual */}
+              <div className="flex rounded-lg border border-border/50 overflow-hidden">
+                <button
+                  onClick={() => { setPresidentAddMode('search'); setPresidentSearch(''); setPresidentSearchResults([]); }}
+                  className={`flex-1 py-2 text-xs font-semibold transition-colors ${presidentAddMode === 'search' ? 'bg-primary text-primary-foreground' : 'bg-muted/30 text-muted-foreground hover:bg-muted/50'}`}
+                >
+                  <Search className="w-3.5 h-3.5 inline mr-1" /> Search User
+                </button>
+                <button
+                  onClick={() => setPresidentAddMode('manual')}
+                  className={`flex-1 py-2 text-xs font-semibold transition-colors ${presidentAddMode === 'manual' ? 'bg-primary text-primary-foreground' : 'bg-muted/30 text-muted-foreground hover:bg-muted/50'}`}
+                >
+                  <Pencil className="w-3.5 h-3.5 inline mr-1" /> Add Manually
                 </button>
               </div>
+
+              {/* Search mode */}
+              {presidentAddMode === 'search' && (
+                <div className="space-y-2">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search by name or email..."
+                      value={presidentSearch}
+                      onChange={async (e) => {
+                        const q = e.target.value;
+                        setPresidentSearch(q);
+                        if (q.length < 2) { setPresidentSearchResults([]); return; }
+                        setPresidentSearchLoading(true);
+                        const { data } = await supabase
+                          .from('profiles')
+                          .select('user_id, full_name, email, programme, year, section, roll_no, phone')
+                          .or(`full_name.ilike.%${q}%,email.ilike.%${q}%`)
+                          .limit(10);
+                        setPresidentSearchResults(data || []);
+                        setPresidentSearchLoading(false);
+                      }}
+                      className="pl-10"
+                    />
+                  </div>
+                  {presidentSearchLoading && (
+                    <div className="flex justify-center py-3">
+                      <div className="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+                    </div>
+                  )}
+                  {!presidentSearchLoading && presidentSearchResults.length > 0 && (
+                    <div className="space-y-1.5 max-h-[200px] overflow-y-auto">
+                      {presidentSearchResults.map(u => (
+                        <button
+                          key={u.user_id}
+                          onClick={() => {
+                            setPresidentFormData({
+                              fullName: u.full_name || '',
+                              email: u.email || '',
+                              programme: u.programme || '',
+                              year: u.year || '',
+                              section: u.section || '',
+                              rollNo: u.roll_no || '',
+                              phone: u.phone || '',
+                            });
+                            setPresidentAddMode('manual');
+                            toast({ title: `${u.full_name} selected`, description: 'Review details and confirm.' });
+                          }}
+                          className="w-full flex items-center gap-3 p-2.5 rounded-xl border border-border/40 bg-background hover:bg-accent/30 transition-colors text-left"
+                        >
+                          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white font-bold text-sm shrink-0">
+                            {u.full_name?.[0]?.toUpperCase() || '?'}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium text-foreground truncate">{u.full_name}</p>
+                            <p className="text-xs text-muted-foreground truncate">{u.email} {u.programme ? `• ${u.programme}` : ''} {u.year || ''}</p>
+                          </div>
+                          <Crown className="w-4 h-4 text-amber-500 ml-auto shrink-0" />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  {!presidentSearchLoading && presidentSearch.length >= 2 && presidentSearchResults.length === 0 && (
+                    <p className="text-xs text-muted-foreground text-center py-3">No users found. Try manual entry.</p>
+                  )}
+                  {presidentSearch.length < 2 && (
+                    <p className="text-xs text-muted-foreground text-center py-3">Type at least 2 characters to search</p>
+                  )}
+                </div>
+              )}
+
+              {/* Manual mode */}
+              {presidentAddMode === 'manual' && (
+                <div className="space-y-3">
+                  <div><Label>Full Name <span className="text-destructive">*</span></Label><Input value={presidentFormData.fullName} onChange={e => setPresidentFormData(p => ({ ...p, fullName: e.target.value }))} className="mt-1" placeholder="President's full name" /></div>
+                  <div><Label>Email <span className="text-destructive">*</span></Label><Input type="email" value={presidentFormData.email} onChange={e => setPresidentFormData(p => ({ ...p, email: e.target.value }))} className="mt-1" placeholder="president@example.com" /></div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div><Label>Programme</Label><Input value={presidentFormData.programme} onChange={e => setPresidentFormData(p => ({ ...p, programme: e.target.value }))} className="mt-1" /></div>
+                    <div><Label>Year</Label><Input value={presidentFormData.year} onChange={e => setPresidentFormData(p => ({ ...p, year: e.target.value }))} className="mt-1" /></div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div><Label>Section</Label><Input value={presidentFormData.section} onChange={e => setPresidentFormData(p => ({ ...p, section: e.target.value }))} className="mt-1" /></div>
+                    <div><Label>Roll No</Label><Input value={presidentFormData.rollNo} onChange={e => setPresidentFormData(p => ({ ...p, rollNo: e.target.value }))} className="mt-1" /></div>
+                  </div>
+                  <div><Label>Phone</Label><Input value={presidentFormData.phone} onChange={e => setPresidentFormData(p => ({ ...p, phone: e.target.value }))} className="mt-1" /></div>
+                  <div className="flex gap-2">
+                    {presidentMode === 'replace' && <button onClick={() => setPresidentMode('view')} className="flex-1 py-2 rounded-lg border border-border text-sm font-medium">Cancel</button>}
+                    <button onClick={handleAddOrReplacePresident} disabled={savingPresident || !presidentFormData.fullName.trim() || !presidentFormData.email.trim()} className="flex-1 py-2 rounded-lg gradient-gold text-primary-foreground text-sm font-medium disabled:opacity-50">
+                      {savingPresident ? 'Saving...' : presidentMode === 'add' ? 'Add President' : 'Replace President'}
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </DialogContent>
