@@ -105,7 +105,7 @@ const AssignPowersModal = ({ open, onOpenChange, clubId }: AssignPowersModalProp
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="glass-card border-white/20 max-w-md max-h-[80vh] overflow-y-auto p-4 sm:p-6">
+      <DialogContent className="bg-card border-border max-w-md max-h-[80vh] overflow-y-auto p-4 sm:p-6 rounded-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 font-display gradient-gold bg-clip-text text-transparent text-lg">
             <Shield className="w-5 h-5 text-primary" />
@@ -128,11 +128,11 @@ const AssignPowersModal = ({ open, onOpenChange, clubId }: AssignPowersModalProp
               const isExpanded = expandedId === member.user_id;
               const badgeVariant = getRoleBadgeVariant(member.role);
               return (
-                <div key={member.user_id} className="rounded-xl overflow-hidden bg-white/10 border border-white/10">
+                <div key={member.user_id} className="rounded-xl overflow-hidden bg-background border border-border shadow-sm">
                   <button
                     type="button"
                     onClick={() => setExpandedId(isExpanded ? null : member.user_id)}
-                    className="flex items-center gap-3 w-full p-3 text-left hover:bg-white/5 transition-colors"
+                    className="flex items-center gap-3 w-full p-3 text-left hover:bg-muted/50 transition-colors"
                   >
                     <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary text-xs font-bold shrink-0">
                       {member.full_name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
@@ -142,7 +142,11 @@ const AssignPowersModal = ({ open, onOpenChange, clubId }: AssignPowersModalProp
                         {member.full_name}
                         {badgeVariant && <VerifiedBadge variant={badgeVariant} size={14} />}
                       </p>
-                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full border font-medium ${getRoleColor(member.role)}`}>
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full border font-medium ${
+                        member.role === 'president' || member.role === 'vice_president'
+                          ? 'text-purple-700 bg-purple-100 border-purple-200'
+                          : 'text-blue-700 bg-blue-100 border-blue-200'
+                      }`}>
                         {roleLabelMap[member.role] ?? member.role}
                       </span>
                     </div>
@@ -163,12 +167,12 @@ const AssignPowersModal = ({ open, onOpenChange, clubId }: AssignPowersModalProp
                         transition={{ duration: 0.25, ease: 'easeInOut' }}
                         className="overflow-hidden"
                       >
-                        <div className="px-3 pb-3 space-y-2 border-t border-white/10 pt-2">
+                        <div className="px-3 pb-3 space-y-2 border-t border-border pt-2">
                           {AVAILABLE_POWERS.map(power => {
                             const has = hasPower(member.user_id, power.key);
                             const isToggling = toggling === `${member.user_id}-${power.key}`;
                             return (
-                              <div key={power.key} className="flex items-center justify-between py-1.5 px-2 rounded-lg hover:bg-white/30 transition-colors text-destructive-foreground shadow-sm">
+                              <div key={power.key} className="flex items-center justify-between py-1.5 px-2 rounded-lg hover:bg-muted/50 transition-colors shadow-sm">
                                 <div className="min-w-0 flex-1">
                                   <p className="text-sm font-medium text-foreground">{power.label}</p>
                                   <p className="text-xs text-muted-foreground">{power.description}</p>
