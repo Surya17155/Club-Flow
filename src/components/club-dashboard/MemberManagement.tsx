@@ -9,7 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
-import { UserPlus, Trash2, Eye, Loader2, Search, Users, MoreVertical, ShieldCheck, Upload, FileSpreadsheet, CheckCircle2, XCircle, AlertCircle, ChevronRight } from 'lucide-react';
+import { UserPlus, Trash2, Eye, Loader2, Search, Users, MoreVertical, ShieldCheck, Upload, FileSpreadsheet, CheckCircle2, XCircle, AlertCircle, ChevronRight, Pencil } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import VerifiedBadge, { getRoleBadgeVariant } from '@/components/ui/VerifiedBadge';
 
@@ -477,7 +477,7 @@ const MemberManagement = ({ clubId, isSuperAdmin = false }: Props) => {
               <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Post-holders ({postHolders.length})</h4>
               <div className="space-y-2">
                 {postHolders.map(m => (
-                  <MemberRow key={m.id} member={m} onView={() => setViewMember(m)} onRemove={() => handleRemoveMember(m)} onChangeRole={() => openRoleDialog(m)} removing={removing === m.id} />
+                  <MemberRow key={m.id} member={m} onView={() => setViewMember(m)} onRemove={() => handleRemoveMember(m)} onChangeRole={() => openRoleDialog(m)} removing={removing === m.id} isSuperAdmin={isSuperAdmin} onEdit={() => openEditDialog(m)} />
                 ))}
               </div>
             </div>
