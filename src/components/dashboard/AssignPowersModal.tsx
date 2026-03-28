@@ -168,7 +168,7 @@ const AssignPowersModal = ({ open, onOpenChange, clubId }: AssignPowersModalProp
                             const has = hasPower(member.user_id, power.key);
                             const isToggling = toggling === `${member.user_id}-${power.key}`;
                             return (
-                              <div key={power.key} className="flex items-center justify-between py-1.5 px-2 rounded-lg hover:bg-white/5 transition-colors">
+                              <div key={power.key} className="flex items-center justify-between py-1.5 px-2 rounded-lg hover:bg-white/30 transition-colors text-destructive-foreground shadow-sm">
                                 <div className="min-w-0 flex-1">
                                   <p className="text-sm font-medium text-foreground">{power.label}</p>
                                   <p className="text-xs text-muted-foreground">{power.description}</p>
