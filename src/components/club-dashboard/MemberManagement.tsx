@@ -646,7 +646,7 @@ const MemberManagement = ({ clubId }: Props) => {
                 <Label className="mb-1 block">New Role</Label>
                 <Select value={newRole} onValueChange={setNewRole}>
                   <SelectTrigger className="bg-white/30"><SelectValue /></SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="max-h-56 overflow-y-auto" position="popper" side="bottom" sideOffset={4}>
                     {assignableRoles.map(r => (
                       <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
                     ))}
@@ -680,7 +680,7 @@ const MemberManagement = ({ clubId }: Props) => {
                 )}
               </div>
               <div>
-                <h3 className="text-lg font-bold text-foreground inline-flex items-center">{viewMember.full_name}{getRoleBadgeVariant(viewMember.role) && <VerifiedBadge variant={getRoleBadgeVariant(viewMember.role)!} />}</h3>
+                <h3 className="text-lg font-bold text-foreground inline-flex items-center">{viewMember.full_name}{getRoleBadgeVariant(viewMember.role) && getRoleBadgeVariant(viewMember.role) !== 'gray' && <VerifiedBadge variant={getRoleBadgeVariant(viewMember.role)!} />}</h3>
                 <Badge className={`mt-1 ${roleColors[viewMember.role] || roleColors.member}`}>
                   {roleLabelMap[viewMember.role] ?? viewMember.role}
                 </Badge>
@@ -855,7 +855,7 @@ const MemberRow = ({ member, onView, onRemove, onChangeRole, removing }: { membe
         )}
       </div>
       <div>
-        <p className="text-sm font-semibold text-foreground inline-flex items-center">{member.full_name}{getRoleBadgeVariant(member.role) && <VerifiedBadge variant={getRoleBadgeVariant(member.role)!} size={14} />}</p>
+        <p className="text-sm font-semibold text-foreground inline-flex items-center">{member.full_name}{getRoleBadgeVariant(member.role) && getRoleBadgeVariant(member.role) !== 'gray' && <VerifiedBadge variant={getRoleBadgeVariant(member.role)!} size={14} />}</p>
         <p className="text-xs text-muted-foreground">{member.email || member.roll_no || ''}</p>
       </div>
     </div>
