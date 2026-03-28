@@ -28,10 +28,19 @@ interface EventCard {
   attendees?: string[];
 }
 
+interface ToolResult {
+  action: string;
+  title: string;
+  summary: string;
+  details?: Record<string, number>;
+  items?: Array<{ name: string; status: string }>;
+}
+
 interface ParsedContent {
   blocks: Array<
     | { type: 'members'; header: string; subtext: string; members: MemberCard[] }
     | { type: 'events'; header: string; subtext: string; events: EventCard[] }
+    | { type: 'tool-result'; data: ToolResult }
     | { type: 'markdown'; content: string }
   >;
 }
@@ -42,7 +51,7 @@ function parseResponse(content: string): ParsedContent {
   const blocks: ParsedContent['blocks'] = [];
 
   // Split by code fences for members-json and events-json
-  const regex = /```(members-json|events-json)\s*\n([\s\S]*?)```/g;
+  const regex = /```(members-json|events-json|tool-result)\s*\n([\s\S]*?)```/g;
   let lastIndex = 0;
   let match: RegExpExecArray | null;
 
@@ -70,6 +79,8 @@ function parseResponse(content: string): ParsedContent {
           subtext: data.subtext || '',
           events: data.events,
         });
+      } else if (blockType === 'tool-result' && data.action) {
+        blocks.push({ type: 'tool-result', data });
       }
     } catch {
       // If JSON fails, render as markdown
