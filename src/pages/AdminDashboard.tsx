@@ -462,7 +462,7 @@ const AdminDashboard = () => {
             )}
 
             {/* About section */}
-            <div className="w-full text-left rounded-xl p-4 mb-6 bg-white/30">
+            <div className="w-full text-left rounded-2xl p-4 mb-6" style={{ background: "rgba(255,252,244,0.6)", border: "1px solid rgba(230,200,140,0.20)" }}>
               <h4 className="font-bold mb-3 text-foreground">About</h4>
               <div className="space-y-2 text-sm">
                 {programme && (
