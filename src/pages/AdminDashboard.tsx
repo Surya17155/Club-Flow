@@ -612,11 +612,11 @@ const AdminDashboard = () => {
             </div>
           ) : (
             /* Club Mode: Analytics chart + Upcoming Events */
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2 glass-card p-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              <div className="lg:col-span-2 warm-glass-card p-6">
                 <div className="flex justify-between items-center mb-6">
-                  <h3 className="font-bold text-lg text-foreground">Attendance Analytics</h3>
-                  <div className="glass-input px-3 py-1 rounded-lg text-xs flex items-center gap-1 cursor-pointer text-muted-foreground">
+                  <h3 className="font-bold text-lg" style={{ color: "#1A1408" }}>Attendance Analytics</h3>
+                  <div className="px-3 py-1 rounded-full text-xs flex items-center gap-1 cursor-pointer" style={{ background: "rgba(245,166,35,0.10)", color: "rgba(26,20,8,0.55)", border: "1px solid rgba(230,200,140,0.25)" }}>
                     Last 30 Days <ChevronDown className="w-3 h-3" />
                   </div>
                 </div>
