@@ -5,6 +5,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const DEFAULT_PASSWORD = "iilm@123";
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -103,12 +105,10 @@ Deno.serve(async (req) => {
           .eq("user_id", userId);
       }
     } else {
-      // Step 2: Create new auth user with temp password
-      const tempPassword = crypto.randomUUID() + "Aa1!";
-
+      // Step 2: Create new auth user with default password
       const { data: newUser, error: createError } = await adminClient.auth.admin.createUser({
         email: email.trim().toLowerCase(),
-        password: tempPassword,
+        password: DEFAULT_PASSWORD,
         email_confirm: true,
         user_metadata: {
           full_name,
