@@ -339,9 +339,10 @@ const AdminDashboard = () => {
           {isPersonal && (
             <button
               onClick={() => navigate("/discover")}
-              className="text-primary-foreground text-sm font-medium px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-transform active:scale-95 gradient-gold"
+              className="text-white text-sm font-medium px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-transform active:scale-95"
+              style={{ background: "linear-gradient(135deg, #F5A623, #D4920A)", boxShadow: "0 4px 14px rgba(245,166,35,0.35)" }}
             >
-              <Compass className="w-4 h-4" /> Discover Clubs
+              <Compass className="w-4 h-4 stroke-[1.5]" /> Discover Clubs
             </button>
           )}
           {!isPersonal && activeClub && (activeClub.role === "president" || activeClub.role === "admin") && (
