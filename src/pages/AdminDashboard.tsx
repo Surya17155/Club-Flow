@@ -647,7 +647,6 @@ const AdminDashboard = () => {
                         <stop offset="100%" stopColor="#F5A623" />
                       </linearGradient>
                     </defs>
-                    </defs>
                     <Bar dataKey="attendance" fill="url(#barGradient)" radius={[8, 8, 0, 0]} name="Attendance %" />
                     <Line
                       type="monotone"
