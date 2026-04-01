@@ -656,7 +656,6 @@ const AdminDashboard = () => {
                       dot={{ fill: "#FFFCF4", stroke: "#D4920A", strokeWidth: 2, r: 5 }}
                       name="Engagement Score"
                     />
-                    />
                   </ComposedChart>
                 </ResponsiveContainer>
               </div>
