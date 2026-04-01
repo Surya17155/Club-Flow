@@ -53,6 +53,31 @@ const Login = () => {
     }
   };
 
+  const handleGoogleLogin = async () => {
+    setIsGoogleLoading(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+      });
+
+      if (result.error) {
+        toast({ title: 'Google login failed', description: String(result.error), variant: 'destructive' });
+        return;
+      }
+
+      if (result.redirected) {
+        return;
+      }
+
+      toast({ title: 'Welcome!', description: 'Successfully logged in with Google.' });
+      navigate('/dashboard');
+    } catch (error: any) {
+      toast({ title: 'Google login failed', description: error.message, variant: 'destructive' });
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
       {/* Background */}
