@@ -356,8 +356,11 @@ const AdminDashboard = () => {
           )}
           {!isPersonal && activeClub && hasPower("create_event") && (
             <DropdownMenu>
-              <DropdownMenuTrigger className="text-primary-foreground text-sm font-medium px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-transform active:scale-95 gradient-gold">
-                <Calendar className="w-4 h-4" /> Events <ChevronDown className="w-3 h-3" />
+              <DropdownMenuTrigger
+                className="text-white text-sm font-medium px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-transform active:scale-95"
+                style={{ background: "linear-gradient(135deg, #F5A623, #D4920A)", boxShadow: "0 4px 14px rgba(245,166,35,0.35)" }}
+              >
+                <Calendar className="w-4 h-4 stroke-[1.5]" /> Events <ChevronDown className="w-3 h-3" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuItem onSelect={() => navigate("/create-event")}>
