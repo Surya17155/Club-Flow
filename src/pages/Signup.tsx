@@ -24,6 +24,7 @@ const Signup = () => {
     year: '',
     rollNo: '',
     phone: '',
+    classCoordinator: '',
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
