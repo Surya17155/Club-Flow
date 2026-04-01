@@ -276,28 +276,26 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen relative antialiased p-6 md:p-8 dashboard-corner-gradient text-foreground">
-      {/* Background blobs */}
+    <div
+      className="min-h-screen relative antialiased p-6 lg:p-8 warm-glass-dashboard"
+      style={{
+        background: `
+          radial-gradient(ellipse 80% 60% at 75% 85%, rgba(245,166,35,0.12) 0%, transparent 60%),
+          radial-gradient(ellipse 70% 50% at 20% 20%, rgba(212,146,10,0.06) 0%, transparent 50%),
+          linear-gradient(180deg, #FFFCF4 0%, #FFF8E8 50%, #FFF3D9 100%)
+        `,
+        color: "#1A1408",
+      }}
+    >
+      {/* Ambient amber bloom – lower right */}
       <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
         <div
-          className="absolute top-[-8%] left-[-8%] w-[550px] h-[550px] rounded-full mix-blend-multiply filter blur-[100px] opacity-80 animate-blob"
-          style={{ backgroundColor: "hsl(45 90% 85% / 0.9)" }}
+          className="absolute bottom-[-15%] right-[-10%] w-[700px] h-[700px] rounded-full filter blur-[140px] opacity-40"
+          style={{ backgroundColor: "rgba(245,166,35,0.25)" }}
         />
         <div
-          className="absolute top-[-5%] right-[-5%] w-[450px] h-[450px] rounded-full mix-blend-multiply filter blur-[90px] opacity-70 animate-blob animation-delay-2000"
-          style={{ backgroundColor: "hsl(25 80% 82% / 0.8)" }}
-        />
-        <div
-          className="absolute bottom-[-8%] left-[-5%] w-[500px] h-[500px] rounded-full mix-blend-multiply filter blur-[100px] opacity-60 animate-blob animation-delay-4000"
-          style={{ backgroundColor: "hsl(35 75% 78% / 0.6)" }}
-        />
-        <div
-          className="absolute bottom-[-10%] right-[-5%] w-[600px] h-[600px] rounded-full mix-blend-multiply filter blur-[100px] opacity-70 animate-blob"
-          style={{ backgroundColor: "hsl(28 70% 70% / 0.45)", animationDelay: "3s" }}
-        />
-        <div
-          className="absolute top-[40%] left-[30%] w-[300px] h-[300px] rounded-full filter blur-[120px] opacity-30"
-          style={{ backgroundColor: "hsl(40 80% 88%)" }}
+          className="absolute top-[-10%] left-[-8%] w-[500px] h-[500px] rounded-full filter blur-[120px] opacity-25"
+          style={{ backgroundColor: "rgba(212,146,10,0.15)" }}
         />
       </div>
 
