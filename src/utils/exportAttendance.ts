@@ -10,6 +10,7 @@ interface AttendeeRow {
   scanned_at: string;
   status: string;
   manually_added?: boolean | null;
+  class_coordinator?: string | null;
 }
 
 export const exportAttendanceXLSX = (
