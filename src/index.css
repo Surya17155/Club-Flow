@@ -279,15 +279,30 @@
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
   background: hsl(var(--border));
-  border-radius: 4px;
+  border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--muted-foreground));
+}
+
+/* Warm amber scrollbar for dashboard */
+.warm-glass-dashboard::-webkit-scrollbar {
+  width: 6px;
+}
+.warm-glass-dashboard::-webkit-scrollbar-track {
+  background: transparent;
+}
+.warm-glass-dashboard::-webkit-scrollbar-thumb {
+  background: rgba(245, 166, 35, 0.25);
+  border-radius: 3px;
+}
+.warm-glass-dashboard::-webkit-scrollbar-thumb:hover {
+  background: rgba(245, 166, 35, 0.45);
 }
