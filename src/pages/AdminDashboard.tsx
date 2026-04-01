@@ -301,8 +301,8 @@ const AdminDashboard = () => {
 
       {/* Header */}
       <header className="relative z-20 flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-        <h1 className="text-xl md:text-2xl font-bold font-display text-foreground">
-          {greeting}, <span className="text-primary">{fullName.split(" ")[0]}</span> 👋
+        <h1 className="text-xl md:text-2xl font-bold font-display" style={{ color: "#1A1408" }}>
+          {greeting}, <span style={{ color: "#F5A623" }}>{fullName.split(" ")[0]}</span> 👋
         </h1>
 
         {/* Functional Toggle */}
