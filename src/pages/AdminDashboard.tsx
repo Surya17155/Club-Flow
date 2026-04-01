@@ -652,10 +652,11 @@ const AdminDashboard = () => {
                     <Line
                       type="monotone"
                       dataKey="engagement"
-                      stroke="#bf7e54"
+                      stroke="#D4920A"
                       strokeWidth={2.5}
-                      dot={{ fill: "#fdfbf7", stroke: "#bf7e54", strokeWidth: 2, r: 5 }}
+                      dot={{ fill: "#FFFCF4", stroke: "#D4920A", strokeWidth: 2, r: 5 }}
                       name="Engagement Score"
+                    />
                     />
                   </ComposedChart>
                 </ResponsiveContainer>
