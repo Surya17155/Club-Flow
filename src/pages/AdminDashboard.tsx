@@ -276,51 +276,58 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen relative antialiased p-6 md:p-8 dashboard-corner-gradient text-foreground">
-      {/* Background blobs */}
+    <div
+      className="min-h-screen relative antialiased p-6 lg:p-8 warm-glass-dashboard"
+      style={{
+        background: `
+          radial-gradient(ellipse 80% 60% at 75% 85%, rgba(245,166,35,0.12) 0%, transparent 60%),
+          radial-gradient(ellipse 70% 50% at 20% 20%, rgba(212,146,10,0.06) 0%, transparent 50%),
+          linear-gradient(180deg, #FFFCF4 0%, #FFF8E8 50%, #FFF3D9 100%)
+        `,
+        color: "#1A1408",
+      }}
+    >
+      {/* Ambient amber bloom – lower right */}
       <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
         <div
-          className="absolute top-[-8%] left-[-8%] w-[550px] h-[550px] rounded-full mix-blend-multiply filter blur-[100px] opacity-80 animate-blob"
-          style={{ backgroundColor: "hsl(45 90% 85% / 0.9)" }}
+          className="absolute bottom-[-15%] right-[-10%] w-[700px] h-[700px] rounded-full filter blur-[140px] opacity-40"
+          style={{ backgroundColor: "rgba(245,166,35,0.25)" }}
         />
         <div
-          className="absolute top-[-5%] right-[-5%] w-[450px] h-[450px] rounded-full mix-blend-multiply filter blur-[90px] opacity-70 animate-blob animation-delay-2000"
-          style={{ backgroundColor: "hsl(25 80% 82% / 0.8)" }}
-        />
-        <div
-          className="absolute bottom-[-8%] left-[-5%] w-[500px] h-[500px] rounded-full mix-blend-multiply filter blur-[100px] opacity-60 animate-blob animation-delay-4000"
-          style={{ backgroundColor: "hsl(35 75% 78% / 0.6)" }}
-        />
-        <div
-          className="absolute bottom-[-10%] right-[-5%] w-[600px] h-[600px] rounded-full mix-blend-multiply filter blur-[100px] opacity-70 animate-blob"
-          style={{ backgroundColor: "hsl(28 70% 70% / 0.45)", animationDelay: "3s" }}
-        />
-        <div
-          className="absolute top-[40%] left-[30%] w-[300px] h-[300px] rounded-full filter blur-[120px] opacity-30"
-          style={{ backgroundColor: "hsl(40 80% 88%)" }}
+          className="absolute top-[-10%] left-[-8%] w-[500px] h-[500px] rounded-full filter blur-[120px] opacity-25"
+          style={{ backgroundColor: "rgba(212,146,10,0.15)" }}
         />
       </div>
 
       {/* Header */}
       <header className="relative z-20 flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-        <h1 className="text-xl md:text-2xl font-bold font-display text-foreground">
-          {greeting}, <span className="text-primary">{fullName.split(" ")[0]}</span> 👋
+        <h1 className="text-xl md:text-2xl font-bold font-display" style={{ color: "#1A1408" }}>
+          {greeting}, <span style={{ color: "#F5A623" }}>{fullName.split(" ")[0]}</span> 👋
         </h1>
 
-        {/* Functional Toggle */}
-        <div className="inline-flex items-center rounded-[20px] p-1 bg-muted">
+        {/* Toggle pill with sliding amber indicator */}
+        <div className="relative inline-flex items-center rounded-full p-1" style={{ background: "rgba(245,166,35,0.12)", border: "1px solid rgba(230,200,140,0.30)" }}>
+          <div
+            className="absolute top-1 bottom-1 rounded-full transition-all duration-200 ease-out"
+            style={{
+              width: "calc(50% - 4px)",
+              left: isPersonal ? "4px" : "calc(50%)",
+              background: "linear-gradient(135deg, #F5A623, #D4920A)",
+              boxShadow: "0 2px 8px rgba(245,166,35,0.35)",
+            }}
+          />
           <button
             onClick={() => setViewMode("personal")}
-            className={`px-4 py-1.5 rounded-2xl text-sm font-semibold transition-all ${
-              isPersonal ? "shadow-sm bg-white text-primary" : "text-muted-foreground"
+            className={`relative z-10 px-5 py-1.5 rounded-full text-sm font-semibold transition-colors duration-200 ${
+              isPersonal ? "text-white" : "text-[#1A1408]/60"
             }`}
           >
             Personal
           </button>
           <button
             onClick={() => setViewMode("club")}
-            className={`px-4 py-1.5 rounded-2xl text-sm font-semibold transition-all ${
-              !isPersonal ? "shadow-sm bg-white text-primary" : "text-muted-foreground"
+            className={`relative z-10 px-5 py-1.5 rounded-full text-sm font-semibold transition-colors duration-200 ${
+              !isPersonal ? "text-white" : "text-[#1A1408]/60"
             }`}
           >
             Club
@@ -331,23 +338,28 @@ const AdminDashboard = () => {
           {isPersonal && (
             <button
               onClick={() => navigate("/discover")}
-              className="text-primary-foreground text-sm font-medium px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-transform active:scale-95 gradient-gold"
+              className="text-white text-sm font-medium px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-transform active:scale-95"
+              style={{ background: "linear-gradient(135deg, #F5A623, #D4920A)", boxShadow: "0 4px 14px rgba(245,166,35,0.35)" }}
             >
-              <Compass className="w-4 h-4" /> Discover Clubs
+              <Compass className="w-4 h-4 stroke-[1.5]" /> Discover Clubs
             </button>
           )}
           {!isPersonal && activeClub && (activeClub.role === "president" || activeClub.role === "admin") && (
             <button
               onClick={() => navigate("/clubs")}
-              className="text-primary-foreground text-sm font-medium px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-transform active:scale-95 gradient-gold"
+              className="text-white text-sm font-medium px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-transform active:scale-95"
+              style={{ background: "linear-gradient(135deg, #F5A623, #D4920A)", boxShadow: "0 4px 14px rgba(245,166,35,0.35)" }}
             >
-              <Users className="w-4 h-4" /> Manage Club
+              <Users className="w-4 h-4 stroke-[1.5]" /> Manage Club
             </button>
           )}
           {!isPersonal && activeClub && hasPower("create_event") && (
             <DropdownMenu>
-              <DropdownMenuTrigger className="text-primary-foreground text-sm font-medium px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-transform active:scale-95 gradient-gold">
-                <Calendar className="w-4 h-4" /> Events <ChevronDown className="w-3 h-3" />
+              <DropdownMenuTrigger
+                className="text-white text-sm font-medium px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-transform active:scale-95"
+                style={{ background: "linear-gradient(135deg, #F5A623, #D4920A)", boxShadow: "0 4px 14px rgba(245,166,35,0.35)" }}
+              >
+                <Calendar className="w-4 h-4 stroke-[1.5]" /> Events <ChevronDown className="w-3 h-3" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuItem onSelect={() => navigate("/create-event")}>
@@ -364,19 +376,19 @@ const AdminDashboard = () => {
       </header>
 
       {/* Stats Row */}
-      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {statsCards.map((stat, i) => (
           <div
             key={i}
-            className={`glass-card p-6 flex flex-col justify-between h-32 relative overflow-hidden group hover:bg-white/50 transition-colors ${'clickable' in stat && stat.clickable ? 'cursor-pointer ring-primary/20 hover:ring-2' : ''}`}
+            className={`warm-glass-card p-5 flex flex-col justify-between h-[128px] relative overflow-hidden group transition-all duration-200 ${'clickable' in stat && stat.clickable ? 'cursor-pointer hover:shadow-warm-lg' : ''}`}
             onClick={() => {
               if ('clickAction' in stat && stat.clickAction) setActiveStatModal(stat.clickAction);
             }}
           >
             <div>
-              <p className="text-sm mb-1 text-muted-foreground">{stat.label}</p>
+              <p className="text-xs mb-1 font-medium" style={{ color: "rgba(26,20,8,0.55)" }}>{stat.label}</p>
               <div className="flex items-center gap-2">
-                <h3 className="text-3xl font-bold text-foreground">{stat.value}</h3>
+                <h3 className="text-3xl font-bold" style={{ color: "#1A1408" }}>{stat.value}</h3>
                 {"isGrowth" in stat && stat.isGrowth && (
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="hsl(var(--success))" strokeWidth={3}>
                     <path d="M5 15l7-7 7 7" />
@@ -384,14 +396,14 @@ const AdminDashboard = () => {
                 )}
               </div>
               {'clickable' in stat && stat.clickable && (
-                <p className="text-[10px] text-primary font-medium mt-1">Click to view details →</p>
+                <p className="text-[10px] font-medium mt-1" style={{ color: "#F5A623" }}>Click to view details →</p>
               )}
             </div>
             <svg
-              className="absolute bottom-4 right-4 w-24 h-12 text-primary/50"
+              className="absolute bottom-4 right-4 w-24 h-12 opacity-30"
               fill="none"
-              stroke="currentColor"
-              strokeWidth="3"
+              stroke="#F5A623"
+              strokeWidth="2.5"
               viewBox="0 0 100 30"
             >
               <path d={stat.path} strokeLinecap="round" strokeLinejoin="round" />
@@ -401,10 +413,10 @@ const AdminDashboard = () => {
       </section>
 
       {/* Main grid */}
-      <main className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <main className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-4">
         {/* LEFT: Profile */}
-        <div className="lg:col-span-3 h-full">
-          <div className="glass-card p-6 h-full flex flex-col items-center text-center">
+        <div className="h-full">
+          <div className="warm-glass-card p-6 h-full flex flex-col items-center text-center">
             <div className="relative mb-4">
               <div
                 className="absolute inset-0 rounded-full blur-xl transform scale-110"
@@ -449,7 +461,7 @@ const AdminDashboard = () => {
             )}
 
             {/* About section */}
-            <div className="w-full text-left rounded-xl p-4 mb-6 bg-white/30">
+            <div className="w-full text-left rounded-2xl p-4 mb-6" style={{ background: "rgba(255,252,244,0.6)", border: "1px solid rgba(230,200,140,0.20)" }}>
               <h4 className="font-bold mb-3 text-foreground">About</h4>
               <div className="space-y-2 text-sm">
                 {programme && (
@@ -469,7 +481,7 @@ const AdminDashboard = () => {
 
             {/* Personal mode: show club memberships */}
             {isPersonal && clubs.length > 0 && (
-              <div className="w-full text-left rounded-xl p-4 mb-6 bg-white/30">
+              <div className="w-full text-left rounded-2xl p-4 mb-6" style={{ background: "rgba(255,252,244,0.6)", border: "1px solid rgba(230,200,140,0.20)" }}>
                 <h4 className="font-bold mb-3 text-foreground">My Clubs</h4>
                 <div className="space-y-2">
                   {clubs.map((club) => (
@@ -533,14 +545,14 @@ const AdminDashboard = () => {
         </div>
 
         {/* MIDDLE + RIGHT: Calendar/Chart + Events */}
-        <div className="lg:col-span-9 flex flex-col gap-6">
+        <div className="flex flex-col gap-4">
           {isPersonal ? (
             /* Personal Mode: Calendar (full width) + Memberships below */
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
               <div className="lg:col-span-2">
                 <EventCalendar mode="personal" />
               </div>
-              <div className="glass-card p-6">
+              <div className="warm-glass-card p-6">
                 <div className="flex justify-between items-center mb-6">
                   <h3 className="font-bold text-lg text-foreground">My Clubs</h3>
                   <MoreHorizontal className="w-5 h-5 cursor-pointer text-muted-foreground" />
@@ -586,8 +598,8 @@ const AdminDashboard = () => {
                         />
                         <defs>
                           <linearGradient id="personalBarGrad" x1="0" y1="1" x2="0" y2="0">
-                            <stop offset="0%" stopColor="#7eb8da" />
-                            <stop offset="100%" stopColor="#a8d4ea" />
+                            <stop offset="0%" stopColor="#F5A623" />
+                            <stop offset="100%" stopColor="#D4920A" />
                           </linearGradient>
                         </defs>
                         <Bar dataKey="attended" fill="url(#personalBarGrad)" radius={[6, 6, 0, 0]} name="Attended" />
@@ -599,19 +611,19 @@ const AdminDashboard = () => {
             </div>
           ) : (
             /* Club Mode: Analytics chart + Upcoming Events */
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2 glass-card p-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              <div className="lg:col-span-2 warm-glass-card p-6">
                 <div className="flex justify-between items-center mb-6">
-                  <h3 className="font-bold text-lg text-foreground">Attendance Analytics</h3>
-                  <div className="glass-input px-3 py-1 rounded-lg text-xs flex items-center gap-1 cursor-pointer text-muted-foreground">
+                  <h3 className="font-bold text-lg" style={{ color: "#1A1408" }}>Attendance Analytics</h3>
+                  <div className="px-3 py-1 rounded-full text-xs flex items-center gap-1 cursor-pointer" style={{ background: "rgba(245,166,35,0.10)", color: "rgba(26,20,8,0.55)", border: "1px solid rgba(230,200,140,0.25)" }}>
                     Last 30 Days <ChevronDown className="w-3 h-3" />
                   </div>
                 </div>
                 <div className="flex justify-between items-center text-xs mb-6">
                   <span className="font-semibold text-muted-foreground">Event Attendance &amp; Engagement</span>
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-primary" />
-                    <span className="text-muted-foreground">Engagement Score</span>
+                   <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full" style={{ background: "#F5A623" }} />
+                    <span style={{ color: "rgba(26,20,8,0.55)" }}>Engagement Score</span>
                   </div>
                 </div>
                 <ResponsiveContainer width="100%" height={260}>
@@ -630,24 +642,24 @@ const AdminDashboard = () => {
                     />
                     <defs>
                       <linearGradient id="barGradient" x1="0" y1="1" x2="0" y2="0">
-                        <stop offset="0%" stopColor="#dfa579" />
-                        <stop offset="100%" stopColor="#eacda3" />
+                        <stop offset="0%" stopColor="#D4920A" />
+                        <stop offset="100%" stopColor="#F5A623" />
                       </linearGradient>
                     </defs>
                     <Bar dataKey="attendance" fill="url(#barGradient)" radius={[8, 8, 0, 0]} name="Attendance %" />
                     <Line
                       type="monotone"
                       dataKey="engagement"
-                      stroke="#bf7e54"
+                      stroke="#D4920A"
                       strokeWidth={2.5}
-                      dot={{ fill: "#fdfbf7", stroke: "#bf7e54", strokeWidth: 2, r: 5 }}
+                      dot={{ fill: "#FFFCF4", stroke: "#D4920A", strokeWidth: 2, r: 5 }}
                       name="Engagement Score"
                     />
                   </ComposedChart>
                 </ResponsiveContainer>
               </div>
 
-              <div className="glass-card p-6">
+              <div className="warm-glass-card p-6">
                 <div className="flex justify-between items-center mb-6">
                   <h3 className="font-bold text-lg text-foreground">Upcoming Events</h3>
                   <MoreHorizontal className="w-5 h-5 cursor-pointer text-muted-foreground" />
