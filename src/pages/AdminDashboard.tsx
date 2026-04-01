@@ -643,9 +643,10 @@ const AdminDashboard = () => {
                     />
                     <defs>
                       <linearGradient id="barGradient" x1="0" y1="1" x2="0" y2="0">
-                        <stop offset="0%" stopColor="#dfa579" />
-                        <stop offset="100%" stopColor="#eacda3" />
+                        <stop offset="0%" stopColor="#D4920A" />
+                        <stop offset="100%" stopColor="#F5A623" />
                       </linearGradient>
+                    </defs>
                     </defs>
                     <Bar dataKey="attendance" fill="url(#barGradient)" radius={[8, 8, 0, 0]} name="Attendance %" />
                     <Line
