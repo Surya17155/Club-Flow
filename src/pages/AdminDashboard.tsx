@@ -599,8 +599,8 @@ const AdminDashboard = () => {
                         />
                         <defs>
                           <linearGradient id="personalBarGrad" x1="0" y1="1" x2="0" y2="0">
-                            <stop offset="0%" stopColor="#7eb8da" />
-                            <stop offset="100%" stopColor="#a8d4ea" />
+                            <stop offset="0%" stopColor="#F5A623" />
+                            <stop offset="100%" stopColor="#D4920A" />
                           </linearGradient>
                         </defs>
                         <Bar dataKey="attended" fill="url(#personalBarGrad)" radius={[6, 6, 0, 0]} name="Attended" />
