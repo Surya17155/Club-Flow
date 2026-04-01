@@ -108,8 +108,8 @@ const MarkAttendance = () => {
     if (authLoading) return;
 
     if (!user) {
-      toast({ title: 'Please log in first', description: 'You need to be logged in to mark attendance.' });
-      navigate(`/?redirect=/mark-attendance/${token}`);
+      toast({ title: 'Please sign up or log in', description: 'You need an account to mark attendance.' });
+      navigate(`/signup?redirect=/mark-attendance/${token}`);
       return;
     }
 
