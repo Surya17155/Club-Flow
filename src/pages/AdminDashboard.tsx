@@ -414,7 +414,7 @@ const AdminDashboard = () => {
       </section>
 
       {/* Main grid */}
-      <main className="grid grid-cols-1 lg:grid-cols-[260px_1fr_280px] gap-4">
+      <main className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-4">
         {/* LEFT: Profile */}
         <div className="h-full">
           <div className="warm-glass-card p-6 h-full flex flex-col items-center text-center">
