@@ -622,9 +622,9 @@ const AdminDashboard = () => {
                 </div>
                 <div className="flex justify-between items-center text-xs mb-6">
                   <span className="font-semibold text-muted-foreground">Event Attendance &amp; Engagement</span>
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-primary" />
-                    <span className="text-muted-foreground">Engagement Score</span>
+                   <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full" style={{ background: "#F5A623" }} />
+                    <span style={{ color: "rgba(26,20,8,0.55)" }}>Engagement Score</span>
                   </div>
                 </div>
                 <ResponsiveContainer width="100%" height={260}>
