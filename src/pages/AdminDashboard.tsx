@@ -306,19 +306,29 @@ const AdminDashboard = () => {
         </h1>
 
         {/* Functional Toggle */}
-        <div className="inline-flex items-center rounded-[20px] p-1 bg-muted">
+        {/* Toggle pill with sliding amber indicator */}
+        <div className="relative inline-flex items-center rounded-full p-1" style={{ background: "rgba(245,166,35,0.12)", border: "1px solid rgba(230,200,140,0.30)" }}>
+          <div
+            className="absolute top-1 bottom-1 rounded-full transition-all duration-200 ease-out"
+            style={{
+              width: "calc(50% - 4px)",
+              left: isPersonal ? "4px" : "calc(50%)",
+              background: "linear-gradient(135deg, #F5A623, #D4920A)",
+              boxShadow: "0 2px 8px rgba(245,166,35,0.35)",
+            }}
+          />
           <button
             onClick={() => setViewMode("personal")}
-            className={`px-4 py-1.5 rounded-2xl text-sm font-semibold transition-all ${
-              isPersonal ? "shadow-sm bg-white text-primary" : "text-muted-foreground"
+            className={`relative z-10 px-5 py-1.5 rounded-full text-sm font-semibold transition-colors duration-200 ${
+              isPersonal ? "text-white" : "text-[#1A1408]/60"
             }`}
           >
             Personal
           </button>
           <button
             onClick={() => setViewMode("club")}
-            className={`px-4 py-1.5 rounded-2xl text-sm font-semibold transition-all ${
-              !isPersonal ? "shadow-sm bg-white text-primary" : "text-muted-foreground"
+            className={`relative z-10 px-5 py-1.5 rounded-full text-sm font-semibold transition-colors duration-200 ${
+              !isPersonal ? "text-white" : "text-[#1A1408]/60"
             }`}
           >
             Club
