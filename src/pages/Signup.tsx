@@ -64,6 +64,7 @@ const Signup = () => {
         year: formData.year,
         roll_no: formData.rollNo,
         phone: formData.phone,
+        class_coordinator: formData.classCoordinator,
       });
 
       // Check if user already exists (pre-created by admin)
