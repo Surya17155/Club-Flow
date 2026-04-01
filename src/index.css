@@ -197,6 +197,25 @@
       radial-gradient(circle at 100% 100%, hsl(25 75% 70% / 0.5) 0%, transparent 48%),
       linear-gradient(135deg, hsl(40 55% 97%), hsl(38 35% 94%));
   }
+
+  /* Warm glassmorphism card – skill.md v1 */
+  .warm-glass-card {
+    background: rgba(255, 252, 244, 0.88);
+    backdrop-filter: blur(18px) saturate(160%);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    border: 1px solid rgba(230, 200, 140, 0.30);
+    border-radius: 18px;
+    box-shadow: 0 4px 20px -4px rgba(160, 110, 20, 0.10);
+    transition: box-shadow 0.2s ease, background 0.2s ease;
+  }
+
+  .warm-glass-card:hover {
+    box-shadow: 0 8px 32px -6px rgba(160, 110, 20, 0.16);
+  }
+
+  .shadow-warm-lg {
+    box-shadow: 0 8px 32px -6px rgba(160, 110, 20, 0.18);
+  }
 }
 
 /* Background blob animations — GPU-accelerated */
