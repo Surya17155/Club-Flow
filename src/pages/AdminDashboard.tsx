@@ -553,7 +553,7 @@ const AdminDashboard = () => {
               <div className="lg:col-span-2">
                 <EventCalendar mode="personal" />
               </div>
-              <div className="glass-card p-6">
+              <div className="warm-glass-card p-6">
                 <div className="flex justify-between items-center mb-6">
                   <h3 className="font-bold text-lg text-foreground">My Clubs</h3>
                   <MoreHorizontal className="w-5 h-5 cursor-pointer text-muted-foreground" />
