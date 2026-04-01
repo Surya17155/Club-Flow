@@ -173,7 +173,10 @@ const Signup = () => {
                   </Select>
                 </div>
 
-
+                <div className="space-y-2 sm:col-span-2">
+                  <Label htmlFor="classCoordinator">Class Coordinator Name *</Label>
+                  <Input id="classCoordinator" placeholder="Enter your class coordinator's name" value={formData.classCoordinator} onChange={e => updateField('classCoordinator', e.target.value)} required />
+                </div>
 
 
                 <div className="space-y-2">
