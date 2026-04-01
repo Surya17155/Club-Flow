@@ -377,19 +377,19 @@ const AdminDashboard = () => {
       </header>
 
       {/* Stats Row */}
-      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {statsCards.map((stat, i) => (
           <div
             key={i}
-            className={`glass-card p-6 flex flex-col justify-between h-32 relative overflow-hidden group hover:bg-white/50 transition-colors ${'clickable' in stat && stat.clickable ? 'cursor-pointer ring-primary/20 hover:ring-2' : ''}`}
+            className={`warm-glass-card p-5 flex flex-col justify-between h-[128px] relative overflow-hidden group transition-all duration-200 ${'clickable' in stat && stat.clickable ? 'cursor-pointer hover:shadow-warm-lg' : ''}`}
             onClick={() => {
               if ('clickAction' in stat && stat.clickAction) setActiveStatModal(stat.clickAction);
             }}
           >
             <div>
-              <p className="text-sm mb-1 text-muted-foreground">{stat.label}</p>
+              <p className="text-xs mb-1 font-medium" style={{ color: "rgba(26,20,8,0.55)" }}>{stat.label}</p>
               <div className="flex items-center gap-2">
-                <h3 className="text-3xl font-bold text-foreground">{stat.value}</h3>
+                <h3 className="text-3xl font-bold" style={{ color: "#1A1408" }}>{stat.value}</h3>
                 {"isGrowth" in stat && stat.isGrowth && (
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="hsl(var(--success))" strokeWidth={3}>
                     <path d="M5 15l7-7 7 7" />
@@ -397,14 +397,14 @@ const AdminDashboard = () => {
                 )}
               </div>
               {'clickable' in stat && stat.clickable && (
-                <p className="text-[10px] text-primary font-medium mt-1">Click to view details →</p>
+                <p className="text-[10px] font-medium mt-1" style={{ color: "#F5A623" }}>Click to view details →</p>
               )}
             </div>
             <svg
-              className="absolute bottom-4 right-4 w-24 h-12 text-primary/50"
+              className="absolute bottom-4 right-4 w-24 h-12 opacity-30"
               fill="none"
-              stroke="currentColor"
-              strokeWidth="3"
+              stroke="#F5A623"
+              strokeWidth="2.5"
               viewBox="0 0 100 30"
             >
               <path d={stat.path} strokeLinecap="round" strokeLinejoin="round" />
