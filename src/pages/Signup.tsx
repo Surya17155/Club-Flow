@@ -85,7 +85,7 @@ const Signup = () => {
         description: 'Please check your email to verify your account.',
       });
       const redirectPath = searchParams.get('redirect');
-      navigate(redirectPath || '/');
+      navigate(redirectPath || '/dashboard', { replace: true });
     } catch (error: any) {
       // Handle "User already registered" error
       if (error.message?.toLowerCase().includes('already registered') || error.message?.toLowerCase().includes('already been registered')) {

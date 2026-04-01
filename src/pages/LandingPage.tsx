@@ -1,7 +1,8 @@
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { ArrowUpRight, QrCode, Shield, Brain } from "lucide-react";
 import { motion } from "framer-motion";
 import dashboardMockup from "@/assets/dashboard-mockup.png";
+import { useAuth } from "@/contexts/AuthContext";
 
 const features = [
 {
@@ -23,6 +24,19 @@ const features = [
 
 const LandingPage = () => {
   const navigate = useNavigate();
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (user) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[hsl(40,33%,96%)]">

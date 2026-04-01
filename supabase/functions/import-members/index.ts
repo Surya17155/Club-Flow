@@ -6,6 +6,7 @@ const corsHeaders = {
 };
 
 const VALID_ROLES = ["president", "vice_president", "secretary", "social_media_head", "member"];
+const DEFAULT_PASSWORD = "iilm@123";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -188,10 +189,9 @@ IMPORTANT: Process ALL ${raw_data.length} rows, not just the samples.`;
 
         if (!userId) {
           // Create new user
-          const tempPassword = crypto.randomUUID() + "Aa1!";
           const { data: newUser, error: createErr } = await adminClient.auth.admin.createUser({
             email,
-            password: tempPassword,
+            password: DEFAULT_PASSWORD,
             email_confirm: true,
             user_metadata: {
               full_name: fullName,
