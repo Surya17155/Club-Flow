@@ -546,7 +546,7 @@ const AdminDashboard = () => {
         </div>
 
         {/* MIDDLE + RIGHT: Calendar/Chart + Events */}
-        <div className="lg:col-span-9 flex flex-col gap-6">
+        <div className="lg:col-span-2 flex flex-col gap-4">
           {isPersonal ? (
             /* Personal Mode: Calendar (full width) + Memberships below */
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
