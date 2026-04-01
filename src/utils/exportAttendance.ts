@@ -10,6 +10,7 @@ interface AttendeeRow {
   scanned_at: string;
   status: string;
   manually_added?: boolean | null;
+  class_coordinator?: string | null;
 }
 
 export const exportAttendanceXLSX = (
@@ -25,6 +26,7 @@ export const exportAttendanceXLSX = (
     'Programme': a.programme || '—',
     'Year': a.year || '—',
     'Section': a.section || '—',
+    'Class Coordinator': a.class_coordinator || '—',
     'Scan Time': new Date(a.scanned_at).toLocaleString(),
     'Status': a.status === 'present' ? 'Present' : a.status,
     'Method': a.manually_added ? 'Manual' : 'QR Scan',

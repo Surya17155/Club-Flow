@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,11 +24,13 @@ const Signup = () => {
     year: '',
     rollNo: '',
     phone: '',
+    classCoordinator: '',
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { signUp } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
 
   const updateField = (field: string, value: string) => {
@@ -63,6 +65,7 @@ const Signup = () => {
         year: formData.year,
         roll_no: formData.rollNo,
         phone: formData.phone,
+        class_coordinator: formData.classCoordinator,
       });
 
       // Check if user already exists (pre-created by admin)
@@ -81,7 +84,8 @@ const Signup = () => {
         title: 'Account created!',
         description: 'Please check your email to verify your account.',
       });
-      navigate('/');
+      const redirectPath = searchParams.get('redirect');
+      navigate(redirectPath || '/');
     } catch (error: any) {
       // Handle "User already registered" error
       if (error.message?.toLowerCase().includes('already registered') || error.message?.toLowerCase().includes('already been registered')) {
@@ -171,7 +175,10 @@ const Signup = () => {
                   </Select>
                 </div>
 
-
+                <div className="space-y-2 sm:col-span-2">
+                  <Label htmlFor="classCoordinator">Class Coordinator Name *</Label>
+                  <Input id="classCoordinator" placeholder="Enter your class coordinator's name" value={formData.classCoordinator} onChange={e => updateField('classCoordinator', e.target.value)} required />
+                </div>
 
 
                 <div className="space-y-2">

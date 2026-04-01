@@ -389,6 +389,7 @@ export type Database = {
         Row: {
           about: string | null
           avatar_url: string | null
+          class_coordinator: string | null
           created_at: string
           email: string | null
           full_name: string
@@ -408,6 +409,7 @@ export type Database = {
         Insert: {
           about?: string | null
           avatar_url?: string | null
+          class_coordinator?: string | null
           created_at?: string
           email?: string | null
           full_name: string
@@ -427,6 +429,7 @@ export type Database = {
         Update: {
           about?: string | null
           avatar_url?: string | null
+          class_coordinator?: string | null
           created_at?: string
           email?: string | null
           full_name?: string

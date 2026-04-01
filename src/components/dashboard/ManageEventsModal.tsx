@@ -111,7 +111,7 @@ const ManageEventsModal = ({ open, onOpenChange }: { open: boolean; onOpenChange
       const studentIds = data.map((a: any) => a.student_id);
       const { data: profiles } = await supabase
         .from('profiles')
-        .select('user_id, full_name, roll_no, programme, section, year, phone')
+        .select('user_id, full_name, roll_no, programme, section, year, phone, class_coordinator')
         .in('user_id', studentIds);
 
       const profileMap: Record<string, any> = {};
@@ -125,6 +125,7 @@ const ManageEventsModal = ({ open, onOpenChange }: { open: boolean; onOpenChange
         section: profileMap[a.student_id]?.section || null,
         year: profileMap[a.student_id]?.year || null,
         phone: profileMap[a.student_id]?.phone || null,
+        class_coordinator: profileMap[a.student_id]?.class_coordinator || null,
       })));
     } else {
       setAttendees([]);

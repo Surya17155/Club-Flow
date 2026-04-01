@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN class_coordinator text DEFAULT null;
