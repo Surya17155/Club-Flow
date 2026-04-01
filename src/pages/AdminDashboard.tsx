@@ -305,7 +305,6 @@ const AdminDashboard = () => {
           {greeting}, <span style={{ color: "#F5A623" }}>{fullName.split(" ")[0]}</span> 👋
         </h1>
 
-        {/* Functional Toggle */}
         {/* Toggle pill with sliding amber indicator */}
         <div className="relative inline-flex items-center rounded-full p-1" style={{ background: "rgba(245,166,35,0.12)", border: "1px solid rgba(230,200,140,0.30)" }}>
           <div
