@@ -21,7 +21,7 @@ import {
   Tag,
   Shield,
   ClipboardList,
-  Compass,
+  
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -276,41 +276,61 @@ const AdminDashboard = () => {
     );
   }
 
+  const cardColors = [
+    { bg: '#DDEBFF', label: '#3B82F6' },  // blue
+    { bg: '#FCE4EC', label: '#E91E63' },  // pink
+    { bg: '#E8F5E9', label: '#4CAF50' },  // green
+  ];
+
+  const clubCardColors = [
+    { bg: '#FFF8E1', label: '#F9A825' },  // yellow
+    { bg: '#E8F5E9', label: '#4CAF50' },  // green
+    { bg: '#EDE7F6', label: '#7C3AED' },  // purple
+  ];
+
   return (
-    <div className="min-h-screen flex antialiased" style={{ backgroundColor: '#EAF1F7' }}>
-      {/* Sidebar */}
+    <div className="h-screen flex antialiased overflow-hidden" style={{ backgroundColor: '#000000' }}>
+      {/* Sidebar — seamless with black bg */}
       <DashboardSidebar />
 
-      {/* Main content container */}
-      <div className="flex-1 flex flex-col min-h-screen p-4">
+      {/* Main content container with breathing space */}
+      <div className="flex-1 flex flex-col p-3 min-h-0">
         <div
-          className="flex-1 flex flex-col overflow-hidden"
+          className="flex-1 flex flex-col min-h-0 overflow-hidden"
           style={{
             background: '#FFFFFF',
             borderRadius: '24px',
-            padding: '24px 28px',
-            boxShadow: '0px 20px 60px rgba(0,0,0,0.08)',
+            padding: '28px 32px',
+            boxShadow: '0px 20px 60px rgba(0,0,0,0.15)',
           }}
         >
           {/* Header */}
-          <header className="flex justify-between items-center mb-6">
-            <h1 className="text-xl font-bold font-display" style={{ color: '#0F172A' }}>
-              {greeting}, <span className="text-primary">{fullName.split(" ")[0]}</span> 👋
+          <header className="flex justify-between items-center mb-8">
+            <h1
+              style={{
+                fontFamily: "'Lexend', sans-serif",
+                fontSize: '24px',
+                fontWeight: 600,
+                color: '#0F172A',
+                letterSpacing: '-0.02em',
+              }}
+            >
+              {greeting}, <span style={{ color: '#3B82F6' }}>{fullName.split(" ")[0]}</span> 👋
             </h1>
 
-            <div className="inline-flex items-center rounded-[20px] p-1" style={{ backgroundColor: '#F7F9FC' }}>
+            <div className="inline-flex items-center rounded-full p-1" style={{ backgroundColor: '#F1F5F9' }}>
               <button
                 onClick={() => setViewMode("personal")}
-                className={`px-4 py-1.5 rounded-2xl text-sm font-semibold transition-all ${
-                  isPersonal ? "shadow-sm bg-white text-primary" : "text-muted-foreground"
+                className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${
+                  isPersonal ? "shadow-sm bg-white text-[#0F172A]" : "text-[#6B7280]"
                 }`}
               >
                 Personal
               </button>
               <button
                 onClick={() => setViewMode("club")}
-                className={`px-4 py-1.5 rounded-2xl text-sm font-semibold transition-all ${
-                  !isPersonal ? "shadow-sm bg-white text-primary" : "text-muted-foreground"
+                className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${
+                  !isPersonal ? "shadow-sm bg-white text-[#0F172A]" : "text-[#6B7280]"
                 }`}
               >
                 Club
@@ -318,25 +338,21 @@ const AdminDashboard = () => {
             </div>
 
             <div className="flex items-center gap-3">
-              {isPersonal && (
-                <button
-                  onClick={() => navigate("/discover")}
-                  className="text-primary-foreground text-sm font-medium px-5 py-2 rounded-full shadow-md flex items-center gap-2 transition-transform active:scale-95 gradient-gold"
-                >
-                  <Compass className="w-4 h-4" /> Discover Clubs
-                </button>
-              )}
               {!isPersonal && activeClub && (activeClub.role === "president" || activeClub.role === "admin") && (
                 <button
                   onClick={() => navigate("/clubs")}
-                  className="text-primary-foreground text-sm font-medium px-5 py-2 rounded-full shadow-md flex items-center gap-2 transition-transform active:scale-95 gradient-gold"
+                  className="text-sm font-medium px-5 py-2 rounded-full shadow-sm flex items-center gap-2 transition-transform active:scale-95"
+                  style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}
                 >
                   <Users className="w-4 h-4" /> Manage Club
                 </button>
               )}
               {!isPersonal && activeClub && hasPower("create_event") && (
                 <DropdownMenu>
-                  <DropdownMenuTrigger className="text-primary-foreground text-sm font-medium px-5 py-2 rounded-full shadow-md flex items-center gap-2 transition-transform active:scale-95 gradient-gold">
+                  <DropdownMenuTrigger
+                    className="text-sm font-medium px-5 py-2 rounded-full shadow-sm flex items-center gap-2 transition-transform active:scale-95"
+                    style={{ backgroundColor: '#0F172A', color: '#FFFFFF' }}
+                  >
                     <Calendar className="w-4 h-4" /> Events <ChevronDown className="w-3 h-3" />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48">
@@ -353,139 +369,66 @@ const AdminDashboard = () => {
             </div>
           </header>
 
-          {/* Stats Row — 3 cards */}
-          <section className="grid grid-cols-3 gap-5 mb-6">
+          {/* Stats Row — 3 colored cards */}
+          <section className="grid grid-cols-3 gap-5">
             {(isPersonal
               ? [
-                  { label: 'Clubs Joined', value: String(personalStats.clubCount), clickAction: 'clubs_joined' as const },
-                  { label: 'Events Attended', value: String(personalStats.eventsAttended), clickAction: 'events_attended' as const },
-                  { label: 'Upcoming Events', value: String(upcomingEvents.length), clickAction: null },
+                  { label: 'Clubs Joined', value: String(personalStats.clubCount), clickAction: 'clubs_joined' as const, color: cardColors[0] },
+                  { label: 'Events Attended', value: String(personalStats.eventsAttended), clickAction: 'events_attended' as const, color: cardColors[1] },
+                  { label: 'Upcoming Events', value: String(upcomingEvents.length), clickAction: null, color: cardColors[2] },
                 ]
               : [
-                  { label: 'Total Members', value: String(clubStats.totalMembers), clickAction: null },
-                  { label: 'Total Events', value: String(clubStats.totalEvents), clickAction: null },
-                  { label: 'Avg. Attendance', value: `${clubStats.avgAttendanceRate}%`, clickAction: null },
+                  { label: 'Total Members', value: String(clubStats.totalMembers), clickAction: null, color: clubCardColors[0] },
+                  { label: 'Total Events', value: String(clubStats.totalEvents), clickAction: null, color: clubCardColors[1] },
+                  { label: 'Avg. Attendance', value: `${clubStats.avgAttendanceRate}%`, clickAction: null, color: clubCardColors[2] },
                 ]
             ).map((stat, i) => (
               <div
                 key={i}
                 onClick={() => { if (stat.clickAction) setActiveStatModal(stat.clickAction); }}
-                className={`flex flex-col justify-center px-5 py-4 rounded-2xl transition-all duration-200 ${stat.clickAction ? 'cursor-pointer hover:shadow-md' : ''}`}
+                className={`flex flex-col justify-center px-6 py-5 rounded-2xl transition-all duration-200 ${stat.clickAction ? 'cursor-pointer hover:shadow-lg hover:scale-[1.02]' : ''}`}
                 style={{
-                  backgroundColor: '#F7F9FC',
-                  height: 100,
-                  boxShadow: '0px 6px 20px rgba(0,0,0,0.04)',
+                  backgroundColor: stat.color.bg,
+                  minHeight: 130,
+                  boxShadow: '0px 4px 16px rgba(0,0,0,0.04)',
                 }}
               >
-                <p className="text-xs font-medium mb-1" style={{ color: '#6B7280' }}>{stat.label}</p>
-                <p className="text-3xl font-bold" style={{ color: '#0F172A' }}>{stat.value}</p>
+                <p className="text-xs font-medium mb-2" style={{ color: '#6B7280', fontFamily: "'Lexend', sans-serif" }}>{stat.label}</p>
+                <p className="text-4xl font-bold" style={{ color: '#0F172A', fontFamily: "'Lexend', sans-serif" }}>{stat.value}</p>
                 {stat.clickAction && (
-                  <p className="text-[10px] text-primary font-medium mt-0.5">View details →</p>
+                  <p className="text-[11px] font-medium mt-1.5" style={{ color: stat.color.label }}>View details →</p>
                 )}
               </div>
             ))}
           </section>
 
-          {/* Main content grid */}
-          <div className="flex-1 overflow-auto" style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 20 }}>
-            {/* Left: Calendar or Analytics */}
-            <div
-              className="rounded-2xl overflow-hidden"
-              style={{
-                backgroundColor: '#F7F9FC',
-                padding: 18,
-                boxShadow: '0px 6px 20px rgba(0,0,0,0.04)',
-              }}
-            >
-              {isPersonal ? (
-                <EventCalendar mode="personal" />
-              ) : (
-                <div>
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="font-bold text-base" style={{ color: '#0F172A' }}>Attendance Analytics</h3>
-                    <div className="px-3 py-1 rounded-lg text-xs flex items-center gap-1 cursor-pointer" style={{ backgroundColor: '#FFFFFF', color: '#6B7280' }}>
-                      Last 30 Days <ChevronDown className="w-3 h-3" />
-                    </div>
-                  </div>
-                  <ResponsiveContainer width="100%" height={280}>
-                    <ComposedChart data={clubStats.chartData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                      <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#6B7280" }} />
-                      <YAxis tick={{ fontSize: 11, fill: "#6B7280" }} domain={[0, 100]} />
-                      <Tooltip
-                        contentStyle={{
-                          background: "#FFFFFF",
-                          border: "1px solid #E5E7EB",
-                          borderRadius: "12px",
-                          fontSize: "12px",
-                        }}
-                      />
-                      <defs>
-                        <linearGradient id="barGradient" x1="0" y1="1" x2="0" y2="0">
-                          <stop offset="0%" stopColor="#dfa579" />
-                          <stop offset="100%" stopColor="#eacda3" />
-                        </linearGradient>
-                      </defs>
-                      <Bar dataKey="attendance" fill="url(#barGradient)" radius={[8, 8, 0, 0]} name="Attendance %" />
-                      <Line
-                        type="monotone"
-                        dataKey="engagement"
-                        stroke="#bf7e54"
-                        strokeWidth={2.5}
-                        dot={{ fill: "#FFFFFF", stroke: "#bf7e54", strokeWidth: 2, r: 5 }}
-                        name="Engagement Score"
-                      />
-                    </ComposedChart>
-                  </ResponsiveContainer>
+          {/* Analytics for club mode */}
+          {!isPersonal && (
+            <div className="flex-1 mt-6 rounded-2xl overflow-hidden" style={{ backgroundColor: '#F7F9FC', padding: 18, boxShadow: '0px 6px 20px rgba(0,0,0,0.04)' }}>
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="font-bold text-base" style={{ color: '#0F172A', fontFamily: "'Lexend', sans-serif" }}>Attendance Analytics</h3>
+                <div className="px-3 py-1 rounded-lg text-xs flex items-center gap-1 cursor-pointer" style={{ backgroundColor: '#FFFFFF', color: '#6B7280' }}>
+                  Last 30 Days <ChevronDown className="w-3 h-3" />
                 </div>
-              )}
-            </div>
-
-            {/* Right: Upcoming Events */}
-            <div
-              className="rounded-2xl overflow-y-auto"
-              style={{
-                backgroundColor: '#F7F9FC',
-                padding: 18,
-                boxShadow: '0px 6px 20px rgba(0,0,0,0.04)',
-                maxHeight: 'calc(100vh - 340px)',
-              }}
-            >
-              <h3 className="font-bold text-base mb-4" style={{ color: '#0F172A' }}>Upcoming Events</h3>
-              <div className="space-y-3">
-                {upcomingEvents.length > 0 ? (
-                  upcomingEvents.map((event) => (
-                    <div
-                      key={event.id}
-                      className="flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-colors hover:bg-white"
-                      onClick={() => {
-                        setSelectedEvent(event);
-                        setEventDialogOpen(true);
-                      }}
-                    >
-                      <div
-                        className="rounded-xl w-11 h-11 flex flex-col items-center justify-center shrink-0"
-                        style={{ backgroundColor: '#DDEBFF' }}
-                      >
-                        <span className="text-[9px] font-bold uppercase" style={{ color: '#3B82F6' }}>
-                          {event.month}
-                        </span>
-                        <span className="text-sm font-bold leading-none" style={{ color: '#1E40AF' }}>
-                          {event.day}
-                        </span>
-                      </div>
-                      <div className="min-w-0">
-                        <h4 className="text-sm font-semibold truncate" style={{ color: '#0F172A' }}>{event.name}</h4>
-                        <span className="text-xs" style={{ color: '#6B7280' }}>{event.club_name}</span>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-sm italic text-center py-6" style={{ color: '#6B7280' }}>No upcoming events</p>
-                )}
               </div>
+              <ResponsiveContainer width="100%" height={200}>
+                <ComposedChart data={clubStats.chartData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#6B7280" }} />
+                  <YAxis tick={{ fontSize: 11, fill: "#6B7280" }} domain={[0, 100]} />
+                  <Tooltip contentStyle={{ background: "#FFFFFF", border: "1px solid #E5E7EB", borderRadius: "12px", fontSize: "12px" }} />
+                  <defs>
+                    <linearGradient id="barGradient" x1="0" y1="1" x2="0" y2="0">
+                      <stop offset="0%" stopColor="#93c5fd" />
+                      <stop offset="100%" stopColor="#3b82f6" />
+                    </linearGradient>
+                  </defs>
+                  <Bar dataKey="attendance" fill="url(#barGradient)" radius={[8, 8, 0, 0]} name="Attendance %" />
+                  <Line type="monotone" dataKey="engagement" stroke="#6366f1" strokeWidth={2.5} dot={{ fill: "#FFFFFF", stroke: "#6366f1", strokeWidth: 2, r: 5 }} name="Engagement Score" />
+                </ComposedChart>
+              </ResponsiveContainer>
             </div>
-          </div>
+          )}
         </div>
       </div>
       {/* Event Detail Dialog */}
