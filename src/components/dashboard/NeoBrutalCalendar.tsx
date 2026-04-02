@@ -211,7 +211,7 @@ const NeoBrutalCalendar = ({ mode }: Props) => {
           ))}
         </div>
 
-        <div className="grid grid-cols-7 gap-2 auto-rows-[clamp(72px,8vw,108px)]">
+        <div className="grid grid-cols-7 gap-1.5 auto-rows-[clamp(48px,5vw,64px)]">
           {calendarCells.map((cell) => {
             const hasEvents = cell.events.length > 0;
 
