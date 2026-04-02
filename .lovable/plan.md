@@ -1,106 +1,77 @@
 
-Goal: rebuild the ClubBot event-details card so it matches your exact flow, and harden the agent so event-detail requests consistently return the correct UI instead of plain text or the old glassy card.
 
-1. Replace the current event-detail UI in `src/components/chat/ChatResponseRenderer.tsx`
-- Remove the current “description card”, “event details card”, glassy popup/backdrop, and the “Access” row entirely.
-- Rebuild the event view as one clean flat section using `bg-card` and normal borders only.
-- New order:
-  1) Club/Event title at top
-  2) Date
-  3) Time (start–end)
-  4) Description as plain text directly in the section
-  5) Important event details from creation flow
-  6) Attendance button
-- Event detail fields shown here will be only the ones that make sense from the event form, such as:
-  - event type
-  - category
-  - attendance given: yes/no
-  - open to all / club members only
-- I will normalize raw stored values like `open`, `club_only`, `restricted`, `hackathon`, etc. into readable labels.
+# Desktop Dashboard Redesign — SaaS-Style with Collapsible Sidebar
 
-2. Convert Attendance into an in-section panel, not a fullscreen modal
-- Replace the current fixed overlay with an internal same-size panel swap inside the same event card area.
-- Clicking “Attendance” will switch this section into an attendance view of the same width/height.
-- Add a top-left close/X button to return to the event summary.
-- Add a visible vertical scrollbar in the attendance list area.
-- Keep the card simple and non-glassy.
+## What Changes
 
-3. Rebuild attendee list tiles
-- Each attendee will render as an individual tile with:
-  - profile photo if available, otherwise fallback avatar
-  - full name
-  - programme
-  - section
-- Clicking a tile will smoothly expand it to reveal more details such as:
-  - email
-  - phone
-  - roll number
-  - year
-  - class coordinator
-  - scan time / attendance method
-- This directly addresses the current problem where attendees are shown as chips/names instead of proper tiles.
+Replace the current warm-glassmorphism desktop dashboard with a clean, modern SaaS layout featuring a dark collapsible sidebar and card-based UI on a soft blue-grey background.
 
-4. Restore and correct Export behavior
-- Add Export at the top of the attendance panel.
-- Export dropdown will offer exactly:
-  - PDF
-  - CSV
-- CSV will export all attendee rows.
-- PDF export will produce the same attendance data in a readable tabular format.
-- I will remove the current Excel-only wording/logic from this specific ClubBot event-details UI so it matches your requested flow.
+## Layout
 
-5. Fix the agent response path so event-detail requests always use the correct renderer
-- Update `supabase/functions/club-chat/index.ts` so requests like:
-  - event details
-  - attendance data
-  - report
-  - export
-  - download event data
-  reliably trigger `fetch_event_data`.
-- Tighten the system instructions so the model must return `event-data-json` for those requests instead of generic `events-json` or plain text.
-- Add a stricter post-tool response pattern so the final response always contains the structured `event-data-json` block the frontend expects.
+```text
+┌─────────┬──────────────────────────────────────────────────┐
+│         │  Header: Greeting + Toggle + Actions             │
+│  Dark   │──────────────────────────────────────────────────│
+│ Sidebar │  Stats: Clubs Joined | Events Attended | Upcoming│
+│  (nav)  │──────────────────────────────────────────────────│
+│         │  ┌──────────────────────┐  ┌──────────────────┐  │
+│ 220px   │  │   Event Calendar     │  │ Upcoming Events  │  │
+│  or     │  │   (large card)       │  │ (320px, scroll)  │  │
+│  64px   │  └──────────────────────┘  └──────────────────┘  │
+│         │                                                  │
+└─────────┴──────────────────────────────────────────────────┘
 
-6. Improve event data returned from the backend
-- Ensure `fetch_event_data` sends all fields needed by the new UI:
-  - club name
-  - event name
-  - event date
-  - start/end time
-  - event type
-  - category
-  - access label
-  - attendance given
-  - description
-  - attendee profile details
-  - avatar URL if available
-- This is important because the current selected UI shows bad/placeholder values like “Access / Not Specified”.
+Outer bg: #EAF1F7
+Main container: white floating card with 24px radius + shadow
+```
 
-7. Prevent fallback to the wrong old card
-- The current chat renderer still has two different event UIs:
-  - generic `events-json` cards
-  - detailed `event-data-json` card
-- I will keep the generic event list for normal “show events” requests, but ensure detailed/report/export requests render only the detailed event-data view.
-- This avoids the old glassy expandable event card appearing when you actually asked for attendance/report details.
+## Plan
 
-Technical details
-- Files to update:
-  - `src/components/chat/ChatResponseRenderer.tsx`
-  - `supabase/functions/club-chat/index.ts`
-- Likely frontend changes:
-  - add internal “summary vs attendance panel” state
-  - replace fixed overlay with same-container panel
-  - add avatar rendering support
-  - add PDF + CSV export helpers for event attendance
-  - add readable label mappers for `event_type` and `access_type`
-- Backend prompt/tooling changes:
-  - strengthen intent routing for event-detail/report/export prompts
-  - force `fetch_event_data` + `event-data-json` for detailed event responses
-  - enrich payload so UI never has to guess missing labels
+### 1. Create `src/components/layout/DashboardSidebar.tsx`
+- Dark gradient sidebar: `linear-gradient(180deg, #1C1C1E, #111113)`
+- Border-radius: `20px 0 0 20px`
+- Expanded: 220px with icon + label; Collapsed: 64px icons only
+- Smooth `transition: all 0.3s ease`, labels fade with `opacity: 0`
+- Nav items: Dashboard, Events, Clubs, Discover, Calendar, Profile, Settings (Lucide icons)
+- Active: `rgba(255,255,255,0.08)` bg, white text, 12px radius
+- Inactive: `#8A8F98` text
+- Profile avatar at top, collapse toggle chevron at bottom
+- Persist state in `localStorage`
 
-Implementation order
-1. Fix backend response contract for event-detail requests
-2. Rebuild the detailed event card layout
-3. Replace fullscreen attendance modal with in-card attendance panel
-4. Rebuild attendee tiles with expandable details and avatars
-5. Add PDF/CSV export in the attendance panel
-6. Verify that detailed event prompts no longer fall back to plain text or the old event card
+### 2. Redesign desktop layout in `src/pages/AdminDashboard.tsx`
+- Remove warm background blobs, glassmorphism cards, and profile left column
+- Outer wrapper: `min-h-screen bg-[#EAF1F7] flex`
+- Sidebar on left, main content in a white floating container:
+  - `bg-white rounded-3xl shadow-[0px_20px_60px_rgba(0,0,0,0.08)] p-6`
+- Main content shifts with sidebar width via smooth margin transition
+
+### 3. Simplify stats to 3 cards
+- Only: **Clubs Joined**, **Events Attended**, **Upcoming Events**
+- Card style: `bg-[#F7F9FC] rounded-2xl p-[18px] h-[100px]` with subtle shadow
+- Remove sparkline SVGs; use clean typography only
+
+### 4. Main content grid
+- `grid-template-columns: 1fr 320px; gap: 20px`
+- Left: Calendar (large card)
+- Right: Upcoming Events (scrollable list card)
+- All cards: `bg-[#F7F9FC] rounded-2xl p-[18px] shadow-[0px_6px_20px_rgba(0,0,0,0.04)]`
+
+### 5. Color system
+- Background: `#EAF1F7`
+- Container: `#FFFFFF`
+- Cards: `#F7F9FC`
+- Primary text: `#0F172A`, Secondary: `#6B7280`
+- No heavy borders, high whitespace, minimal noise
+
+### 6. Responsive rule
+- Sidebar hidden on mobile (existing `isMobile` check)
+- Mobile view remains untouched (`MobileDashboardView`)
+
+## Files to Create
+- `src/components/layout/DashboardSidebar.tsx`
+
+## Files to Modify
+- `src/pages/AdminDashboard.tsx` — desktop return block only
+
+No database or backend changes needed.
+
