@@ -481,12 +481,12 @@ serve(async (req) => {
       { global: { headers: { Authorization: authHeader } } }
     );
 
-    const token = authHeader.replace("Bearer ", "");
-    const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
-    if (claimsError || !claimsData?.claims) {
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
+      console.error("Auth error:", userError?.message);
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: corsHeaders });
     }
-    const userId = claimsData.claims.sub;
+    const userId = user.id;
 
     const { message, conversation_history = [], active_club_id, file_data, file_urls, file_name } = await req.json();
     if (!message) {
@@ -724,6 +724,7 @@ Answer questions accurately. If asked about data you don't have, say so honestly
       let maxIterations = 5;
 
       while (maxIterations-- > 0) {
+        console.log(`Tool loop iteration, messages: ${currentMessages.length}`);
         const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
           headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
@@ -736,6 +737,8 @@ Answer questions accurately. If asked about data you don't have, say so honestly
 
         if (!aiResponse.ok) {
           const status = aiResponse.status;
+          const errText = await aiResponse.text();
+          console.error("AI gateway error in tool loop:", status, errText);
           if (status === 429) return new Response(JSON.stringify({ error: "Rate limit exceeded." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
           if (status === 402) return new Response(JSON.stringify({ error: "AI credits exhausted." }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
           return new Response(JSON.stringify({ error: "AI service error" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
@@ -745,45 +748,65 @@ Answer questions accurately. If asked about data you don't have, say so honestly
         const choice = aiData.choices?.[0];
         const assistantMessage = choice?.message;
 
-        if (!assistantMessage) break;
+        if (!assistantMessage) {
+          console.error("No assistant message in AI response:", JSON.stringify(aiData));
+          break;
+        }
 
         currentMessages.push(assistantMessage);
 
         // Check for tool calls
         if (assistantMessage.tool_calls && assistantMessage.tool_calls.length > 0) {
           for (const toolCall of assistantMessage.tool_calls) {
-            const args = JSON.parse(toolCall.function.arguments);
-            const result = await executeTool(toolCall.function.name, args, adminClient, active_club_id, userId);
-            currentMessages.push({
-              role: "tool",
-              tool_call_id: toolCall.id,
-              content: result,
-            });
+            try {
+              const args = JSON.parse(toolCall.function.arguments);
+              console.log(`Executing tool: ${toolCall.function.name}`);
+              const result = await executeTool(toolCall.function.name, args, adminClient, active_club_id, userId);
+              console.log(`Tool result: ${result.substring(0, 200)}`);
+              currentMessages.push({
+                role: "tool",
+                tool_call_id: toolCall.id,
+                content: result,
+              });
+            } catch (toolErr: any) {
+              console.error(`Tool execution error: ${toolErr.message}`);
+              currentMessages.push({
+                role: "tool",
+                tool_call_id: toolCall.id,
+                content: JSON.stringify({ error: toolErr.message }),
+              });
+            }
           }
           continue;
         }
 
-        // No tool calls — stream the final response
-        const streamResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-          method: "POST",
-          headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-          body: JSON.stringify({
-            model: "google/gemini-3-flash-preview",
-            messages: currentMessages,
-            stream: true,
-          }),
+        // No tool calls — we have the final text response, stream it directly
+        const finalContent = assistantMessage.content || "I completed the requested actions.";
+        const encoder = new TextEncoder();
+        // Split into chunks for smoother streaming
+        const chunkSize = 50;
+        const chunks: string[] = [];
+        for (let i = 0; i < finalContent.length; i += chunkSize) {
+          chunks.push(finalContent.slice(i, i + chunkSize));
+        }
+        const stream = new ReadableStream({
+          start(controller) {
+            for (const chunk of chunks) {
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ choices: [{ delta: { content: chunk } }] })}\n\n`));
+            }
+            controller.enqueue(encoder.encode(`data: [DONE]\n\n`));
+            controller.close();
+          },
         });
-
-        return new Response(streamResp.body, {
+        return new Response(stream, {
           headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
         });
       }
 
-      // Fallback
-      const lastMsg = currentMessages[currentMessages.length - 1];
-      const content = typeof lastMsg === 'object' && lastMsg.content ? lastMsg.content : "I completed the requested actions.";
+      // Fallback if loop exhausted
       const encoder = new TextEncoder();
-      const body = `data: ${JSON.stringify({ choices: [{ delta: { content } }] })}\n\ndata: [DONE]\n\n`;
+      const fallbackContent = "I completed the requested actions. Please check the results.";
+      const body = `data: ${JSON.stringify({ choices: [{ delta: { content: fallbackContent } }] })}\n\ndata: [DONE]\n\n`;
       return new Response(encoder.encode(body), {
         headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
       });
