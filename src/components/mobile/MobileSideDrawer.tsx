@@ -7,8 +7,9 @@ import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   LayoutDashboard, Calendar, Compass, UserCircle, Settings, LogOut,
-  Shield, Settings2, Bot, ArrowRightLeft, Building2, X, Check, ChevronDown,
+  Shield, Settings2, Bot, ArrowRightLeft, Building2, X, Check, ChevronDown, Crown,
 } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
 
 const SUPER_ADMIN_EMAIL = 'suryakant.gnbba2029@iilm.edu';
 
