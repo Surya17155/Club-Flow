@@ -31,6 +31,8 @@ export function DashboardLayout({ children, showHeader = true }: DashboardLayout
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useIsMobile();
+  const { activeDesign } = useDesign();
+  const isNeo = activeDesign === "design-2";
 
   const pageTitle = pageTitles[location.pathname] || "Dashboard";
 
