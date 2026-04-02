@@ -83,6 +83,9 @@ const App = () => (
                 <Route path="/calendar" element={<DesktopFrame><MobileCalendar /></DesktopFrame>} />
                 <Route path="/chat" element={<DesktopFrame><MobileChat /></DesktopFrame>} />
                 <Route path="/scan" element={<Events />} />
+                <Route path="/club-settings" element={<ClubSettingsPage />} />
+                <Route path="/assign-powers" element={<AssignPowersPage />} />
+                <Route path="/chatbot" element={<ChatbotPage />} />
                 <Route path="/manage-outsiders" element={<DesktopFrame><ManageOutsiders /></DesktopFrame>} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
