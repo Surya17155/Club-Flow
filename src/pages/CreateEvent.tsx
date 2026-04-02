@@ -50,7 +50,7 @@ const nb = {
     background: '#E98A3A',
     border: '3px solid #111',
     boxShadow: '4px 4px 0px #111',
-    borderRadius: '8px',
+    borderRadius: '6px',
     fontFamily: "'Space Grotesk', sans-serif",
     fontWeight: 800,
     color: '#111',
