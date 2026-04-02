@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useNavigate } from 'react-router-dom';
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar';
 import { Switch } from '@/components/ui/switch';
 import { supabase } from '@/integrations/supabase/client';
 import { useClub } from '@/contexts/ClubContext';
 import { useDelegatedPowers, AVAILABLE_POWERS } from '@/hooks/useDelegatedPowers';
 import { toast } from 'sonner';
-import { Shield, Loader2, ChevronDown } from 'lucide-react';
+import { Shield, Loader2, ChevronDown, ChevronLeft } from 'lucide-react';
 import VerifiedBadge, { getRoleBadgeVariant } from '@/components/ui/VerifiedBadge';
 import { motion, AnimatePresence } from 'framer-motion';
 
