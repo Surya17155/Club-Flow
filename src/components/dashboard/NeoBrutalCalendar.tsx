@@ -148,13 +148,13 @@ const NeoBrutalCalendar = ({ mode }: Props) => {
       </div>
 
       {/* Calendar Body */}
-      <div className="flex-1 p-5 flex flex-col">
+      <div className="flex-1 px-3 py-2 flex flex-col">
         {/* Day headers */}
-        <div className="grid grid-cols-7 gap-3 mb-3">
+        <div className="grid grid-cols-7 gap-1.5 mb-1.5">
           {DAYS.map((d) => (
             <div
               key={d}
-              className="text-center text-[10px] uppercase"
+              className="text-center text-[8px] uppercase"
               style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, color: 'rgba(17,17,17,0.4)' }}
             >
               {d}
@@ -163,12 +163,12 @@ const NeoBrutalCalendar = ({ mode }: Props) => {
         </div>
 
         {/* Calendar grid */}
-        <div className="grid grid-cols-7 gap-3 flex-1">
+        <div className="grid grid-cols-7 gap-1.5 flex-1">
           {/* Previous month trailing days */}
           {Array.from({ length: startOffset }).map((_, i) => (
             <div
               key={`prev-${i}`}
-              className="aspect-square flex items-center justify-center"
+              className="aspect-square flex items-center justify-center text-[10px]"
               style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, color: 'rgba(17,17,17,0.2)' }}
             >
               {daysInPrevMonth - startOffset + 1 + i}
@@ -188,8 +188,8 @@ const NeoBrutalCalendar = ({ mode }: Props) => {
                 onClick={() => handleDayClick(day)}
                 className="aspect-square flex flex-col items-center justify-center transition-all duration-200"
                 style={{
-                  border: '2px solid #111111',
-                  borderRadius: '10px',
+                  border: '1.5px solid #111111',
+                  borderRadius: '8px',
                   background: todayDay ? '#E98A3A' : hasEvents ? '#F6E1CF' : '#FFFFFF',
                   cursor: hasEvents ? 'pointer' : 'default',
                   fontFamily: "'Space Grotesk', sans-serif",
@@ -205,11 +205,11 @@ const NeoBrutalCalendar = ({ mode }: Props) => {
                   e.currentTarget.style.boxShadow = 'none';
                 }}
               >
-                <span className="font-bold text-sm" style={{ color: todayDay ? '#111111' : '#111111' }}>
+                <span className="font-bold text-[11px]" style={{ color: '#111111' }}>
                   {day}
                 </span>
                 {todayDay && (
-                  <span className="text-[7px] font-bold mt-0.5" style={{ color: '#111111' }}>TODAY</span>
+                  <span className="text-[6px] font-bold" style={{ color: '#111111' }}>TODAY</span>
                 )}
                 {hasEvents && !todayDay && (
                   <div className="w-1.5 h-1.5 rounded-full mt-0.5" style={{ background: '#E98A3A' }} />
