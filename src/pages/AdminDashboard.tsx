@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import VerifiedBadge, { getRoleBadgeVariant } from "@/components/ui/VerifiedBadge";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useDesign } from "@/contexts/DesignContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useClub } from "@/contexts/ClubContext";
 import { useProfile } from "@/hooks/useProfile";
