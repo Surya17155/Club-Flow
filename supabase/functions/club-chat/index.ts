@@ -367,7 +367,7 @@ async function executeTool(
       const search = (args.event_name || "").toLowerCase();
       // Find matching events in this club
       const { data: events } = await adminClient.from("events")
-        .select("id, name, event_date, end_date, event_type, category, access_type, description, club_id")
+        .select("id, name, event_date, end_date, event_type, category, access_type, description, attendance_given, club_id")
         .eq("club_id", clubId)
         .order("event_date", { ascending: false });
       
