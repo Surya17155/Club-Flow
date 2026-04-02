@@ -90,11 +90,11 @@ export function MobileClubProfileCard({
 
         {/* President tag */}
         {president && (
-          <div className="flex items-center gap-1.5 pt-0.5">
-            <span className="px-2.5 py-1 text-[10px] font-black uppercase tracking-wider border-[2px] border-[#111] rounded-[4px] bg-[#E98A3A] text-[#111]">
+          <div className="flex items-center gap-2 pt-0.5">
+            <span className="text-sm font-bold text-[#111]">{president.full_name}</span>
+            <span className="px-2 py-0.5 text-[8px] font-black uppercase tracking-wider border-[2px] border-[#111] rounded-[4px] bg-[#E98A3A] text-[#111]">
               President
             </span>
-            <span className="text-xs font-bold text-[#111]">{president.full_name}</span>
           </div>
         )}
 
