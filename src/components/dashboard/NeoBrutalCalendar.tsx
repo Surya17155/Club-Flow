@@ -199,11 +199,11 @@ const NeoBrutalCalendar = ({ mode }: Props) => {
       </div>
 
       <div className="p-4">
-        <div className="grid grid-cols-7 gap-2 mb-2.5">
+        <div className="grid grid-cols-7 gap-1.5 mb-1.5">
           {DAYS.map((day) => (
             <div
               key={day}
-              className="text-center text-[9px] uppercase leading-none"
+              className="text-center text-[8px] uppercase leading-none"
               style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, color: 'rgba(17,17,17,0.4)' }}
             >
               {day}
@@ -211,7 +211,7 @@ const NeoBrutalCalendar = ({ mode }: Props) => {
           ))}
         </div>
 
-        <div className="grid grid-cols-7 gap-2 auto-rows-[clamp(72px,8vw,108px)]">
+        <div className="grid grid-cols-7 gap-1.5 auto-rows-[clamp(48px,5vw,64px)]">
           {calendarCells.map((cell) => {
             const hasEvents = cell.events.length > 0;
 
