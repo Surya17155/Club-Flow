@@ -301,6 +301,8 @@ const ClubSettingsPage = () => {
       >
         {saving ? 'Saving...' : 'Save Changes'}
       </button>
+        </div>
+      </div>
     </div>
   );
 };
