@@ -211,8 +211,8 @@ const ClubDashboard = () => {
         </div>
 
         {/* Fixed header */}
-        <header className="fixed top-0 left-0 right-0 z-40 px-4 pt-4 pb-3 safe-area-top pointer-events-none" style={{ backgroundColor: '#F4EFE7' }}>
-          <div className="h-9 mb-3" /> {/* Spacer for back button row */}
+        <header className="fixed top-0 left-0 right-0 z-30 px-4 pb-3 safe-area-top" style={{ backgroundColor: '#F4EFE7', paddingTop: 'calc(env(safe-area-inset-top, 0px) + 52px)' }}>
+
 
           {/* Tab toggle - Neo Brutalism */}
           <div className="flex p-1 rounded-[6px] border-[3px] border-[#111] bg-white max-w-[320px] mx-auto" style={{ boxShadow: '3px 3px 0px #111' }}>
