@@ -50,17 +50,27 @@ export function DashboardLayout({ children, showHeader = true }: DashboardLayout
 
   if (!isMobile) {
     return (
-      <div className="h-screen flex antialiased overflow-hidden" style={{ backgroundColor: "#000000" }}>
+      <div className="h-screen flex antialiased overflow-hidden" style={{ backgroundColor: isNeo ? "#F4EFE7" : "#000000" }}>
         <DashboardSidebar />
         <div className="flex-1 flex flex-col p-3 min-h-0">
           <div
             className="flex-1 flex flex-col min-h-0 overflow-auto"
-            style={{
-              background: "#FFFFFF",
-              borderRadius: "24px",
-              padding: "28px 32px",
-              boxShadow: "0px 20px 60px rgba(0,0,0,0.15)",
-            }}
+            style={
+              isNeo
+                ? {
+                    background: "#FFFDF5",
+                    borderRadius: "16px",
+                    padding: "24px 28px",
+                    border: "3px solid #111111",
+                    boxShadow: "6px 6px 0px #111111",
+                  }
+                : {
+                    background: "#FFFFFF",
+                    borderRadius: "24px",
+                    padding: "28px 32px",
+                    boxShadow: "0px 20px 60px rgba(0,0,0,0.15)",
+                  }
+            }
           >
             {showHeader && (
               <header className="flex items-center gap-3 mb-6">
