@@ -421,7 +421,8 @@ const AdminDashboard = () => {
                   >
                     <div className="flex-1 overflow-auto p-4">
                       <EventCalendar />
-
+                    </div>
+                  </div>
                   {/* Upcoming Events */}
                   <div
                     className="flex flex-col overflow-hidden"
