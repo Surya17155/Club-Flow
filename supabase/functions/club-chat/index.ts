@@ -365,16 +365,18 @@ async function executeTool(
 
     if (toolName === "fetch_event_data") {
       const search = (args.event_name || "").toLowerCase();
-      // Find matching events in this club
       const { data: events } = await adminClient.from("events")
         .select("id, name, event_date, end_date, event_type, category, access_type, description, attendance_given, club_id")
         .eq("club_id", clubId)
         .order("event_date", { ascending: false });
       
+      // Also fetch club name
+      const { data: clubRow } = await adminClient.from("clubs").select("name").eq("id", clubId).maybeSingle();
+      const clubName = clubRow?.name || "Unknown Club";
+      
       const matched = (events || []).filter((e: any) => e.name.toLowerCase().includes(search));
       if (matched.length === 0) return JSON.stringify({ error: `No event found matching "${args.event_name}"` });
       
-      // Get attendance for matched events
       const eventResults = [];
       for (const event of matched.slice(0, 5)) {
         const { data: attendance } = await adminClient.from("attendance")
@@ -385,7 +387,7 @@ async function executeTool(
         let attendeeProfiles: any[] = [];
         if (studentIds.length > 0) {
           const { data } = await adminClient.from("profiles")
-            .select("user_id, full_name, email, roll_no, phone, programme, year, section, class_coordinator")
+            .select("user_id, full_name, email, roll_no, phone, programme, year, section, class_coordinator, avatar_url")
             .in("user_id", studentIds);
           attendeeProfiles = data || [];
         }
@@ -401,6 +403,7 @@ async function executeTool(
             year: p?.year || "",
             section: p?.section || "",
             class_coordinator: p?.class_coordinator || "",
+            avatar_url: p?.avatar_url || "",
             scanned_at: a.scanned_at,
             status: a.status,
             method: a.manually_added ? "Manual" : "QR Scan",
@@ -408,6 +411,7 @@ async function executeTool(
         });
         
         eventResults.push({
+          club_name: clubName,
           event_id: event.id,
           name: event.name,
           date: event.event_date,
