@@ -159,7 +159,7 @@ export function ChatPanel({ open, onClose, activeClubId }: ChatPanelProps) {
               }`}
             >
               {msg.role === 'assistant' ? (
-                <ChatResponseRenderer content={msg.content} />
+                <ChatResponseRenderer content={msg.content} onFormSubmit={handleFormSubmit} />
               ) : (
                 msg.content
               )}
