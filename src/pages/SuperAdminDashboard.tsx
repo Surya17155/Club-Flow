@@ -32,7 +32,7 @@ const roleLabelMap: Record<string, string> = {
 };
 
 const SuperAdminDashboard = () => {
-  const { activeDesign, setActiveDesign, designs } = useDesign();
+  const NB = { font: "'Space Grotesk', sans-serif", bg: '#F4EFE7', card: '#FFFDF5', border: '#111', orange: '#E98A3A' };
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
