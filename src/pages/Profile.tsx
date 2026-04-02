@@ -49,6 +49,7 @@ const Profile = () => {
         year: val('year'),
         phone: val('phone'),
         roll_no: val('roll_no'),
+        class_coordinator: val('class_coordinator'),
         section: val('section'),
         social_linkedin: val('social_linkedin'),
         social_instagram: val('social_instagram'),
