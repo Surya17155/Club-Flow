@@ -43,6 +43,7 @@ import {
 } from "recharts";
 import ProfileDropdown from "@/components/dashboard/ProfileDropdown";
 import EventCalendar from "@/components/dashboard/EventCalendar";
+import NeoBrutalCalendar from "@/components/dashboard/NeoBrutalCalendar";
 import ManageEventsModal from "@/components/dashboard/ManageEventsModal";
 import {
   DropdownMenu,
@@ -419,9 +420,7 @@ const AdminDashboard = () => {
                       background: '#FFFFFF',
                     }}
                   >
-                    <div className="flex-1 overflow-auto p-4">
-                      <EventCalendar mode="personal" />
-                    </div>
+                    <NeoBrutalCalendar mode="personal" />
                   </div>
                   {/* Upcoming Events */}
                   <div
