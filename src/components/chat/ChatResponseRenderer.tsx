@@ -1,6 +1,6 @@
 import { useState, memo, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, User, Mail, Phone, Instagram, Linkedin, GraduationCap, Shield, Calendar, Clock, Users, Tag, MapPin, ChevronDown, Download, FileSpreadsheet, FileText } from 'lucide-react';
+import { X, User, Mail, Phone, Instagram, Linkedin, GraduationCap, Shield, Calendar, Clock, Users, Tag, MapPin, ChevronDown, Download, FileSpreadsheet, FileText, Info, CheckCircle2, Globe } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
