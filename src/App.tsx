@@ -14,26 +14,28 @@ import LandingPage from "./pages/LandingPage";
 import Login from "./pages/Login";
 import AdminDashboard from "./pages/AdminDashboard";
 
-// Lazy-load non-critical routes
-const Signup = lazy(() => import("./pages/Signup"));
-const ResetPassword = lazy(() => import("./pages/ResetPassword"));
-const Dashboard = lazy(() => import("./pages/Dashboard"));
-const ClubDashboard = lazy(() => import("./pages/ClubDashboard"));
-const MemberDashboard = lazy(() => import("./pages/MemberDashboard"));
-const Events = lazy(() => import("./pages/Events"));
+// Eager-load frequently visited routes to eliminate loading delays
+import Signup from "./pages/Signup";
+import ResetPassword from "./pages/ResetPassword";
+import Dashboard from "./pages/Dashboard";
+import ClubDashboard from "./pages/ClubDashboard";
+import MemberDashboard from "./pages/MemberDashboard";
+import Events from "./pages/Events";
+import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
+import CreateEvent from "./pages/CreateEvent";
+import DiscoverClubs from "./pages/DiscoverClubs";
+import MobileCalendar from "./pages/MobileCalendar";
+import MobileChat from "./pages/MobileChat";
+import ClubSettingsPage from "./pages/ClubSettingsPage";
+import AssignPowersPage from "./pages/AssignPowersPage";
+import ChatbotPage from "./pages/ChatbotPage";
+
+// Lazy-load rarely visited routes
 const MarkAttendance = lazy(() => import("./pages/MarkAttendance"));
-const Profile = lazy(() => import("./pages/Profile"));
-const Settings = lazy(() => import("./pages/Settings"));
-const CreateEvent = lazy(() => import("./pages/CreateEvent"));
 const SuperAdminDashboard = lazy(() => import("./pages/SuperAdminDashboard"));
 const GlobalReports = lazy(() => import("./pages/GlobalReports"));
-const DiscoverClubs = lazy(() => import("./pages/DiscoverClubs"));
-const MobileCalendar = lazy(() => import("./pages/MobileCalendar"));
-const MobileChat = lazy(() => import("./pages/MobileChat"));
 const ManageOutsiders = lazy(() => import("./pages/ManageOutsiders"));
-const ClubSettingsPage = lazy(() => import("./pages/ClubSettingsPage"));
-const AssignPowersPage = lazy(() => import("./pages/AssignPowersPage"));
-const ChatbotPage = lazy(() => import("./pages/ChatbotPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
