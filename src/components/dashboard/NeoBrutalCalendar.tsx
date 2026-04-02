@@ -4,7 +4,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useClub } from '@/contexts/ClubContext';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 
 interface CalendarEvent {
@@ -19,6 +18,14 @@ interface CalendarEvent {
   attendance_given?: boolean;
   club_id: string;
   club_name?: string;
+}
+
+interface CalendarCell {
+  key: string;
+  day: number;
+  isCurrentMonth: boolean;
+  isToday: boolean;
+  events: CalendarEvent[];
 }
 
 const DAYS = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
@@ -42,6 +49,7 @@ const NeoBrutalCalendar = ({ mode }: Props) => {
 
   useEffect(() => {
     if (!user) return;
+
     const fetchEvents = async () => {
       const startOfMonth = new Date(year, month, 1).toISOString();
       const endOfMonth = new Date(year, month + 1, 0, 23, 59, 59).toISOString();
@@ -74,11 +82,11 @@ const NeoBrutalCalendar = ({ mode }: Props) => {
         }))
       );
     };
+
     fetchEvents();
   }, [user, year, month, mode, activeClub?.club_id]);
 
   const firstDayOfMonth = new Date(year, month, 1).getDay();
-  // Convert Sunday=0 to Monday-based: Mon=0, Tue=1, ..., Sun=6
   const startOffset = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1;
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const daysInPrevMonth = new Date(year, month, 0).getDate();
@@ -86,118 +94,163 @@ const NeoBrutalCalendar = ({ mode }: Props) => {
   const prevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
   const nextMonth = () => setCurrentDate(new Date(year, month + 1, 1));
 
-  const getEventsForDay = (day: number) => {
-    return events.filter((e) => {
-      const d = new Date(e.event_date);
-      return d.getDate() === day && d.getMonth() === month && d.getFullYear() === year;
+  const getEventsForDate = (targetDate: Date) => {
+    return events.filter((event) => {
+      const eventDate = new Date(event.event_date);
+      return (
+        eventDate.getDate() === targetDate.getDate() &&
+        eventDate.getMonth() === targetDate.getMonth() &&
+        eventDate.getFullYear() === targetDate.getFullYear()
+      );
     });
   };
 
   const today = new Date();
-  const isToday = (day: number) =>
-    today.getDate() === day && today.getMonth() === month && today.getFullYear() === year;
 
-  const handleDayClick = (day: number) => {
-    const dayEvents = getEventsForDay(day);
-    if (dayEvents.length > 0) {
-      setSelectedDayEvents(dayEvents);
-      setSelectedDay(day);
-      setDialogOpen(true);
-    }
+  const calendarCells = useMemo<CalendarCell[]>(() => {
+    return Array.from({ length: 42 }, (_, index) => {
+      const offsetDay = index - startOffset;
+      let cellDate: Date;
+      let isCurrentMonth = true;
+
+      if (offsetDay < 0) {
+        cellDate = new Date(year, month - 1, daysInPrevMonth + offsetDay + 1);
+        isCurrentMonth = false;
+      } else if (offsetDay >= daysInMonth) {
+        cellDate = new Date(year, month + 1, offsetDay - daysInMonth + 1);
+        isCurrentMonth = false;
+      } else {
+        cellDate = new Date(year, month, offsetDay + 1);
+      }
+
+      const dayEvents = getEventsForDate(cellDate);
+      const isToday =
+        cellDate.getDate() === today.getDate() &&
+        cellDate.getMonth() === today.getMonth() &&
+        cellDate.getFullYear() === today.getFullYear();
+
+      return {
+        key: `${cellDate.getFullYear()}-${cellDate.getMonth()}-${cellDate.getDate()}`,
+        day: cellDate.getDate(),
+        isCurrentMonth,
+        isToday,
+        events: dayEvents,
+      };
+    });
+  }, [daysInMonth, daysInPrevMonth, events, month, startOffset, today, year]);
+
+  const handleDayClick = (day: number, dayEvents: CalendarEvent[]) => {
+    if (dayEvents.length === 0) return;
+    setSelectedDayEvents(dayEvents);
+    setSelectedDay(day);
+    setDialogOpen(true);
   };
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Header */}
+    <div className="flex flex-col h-full min-h-0">
       <div
-        className="px-6 py-4 flex justify-between items-center"
+        className="px-4 py-3 flex justify-between items-center gap-2"
         style={{ borderBottom: '2px solid #111111', background: 'rgba(246,225,207,0.3)' }}
       >
         <h3
-          className="text-lg uppercase tracking-wide"
+          className="text-base uppercase tracking-wide"
           style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, color: '#111111', letterSpacing: '-0.5px' }}
         >
           Attendance Calendar
         </h3>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 shrink-0">
           <button
             onClick={prevMonth}
-            className="p-1.5 transition-all"
+            className="p-1 transition-all"
             style={{ border: '2px solid #111111', borderRadius: '6px', background: 'transparent' }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = '#111111'; e.currentTarget.style.color = '#FFFFFF'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#111111'; }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = '#111111';
+              e.currentTarget.style.color = '#FFFFFF';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'transparent';
+              e.currentTarget.style.color = '#111111';
+            }}
           >
-            <ChevronLeft className="w-4 h-4" />
+            <ChevronLeft className="w-3.5 h-3.5" />
           </button>
           <span
-            className="text-sm px-4"
+            className="text-[11px] px-2 text-center"
             style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, color: '#111111' }}
           >
             {MONTHS[month].toUpperCase()} {year}
           </span>
           <button
             onClick={nextMonth}
-            className="p-1.5 transition-all"
+            className="p-1 transition-all"
             style={{ border: '2px solid #111111', borderRadius: '6px', background: 'transparent' }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = '#111111'; e.currentTarget.style.color = '#FFFFFF'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#111111'; }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = '#111111';
+              e.currentTarget.style.color = '#FFFFFF';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'transparent';
+              e.currentTarget.style.color = '#111111';
+            }}
           >
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
 
-      {/* Calendar Body */}
-      <div className="flex-1 px-3 py-2 flex flex-col">
-        {/* Day headers */}
-        <div className="grid grid-cols-7 gap-1.5 mb-1.5">
-          {DAYS.map((d) => (
+      <div className="flex-1 px-2.5 py-2 flex flex-col min-h-0">
+        <div className="grid grid-cols-7 gap-1 mb-1.5">
+          {DAYS.map((day) => (
             <div
-              key={d}
-              className="text-center text-[8px] uppercase"
-              style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, color: 'rgba(17,17,17,0.4)' }}
+              key={day}
+              className="text-center text-[7px] uppercase leading-none"
+              style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, color: 'rgba(17,17,17,0.45)' }}
             >
-              {d}
+              {day}
             </div>
           ))}
         </div>
 
-        {/* Calendar grid */}
-        <div className="grid grid-cols-7 gap-1.5 flex-1">
-          {/* Previous month trailing days */}
-          {Array.from({ length: startOffset }).map((_, i) => (
-            <div
-              key={`prev-${i}`}
-              className="aspect-square flex items-center justify-center text-[10px]"
-              style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, color: 'rgba(17,17,17,0.2)' }}
-            >
-              {daysInPrevMonth - startOffset + 1 + i}
-            </div>
-          ))}
+        <div
+          className="grid grid-cols-7 gap-1 flex-1 min-h-0"
+          style={{ gridTemplateRows: 'repeat(6, minmax(0, 1fr))' }}
+        >
+          {calendarCells.map((cell) => {
+            const hasEvents = cell.events.length > 0;
 
-          {/* Current month days */}
-          {Array.from({ length: daysInMonth }).map((_, i) => {
-            const day = i + 1;
-            const dayEvents = getEventsForDay(day);
-            const hasEvents = dayEvents.length > 0;
-            const todayDay = isToday(day);
+            if (!cell.isCurrentMonth) {
+              return (
+                <div
+                  key={cell.key}
+                  className="min-h-0 flex items-center justify-center text-[9px]"
+                  style={{
+                    fontFamily: "'Space Grotesk', sans-serif",
+                    fontWeight: 700,
+                    color: 'rgba(17,17,17,0.24)',
+                  }}
+                >
+                  {cell.day}
+                </div>
+              );
+            }
 
             return (
               <div
-                key={day}
-                onClick={() => handleDayClick(day)}
-                className="aspect-square flex flex-col items-center justify-center transition-all duration-200"
+                key={cell.key}
+                onClick={() => handleDayClick(cell.day, cell.events)}
+                className="min-h-0 flex flex-col items-center justify-center transition-all duration-200 select-none"
                 style={{
                   border: '1.5px solid #111111',
                   borderRadius: '8px',
-                  background: todayDay ? '#E98A3A' : hasEvents ? '#F6E1CF' : '#FFFFFF',
+                  background: cell.isToday ? '#E98A3A' : hasEvents ? '#F6E1CF' : '#FFFFFF',
                   cursor: hasEvents ? 'pointer' : 'default',
                   fontFamily: "'Space Grotesk', sans-serif",
+                  padding: '2px 1px',
                 }}
                 onMouseEnter={(e) => {
-                  if (hasEvents || todayDay) {
-                    e.currentTarget.style.transform = 'translate(-2px, -2px)';
-                    e.currentTarget.style.boxShadow = '4px 4px 0px #111111';
+                  if (hasEvents || cell.isToday) {
+                    e.currentTarget.style.transform = 'translate(-1px, -1px)';
+                    e.currentTarget.style.boxShadow = '3px 3px 0px #111111';
                   }
                 }}
                 onMouseLeave={(e) => {
@@ -205,25 +258,22 @@ const NeoBrutalCalendar = ({ mode }: Props) => {
                   e.currentTarget.style.boxShadow = 'none';
                 }}
               >
-                <span className="font-bold text-[11px]" style={{ color: '#111111' }}>
-                  {day}
+                <span className="font-bold text-[10px] leading-none" style={{ color: '#111111' }}>
+                  {cell.day}
                 </span>
-                {todayDay && (
-                  <span className="text-[6px] font-bold" style={{ color: '#111111' }}>TODAY</span>
-                )}
-                {hasEvents && !todayDay && (
-                  <div className="w-1.5 h-1.5 rounded-full mt-0.5" style={{ background: '#E98A3A' }} />
-                )}
-                {hasEvents && todayDay && (
-                  <div className="w-1.5 h-1.5 rounded-full mt-0.5" style={{ background: '#111111' }} />
-                )}
+                {cell.isToday ? (
+                  <span className="text-[5px] font-bold leading-none mt-0.5" style={{ color: '#111111' }}>
+                    TODAY
+                  </span>
+                ) : hasEvents ? (
+                  <div className="w-1 h-1 rounded-full mt-1" style={{ background: '#E98A3A' }} />
+                ) : null}
               </div>
             );
           })}
         </div>
       </div>
 
-      {/* Event Details Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent
           className="max-w-md"
@@ -259,9 +309,16 @@ const NeoBrutalCalendar = ({ mode }: Props) => {
                 }}
               >
                 {ev.club_name && (
-                  <p className="text-xs font-bold uppercase tracking-wider" style={{ color: '#E98A3A' }}>{ev.club_name}</p>
+                  <p className="text-xs font-bold uppercase tracking-wider" style={{ color: '#E98A3A' }}>
+                    {ev.club_name}
+                  </p>
                 )}
-                <h4 className="font-bold text-base" style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#111111' }}>{ev.name}</h4>
+                <h4
+                  className="font-bold text-base"
+                  style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#111111' }}
+                >
+                  {ev.name}
+                </h4>
 
                 <div className="space-y-1.5 text-xs">
                   <div className="flex items-center gap-1.5" style={{ color: '#555' }}>
@@ -314,8 +371,12 @@ const NeoBrutalCalendar = ({ mode }: Props) => {
 
                 {ev.description && (
                   <div style={{ borderTop: '2px solid #111', paddingTop: '8px' }}>
-                    <h5 className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: '#888' }}>Description</h5>
-                    <p className="text-xs leading-relaxed" style={{ color: '#555' }}>{ev.description}</p>
+                    <h5 className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: '#888' }}>
+                      Description
+                    </h5>
+                    <p className="text-xs leading-relaxed" style={{ color: '#555' }}>
+                      {ev.description}
+                    </p>
                   </div>
                 )}
               </div>
