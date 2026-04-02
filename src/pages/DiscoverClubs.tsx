@@ -183,7 +183,7 @@ const DiscoverClubs = () => {
               }}
             />
           </div>
-          {isMobile && <ProfileDropdown viewMode="personal" />}
+          
         </div>
       </header>
 
