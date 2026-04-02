@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-export type DesignTheme = 'design-1';
+export type DesignTheme = 'design-1' | 'design-2';
 
 interface DesignContextType {
   activeDesign: DesignTheme;
@@ -10,6 +10,7 @@ interface DesignContextType {
 
 const designs = [
   { id: 'design-1' as const, name: 'Design 1', description: 'Modern SaaS — Black sidebar, white floating card, colored stat cards, Lexend typography' },
+  { id: 'design-2' as const, name: 'Design 2', description: 'New Brutalism Style — Cream background, thick borders, hard shadows, Space Grotesk typography' },
 ];
 
 const DesignContext = createContext<DesignContextType | undefined>(undefined);
