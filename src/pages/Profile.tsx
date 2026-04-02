@@ -49,6 +49,7 @@ const Profile = () => {
         year: val('year'),
         phone: val('phone'),
         roll_no: val('roll_no'),
+        class_coordinator: val('class_coordinator'),
         section: val('section'),
         social_linkedin: val('social_linkedin'),
         social_instagram: val('social_instagram'),
@@ -139,6 +140,10 @@ const Profile = () => {
             <div>
               <Label>Year</Label>
               <Input value={val('year')} onChange={e => setForm({ ...form, year: e.target.value })} className="mt-1.5" />
+            </div>
+            <div>
+              <Label>Class Coordinator</Label>
+              <Input value={val('class_coordinator')} onChange={e => setForm({ ...form, class_coordinator: e.target.value })} className="mt-1.5" placeholder="Enter class coordinator name" />
             </div>
           </div>
           <div className="mt-5">
