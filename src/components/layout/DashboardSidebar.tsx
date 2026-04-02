@@ -2,6 +2,9 @@ import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
+import { useClub } from '@/contexts/ClubContext';
+import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
+import { useDesign } from '@/contexts/DesignContext';
 import {
   LayoutDashboard,
   Calendar,
@@ -13,6 +16,13 @@ import {
   ChevronLeft,
   ChevronRight,
   LogOut,
+  Shield,
+  Settings2,
+  Bot,
+  ArrowRightLeft,
+  Crown,
+  Users,
+  Check,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -22,8 +32,11 @@ import {
   useTransform,
   AnimatePresence,
 } from 'framer-motion';
+import AssignPowersModal from '@/components/dashboard/AssignPowersModal';
+import ClubSettingsModal from '@/components/dashboard/ClubSettingsModal';
+import { ChatPanel } from '@/components/chat/ChatPanel';
 
-const navItems = [
+const coreNavItems = [
   { title: 'Dashboard', url: '/admin', icon: LayoutDashboard },
   { title: 'Events', url: '/events', icon: Calendar },
   { title: 'Clubs', url: '/clubs', icon: Building2 },
@@ -34,19 +47,21 @@ const navItems = [
 ];
 
 const STORAGE_KEY = 'dashboard-sidebar-collapsed';
+const SUPER_ADMIN_EMAIL = 'suryakant.gnbba2029@iilm.edu';
 
 function MagnifiedIcon({
   item,
   active,
   mouseY,
-  index,
   onClick,
+  isNeo,
 }: {
-  item: (typeof navItems)[0];
+  item: { title: string; icon: any; url: string };
   active: boolean;
   mouseY: any;
-  index: number;
+  index?: number;
   onClick: () => void;
+  isNeo?: boolean;
 }) {
   const ref = useRef<HTMLButtonElement>(null);
 
@@ -74,17 +89,20 @@ function MagnifiedIcon({
       style={{
         width: size,
         height: size,
-        background: active ? '#FFFFFF' : 'transparent',
+        background: active
+          ? isNeo ? '#E98A3A' : '#FFFFFF'
+          : 'transparent',
+        border: active && isNeo ? '2px solid #111111' : 'none',
+        boxShadow: active && isNeo ? '2px 2px 0px #111111' : 'none',
       }}
-      whileHover={{ background: active ? '#FFFFFF' : 'rgba(255,255,255,0.08)' }}
+      whileHover={{ background: active ? (isNeo ? '#E98A3A' : '#FFFFFF') : (isNeo ? '#2A2A2A' : 'rgba(255,255,255,0.08)') }}
     >
       <motion.div style={{ scale: iconScale }} className="flex items-center justify-center">
         <item.icon
           className="w-[18px] h-[18px]"
-          style={{ color: active ? '#000000' : '#8A8F98' }}
+          style={{ color: active ? (isNeo ? '#111111' : '#000000') : '#8A8F98' }}
         />
       </motion.div>
-      {/* Tooltip on hover */}
       <AnimatePresence>
         <motion.div
           className="absolute left-full ml-3 px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"
@@ -106,7 +124,18 @@ export function DashboardSidebar() {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { profile } = useProfile();
+  const { activeClub, clubs, switchClub } = useClub();
+  const { isPresident, hasPower } = useDelegatedPowers();
+  const { activeDesign } = useDesign();
   const mouseY = useMotionValue(Infinity);
+
+  // Contextual modals/panels
+  const [showPowersModal, setShowPowersModal] = useState(false);
+  const [showClubSettings, setShowClubSettings] = useState(false);
+  const [showChat, setShowChat] = useState(false);
+  const [showClubSwitcher, setShowClubSwitcher] = useState(false);
+
+  const isNeo = activeDesign === 'design-2';
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, String(collapsed));
@@ -114,6 +143,34 @@ export function DashboardSidebar() {
 
   const isActive = (url: string) =>
     location.pathname === url || (url !== '/admin' && location.pathname.startsWith(url + '/'));
+
+  const isSuperAdminEmail = user?.email === SUPER_ADMIN_EMAIL;
+  const isSuperAdminMode = location.pathname === '/super-admin' || location.pathname === '/global-reports' || location.pathname.startsWith('/club/');
+
+  // Determine view mode from localStorage
+  const viewMode = (localStorage.getItem('dashboardViewMode') as 'personal' | 'club') || 'personal';
+  const isClubMode = viewMode === 'club';
+
+  // Build contextual nav items
+  const contextItems: { title: string; icon: any; action: () => void }[] = [];
+
+  if (isClubMode && activeClub) {
+    if (isPresident) {
+      contextItems.push({ title: 'Assign Powers', icon: Shield, action: () => setShowPowersModal(true) });
+      contextItems.push({ title: 'Club Settings', icon: Settings2, action: () => setShowClubSettings(true) });
+    }
+    if (hasPower('use_chatbot')) {
+      contextItems.push({ title: 'AI Chatbot', icon: Bot, action: () => setShowChat(true) });
+    }
+    if (clubs.length > 1) {
+      contextItems.push({ title: 'Switch Club', icon: ArrowRightLeft, action: () => setShowClubSwitcher(!showClubSwitcher) });
+    }
+  }
+
+  if (isSuperAdminEmail && isSuperAdminMode) {
+    contextItems.push({ title: 'AI Chatbot', icon: Bot, action: () => setShowChat(true) });
+    contextItems.push({ title: 'Manage Outsiders', icon: Users, action: () => navigate('/manage-outsiders') });
+  }
 
   const initials = (profile?.full_name || user?.user_metadata?.full_name || 'U')
     .split(' ')
@@ -127,100 +184,234 @@ export function DashboardSidebar() {
     navigate('/');
   };
 
+  const handleSuperAdminToggle = () => {
+    if (isSuperAdminMode) {
+      navigate('/admin');
+    } else {
+      navigate('/super-admin');
+    }
+  };
+
+  const sidebarBg = isNeo ? '#111111' : '#000000';
+  const activeBg = isNeo ? '#E98A3A' : '#FFFFFF';
+  const activeText = '#111111';
+  const inactiveText = isNeo ? '#B0B0B0' : '#8A8F98';
+  const hoverBg = isNeo ? '#2A2A2A' : 'rgba(255,255,255,0.05)';
+
   return (
-    <div
-      className="flex flex-col shrink-0 h-screen overflow-hidden"
-      onMouseMove={(e) => { if (collapsed) mouseY.set(e.clientY); }}
-      onMouseLeave={() => mouseY.set(Infinity)}
-      style={{
-        width: collapsed ? 64 : 220,
-        background: '#000000',
-        transition: 'width 0.3s ease',
-      }}
-    >
-      {/* Profile avatar */}
-      <div className="flex items-center gap-3 px-4 pt-6 pb-4">
-        <Avatar className="w-9 h-9 shrink-0">
-          <AvatarImage src={profile?.avatar_url || user?.user_metadata?.avatar_url} />
-          <AvatarFallback className="bg-white/10 text-white text-xs font-semibold">
-            {initials}
-          </AvatarFallback>
-        </Avatar>
-        {!collapsed && (
-          <div className="min-w-0 overflow-hidden" style={{ transition: 'opacity 0.2s ease', opacity: 1 }}>
-            <p className="text-sm font-semibold text-white truncate">
-              {profile?.full_name || user?.user_metadata?.full_name || 'User'}
-            </p>
-            <p className="text-[11px] text-[#8A8F98] truncate">{user?.email}</p>
-          </div>
-        )}
-      </div>
+    <>
+      <div
+        className="flex flex-col shrink-0 h-screen overflow-hidden"
+        onMouseMove={(e) => { if (collapsed) mouseY.set(e.clientY); }}
+        onMouseLeave={() => mouseY.set(Infinity)}
+        style={{
+          width: collapsed ? 64 : 220,
+          background: sidebarBg,
+          transition: 'width 0.25s ease',
+          borderRight: isNeo ? '3px solid #111111' : 'none',
+        }}
+      >
+        {/* Profile avatar */}
+        <div className="flex items-center gap-3 px-4 pt-6 pb-4">
+          <Avatar className="w-9 h-9 shrink-0" style={isNeo ? { border: '2px solid #E98A3A' } : {}}>
+            <AvatarImage src={profile?.avatar_url || user?.user_metadata?.avatar_url} />
+            <AvatarFallback className="bg-white/10 text-white text-xs font-semibold">
+              {initials}
+            </AvatarFallback>
+          </Avatar>
+          {!collapsed && (
+            <div className="min-w-0 overflow-hidden" style={{ transition: 'opacity 0.2s ease', opacity: 1 }}>
+              <p className="text-sm font-semibold text-white truncate" style={isNeo ? { fontFamily: "'Space Grotesk', sans-serif" } : {}}>
+                {profile?.full_name || user?.user_metadata?.full_name || 'User'}
+              </p>
+              <p className="text-[11px] truncate" style={{ color: inactiveText }}>{user?.email}</p>
+            </div>
+          )}
+        </div>
 
-      {/* Nav items */}
-      <nav className="flex-1 flex flex-col gap-1 px-3 mt-2">
-        {navItems.map((item, index) => {
-          const active = isActive(item.url);
+        {/* Nav items */}
+        <nav className="flex-1 flex flex-col gap-1 px-3 mt-2 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
+          {coreNavItems.map((item, index) => {
+            const active = isActive(item.url);
 
-          if (collapsed) {
+            if (collapsed) {
+              return (
+                <div key={item.title} className="group relative">
+                  <MagnifiedIcon
+                    item={item}
+                    active={active}
+                    mouseY={mouseY}
+                    index={index}
+                    onClick={() => navigate(item.url)}
+                    isNeo={isNeo}
+                  />
+                </div>
+              );
+            }
+
             return (
-              <div key={item.title} className="group relative">
-                <MagnifiedIcon
-                  item={item}
-                  active={active}
-                  mouseY={mouseY}
-                  index={index}
-                  onClick={() => navigate(item.url)}
-                />
-              </div>
+              <button
+                key={item.title}
+                onClick={() => navigate(item.url)}
+                className="flex items-center gap-3 px-3 py-2.5 transition-all duration-200 w-full text-left"
+                style={{
+                  background: active ? activeBg : 'transparent',
+                  color: active ? activeText : inactiveText,
+                  borderRadius: isNeo ? '10px' : '999px',
+                  border: active && isNeo ? '2px solid #111111' : '2px solid transparent',
+                  boxShadow: active && isNeo ? '3px 3px 0px #111111' : 'none',
+                  fontFamily: isNeo ? "'Space Grotesk', sans-serif" : undefined,
+                  fontWeight: active && isNeo ? 700 : 500,
+                }}
+                onMouseEnter={(e) => { if (!active) e.currentTarget.style.background = hoverBg; }}
+                onMouseLeave={(e) => { if (!active) e.currentTarget.style.background = 'transparent'; }}
+              >
+                <item.icon className="w-[18px] h-[18px] shrink-0" />
+                <span className="text-sm truncate" style={{ transition: 'opacity 0.2s ease' }}>
+                  {item.title}
+                </span>
+              </button>
             );
-          }
+          })}
 
-          return (
+          {/* Contextual items separator */}
+          {contextItems.length > 0 && !collapsed && (
+            <div className="my-2 mx-2 border-t" style={{ borderColor: isNeo ? '#333' : 'rgba(255,255,255,0.1)' }} />
+          )}
+
+          {/* Contextual nav items */}
+          {contextItems.map((item) => {
+            if (collapsed) {
+              return (
+                <div key={item.title} className="group relative">
+                  <button
+                    onClick={item.action}
+                    className="flex items-center justify-center w-10 h-10 rounded-full mx-auto transition-colors"
+                    style={{ color: isNeo ? '#E98A3A' : '#8A8F98' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = hoverBg; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+                  >
+                    <item.icon className="w-[18px] h-[18px]" />
+                  </button>
+                </div>
+              );
+            }
+
+            return (
+              <button
+                key={item.title}
+                onClick={item.action}
+                className="flex items-center gap-3 px-3 py-2.5 transition-all duration-200 w-full text-left"
+                style={{
+                  color: isNeo ? '#E98A3A' : '#8A8F98',
+                  borderRadius: isNeo ? '10px' : '999px',
+                  fontFamily: isNeo ? "'Space Grotesk', sans-serif" : undefined,
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = hoverBg; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+              >
+                <item.icon className="w-[18px] h-[18px] shrink-0" />
+                <span className="text-sm font-medium truncate">{item.title}</span>
+              </button>
+            );
+          })}
+
+          {/* Club switcher inline */}
+          {showClubSwitcher && !collapsed && (
+            <div className="ml-2 mt-1 space-y-1">
+              {clubs.map(club => (
+                <button
+                  key={club.club_id}
+                  onClick={() => { switchClub(club.club_id); setShowClubSwitcher(false); }}
+                  className="flex items-center justify-between w-full px-3 py-2 rounded-lg text-xs transition-colors"
+                  style={{
+                    color: activeClub?.club_id === club.club_id ? (isNeo ? '#E98A3A' : '#fff') : inactiveText,
+                    background: activeClub?.club_id === club.club_id ? (isNeo ? '#2A2A2A' : 'rgba(255,255,255,0.08)') : 'transparent',
+                  }}
+                >
+                  <span className="truncate">{club.club_name}</span>
+                  {activeClub?.club_id === club.club_id && <Check className="w-3 h-3 shrink-0" />}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Super Admin toggle */}
+          {isSuperAdminEmail && !collapsed && (
             <button
-              key={item.title}
-              onClick={() => navigate(item.url)}
+              onClick={handleSuperAdminToggle}
               className="flex items-center gap-3 px-3 py-2.5 transition-all duration-200 w-full text-left"
               style={{
-                background: active ? '#FFFFFF' : 'transparent',
-                color: active ? '#000000' : '#8A8F98',
-                borderRadius: '999px',
+                color: isSuperAdminMode ? '#F59E0B' : inactiveText,
+                borderRadius: isNeo ? '10px' : '999px',
+                background: isSuperAdminMode ? (isNeo ? '#2A2A2A' : 'rgba(245,158,11,0.1)') : 'transparent',
+                fontFamily: isNeo ? "'Space Grotesk', sans-serif" : undefined,
               }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = hoverBg; }}
+              onMouseLeave={(e) => { if (!isSuperAdminMode) e.currentTarget.style.background = 'transparent'; }}
             >
-              <item.icon className="w-[18px] h-[18px] shrink-0" />
-              <span
-                className="text-sm font-medium truncate"
-                style={{ transition: 'opacity 0.2s ease' }}
-              >
-                {item.title}
-              </span>
+              <Crown className="w-[18px] h-[18px] shrink-0" />
+              <span className="text-sm font-medium truncate">Super Admin</span>
             </button>
-          );
-        })}
-      </nav>
-
-      {/* Bottom: sign out + collapse toggle */}
-      <div className="px-3 pb-4 space-y-1">
-        <button
-          onClick={handleSignOut}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-full transition-all duration-200 w-full text-left hover:bg-white/5"
-          style={{ color: '#8A8F98' }}
-        >
-          <LogOut className="w-[18px] h-[18px] shrink-0" />
-          {!collapsed && (
-            <span className="text-sm font-medium" style={{ transition: 'opacity 0.2s ease' }}>
-              Sign Out
-            </span>
           )}
-        </button>
 
-        <button
-          onClick={() => setCollapsed((c) => !c)}
-          className="flex items-center justify-center w-full py-2 rounded-full transition-all duration-200 hover:bg-white/5"
-          style={{ color: '#8A8F98' }}
-        >
-          {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-        </button>
+          {isSuperAdminEmail && collapsed && (
+            <div className="group relative">
+              <button
+                onClick={handleSuperAdminToggle}
+                className="flex items-center justify-center w-10 h-10 rounded-full mx-auto transition-colors"
+                style={{ color: isSuperAdminMode ? '#F59E0B' : inactiveText }}
+              >
+                <Crown className="w-[18px] h-[18px]" />
+              </button>
+            </div>
+          )}
+        </nav>
+
+        {/* Bottom: sign out + collapse toggle */}
+        <div className="px-3 pb-4 space-y-1">
+          <button
+            onClick={handleSignOut}
+            className="flex items-center gap-3 px-3 py-2.5 transition-all duration-200 w-full text-left"
+            style={{
+              color: inactiveText,
+              borderRadius: isNeo ? '10px' : '999px',
+              fontFamily: isNeo ? "'Space Grotesk', sans-serif" : undefined,
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = hoverBg; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+          >
+            <LogOut className="w-[18px] h-[18px] shrink-0" />
+            {!collapsed && (
+              <span className="text-sm font-medium" style={{ transition: 'opacity 0.2s ease' }}>
+                Sign Out
+              </span>
+            )}
+          </button>
+
+          <button
+            onClick={() => setCollapsed((c) => !c)}
+            className="flex items-center justify-center w-full py-2 transition-all duration-200"
+            style={{
+              color: inactiveText,
+              borderRadius: isNeo ? '10px' : '999px',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = hoverBg; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+          >
+            {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+          </button>
+        </div>
       </div>
-    </div>
+
+      {/* Modals */}
+      <AssignPowersModal open={showPowersModal} onOpenChange={setShowPowersModal} />
+      <ClubSettingsModal open={showClubSettings} onOpenChange={setShowClubSettings} />
+      <ChatPanel
+        open={showChat}
+        onClose={() => setShowChat(false)}
+        activeClubId={(isSuperAdminEmail && isSuperAdminMode) ? undefined : activeClub?.club_id}
+      />
+    </>
   );
 }
