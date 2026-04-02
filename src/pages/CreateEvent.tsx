@@ -14,7 +14,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 
-const EVENT_TYPES = ['Normal', 'Seminar', 'Workshop', 'Industrial Visit', 'Hackathon', 'Guest Lecture'];
+const EVENT_TYPES = ['Normal', 'Workshop', 'Industrial Visit', 'Hackathon', 'Guest Lecture', 'Competition'];
 const LOCATIONS = ['Auditorium', 'Seminar Hall', 'Custom Location'];
 const HOURS = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0'));
 const MINUTES = ['00', '15', '30', '45'];
