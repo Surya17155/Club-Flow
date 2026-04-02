@@ -19,31 +19,29 @@ export function DesktopFrame({ children }: DesktopFrameProps) {
 
   return (
     <div
-      className="h-screen flex antialiased overflow-hidden"
+      className="min-h-screen flex antialiased"
       style={{ backgroundColor: isNeo ? "#F4EFE7" : "#000000" }}
     >
       <DashboardSidebar />
-      <div className="flex-1 flex flex-col p-3 min-h-0">
+      <div className="flex-1 flex flex-col min-w-0">
         <div
-          className="flex-1 flex flex-col min-h-0 overflow-hidden"
+          className="flex-1 flex flex-col"
           style={
             isNeo
               ? {
-                  background: "#FFFDF5",
-                  borderRadius: "16px",
+                  background: "#F4EFE7",
                   padding: "24px 28px",
-                  border: "3px solid #111111",
-                  boxShadow: "6px 6px 0px #111111",
                 }
               : {
                   background: "#FFFFFF",
                   borderRadius: "24px",
                   padding: "28px 32px",
+                  margin: "12px",
                   boxShadow: "0px 20px 60px rgba(0,0,0,0.15)",
                 }
           }
         >
-          <main className="flex-1 min-h-0 overflow-auto">{children}</main>
+          <main className="flex-1">{children}</main>
         </div>
       </div>
     </div>

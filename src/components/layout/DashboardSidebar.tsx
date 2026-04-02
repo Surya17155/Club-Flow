@@ -216,7 +216,7 @@ export function DashboardSidebar() {
   return (
     <>
       <div
-        className="flex flex-col shrink-0 overflow-hidden"
+        className="flex flex-col shrink-0"
         onMouseMove={(e) => { if (collapsed) mouseY.set(e.clientY); }}
         onMouseLeave={() => mouseY.set(Infinity)}
         style={{
@@ -226,7 +226,10 @@ export function DashboardSidebar() {
           borderRadius: isNeo ? '16px' : '16px',
           border: isNeo ? '3px solid #111111' : 'none',
           margin: '12px',
+          position: 'sticky',
+          top: 12,
           height: 'calc(100vh - 24px)',
+          overflow: 'hidden',
         }}
       >
         {/* Profile avatar */}
@@ -441,7 +444,7 @@ export function DashboardSidebar() {
         </nav>
 
         {/* Bottom: sign out + collapse toggle */}
-        <div className="px-3 pb-4 space-y-1">
+        <div className="px-3 pb-4 space-y-1 mt-auto">
           <button
             onClick={handleSignOut}
             className="flex items-center gap-3 px-3 py-2.5 transition-all duration-200 w-full text-left"
