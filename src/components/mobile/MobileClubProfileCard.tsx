@@ -1,4 +1,3 @@
-import { Badge } from '@/components/ui/badge';
 import { Instagram, Linkedin } from 'lucide-react';
 
 interface MobileClubProfileCardProps {
@@ -8,14 +7,8 @@ interface MobileClubProfileCardProps {
   postHolders?: { role: string; full_name: string }[];
   socialInstagram?: string | null;
   socialLinkedin?: string | null;
+  tagline?: string | null;
 }
-
-const roleLabelMap: Record<string, string> = {
-  president: 'President',
-  vice_president: 'Vice President',
-  secretary: 'Secretary',
-  social_media_head: 'Social Media Head',
-};
 
 export function MobileClubProfileCard({
   clubName,
@@ -24,6 +17,7 @@ export function MobileClubProfileCard({
   postHolders = [],
   socialInstagram,
   socialLinkedin,
+  tagline,
 }: MobileClubProfileCardProps) {
   const initials = clubName
     .split(' ')
@@ -32,25 +26,18 @@ export function MobileClubProfileCard({
     .slice(0, 2)
     .toUpperCase();
 
+  const president = postHolders.find(ph => ph.role === 'president');
+
   return (
     <div
-      className="mx-auto w-full overflow-hidden"
-      style={{
-        maxWidth: '320px',
-        borderRadius: '22px',
-        background: 'hsl(var(--card))',
-        boxShadow:
-          '0 4px 6px -1px rgba(0,0,0,0.06), 0 10px 20px -2px rgba(0,0,0,0.08), 0 20px 40px -4px rgba(0,0,0,0.04)',
-      }}
+      className="mx-auto w-full overflow-hidden border-[3px] border-[#111] rounded-[6px] bg-white"
+      style={{ maxWidth: '320px', boxShadow: '4px 4px 0px #111' }}
     >
       {/* Image container */}
       <div
-        className="relative w-full overflow-hidden"
+        className="relative w-full overflow-hidden border-b-[3px] border-[#111]"
         style={{
-          margin: '10px 10px 0 10px',
-          width: 'calc(100% - 20px)',
           aspectRatio: '3 / 4',
-          borderRadius: '16px',
         }}
       >
         {clubLogo ? (
@@ -61,11 +48,11 @@ export function MobileClubProfileCard({
           />
         ) : (
           <div
-            className="w-full h-full flex items-center justify-center text-5xl font-bold"
+            className="w-full h-full flex items-center justify-center text-5xl font-black"
             style={{
-              background:
-                'linear-gradient(145deg, hsl(var(--primary) / 0.15), hsl(var(--primary) / 0.25))',
-              color: 'hsl(var(--primary))',
+              background: '#FDE8D0',
+              color: '#111',
+              fontFamily: "'Space Grotesk', sans-serif",
             }}
           >
             {initials}
@@ -74,20 +61,20 @@ export function MobileClubProfileCard({
       </div>
 
       {/* Content section */}
-      <div className="px-4 pt-3.5 pb-4 space-y-2.5">
+      <div className="px-4 pt-3.5 pb-4 space-y-2">
         {/* Name row with verification dot */}
         <div className="flex items-center gap-2">
-          <h2 className="text-lg font-bold font-display text-foreground leading-tight">
+          <h2 className="text-lg font-black text-[#111] leading-tight" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
             {clubName}
           </h2>
           <div
-            className="w-[18px] h-[18px] rounded-full flex items-center justify-center flex-shrink-0"
-            style={{ background: 'hsl(var(--primary))' }}
+            className="w-[18px] h-[18px] rounded-[4px] flex items-center justify-center flex-shrink-0 border-[2px] border-[#111]"
+            style={{ background: '#E98A3A' }}
           >
             <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
               <path
                 d="M2.5 5L4.5 7L7.5 3"
-                stroke="white"
+                stroke="#111"
                 strokeWidth="1.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -96,37 +83,30 @@ export function MobileClubProfileCard({
           </div>
         </div>
 
+        {/* Tagline */}
+        {tagline && (
+          <p className="text-xs text-[#111]/60 font-medium italic">{tagline}</p>
+        )}
+
+        {/* President tag */}
+        {president && (
+          <div className="flex items-center gap-1.5 pt-0.5">
+            <span className="px-2.5 py-1 text-[10px] font-black uppercase tracking-wider border-[2px] border-[#111] rounded-[4px] bg-[#E98A3A] text-[#111]">
+              President
+            </span>
+            <span className="text-xs font-bold text-[#111]">{president.full_name}</span>
+          </div>
+        )}
+
         {/* About / Description — 2 lines max */}
         {clubAbout ? (
-          <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+          <p className="text-xs text-[#111]/60 line-clamp-2 leading-relaxed font-medium">
             {clubAbout}
           </p>
         ) : (
-          <p className="text-xs text-muted-foreground italic">Official Club Dashboard</p>
+          <p className="text-xs text-[#111]/40 italic font-medium">Official Club Dashboard</p>
         )}
 
-        {/* Footer: post-holders preview as badges */}
-        {postHolders.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 pt-1">
-            {postHolders.slice(0, 3).map((ph, i) => (
-              <Badge
-                key={i}
-                variant="secondary"
-                className="text-[10px] font-medium bg-primary/10 text-primary border-0 px-2 py-0.5"
-              >
-                {roleLabelMap[ph.role] ?? ph.role}
-              </Badge>
-            ))}
-            {postHolders.length > 3 && (
-              <Badge
-                variant="outline"
-                className="text-[10px] font-medium px-2 py-0.5"
-              >
-                +{postHolders.length - 3}
-              </Badge>
-            )}
-          </div>
-        )}
         {/* Social Links */}
         {(socialInstagram || socialLinkedin) && (
           <div className="flex justify-center gap-4 pt-1">
@@ -135,9 +115,9 @@ export function MobileClubProfileCard({
                 href={socialInstagram.startsWith('http') ? socialInstagram : `https://instagram.com/${socialInstagram}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-foreground transition-colors"
+                className="w-8 h-8 flex items-center justify-center border-[2px] border-[#111] rounded-[4px] hover:bg-[#E98A3A]/20 transition-colors"
               >
-                <Instagram className="w-4 h-4" />
+                <Instagram className="w-4 h-4 text-[#111]" />
               </a>
             )}
             {socialLinkedin && (
@@ -145,9 +125,9 @@ export function MobileClubProfileCard({
                 href={socialLinkedin.startsWith('http') ? socialLinkedin : `https://linkedin.com/company/${socialLinkedin}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-foreground transition-colors"
+                className="w-8 h-8 flex items-center justify-center border-[2px] border-[#111] rounded-[4px] hover:bg-[#E98A3A]/20 transition-colors"
               >
-                <Linkedin className="w-4 h-4" />
+                <Linkedin className="w-4 h-4 text-[#111]" />
               </a>
             )}
           </div>
