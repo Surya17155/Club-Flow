@@ -367,7 +367,7 @@ async function executeTool(
       const search = (args.event_name || "").toLowerCase();
       // Find matching events in this club
       const { data: events } = await adminClient.from("events")
-        .select("id, name, event_date, end_date, event_type, category, access_type, description, club_id")
+        .select("id, name, event_date, end_date, event_type, category, access_type, description, attendance_given, club_id")
         .eq("club_id", clubId)
         .order("event_date", { ascending: false });
       
@@ -415,6 +415,7 @@ async function executeTool(
           type: event.event_type,
           category: event.category,
           access_type: event.access_type,
+          attendance_given: event.attendance_given,
           description: event.description,
           total_attendees: attendees.length,
           attendees,
@@ -660,7 +661,7 @@ If the file contains emails and class_coordinator names (or other profile fields
 
 3. After using fetch_event_data, output the result as:
 \`\`\`event-data-json
-{"event_name":"Hackathon","event_date":"2026-03-15","total_attendees":25,"attendees":[{"name":"John","email":"john@iilm.edu","roll_no":"123","phone":"9876543210","programme":"BBA","year":"2","section":"A","class_coordinator":"Dr. Smith","scanned_at":"2026-03-15T10:30:00","method":"QR Scan"}]}
+{"event_name":"Hackathon","event_date":"2026-03-15T10:00:00","end_date":"2026-03-15T16:00:00","event_type":"Workshop","category":"Technical","access_type":"Open to All","attendance_given":true,"description":"Annual coding competition","total_attendees":25,"attendees":[{"name":"John","email":"john@iilm.edu","roll_no":"123","phone":"9876543210","programme":"BBA","year":"2","section":"A","class_coordinator":"Dr. Smith","scanned_at":"2026-03-15T10:30:00","method":"QR Scan"}]}
 \`\`\`
 
 4. When you use any action tool, wrap the result in a \`\`\`tool-result block.
@@ -696,7 +697,7 @@ ${JSON.stringify(clubSummaries, null, 2)}${fileContext}
 
 **EVENT DATA (for download)**: After using fetch_event_data, output as:
 \`\`\`event-data-json
-{"event_name":"Event Name","event_date":"2026-03-15","total_attendees":25,"attendees":[...]}
+{"event_name":"Event Name","event_date":"2026-03-15T10:00:00","end_date":"2026-03-15T16:00:00","event_type":"Workshop","category":"Technical","access_type":"Open to All","attendance_given":true,"description":"Event description here","total_attendees":25,"attendees":[...]}
 \`\`\`
 
 **MEMBER FORM**: When showing an add-member form, output as:
