@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { MobileBottomNav } from "@/components/mobile/MobileBottomNav";
 import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
+import { useDesign } from "@/contexts/DesignContext";
 
 const pageTitles: Record<string, string> = {
   "/events": "Events",
