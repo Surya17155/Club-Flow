@@ -309,15 +309,33 @@ const AdminDashboard = () => {
                 {greeting}, <span style={{ color: '#E98A3A' }}>{fullName.split(" ")[0]}</span> 👋
               </h1>
 
-              <div
-                className="inline-flex items-center p-1"
-                style={{
-                  backgroundColor: '#FFFDF5',
-                  border: '2px solid #111111',
-                  borderRadius: '10px',
-                  boxShadow: '3px 3px 0px #111111',
-                }}
-              >
+              <div className="flex items-center gap-3">
+                {!isPersonal && activeClub && (activeClub.role === "president" || activeClub.role === "admin") && (
+                  <button
+                    onClick={() => navigate("/clubs")}
+                    className="text-sm font-bold px-5 py-2 flex items-center gap-2 transition-transform active:scale-95"
+                    style={{
+                      backgroundColor: '#111111',
+                      color: '#FFFDF5',
+                      borderRadius: '10px',
+                      border: '2px solid #111111',
+                      boxShadow: '3px 3px 0px #111111',
+                      fontFamily: "'Space Grotesk', sans-serif",
+                    }}
+                  >
+                    <Users className="w-4 h-4" /> Manage Club
+                  </button>
+                )}
+
+                <div
+                  className="inline-flex items-center p-1"
+                  style={{
+                    backgroundColor: '#FFFDF5',
+                    border: '2px solid #111111',
+                    borderRadius: '10px',
+                    boxShadow: '3px 3px 0px #111111',
+                  }}
+                >
                 <button
                   onClick={() => setViewMode("personal")}
                   className="px-5 py-2 text-sm transition-all"
