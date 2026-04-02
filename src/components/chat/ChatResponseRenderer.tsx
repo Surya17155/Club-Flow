@@ -55,6 +55,12 @@ interface MemberFormData {
 interface EventData {
   event_name: string;
   event_date: string;
+  end_date?: string;
+  event_type?: string;
+  category?: string;
+  access_type?: string;
+  attendance_given?: boolean;
+  description?: string;
   total_attendees: number;
   attendees: Array<{
     name: string;
