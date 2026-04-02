@@ -166,7 +166,7 @@ const NBTimePicker = ({
           <option value="">--</option>
           {MINUTES.map(m => <option key={m} value={m}>{m}</option>)}
         </select>
-        <div className="flex border-2 border-[#111] rounded-lg overflow-hidden" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+        <div className="flex border-2 border-[#111] rounded-md overflow-hidden" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
           <button
             type="button"
             onClick={() => onPeriodChange('AM')}
