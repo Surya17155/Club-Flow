@@ -22,9 +22,10 @@ const pageTitles: Record<string, string> = {
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
+  showHeader?: boolean;
 }
 
-export function DashboardLayout({ children }: DashboardLayoutProps) {
+export function DashboardLayout({ children, showHeader = true }: DashboardLayoutProps) {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -34,7 +35,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#000' }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "#000000" }}>
         <div className="w-8 h-8 border-3 border-white/30 border-t-white rounded-full animate-spin" />
       </div>
     );
@@ -44,40 +45,42 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     return <Navigate to="/" replace />;
   }
 
-  // Desktop: persistent sidebar + floating white card (same as AdminDashboard)
   if (!isMobile) {
     return (
-      <div className="h-screen flex antialiased overflow-hidden" style={{ backgroundColor: '#000000' }}>
+      <div className="h-screen flex antialiased overflow-hidden" style={{ backgroundColor: "#000000" }}>
         <DashboardSidebar />
         <div className="flex-1 flex flex-col p-3 min-h-0">
           <div
             className="flex-1 flex flex-col min-h-0 overflow-auto"
             style={{
-              background: '#FFFFFF',
-              borderRadius: '24px',
-              padding: '28px 32px',
-              boxShadow: '0px 20px 60px rgba(0,0,0,0.15)',
+              background: "#FFFFFF",
+              borderRadius: "24px",
+              padding: "28px 32px",
+              boxShadow: "0px 20px 60px rgba(0,0,0,0.15)",
             }}
           >
-            {/* Page header */}
-            <header className="flex items-center gap-3 mb-6">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => navigate("/admin")}
-                className="text-[#6B7280] hover:text-[#0F172A]"
-              >
-                <ArrowLeft className="w-4 h-4" />
-              </Button>
-              <h1
-                className="text-xl font-bold flex-1"
-                style={{ fontFamily: "'Lexend', sans-serif", color: '#0F172A' }}
-              >
-                {pageTitle}
-              </h1>
-            </header>
+            {showHeader && (
+              <header className="flex items-center gap-3 mb-6">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => navigate("/admin")}
+                  className="text-[#6B7280] hover:text-[#0F172A]"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                </Button>
+                <h1
+                  className="text-xl font-bold flex-1"
+                  style={{ fontFamily: "'Lexend', sans-serif", color: "#0F172A" }}
+                >
+                  {pageTitle}
+                </h1>
+                <Button variant="ghost" size="icon" className="text-[#6B7280] hover:text-[#0F172A] ml-auto">
+                  <Bell className="w-4 h-4" />
+                </Button>
+              </header>
+            )}
 
-            {/* Page content */}
             <main className="flex-1 overflow-auto">
               {children}
             </main>
@@ -87,7 +90,6 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     );
   }
 
-  // Mobile: header + bottom nav
   return (
     <div className="min-h-screen flex flex-col w-full">
       <header className="h-14 flex items-center gap-3 border-b border-border bg-card/80 backdrop-blur-sm px-4 shrink-0">
@@ -99,16 +101,12 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         >
           <ArrowLeft className="w-4 h-4" />
         </Button>
-        <h1 className="text-lg font-bold font-display text-foreground flex-1">
-          {pageTitle}
-        </h1>
+        <h1 className="text-lg font-bold font-display text-foreground flex-1">{pageTitle}</h1>
         <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground ml-auto">
           <Bell className="w-4 h-4" />
         </Button>
       </header>
-      <main className="flex-1 overflow-auto p-4 md:p-6 pb-20">
-        {children}
-      </main>
+      <main className="flex-1 overflow-auto p-4 md:p-6 pb-20">{children}</main>
       <MobileBottomNav />
     </div>
   );

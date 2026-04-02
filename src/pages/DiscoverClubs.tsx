@@ -4,12 +4,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { Search, Users, ArrowLeft, Send, Check, Clock, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import ProfileDropdown from '@/components/dashboard/ProfileDropdown';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface ClubCard {
   id: string;
@@ -25,11 +26,12 @@ interface ClubCard {
 const DiscoverClubs = () => {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const [clubs, setClubs] = useState<ClubCard[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [myClubIds, setMyClubIds] = useState<Set<string>>(new Set());
-  const [myRequests, setMyRequests] = useState<Map<string, string>>(new Map()); // club_id -> status
+  const [myRequests, setMyRequests] = useState<Map<string, string>>(new Map());
   const [joinDialogOpen, setJoinDialogOpen] = useState(false);
   const [selectedClub, setSelectedClub] = useState<ClubCard | null>(null);
   const [joinMessage, setJoinMessage] = useState('');
@@ -49,17 +51,12 @@ const DiscoverClubs = () => {
       supabase.from('club_join_requests').select('club_id, status').eq('user_id', user!.id),
     ]);
 
-    // Count members per club
     const counts: Record<string, number> = {};
     (membersData ?? []).forEach((m: any) => {
       counts[m.club_id] = (counts[m.club_id] || 0) + 1;
     });
 
-    setClubs((clubsData ?? []).map((c: any) => ({
-      ...c,
-      memberCount: counts[c.id] || 0,
-    })));
-
+    setClubs((clubsData ?? []).map((c: any) => ({ ...c, memberCount: counts[c.id] || 0 })));
     setMyClubIds(new Set((myMemberships ?? []).map((m: any) => m.club_id)));
     const reqMap = new Map<string, string>();
     (requests ?? []).forEach((r: any) => reqMap.set(r.club_id, r.status));
@@ -90,7 +87,11 @@ const DiscoverClubs = () => {
     const { error } = await supabase.from('club_join_requests').delete().eq('club_id', clubId).eq('user_id', user!.id);
     if (!error) {
       toast.success('Request cancelled');
-      setMyRequests(prev => { const m = new Map(prev); m.delete(clubId); return m; });
+      setMyRequests(prev => {
+        const m = new Map(prev);
+        m.delete(clubId);
+        return m;
+      });
     }
   };
 
@@ -105,24 +106,19 @@ const DiscoverClubs = () => {
 
   const filtered = clubs.filter(c =>
     c.name.toLowerCase().includes(search.toLowerCase()) ||
-    (c.tagline?.toLowerCase().includes(search.toLowerCase())) ||
-    (c.category?.toLowerCase().includes(search.toLowerCase()))
+    c.tagline?.toLowerCase().includes(search.toLowerCase()) ||
+    c.category?.toLowerCase().includes(search.toLowerCase())
   );
 
-  return (
-    <div className="min-h-screen relative antialiased p-4 sm:p-6 md:p-8 dashboard-corner-gradient text-foreground">
-      {/* Background blobs */}
-      <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
-        <div className="absolute top-[-8%] left-[-8%] w-[550px] h-[550px] rounded-full mix-blend-multiply filter blur-[100px] opacity-80 animate-blob" style={{ backgroundColor: 'hsl(45 90% 85% / 0.9)' }} />
-        <div className="absolute bottom-[-10%] right-[-5%] w-[600px] h-[600px] rounded-full mix-blend-multiply filter blur-[100px] opacity-70 animate-blob animation-delay-2000" style={{ backgroundColor: 'hsl(28 70% 70% / 0.45)' }} />
-      </div>
-
-      {/* Header */}
+  const content = (
+    <>
       <header className="relative z-20 flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" className="rounded-full" onClick={() => navigate('/admin')}>
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
+          {isMobile && (
+            <Button variant="ghost" size="icon" className="rounded-full" onClick={() => navigate('/admin')}>
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+          )}
           <div>
             <h1 className="text-xl md:text-2xl font-bold font-display text-foreground">Discover Clubs</h1>
             <p className="text-sm text-muted-foreground">Browse and request to join clubs</p>
@@ -138,11 +134,10 @@ const DiscoverClubs = () => {
               className="glass-input rounded-full py-2 pl-10 pr-4 w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-ring text-sm"
             />
           </div>
-          <ProfileDropdown viewMode="personal" />
+          {isMobile && <ProfileDropdown viewMode="personal" />}
         </div>
       </header>
 
-      {/* Club Grid */}
       {loading ? (
         <div className="flex justify-center py-12">
           <div className="w-8 h-8 border-[3px] border-primary/30 border-t-primary rounded-full animate-spin" />
@@ -170,9 +165,7 @@ const DiscoverClubs = () => {
                   </div>
                 </div>
 
-                {club.description && (
-                  <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{club.description}</p>
-                )}
+                {club.description && <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{club.description}</p>}
 
                 <div className="flex items-center gap-2 mb-4 flex-wrap">
                   <Badge variant="secondary" className="text-xs">
@@ -201,10 +194,7 @@ const DiscoverClubs = () => {
                       Request Declined
                     </Button>
                   ) : (
-                    <Button
-                      className="w-full rounded-full gradient-gold text-primary-foreground"
-                      onClick={() => { setSelectedClub(club); setJoinDialogOpen(true); }}
-                    >
+                    <Button className="w-full rounded-full gradient-gold text-primary-foreground" onClick={() => { setSelectedClub(club); setJoinDialogOpen(true); }}>
                       <Send className="w-4 h-4 mr-1" /> Request to Join
                     </Button>
                   )}
@@ -215,7 +205,6 @@ const DiscoverClubs = () => {
         </div>
       )}
 
-      {/* Join Request Dialog */}
       <Dialog open={joinDialogOpen} onOpenChange={setJoinDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -241,8 +230,18 @@ const DiscoverClubs = () => {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
+
+  if (!isMobile) {
+    return (
+      <DashboardLayout showHeader={false}>
+        <div className="space-y-4 sm:space-y-6 animate-fade-in text-foreground">{content}</div>
+      </DashboardLayout>
+    );
+  }
+
+  return <div className="min-h-screen relative antialiased p-4 sm:p-6 md:p-8 dashboard-corner-gradient text-foreground">{content}</div>;
 };
 
 export default DiscoverClubs;
