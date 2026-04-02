@@ -9,20 +9,58 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useDesign } from '@/contexts/DesignContext';
+
+const NEO = {
+  card: {
+    background: '#FFFFFF',
+    border: '2px solid #111111',
+    borderRadius: '12px',
+    boxShadow: '4px 4px 0px #111111',
+    padding: '28px',
+  } as React.CSSProperties,
+  font: "'Space Grotesk', sans-serif",
+  input: {
+    border: '2px solid #111111',
+    borderRadius: '10px',
+    background: '#FFFDF5',
+    fontFamily: "'Space Grotesk', sans-serif",
+  } as React.CSSProperties,
+  btnPrimary: {
+    background: '#E98A3A',
+    color: '#111111',
+    border: '2px solid #111111',
+    borderRadius: '10px',
+    boxShadow: '3px 3px 0px #111111',
+    fontFamily: "'Space Grotesk', sans-serif",
+    fontWeight: 700,
+  } as React.CSSProperties,
+  btnDanger: {
+    background: '#111111',
+    color: '#FFFDF5',
+    border: '2px solid #111111',
+    borderRadius: '10px',
+    boxShadow: '3px 3px 0px #111111',
+    fontFamily: "'Space Grotesk', sans-serif",
+    fontWeight: 700,
+  } as React.CSSProperties,
+};
 
 const Settings = () => {
   const { user, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { toast } = useToast();
+  const { activeDesign } = useDesign();
+  const isNeo = activeDesign === 'design-2';
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [saving, setSaving] = useState(false);
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center dashboard-corner-gradient">
-        <div className="w-8 h-8 border-[3px] border-primary/30 border-t-primary rounded-full animate-spin" />
+      <div className="min-h-screen flex items-center justify-center" style={{ background: isNeo ? '#F4EFE7' : undefined }}>
+        <div className="w-8 h-8 border-[3px] border-[#E98A3A]/30 border-t-[#E98A3A] rounded-full animate-spin" />
       </div>
     );
   }
@@ -50,43 +88,65 @@ const Settings = () => {
   };
 
   const content = (
-    <div className="max-w-xl mx-auto grid gap-6 text-foreground">
+    <div className="max-w-xl mx-auto grid gap-6">
       {isMobile && (
         <div className="flex items-center gap-4 mb-2">
-          <button onClick={() => navigate(-1)} className="glass-card p-2 rounded-full hover:bg-white/50 transition">
-            <ArrowLeft className="w-5 h-5 text-foreground" />
+          <button onClick={() => navigate(-1)} className="p-2 rounded-full" style={isNeo ? { border: '2px solid #111', background: '#FFFDF5' } : {}}>
+            <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-2xl font-bold text-foreground font-['Space_Grotesk']">Settings</h1>
+          <h1 className="text-2xl font-bold" style={isNeo ? { fontFamily: NEO.font, color: '#111' } : {}}>Settings</h1>
         </div>
       )}
 
-      <div className="glass-card p-8">
-        <h2 className="text-lg font-bold text-foreground mb-4 font-['Space_Grotesk']">Account</h2>
+      {/* Account */}
+      <div style={isNeo ? NEO.card : undefined} className={isNeo ? '' : 'glass-card p-8'}>
+        <h2 className="text-lg font-bold mb-4" style={isNeo ? { fontFamily: NEO.font, color: '#111' } : {}}>Account</h2>
         <div>
-          <Label>Email</Label>
-          <Input value={user.email ?? ''} disabled className="mt-1.5 opacity-60" />
+          <Label style={isNeo ? { fontFamily: NEO.font, fontWeight: 600, color: '#111' } : {}}>Email</Label>
+          <Input value={user.email ?? ''} disabled className="mt-1.5" style={isNeo ? { ...NEO.input, opacity: 0.6 } : { opacity: 0.6 }} />
         </div>
       </div>
 
-      <div className="glass-card p-8">
-        <h2 className="text-lg font-bold text-foreground mb-4 font-['Space_Grotesk'] flex items-center gap-2">
+      {/* Change Password */}
+      <div style={isNeo ? NEO.card : undefined} className={isNeo ? '' : 'glass-card p-8'}>
+        <h2 className="text-lg font-bold mb-4 flex items-center gap-2" style={isNeo ? { fontFamily: NEO.font, color: '#111' } : {}}>
           <Lock className="w-5 h-5" /> Change Password
         </h2>
         <div className="space-y-4">
-          <div><Label>New Password</Label><Input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} className="mt-1.5" placeholder="••••••••" /></div>
-          <div><Label>Confirm New Password</Label><Input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} className="mt-1.5" placeholder="••••••••" /></div>
-          <Button onClick={handleChangePassword} disabled={saving} className="gradient-gold text-primary-foreground rounded-full px-6">
-            {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+          <div>
+            <Label style={isNeo ? { fontFamily: NEO.font, fontWeight: 600, color: '#111' } : {}}>New Password</Label>
+            <Input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} className="mt-1.5" placeholder="••••••••" style={isNeo ? NEO.input : {}} />
+          </div>
+          <div>
+            <Label style={isNeo ? { fontFamily: NEO.font, fontWeight: 600, color: '#111' } : {}}>Confirm New Password</Label>
+            <Input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} className="mt-1.5" placeholder="••••••••" style={isNeo ? NEO.input : {}} />
+          </div>
+          <button
+            onClick={handleChangePassword}
+            disabled={saving}
+            className="flex items-center gap-2 px-6 py-2.5 text-sm transition-all"
+            style={isNeo ? NEO.btnPrimary : { background: 'var(--primary)', color: 'white', borderRadius: '9999px' }}
+            onMouseEnter={isNeo ? (e) => { e.currentTarget.style.transform = 'translate(-1px, -1px)'; e.currentTarget.style.boxShadow = '4px 4px 0px #111'; } : undefined}
+            onMouseLeave={isNeo ? (e) => { e.currentTarget.style.transform = 'translate(0,0)'; e.currentTarget.style.boxShadow = '3px 3px 0px #111'; } : undefined}
+          >
+            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
             Update Password
-          </Button>
+          </button>
         </div>
       </div>
 
-      <div className="glass-card p-8">
-        <h2 className="text-lg font-bold text-foreground mb-4 font-['Space_Grotesk']">Session</h2>
-        <Button variant="destructive" onClick={signOut} className="rounded-full px-6">
+      {/* Session */}
+      <div style={isNeo ? NEO.card : undefined} className={isNeo ? '' : 'glass-card p-8'}>
+        <h2 className="text-lg font-bold mb-4" style={isNeo ? { fontFamily: NEO.font, color: '#111' } : {}}>Session</h2>
+        <button
+          onClick={signOut}
+          className="px-6 py-2.5 text-sm transition-all"
+          style={isNeo ? NEO.btnDanger : { background: 'var(--destructive)', color: 'white', borderRadius: '9999px' }}
+          onMouseEnter={isNeo ? (e) => { e.currentTarget.style.transform = 'translate(-1px, -1px)'; e.currentTarget.style.boxShadow = '4px 4px 0px #111'; } : undefined}
+          onMouseLeave={isNeo ? (e) => { e.currentTarget.style.transform = 'translate(0,0)'; e.currentTarget.style.boxShadow = '3px 3px 0px #111'; } : undefined}
+        >
           Sign Out
-        </Button>
+        </button>
       </div>
     </div>
   );

@@ -420,9 +420,7 @@ const AdminDashboard = () => {
                       background: '#FFFFFF',
                     }}
                   >
-                    <div className="flex-1 overflow-auto p-4">
-                      <EventCalendar mode="personal" />
-                    </div>
+                    <NeoBrutalCalendar mode="personal" />
                   </div>
                   {/* Upcoming Events */}
                   <div
