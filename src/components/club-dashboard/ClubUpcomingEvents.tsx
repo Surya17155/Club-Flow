@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Calendar, Clock, Users, Tag, MapPin } from 'lucide-react';
+import { Calendar, Clock, Users } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
 
 interface UpcomingEvent {
   id: string;
@@ -27,7 +26,6 @@ interface EventDetail {
 
 interface Props {
   clubId: string;
-  clubLogo?: string | null;
   clubName: string;
 }
 
@@ -37,7 +35,7 @@ const eventTypeLabelMap: Record<string, string> = {
   competition: 'Competition', social: 'Social', other: 'Other',
 };
 
-const ClubUpcomingEvents = ({ clubId, clubLogo, clubName }: Props) => {
+const ClubUpcomingEvents = ({ clubId, clubName }: Props) => {
   const [events, setEvents] = useState<UpcomingEvent[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<EventDetail | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -97,95 +95,81 @@ const ClubUpcomingEvents = ({ clubId, clubLogo, clubName }: Props) => {
   };
 
   return (
-    <div className="glass-card p-5 h-full">
-      {/* Club logo at top */}
-      <div className="w-16 h-16 rounded-full bg-foreground flex items-center justify-center mb-4 shadow-xl border-4 border-white/20 overflow-hidden mx-auto">
-        {clubLogo ? (
-          <img src={clubLogo} alt={clubName} className="w-full h-full object-cover" />
-        ) : (
-          <span className="text-2xl font-display font-bold text-background">{clubName[0]}</span>
-        )}
-      </div>
-
-      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">Upcoming Events</h3>
+    <div className="border-[3px] border-[#111] rounded-[6px] bg-white p-5 h-full" style={{ boxShadow: '4px 4px 0px #111' }}>
+      <h3 className="text-sm font-black text-[#111] uppercase tracking-wider mb-4" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Upcoming Events</h3>
 
       <div className="space-y-3">
         {events.length > 0 ? events.map(event => (
           <div
             key={event.id}
             onClick={() => handleEventClick(event.id)}
-            className="flex items-center justify-between p-2 rounded-xl hover:bg-white/30 transition cursor-pointer"
+            className="flex items-center justify-between p-3 rounded-[6px] border-[2px] border-[#111] hover:bg-[#FDE8D0] hover:translate-y-[-2px] transition-all cursor-pointer"
+            style={{ boxShadow: '2px 2px 0px #111' }}
           >
             <div className="flex items-center gap-3">
-              <div className="bg-white rounded-lg shadow-sm border border-border flex flex-col items-center justify-start h-14 min-w-[3.5rem] overflow-hidden">
-                <div className="bg-destructive w-full h-5 flex items-center justify-center">
-                  <span className="text-[9px] text-destructive-foreground font-bold uppercase tracking-wide">{event.month}</span>
+              <div className="border-[2px] border-[#111] rounded-[4px] overflow-hidden flex flex-col items-center min-w-[3rem]">
+                <div className="bg-[#E98A3A] w-full py-0.5 flex items-center justify-center">
+                  <span className="text-[9px] text-[#111] font-black uppercase tracking-wide">{event.month}</span>
                 </div>
-                <div className="flex items-center justify-center h-full pb-1">
-                  <span className="text-xl font-bold text-foreground leading-none">{event.day}</span>
+                <div className="flex items-center justify-center py-1 bg-white">
+                  <span className="text-lg font-black text-[#111] leading-none">{event.day}</span>
                 </div>
               </div>
               <div>
-                <h4 className="font-semibold text-foreground text-sm">{event.name}</h4>
-                <p className="text-xs text-muted-foreground">{event.daysAway}</p>
+                <h4 className="font-bold text-[#111] text-sm">{event.name}</h4>
+                <p className="text-xs text-[#111]/50 font-medium">{event.daysAway}</p>
               </div>
             </div>
-            <Calendar className="w-5 h-5 text-muted-foreground" />
+            <Calendar className="w-4 h-4 text-[#111]/40" />
           </div>
         )) : (
-          <p className="text-sm text-muted-foreground italic text-center py-4">No upcoming events</p>
+          <p className="text-sm text-[#111]/50 font-medium text-center py-4">No upcoming events</p>
         )}
       </div>
 
       {/* Event Detail Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md border-[3px] border-[#111] rounded-[6px] bg-white" style={{ boxShadow: '6px 6px 0px #111' }}>
           <DialogHeader>
-            <DialogTitle>{loadingDetail ? 'Loading...' : selectedEvent?.name}</DialogTitle>
-            <DialogDescription>Event details for {clubName}</DialogDescription>
+            <DialogTitle className="font-black text-[#111]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{loadingDetail ? 'Loading...' : selectedEvent?.name}</DialogTitle>
+            <DialogDescription className="text-[#111]/50 font-medium">Event details for {clubName}</DialogDescription>
           </DialogHeader>
           {loadingDetail ? (
             <div className="flex justify-center py-8">
-              <div className="w-6 h-6 border-[3px] border-primary/30 border-t-primary rounded-full animate-spin" />
+              <div className="w-6 h-6 border-[3px] border-[#111]/30 border-t-[#111] rounded-full animate-spin" />
             </div>
           ) : selectedEvent ? (
             <div className="space-y-4">
               {/* Badges */}
               <div className="flex flex-wrap gap-2">
-                <Badge variant="secondary">{eventTypeLabelMap[selectedEvent.event_type] ?? selectedEvent.event_type}</Badge>
-                <Badge variant="outline" className="capitalize">{selectedEvent.category}</Badge>
-                <Badge variant="outline">{selectedEvent.access_type}</Badge>
+                <span className="px-3 py-1 text-xs font-bold border-[2px] border-[#111] rounded-[4px] bg-[#E98A3A] text-[#111]">{eventTypeLabelMap[selectedEvent.event_type] ?? selectedEvent.event_type}</span>
+                <span className="px-3 py-1 text-xs font-bold border-[2px] border-[#111] rounded-[4px] bg-white text-[#111] capitalize">{selectedEvent.category}</span>
+                <span className="px-3 py-1 text-xs font-bold border-[2px] border-[#111] rounded-[4px] bg-white text-[#111]">{selectedEvent.access_type === 'open' ? 'Open for All' : 'Only for Club Members'}</span>
               </div>
 
               {/* Date & Time */}
               <div className="flex items-start gap-3 text-sm">
-                <Clock className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+                <Clock className="w-4 h-4 text-[#111]/60 mt-0.5 shrink-0" />
                 <div>
-                  <p className="font-medium text-foreground">{formatDateTime(selectedEvent.event_date)}</p>
+                  <p className="font-bold text-[#111]">{formatDateTime(selectedEvent.event_date)}</p>
                   {selectedEvent.end_date && (
-                    <p className="text-muted-foreground">Ends: {formatDateTime(selectedEvent.end_date)}</p>
+                    <p className="text-[#111]/50 font-medium">Ends: {formatDateTime(selectedEvent.end_date)}</p>
                   )}
                 </div>
               </div>
 
               {/* Participants */}
               <div className="flex items-center gap-3 text-sm">
-                <Users className="w-4 h-4 text-muted-foreground shrink-0" />
-                <span className="text-foreground">{selectedEvent.participant_count} Registered Participants</span>
+                <Users className="w-4 h-4 text-[#111]/60 shrink-0" />
+                <span className="text-[#111] font-bold">{selectedEvent.participant_count} Registered Participants</span>
               </div>
 
               {/* Description */}
-              {selectedEvent.description && (
-                <div className="pt-2 border-t border-border/50">
-                  <p className="text-sm text-muted-foreground leading-relaxed">{selectedEvent.description}</p>
-                </div>
-              )}
-
-              {!selectedEvent.description && (
-                <div className="pt-2 border-t border-border/50">
-                  <p className="text-sm text-muted-foreground italic">No description provided.</p>
-                </div>
-              )}
+              <div className="pt-2 border-t-[2px] border-[#111]/20">
+                <p className="text-sm text-[#111]/70 leading-relaxed font-medium">
+                  {selectedEvent.description || 'No description provided.'}
+                </p>
+              </div>
             </div>
           ) : null}
         </DialogContent>

@@ -6,15 +6,12 @@ import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
 import { useClubStats } from '@/hooks/useClubStats';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { supabase } from '@/integrations/supabase/client';
-import { Edit3, Calendar, ChevronDown, ClipboardList, ChevronLeft, ChevronRight, Users, TrendingUp, CheckCircle } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { ChevronLeft, Users, Calendar as CalendarIcon } from 'lucide-react';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import ProfileDropdown from '@/components/dashboard/ProfileDropdown';
 import ManageEventsModal from '@/components/dashboard/ManageEventsModal';
 import ClubProfileSidebar from '@/components/club-dashboard/ClubProfileSidebar';
-import ClubStatsRow from '@/components/club-dashboard/ClubStatsRow';
 import ClubUpcomingEvents from '@/components/club-dashboard/ClubUpcomingEvents';
 import MemberManagement from '@/components/club-dashboard/MemberManagement';
 import JoinRequestsPanel from '@/components/club-dashboard/JoinRequestsPanel';
@@ -92,10 +89,10 @@ const ClubDashboard = () => {
   }, [user?.id]);
 
   // Club details
-  const [clubDetails, setClubDetails] = useState<{ about: string | null; logo_url: string | null; social_instagram: string | null; social_linkedin: string | null }>({ about: null, logo_url: null, social_instagram: null, social_linkedin: null });
+  const [clubDetails, setClubDetails] = useState<{ about: string | null; logo_url: string | null; social_instagram: string | null; social_linkedin: string | null; tagline: string | null }>({ about: null, logo_url: null, social_instagram: null, social_linkedin: null, tagline: null });
   useEffect(() => {
     if (!clubId) return;
-    supabase.from('clubs').select('about, logo_url, social_instagram, social_linkedin').eq('id', clubId).maybeSingle().then(({ data }: any) => {
+    supabase.from('clubs').select('about, logo_url, social_instagram, social_linkedin, tagline').eq('id', clubId).maybeSingle().then(({ data }: any) => {
       if (data) setClubDetails(data);
     });
   }, [clubId]);
@@ -152,16 +149,16 @@ const ClubDashboard = () => {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#fdfbf7' }}>
-        <div className="w-8 h-8 border-[3px] border-primary/30 border-t-primary rounded-full animate-spin" />
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F4EFE7' }}>
+        <div className="w-8 h-8 border-[3px] border-[#111]/30 border-t-[#111] rounded-full animate-spin" />
       </div>
     );
   }
   if (!user) return <Navigate to="/" replace />;
   if (!isRoleCheckComplete) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#fdfbf7' }}>
-        <div className="w-8 h-8 border-[3px] border-primary/30 border-t-primary rounded-full animate-spin" />
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F4EFE7' }}>
+        <div className="w-8 h-8 border-[3px] border-[#111]/30 border-t-[#111] rounded-full animate-spin" />
       </div>
     );
   }
@@ -169,11 +166,11 @@ const ClubDashboard = () => {
   const hasAccess = isPresident || hasPower('manage_club') || isSuperAdmin;
   if ((!hasAccess && !isSuperAdmin) || !clubId) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6" style={{ backgroundColor: '#fdfbf7' }}>
-        <div className="glass-card p-8 text-center max-w-md">
-          <h2 className="text-xl font-bold text-foreground mb-2">Access Restricted</h2>
-          <p className="text-sm text-muted-foreground mb-4">Only the club president or users with official dashboard access can view this page.</p>
-          <Button onClick={() => navigate('/dashboard')} className="rounded-full">Go to Dashboard</Button>
+      <div className="min-h-screen flex items-center justify-center p-6" style={{ backgroundColor: '#F4EFE7' }}>
+        <div className="p-8 text-center max-w-md border-[3px] border-[#111] rounded-[6px] bg-white" style={{ boxShadow: '4px 4px 0px #111' }}>
+          <h2 className="text-xl font-bold text-[#111] mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Access Restricted</h2>
+          <p className="text-sm text-[#111]/60 mb-4">Only the club president or users with official dashboard access can view this page.</p>
+          <button onClick={() => navigate('/dashboard')} className="px-6 py-2.5 bg-[#E98A3A] text-[#111] font-bold text-sm border-[3px] border-[#111] rounded-[6px] hover:translate-y-[2px] hover:shadow-none transition-all" style={{ boxShadow: '3px 3px 0px #111' }}>Go to Dashboard</button>
         </div>
       </div>
     );
@@ -183,63 +180,53 @@ const ClubDashboard = () => {
     ? (routeClubId === activeClub?.club_id ? activeClub?.club_name : clubNameOverride) || 'Club'
     : activeClub?.club_name || clubNameOverride || 'Club';
 
-  const statsItems = [
-    { label: 'Total Members:', value: String(clubStats.totalMembers), path: 'M0,25 C30,25 30,10 50,10 S70,20 100,5' },
-    { label: 'All-Time Attendance:', value: String(clubStats.chartData.reduce((s, d) => s + d.attendance, 0)), path: 'M0,25 C20,28 40,5 60,15 S80,5 100,10' },
-    { label: 'Engagement Index:', value: `${clubStats.avgAttendanceRate}/100`, path: 'M0,20 C30,20 40,25 60,10 S90,5 100,5' },
-  ];
-
-  const statIcons = [Users, CheckCircle, TrendingUp];
+  // Find president
+  const president = postHolders.find(ph => ph.role === 'president');
 
   // ─── MOBILE LAYOUT ─────────────────────────────────────────
   if (isMobile) {
     return (
       <div
-        className="min-h-screen pb-20 dashboard-corner-gradient overflow-x-hidden"
-        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        className="min-h-screen pb-20 overflow-x-hidden"
+        style={{ backgroundColor: '#F4EFE7', scrollbarWidth: 'none', msOverflowStyle: 'none', fontFamily: "'Space Grotesk', sans-serif" }}
       >
         <style>{`::-webkit-scrollbar { display: none; }`}</style>
 
-        {/* Background blobs */}
-        <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
-          <div className="absolute top-[-8%] left-[-8%] w-[300px] h-[300px] rounded-full mix-blend-multiply filter blur-[80px] opacity-60 animate-blob" style={{ backgroundColor: 'hsl(45 90% 85% / 0.9)' }} />
-          <div className="absolute bottom-[20%] right-[-10%] w-[250px] h-[250px] rounded-full mix-blend-multiply filter blur-[80px] opacity-50 animate-blob animation-delay-2000" style={{ backgroundColor: 'hsl(25 80% 82% / 0.8)' }} />
-        </div>
-
-        {/* Fixed header — no background, elements float on app bg */}
-        <header className="fixed top-0 left-0 right-0 z-40 px-4 pt-4 pb-3 safe-area-top">
-          {/* Top row: back button, app name center, profile avatar right */}
-          <div className="flex items-center justify-between mb-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="rounded-full w-9 h-9"
+        {/* Fixed header */}
+        <header className="fixed top-0 left-0 right-0 z-40 px-4 pt-4 pb-3 safe-area-top" style={{ backgroundColor: '#F4EFE7' }}>
+          {/* Top row: back button + tab toggle */}
+          <div className="flex items-center justify-between mb-3">
+            <button
               onClick={() => navigate(cameFromSuperAdmin ? '/super-admin' : '/admin')}
+              className="w-9 h-9 flex items-center justify-center border-[3px] border-[#111] rounded-[6px] bg-[#111] text-white hover:translate-y-[1px] transition-all"
+              style={{ boxShadow: '2px 2px 0px #E98A3A' }}
             >
               <ChevronLeft className="w-5 h-5" />
-            </Button>
-            <h1 className="text-lg font-bold font-display text-foreground">IILM Club</h1>
-            <ProfileDropdown viewMode="club" />
+            </button>
+            <div className="flex-1" />
           </div>
 
-          {/* Tab toggle pill */}
-          <div className="glass-card flex p-1 rounded-full max-w-[280px] mx-auto">
+          {/* Tab toggle - Neo Brutalism */}
+          <div className="flex p-1 rounded-[6px] border-[3px] border-[#111] bg-white max-w-[320px] mx-auto" style={{ boxShadow: '3px 3px 0px #111' }}>
             <button
               onClick={() => setActiveTab('overview')}
-              className={`flex-1 py-2 px-3 rounded-full text-xs font-semibold transition-all duration-300 ${activeTab === 'overview' ? 'bg-white shadow-sm text-primary' : 'text-muted-foreground'}`}
+              className={`flex-1 py-2 px-3 rounded-[4px] text-xs font-bold transition-all ${activeTab === 'overview' ? 'bg-[#E98A3A] text-[#111] border-[2px] border-[#111]' : 'text-[#111]/50'}`}
+              style={activeTab === 'overview' ? { boxShadow: '2px 2px 0px #111' } : {}}
             >
               Overview
             </button>
             <button
               onClick={() => setActiveTab('members')}
-              className={`flex-1 py-2 px-3 rounded-full text-xs font-semibold transition-all duration-300 ${activeTab === 'members' ? 'bg-white shadow-sm text-primary' : 'text-muted-foreground'}`}
+              className={`flex-1 py-2 px-3 rounded-[4px] text-xs font-bold transition-all ${activeTab === 'members' ? 'bg-[#E98A3A] text-[#111] border-[2px] border-[#111]' : 'text-[#111]/50'}`}
+              style={activeTab === 'members' ? { boxShadow: '2px 2px 0px #111' } : {}}
             >
               Members
             </button>
             {isPresident && (
               <button
                 onClick={() => setActiveTab('requests')}
-                className={`flex-1 py-2 px-3 rounded-full text-xs font-semibold transition-all duration-300 ${activeTab === 'requests' ? 'bg-white shadow-sm text-primary' : 'text-muted-foreground'}`}
+                className={`flex-1 py-2 px-3 rounded-[4px] text-xs font-bold transition-all ${activeTab === 'requests' ? 'bg-[#E98A3A] text-[#111] border-[2px] border-[#111]' : 'text-[#111]/50'}`}
+                style={activeTab === 'requests' ? { boxShadow: '2px 2px 0px #111' } : {}}
               >
                 Requests
               </button>
@@ -258,74 +245,36 @@ const ClubDashboard = () => {
                 clubName={clubName}
                 clubLogo={clubDetails.logo_url}
                 clubAbout={clubDetails.about}
-                postHolders={postHolders}
+                postHolders={president ? [president] : []}
                 socialInstagram={clubDetails.social_instagram}
                 socialLinkedin={clubDetails.social_linkedin}
+                tagline={clubDetails.tagline}
               />
 
-              {/* Stats Row */}
+              {/* Stats Row - Only 2 cards */}
               <div className="grid grid-cols-2 gap-3">
-                {statsItems.map((stat, i) => {
-                  const Icon = statIcons[i % statIcons.length];
-                  return (
-                    <div key={i} className="glass-card p-4 text-center">
-                      <Icon className="w-5 h-5 text-primary mx-auto mb-1.5" />
-                      <h3 className="text-2xl font-bold text-primary">{stat.value}</h3>
-                      <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mt-0.5">
-                        {stat.label.replace(':', '')}
-                      </p>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Quick Actions */}
-              {hasPower('create_event') && (
-                <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
-                  <button
-                    onClick={() => navigate('/create-event')}
-                    className="flex items-center gap-1.5 px-4 py-2.5 rounded-full gradient-gold text-primary-foreground text-xs font-semibold shadow-gold whitespace-nowrap"
-                  >
-                    <Edit3 className="w-3.5 h-3.5" /> Create Event
-                  </button>
-                  <button
-                    onClick={() => setManageEventsOpen(true)}
-                    className="flex items-center gap-1.5 px-4 py-2.5 rounded-full glass-card text-foreground text-xs font-semibold whitespace-nowrap"
-                  >
-                    <ClipboardList className="w-3.5 h-3.5" /> Manage Events
-                  </button>
+                <div className="p-4 text-center border-[3px] border-[#111] rounded-[6px] bg-white" style={{ boxShadow: '4px 4px 0px #111' }}>
+                  <Users className="w-5 h-5 text-[#111] mx-auto mb-1.5" />
+                  <h3 className="text-2xl font-black text-[#111]">{clubStats.totalMembers}</h3>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-[#111]/60 mt-0.5">Total Members</p>
                 </div>
-              )}
+                <div className="p-4 text-center border-[3px] border-[#111] rounded-[6px]" style={{ backgroundColor: '#FDE8D0', boxShadow: '4px 4px 0px #111' }}>
+                  <CalendarIcon className="w-5 h-5 text-[#111] mx-auto mb-1.5" />
+                  <h3 className="text-2xl font-black text-[#111]">{clubStats.totalEvents}</h3>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-[#111]/60 mt-0.5">Total Events</p>
+                </div>
+              </div>
 
               {/* Upcoming Events */}
               <section>
-                <h3 className="text-base font-bold font-display text-foreground mb-3">Upcoming Events</h3>
-                <ClubUpcomingEvents clubId={clubId} clubLogo={clubDetails.logo_url} clubName={clubName} />
-              </section>
-
-              {/* Participation Chart */}
-              <section className="glass-card p-4">
-                <h3 className="text-sm font-bold text-foreground font-display mb-3">Participation Analytics</h3>
-                {clubStats.chartData.length > 0 ? (
-                  <ResponsiveContainer width="100%" height={180}>
-                    <LineChart data={clubStats.chartData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                      <XAxis dataKey="name" tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} />
-                      <YAxis tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} />
-                      <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', fontSize: '12px' }} />
-                      <Line type="monotone" dataKey="attendance" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ fill: 'hsl(var(--primary))' }} />
-                    </LineChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <p className="text-sm text-muted-foreground italic text-center py-6">No event data yet</p>
-                )}
+                <ClubUpcomingEvents clubId={clubId} clubName={clubName} />
               </section>
             </>
           ) : activeTab === 'members' ? (
             <MemberManagement clubId={clubId} isSuperAdmin={isSuperAdmin} />
           ) : (
-            <div className="glass-card p-4">
-              <h2 className="text-base font-bold text-foreground mb-3">Pending Join Requests</h2>
+            <div className="border-[3px] border-[#111] rounded-[6px] bg-white p-4" style={{ boxShadow: '4px 4px 0px #111' }}>
+              <h2 className="text-base font-black text-[#111] mb-3" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Pending Join Requests</h2>
               <JoinRequestsPanel clubId={clubId} />
             </div>
           )}
@@ -343,95 +292,84 @@ const ClubDashboard = () => {
       <div className="space-y-6 animate-fade-in text-foreground">
         <header className="relative z-20 flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" className="rounded-full" onClick={() => navigate(cameFromSuperAdmin ? '/super-admin' : '/admin')}>
+            <button
+              onClick={() => navigate(cameFromSuperAdmin ? '/super-admin' : '/admin')}
+              className="w-9 h-9 flex items-center justify-center border-[3px] border-[#111] rounded-[6px] bg-[#111] text-white hover:translate-y-[1px] transition-all"
+              style={{ boxShadow: '2px 2px 0px #E98A3A' }}
+            >
               <ChevronLeft className="w-5 h-5" />
-            </Button>
-            <h1 className="text-xl md:text-2xl font-bold font-display text-foreground">
-              {clubName} <span className="text-primary">Official</span>
+            </button>
+            <h1 className="text-xl md:text-2xl font-black text-[#111]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+              {clubName} <span className="text-[#E98A3A]">Official</span>
             </h1>
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="inline-flex items-center rounded-[20px] p-1 bg-muted">
-              <button onClick={() => setActiveTab('overview')} className={`px-3 sm:px-4 py-1.5 rounded-2xl text-sm font-semibold transition-all ${activeTab === 'overview' ? 'shadow-sm bg-white text-primary' : 'text-muted-foreground'}`}>Overview</button>
-              <button onClick={() => setActiveTab('members')} className={`px-3 sm:px-4 py-1.5 rounded-2xl text-sm font-semibold transition-all ${activeTab === 'members' ? 'shadow-sm bg-white text-primary' : 'text-muted-foreground'}`}>Members</button>
+            {/* Neo Brutalism Tab Toggle */}
+            <div className="flex p-1 rounded-[6px] border-[3px] border-[#111] bg-white" style={{ boxShadow: '3px 3px 0px #111' }}>
+              <button onClick={() => setActiveTab('overview')} className={`px-4 py-1.5 rounded-[4px] text-sm font-bold transition-all ${activeTab === 'overview' ? 'bg-[#E98A3A] text-[#111] border-[2px] border-[#111]' : 'text-[#111]/50'}`} style={activeTab === 'overview' ? { boxShadow: '2px 2px 0px #111' } : {}}>Overview</button>
+              <button onClick={() => setActiveTab('members')} className={`px-4 py-1.5 rounded-[4px] text-sm font-bold transition-all ${activeTab === 'members' ? 'bg-[#E98A3A] text-[#111] border-[2px] border-[#111]' : 'text-[#111]/50'}`} style={activeTab === 'members' ? { boxShadow: '2px 2px 0px #111' } : {}}>Members</button>
               {isPresident && (
-                <button onClick={() => setActiveTab('requests')} className={`px-3 sm:px-4 py-1.5 rounded-2xl text-sm font-semibold transition-all ${activeTab === 'requests' ? 'shadow-sm bg-white text-primary' : 'text-muted-foreground'}`}>Requests</button>
+                <button onClick={() => setActiveTab('requests')} className={`px-4 py-1.5 rounded-[4px] text-sm font-bold transition-all ${activeTab === 'requests' ? 'bg-[#E98A3A] text-[#111] border-[2px] border-[#111]' : 'text-[#111]/50'}`} style={activeTab === 'requests' ? { boxShadow: '2px 2px 0px #111' } : {}}>Requests</button>
               )}
             </div>
-
-            {hasPower('create_event') && (
-              <DropdownMenu>
-                <DropdownMenuTrigger className="text-primary-foreground text-sm font-medium px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-transform active:scale-95 gradient-gold">
-                  <Calendar className="w-4 h-4" /> Events <ChevronDown className="w-3 h-3" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem onSelect={() => navigate('/create-event')}><Edit3 className="mr-2 h-4 w-4" /> Create Event</DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => setManageEventsOpen(true)}><ClipboardList className="mr-2 h-4 w-4" /> Manage Events</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-
-            <ProfileDropdown viewMode="club" />
           </div>
         </header>
 
         {activeTab === 'overview' ? (
           <>
-            <section><ClubStatsRow stats={statsItems} /></section>
+            {/* Stats - 2 cards */}
+            <section className="grid grid-cols-2 md:grid-cols-2 gap-4 max-w-md">
+              <div className="p-5 text-center border-[3px] border-[#111] rounded-[6px] bg-white" style={{ boxShadow: '4px 4px 0px #111' }}>
+                <Users className="w-6 h-6 text-[#111] mx-auto mb-2" />
+                <h3 className="text-3xl font-black text-[#111]">{clubStats.totalMembers}</h3>
+                <p className="text-xs font-bold uppercase tracking-wider text-[#111]/60 mt-1">Total Members</p>
+              </div>
+              <div className="p-5 text-center border-[3px] border-[#111] rounded-[6px]" style={{ backgroundColor: '#FDE8D0', boxShadow: '4px 4px 0px #111' }}>
+                <CalendarIcon className="w-6 h-6 text-[#111] mx-auto mb-2" />
+                <h3 className="text-3xl font-black text-[#111]">{clubStats.totalEvents}</h3>
+                <p className="text-xs font-bold uppercase tracking-wider text-[#111]/60 mt-1">Total Events</p>
+              </div>
+            </section>
+
             <main className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               <div className="lg:col-span-3">
                 <ClubProfileSidebar clubId={clubId} clubName={clubName} clubAbout={clubDetails.about} clubLogo={clubDetails.logo_url} socialInstagram={clubDetails.social_instagram} socialLinkedin={clubDetails.social_linkedin} />
               </div>
               <div className="lg:col-span-6 space-y-6">
-                <div className="glass-card p-6">
+                {/* Calendar */}
+                <div className="border-[3px] border-[#111] rounded-[6px] bg-white p-6" style={{ boxShadow: '4px 4px 0px #111' }}>
                   <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-bold text-foreground font-display">Monthly Calendar</h3>
+                    <h3 className="text-lg font-black text-[#111]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Monthly Calendar</h3>
                     <div className="flex items-center gap-2">
-                      <button onClick={() => { if (calMonth === 0) { setCalMonth(11); setCalYear(y => y - 1); } else setCalMonth(m => m - 1); }} className="p-1 rounded hover:bg-muted"><ChevronLeft className="w-4 h-4" /></button>
-                      <span className="text-sm font-medium min-w-[120px] text-center">{monthName} {calYear}</span>
-                      <button onClick={() => { if (calMonth === 11) { setCalMonth(0); setCalYear(y => y + 1); } else setCalMonth(m => m + 1); }} className="p-1 rounded hover:bg-muted"><ChevronRight className="w-4 h-4" /></button>
+                      <button onClick={() => { if (calMonth === 0) { setCalMonth(11); setCalYear(y => y - 1); } else setCalMonth(m => m - 1); }} className="p-1.5 border-[2px] border-[#111] rounded-[4px] hover:bg-[#E98A3A]/20 transition-colors"><ChevronLeft className="w-4 h-4" /></button>
+                      <span className="text-sm font-bold min-w-[120px] text-center text-[#111]">{monthName} {calYear}</span>
+                      <button onClick={() => { if (calMonth === 11) { setCalMonth(0); setCalYear(y => y + 1); } else setCalMonth(m => m + 1); }} className="p-1.5 border-[2px] border-[#111] rounded-[4px] hover:bg-[#E98A3A]/20 transition-colors"><ChevronLeft className="w-4 h-4 rotate-180" /></button>
                     </div>
                   </div>
                   <div className="grid grid-cols-7 gap-1">
-                    {DAYS.map(d => (<div key={d} className="text-center text-xs font-medium text-muted-foreground py-2">{d}</div>))}
+                    {DAYS.map(d => (<div key={d} className="text-center text-xs font-bold text-[#111]/50 py-2">{d}</div>))}
                     {weeks.flat().map((day, i) => {
                       const dateKey = day ? `${calYear}-${String(calMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}` : '';
                       const events = day ? calendarEvents[dateKey] || [] : [];
                       const isToday = day === now.getDate() && calMonth === now.getMonth() && calYear === now.getFullYear();
                       return (
-                        <div key={i} className={`min-h-[60px] p-1 rounded-lg text-xs border ${isToday ? 'border-primary/40 bg-primary/5' : 'border-transparent'} ${day ? 'hover:border-border hover:bg-muted/30 cursor-pointer' : ''}`}>
-                          {day && (<><span className={`${isToday ? 'text-primary font-bold' : 'text-muted-foreground'}`}>{day}</span>{events.map((ev, j) => (<div key={j} className={`mt-0.5 px-1 py-0.5 rounded text-[10px] text-primary-foreground truncate ${ev.color}`}>{ev.name}</div>))}</>)}
+                        <div key={i} className={`min-h-[60px] p-1 rounded-[4px] text-xs border-[2px] ${isToday ? 'border-[#E98A3A] bg-[#E98A3A]/10' : 'border-transparent'} ${day ? 'hover:border-[#111] hover:bg-[#FDE8D0]/30 cursor-pointer transition-all' : ''}`}>
+                          {day && (<><span className={`${isToday ? 'text-[#E98A3A] font-black' : 'text-[#111]/70 font-bold'}`}>{day}</span>{events.map((ev, j) => (<div key={j} className="mt-0.5 px-1 py-0.5 rounded-[2px] text-[10px] text-white truncate bg-[#E98A3A] border border-[#111]">{ev.name}</div>))}</>)}
                         </div>
                       );
                     })}
                   </div>
                 </div>
-                <div className="glass-card p-6">
-                  <h3 className="text-lg font-bold text-foreground font-display mb-4">Participation Analytics</h3>
-                  {clubStats.chartData.length > 0 ? (
-                    <ResponsiveContainer width="100%" height={200}>
-                      <LineChart data={clubStats.chartData}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                        <XAxis dataKey="name" tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} />
-                        <YAxis tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} />
-                        <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px' }} />
-                        <Line type="monotone" dataKey="attendance" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ fill: 'hsl(var(--primary))' }} />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  ) : (
-                    <p className="text-sm text-muted-foreground italic text-center py-8">No event data yet</p>
-                  )}
-                </div>
               </div>
-              <div className="lg:col-span-3"><ClubUpcomingEvents clubId={clubId} clubLogo={clubDetails.logo_url} clubName={clubName} /></div>
+              <div className="lg:col-span-3"><ClubUpcomingEvents clubId={clubId} clubName={clubName} /></div>
             </main>
           </>
         ) : activeTab === 'members' ? (
           <MemberManagement clubId={clubId} isSuperAdmin={isSuperAdmin} />
         ) : (
-          <div className="glass-card p-6">
-            <h2 className="text-lg font-bold text-foreground mb-4">Pending Join Requests</h2>
+          <div className="border-[3px] border-[#111] rounded-[6px] bg-white p-6" style={{ boxShadow: '4px 4px 0px #111' }}>
+            <h2 className="text-lg font-black text-[#111] mb-4" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Pending Join Requests</h2>
             <JoinRequestsPanel clubId={clubId} />
           </div>
         )}

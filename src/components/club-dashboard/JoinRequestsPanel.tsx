@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Check, X, Clock, UserPlus } from 'lucide-react';
+import { Check, X, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface JoinRequest {
@@ -61,7 +59,6 @@ const JoinRequestsPanel = ({ clubId }: { clubId: string }) => {
 
   const handleAction = async (request: JoinRequest, action: 'approved' | 'rejected') => {
     if (action === 'approved') {
-      // Insert into club_members
       const { error: memberError } = await supabase.from('club_members').insert({
         club_id: clubId,
         user_id: request.user_id,
@@ -89,14 +86,14 @@ const JoinRequestsPanel = ({ clubId }: { clubId: string }) => {
   if (loading) {
     return (
       <div className="flex justify-center py-6">
-        <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+        <div className="w-6 h-6 border-[3px] border-[#111]/30 border-t-[#111] rounded-full animate-spin" />
       </div>
     );
   }
 
   if (requests.length === 0) {
     return (
-      <div className="text-center py-6 text-muted-foreground text-sm italic">
+      <div className="text-center py-6 text-[#111]/50 text-sm font-medium">
         No pending join requests
       </div>
     );
@@ -105,28 +102,36 @@ const JoinRequestsPanel = ({ clubId }: { clubId: string }) => {
   return (
     <div className="space-y-3">
       {requests.map(req => (
-        <div key={req.id} className="flex items-center gap-4 p-4 rounded-xl border border-border/50 bg-white/40">
-          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-            <UserPlus className="w-5 h-5 text-primary" />
+        <div key={req.id} className="flex items-center gap-4 p-4 rounded-[6px] border-[2px] border-[#111] bg-white" style={{ boxShadow: '3px 3px 0px #111' }}>
+          <div className="w-10 h-10 rounded-[4px] bg-[#FDE8D0] border-[2px] border-[#111] flex items-center justify-center shrink-0">
+            <UserPlus className="w-5 h-5 text-[#111]" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold text-foreground">{req.full_name}</p>
-            <div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
+            <p className="text-sm font-bold text-[#111]">{req.full_name}</p>
+            <div className="flex items-center gap-2 text-xs text-[#111]/50 font-medium flex-wrap">
               {req.roll_no && <span>{req.roll_no}</span>}
               {req.programme && <span>• {req.programme}</span>}
               <span>• {new Date(req.created_at).toLocaleDateString()}</span>
             </div>
             {req.message && (
-              <p className="text-xs text-muted-foreground mt-1 italic">"{req.message}"</p>
+              <p className="text-xs text-[#111]/40 mt-1 italic font-medium">"{req.message}"</p>
             )}
           </div>
           <div className="flex gap-2 shrink-0">
-            <Button size="sm" className="rounded-full gradient-gold text-primary-foreground" onClick={() => handleAction(req, 'approved')}>
+            <button
+              onClick={() => handleAction(req, 'approved')}
+              className="w-9 h-9 flex items-center justify-center bg-[#E98A3A] border-[2px] border-[#111] rounded-[4px] text-[#111] font-bold hover:translate-y-[1px] hover:shadow-none transition-all"
+              style={{ boxShadow: '2px 2px 0px #111' }}
+            >
               <Check className="w-4 h-4" />
-            </Button>
-            <Button size="sm" variant="outline" className="rounded-full text-destructive" onClick={() => handleAction(req, 'rejected')}>
+            </button>
+            <button
+              onClick={() => handleAction(req, 'rejected')}
+              className="w-9 h-9 flex items-center justify-center bg-white border-[2px] border-[#111] rounded-[4px] text-[#111] font-bold hover:translate-y-[1px] hover:shadow-none transition-all"
+              style={{ boxShadow: '2px 2px 0px #111' }}
+            >
               <X className="w-4 h-4" />
-            </Button>
+            </button>
           </div>
         </div>
       ))}
