@@ -36,12 +36,19 @@ import AssignPowersModal from '@/components/dashboard/AssignPowersModal';
 import ClubSettingsModal from '@/components/dashboard/ClubSettingsModal';
 import { ChatPanel } from '@/components/chat/ChatPanel';
 
-const coreNavItems = [
+const personalNavItems = [
+  { title: 'Dashboard', url: '/admin', icon: LayoutDashboard },
+  { title: 'Events', url: '/events', icon: Calendar },
+  { title: 'Discover', url: '/discover', icon: Compass },
+  { title: 'Profile', url: '/profile', icon: UserCircle },
+  { title: 'Settings', url: '/settings', icon: Settings },
+];
+
+const clubNavItems = [
   { title: 'Dashboard', url: '/admin', icon: LayoutDashboard },
   { title: 'Events', url: '/events', icon: Calendar },
   { title: 'Club', url: '/clubs', icon: Building2 },
-  { title: 'Discover', url: '/discover', icon: Compass },
-  { title: 'Profile', url: '/profile', icon: UserCircle },
+  { title: 'Club Settings', url: '/club-settings', icon: Settings2 },
   { title: 'Settings', url: '/settings', icon: Settings },
 ];
 
@@ -171,11 +178,10 @@ export function DashboardSidebar() {
 
   if (isClubMode && activeClub) {
     if (isPresident) {
-      contextItems.push({ title: 'Assign Powers', icon: Shield, action: () => setShowPowersModal(true) });
-      contextItems.push({ title: 'Club Settings', icon: Settings2, action: () => setShowClubSettings(true) });
+      contextItems.push({ title: 'Assign Powers', icon: Shield, action: () => navigate('/assign-powers') });
     }
     if (hasPower('use_chatbot')) {
-      contextItems.push({ title: 'AI Chatbot', icon: Bot, action: () => setShowChat(true) });
+      contextItems.push({ title: 'AI Chatbot', icon: Bot, action: () => navigate('/chatbot') });
     }
     if (clubs.length > 1) {
       contextItems.push({ title: 'Switch Club', icon: ArrowRightLeft, action: () => setShowClubSwitcher(!showClubSwitcher) });
@@ -183,7 +189,7 @@ export function DashboardSidebar() {
   }
 
   if (isSuperAdminEmail && isSuperAdminMode) {
-    contextItems.push({ title: 'AI Chatbot', icon: Bot, action: () => setShowChat(true) });
+    contextItems.push({ title: 'AI Chatbot', icon: Bot, action: () => navigate('/chatbot') });
     contextItems.push({ title: 'Manage Outsiders', icon: Users, action: () => navigate('/manage-outsiders') });
   }
 
@@ -306,7 +312,7 @@ export function DashboardSidebar() {
 
         {/* Nav items */}
         <nav className="flex-1 flex flex-col gap-1 px-3 mt-2 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
-          {coreNavItems.filter(item => !(item.url === '/clubs' && !isClubMode)).map((item, index) => {
+          {(isClubMode ? clubNavItems : personalNavItems).map((item, index) => {
             const active = isActive(item.url);
 
             if (collapsed) {
