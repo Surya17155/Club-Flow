@@ -156,7 +156,7 @@ const MobileChat = () => {
           <div key={i} className={`flex gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             {msg.role === 'assistant' && <Bot className="w-5 h-5 mt-1 text-primary shrink-0" />}
             <div className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 text-sm ${msg.role === 'user' ? 'bg-primary text-primary-foreground rounded-br-md' : 'bg-muted text-foreground rounded-bl-md'}`}>
-              {msg.role === 'assistant' ? <ChatResponseRenderer content={msg.content} /> : msg.content}
+              {msg.role === 'assistant' ? <ChatResponseRenderer content={msg.content} onFormSubmit={handleFormSubmit} /> : msg.content}
             </div>
             {msg.role === 'user' && <User className="w-5 h-5 mt-1 text-muted-foreground shrink-0" />}
           </div>
