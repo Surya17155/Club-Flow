@@ -16,6 +16,189 @@ import { useIsMobile } from '@/hooks/use-mobile';
 
 const EVENT_TYPES = ['Normal', 'Seminar', 'Workshop', 'Industrial Visit', 'Hackathon', 'Guest Lecture'];
 const LOCATIONS = ['Auditorium', 'Seminar Hall', 'Custom Location'];
+const HOURS = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0'));
+const MINUTES = ['00', '15', '30', '45'];
+
+const nb = {
+  card: {
+    background: '#FFFDF9',
+    border: '3px solid #111',
+    boxShadow: '6px 6px 0px #111',
+    borderRadius: '12px',
+    fontFamily: "'Space Grotesk', sans-serif",
+  } as React.CSSProperties,
+  input: {
+    background: '#FFF8F0',
+    border: '2px solid #111',
+    borderRadius: '8px',
+    fontFamily: "'Space Grotesk', sans-serif",
+    fontSize: '14px',
+    fontWeight: 600,
+  } as React.CSSProperties,
+  label: {
+    fontFamily: "'Space Grotesk', sans-serif",
+    fontWeight: 700,
+    fontSize: '13px',
+    color: '#111',
+  } as React.CSSProperties,
+  heading: {
+    fontFamily: "'Space Grotesk', sans-serif",
+    fontWeight: 800,
+    color: '#111',
+  } as React.CSSProperties,
+  btnOrange: {
+    background: '#E98A3A',
+    border: '3px solid #111',
+    boxShadow: '4px 4px 0px #111',
+    borderRadius: '8px',
+    fontFamily: "'Space Grotesk', sans-serif",
+    fontWeight: 800,
+    color: '#111',
+    cursor: 'pointer',
+    transition: 'all 0.1s ease',
+  } as React.CSSProperties,
+  btnBlack: {
+    background: '#111',
+    border: '3px solid #111',
+    boxShadow: '4px 4px 0px #333',
+    borderRadius: '8px',
+    fontFamily: "'Space Grotesk', sans-serif",
+    fontWeight: 800,
+    color: '#fff',
+    cursor: 'pointer',
+    transition: 'all 0.1s ease',
+  } as React.CSSProperties,
+  dropdown: {
+    background: '#FFFDF9',
+    border: '3px solid #111',
+    boxShadow: '4px 4px 0px #111',
+    borderRadius: '10px',
+    fontFamily: "'Space Grotesk', sans-serif",
+  } as React.CSSProperties,
+};
+
+const NBDropdown = ({
+  label,
+  value,
+  options,
+  onSelect,
+  icon,
+  placeholder,
+}: {
+  label: string;
+  value: string;
+  options: string[];
+  onSelect: (v: string) => void;
+  icon?: React.ReactNode;
+  placeholder?: string;
+}) => {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="space-y-1.5 relative">
+      <label style={nb.label}>{label}</label>
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="w-full px-4 py-2.5 flex items-center gap-2 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
+        style={nb.input}
+      >
+        {icon}
+        <span className="flex-1 text-left" style={{ color: value ? '#111' : '#999' }}>{value || placeholder || 'Select...'}</span>
+        <ChevronDown className="w-4 h-4" style={{ color: '#111' }} />
+      </button>
+      {open && (
+        <div className="absolute z-50 w-full mt-1 overflow-hidden" style={nb.dropdown}>
+          <div className="p-1 space-y-0.5">
+            {options.map((opt) => (
+              <div
+                key={opt}
+                onClick={() => { onSelect(opt); setOpen(false); }}
+                className="px-4 py-2 rounded-lg cursor-pointer text-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px]"
+                style={{
+                  fontFamily: "'Space Grotesk', sans-serif",
+                  fontWeight: value === opt ? 700 : 500,
+                  background: value === opt ? '#F6E1CF' : 'transparent',
+                  color: '#111',
+                  border: value === opt ? '2px solid #111' : '2px solid transparent',
+                }}
+              >
+                {opt}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const NBTimePicker = ({
+  label,
+  hour, minute, period,
+  onHourChange, onMinuteChange, onPeriodChange,
+}: {
+  label: string;
+  hour: string; minute: string; period: 'AM' | 'PM';
+  onHourChange: (v: string) => void;
+  onMinuteChange: (v: string) => void;
+  onPeriodChange: (v: 'AM' | 'PM') => void;
+}) => {
+  return (
+    <div className="flex-1 space-y-1">
+      <span style={{ ...nb.label, fontSize: '12px', color: '#555' }}>{label}</span>
+      <div className="flex gap-1.5 items-center">
+        <select
+          value={hour}
+          onChange={(e) => onHourChange(e.target.value)}
+          className="px-2 py-2 text-sm appearance-none text-center"
+          style={{ ...nb.input, width: '52px' }}
+        >
+          <option value="">--</option>
+          {HOURS.map(h => <option key={h} value={h}>{h}</option>)}
+        </select>
+        <span style={{ fontWeight: 900, fontSize: '16px', color: '#111' }}>:</span>
+        <select
+          value={minute}
+          onChange={(e) => onMinuteChange(e.target.value)}
+          className="px-2 py-2 text-sm appearance-none text-center"
+          style={{ ...nb.input, width: '52px' }}
+        >
+          <option value="">--</option>
+          {MINUTES.map(m => <option key={m} value={m}>{m}</option>)}
+        </select>
+        <div className="flex border-2 border-[#111] rounded-lg overflow-hidden" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+          <button
+            type="button"
+            onClick={() => onPeriodChange('AM')}
+            className="px-2.5 py-1.5 text-xs font-bold transition-all"
+            style={{
+              background: period === 'AM' ? '#E98A3A' : '#FFF8F0',
+              color: '#111',
+            }}
+          >AM</button>
+          <button
+            type="button"
+            onClick={() => onPeriodChange('PM')}
+            className="px-2.5 py-1.5 text-xs font-bold transition-all"
+            style={{
+              background: period === 'PM' ? '#E98A3A' : '#FFF8F0',
+              color: '#111',
+              borderLeft: '2px solid #111',
+            }}
+          >PM</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+function to24(hour: string, minute: string, period: 'AM' | 'PM'): string {
+  if (!hour || !minute) return '';
+  let h = parseInt(hour);
+  if (period === 'AM' && h === 12) h = 0;
+  if (period === 'PM' && h !== 12) h += 12;
+  return `${String(h).padStart(2, '0')}:${minute}`;
+}
 
 const CreateEvent = () => {
   const { user, loading } = useAuth();
@@ -26,34 +209,39 @@ const CreateEvent = () => {
 
   const [eventName, setEventName] = useState('');
   const [eventType, setEventType] = useState('Normal');
-  
   const [eventDate, setEventDate] = useState('');
-  const [startTime, setStartTime] = useState('');
-  const [endTime, setEndTime] = useState('');
+
+  const [startHour, setStartHour] = useState('');
+  const [startMinute, setStartMinute] = useState('');
+  const [startPeriod, setStartPeriod] = useState<'AM' | 'PM'>('AM');
+  const [endHour, setEndHour] = useState('');
+  const [endMinute, setEndMinute] = useState('');
+  const [endPeriod, setEndPeriod] = useState<'AM' | 'PM'>('PM');
+
   const [location, setLocation] = useState('');
   const [description, setDescription] = useState('');
   const [openToAll, setOpenToAll] = useState(true);
   const [clubMembersOnly, setClubMembersOnly] = useState(false);
   const [attendanceGiven, setAttendanceGiven] = useState<boolean>(false);
   const [capacity, setCapacity] = useState('');
-  const [showTypeDropdown, setShowTypeDropdown] = useState(false);
-  
-  const [showLocationDropdown, setShowLocationDropdown] = useState(false);
   const [isCustomLocation, setIsCustomLocation] = useState(false);
   const [qrToken, setQrToken] = useState<string | null>(null);
   const [publishing, setPublishing] = useState(false);
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center gradient-warm">
-        <div className="w-8 h-8 border-3 border-primary/30 border-t-primary rounded-full animate-spin" />
-      </div>);
-
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#F4EFE7' }}>
+        <div className="w-8 h-8 border-3 border-[#E98A3A] border-t-[#111] rounded-full animate-spin" />
+      </div>
+    );
   }
 
   if (!user) return <Navigate to="/" replace />;
   if (!activeClub) return <Navigate to="/admin" replace />;
   if (!hasPower('create_event')) return <Navigate to="/admin" replace />;
+
+  const startTime = to24(startHour, startMinute, startPeriod);
+  const endTime = to24(endHour, endMinute, endPeriod);
 
   const validateMandatoryFields = (): boolean => {
     if (!eventName.trim()) { toast.error('Event name is required'); return false; }
@@ -62,7 +250,6 @@ const CreateEvent = () => {
     if (!startTime) { toast.error('Start time is required'); return false; }
     if (!endTime) { toast.error('End time is required'); return false; }
     if (startTime && endTime && startTime >= endTime) { toast.error('End time must be after start time'); return false; }
-    
     return true;
   };
 
@@ -75,10 +262,8 @@ const CreateEvent = () => {
 
   const handlePublish = async () => {
     if (!validateMandatoryFields()) return;
-
     setPublishing(true);
     try {
-      // Build timezone offset string to preserve user's local time
       const now = new Date();
       const offsetMin = now.getTimezoneOffset();
       const sign = offsetMin <= 0 ? '+' : '-';
@@ -112,344 +297,291 @@ const CreateEvent = () => {
   };
 
   return (
-    <div className={isMobile ? 'min-h-screen relative antialiased dashboard-corner-gradient text-foreground' : 'h-full overflow-auto text-foreground'}>
-      {isMobile && (
-        <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
-          <div className="absolute top-[-8%] left-[-8%] w-[550px] h-[550px] rounded-full mix-blend-multiply filter blur-[100px] opacity-80 animate-blob" style={{ backgroundColor: 'hsl(45 90% 85% / 0.9)' }} />
-          <div className="absolute top-[-5%] right-[-5%] w-[450px] h-[450px] rounded-full mix-blend-multiply filter blur-[90px] opacity-70 animate-blob animation-delay-2000" style={{ backgroundColor: 'hsl(25 80% 82% / 0.8)' }} />
-          <div className="absolute bottom-[-8%] left-[-5%] w-[500px] h-[500px] rounded-full mix-blend-multiply filter blur-[100px] opacity-60 animate-blob animation-delay-4000" style={{ backgroundColor: 'hsl(35 75% 78% / 0.6)' }} />
-          <div className="absolute bottom-[-10%] right-[-5%] w-[600px] h-[600px] rounded-full mix-blend-multiply filter blur-[100px] opacity-70 animate-blob" style={{ backgroundColor: 'hsl(28 70% 70% / 0.45)', animationDelay: '3s' }} />
-          <div className="absolute top-[40%] left-[30%] w-[300px] h-[300px] rounded-full filter blur-[120px] opacity-30" style={{ backgroundColor: 'hsl(40 80% 88%)' }} />
-        </div>
-      )}
-
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div
+      className="min-h-screen text-[#111]"
+      style={{ background: '#F4EFE7', fontFamily: "'Space Grotesk', sans-serif" }}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Header */}
-        <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+        <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight font-display">
+            <h1 className="text-2xl md:text-3xl tracking-tight" style={nb.heading}>
               Create New Event
             </h1>
-            <p className="text-muted-foreground mt-1 text-sm">
-              Fill in the details below to organize your next event for{' '}
-              <span className="font-semibold text-primary">{activeClub.club_name}</span>.
+            <p className="mt-1 text-sm" style={{ color: '#555', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 500 }}>
+              Fill in the details below for{' '}
+              <span className="font-bold" style={{ color: '#E98A3A' }}>{activeClub.club_name}</span>.
             </p>
           </div>
           <button
             onClick={() => navigate('/admin')}
-            className="glass-card px-5 py-2.5 rounded-full flex items-center gap-2 hover:bg-accent/60 transition-all text-foreground font-medium text-sm group">
-            
-            <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-            Back to Dashboard
+            className="px-5 py-2.5 flex items-center gap-2 text-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all"
+            style={nb.btnBlack}
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back
           </button>
         </header>
 
-        {/* Main 3-column grid */}
-        <main className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Main grid */}
+        <main className={cn("grid gap-5", isMobile ? "grid-cols-1" : "grid-cols-1 lg:grid-cols-3")}>
           {/* Column 1: Event Details */}
-          <section className="glass-card rounded-3xl p-6 flex flex-col gap-5 overflow-visible relative z-10">
-            <h2 className="text-lg font-bold text-foreground mb-1">Event Details</h2>
+          <section className="p-5 flex flex-col gap-4" style={nb.card}>
+            <h2 className="text-lg mb-1" style={nb.heading}>Event Details</h2>
 
             <div className="space-y-1.5">
-              <label className="block text-sm font-medium text-foreground/90">Event Name</label>
+              <label style={nb.label}>Event Name</label>
               <input
-                className="glass-input w-full px-4 py-2.5 text-foreground placeholder:text-muted-foreground/50 rounded-lg"
+                className="w-full px-4 py-2.5"
                 placeholder="e.g. Annual Tech Symposium"
                 value={eventName}
-                onChange={(e) => setEventName(e.target.value)} />
-              
+                onChange={(e) => setEventName(e.target.value)}
+                style={nb.input}
+              />
             </div>
 
-            {/* Event Type */}
-            <div className="space-y-1.5 relative">
-              <label className="block text-sm font-medium text-foreground/90">Event Type</label>
-              <button
-                type="button"
-                onClick={() => {setShowTypeDropdown(!showTypeDropdown);}}
-                className="glass-input w-full px-4 py-2.5 text-foreground flex justify-between items-center cursor-pointer rounded-lg">
-                
-                <span>{eventType}</span>
-                <ChevronDown className="w-4 h-4 text-muted-foreground" />
-              </button>
-              {showTypeDropdown &&
-              <div className="absolute z-50 w-full mt-1 rounded-xl overflow-hidden shadow-lg border border-border/30" style={{ background: 'rgba(255, 255, 255, 0.85)', backdropFilter: 'blur(32px) saturate(1.3)', WebkitBackdropFilter: 'blur(32px) saturate(1.3)' }}>
-                  <div className="p-1 space-y-0.5">
-                    {EVENT_TYPES.map((type) =>
-                  <div
-                    key={type}
-                    onClick={() => {setEventType(type);setShowTypeDropdown(false);}}
-                    className={`px-4 py-2 rounded-lg cursor-pointer text-sm transition-colors ${
-                    eventType === type ?
-                    'bg-primary/15 text-foreground font-medium' :
-                    'hover:bg-accent/40 text-muted-foreground'}`
-                    }>
-                    
-                        {type}
-                      </div>
-                  )}
-                  </div>
-                </div>
-              }
-            </div>
+            <NBDropdown
+              label="Event Type"
+              value={eventType}
+              options={EVENT_TYPES}
+              onSelect={setEventType}
+              placeholder="Select type"
+            />
 
-
-            {/* Date & Time */}
-             <div className="space-y-1.5">
-              <label className="block text-sm font-medium text-foreground/90">Start Date & Time</label>
-              <div className="flex gap-3">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <button
-                      type="button"
-                      className={cn(
-                        "glass-input flex-grow flex items-center gap-2 pl-3 pr-3 py-2.5 text-foreground rounded-lg text-left text-sm",
-                        !eventDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="w-4 h-4 text-muted-foreground" />
-                      {eventDate ? format(parse(eventDate, 'yyyy-MM-dd', new Date()), 'PPP') : 'Select date'}
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent
-                    className="w-auto p-0 border-border/30 rounded-2xl overflow-hidden z-[100]"
-                    align="start"
-                    sideOffset={8}
-                    style={{
-                      background: 'rgba(255, 255, 255, 0.92)',
-                      backdropFilter: 'blur(32px) saturate(1.3)',
-                      WebkitBackdropFilter: 'blur(32px) saturate(1.3)',
-                    }}
-                  >
-                    <Calendar
-                      mode="single"
-                      selected={eventDate ? parse(eventDate, 'yyyy-MM-dd', new Date()) : undefined}
-                      onSelect={(date) => setEventDate(date ? format(date, 'yyyy-MM-dd') : '')}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-            </div>
-
-            {/* Start & End Time */}
+            {/* Date */}
             <div className="space-y-1.5">
-              <label className="block text-sm font-medium text-foreground/90">Event Time</label>
-              <div className="flex gap-3">
-                <div className="flex-1 space-y-1">
-                  <span className="text-xs text-muted-foreground">Start Time</span>
-                  <div className="relative">
-                    <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-                    <input
-                      type="time"
-                      className="glass-input w-full pl-10 pr-3 py-2.5 text-foreground rounded-lg text-sm"
-                      value={startTime}
-                      onChange={(e) => setStartTime(e.target.value)}
-                    />
-                  </div>
-                </div>
-                <div className="flex-1 space-y-1">
-                  <span className="text-xs text-muted-foreground">End Time</span>
-                  <div className="relative">
-                    <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-                    <input
-                      type="time"
-                      className="glass-input w-full pl-10 pr-3 py-2.5 text-foreground rounded-lg text-sm"
-                      value={endTime}
-                      onChange={(e) => setEndTime(e.target.value)}
-                    />
-                  </div>
-                </div>
+              <label style={nb.label}>Start Date</label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-left hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all"
+                    style={nb.input}
+                  >
+                    <CalendarIcon className="w-4 h-4" style={{ color: '#E98A3A' }} />
+                    <span style={{ color: eventDate ? '#111' : '#999' }}>
+                      {eventDate ? format(parse(eventDate, 'yyyy-MM-dd', new Date()), 'PPP') : 'Select date'}
+                    </span>
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent
+                  className="w-auto p-0 z-[100]"
+                  align="start"
+                  sideOffset={8}
+                  style={{
+                    ...nb.dropdown,
+                    padding: '4px',
+                  }}
+                >
+                  <Calendar
+                    mode="single"
+                    selected={eventDate ? parse(eventDate, 'yyyy-MM-dd', new Date()) : undefined}
+                    onSelect={(date) => setEventDate(date ? format(date, 'yyyy-MM-dd') : '')}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            {/* Time */}
+            <div className="space-y-1.5">
+              <label style={nb.label}>Event Time</label>
+              <div className="flex gap-4">
+                <NBTimePicker
+                  label="Start"
+                  hour={startHour} minute={startMinute} period={startPeriod}
+                  onHourChange={setStartHour} onMinuteChange={setStartMinute} onPeriodChange={setStartPeriod}
+                />
+                <NBTimePicker
+                  label="End"
+                  hour={endHour} minute={endMinute} period={endPeriod}
+                  onHourChange={setEndHour} onMinuteChange={setEndMinute} onPeriodChange={setEndPeriod}
+                />
               </div>
             </div>
 
             {/* Location */}
-            <div className="space-y-1.5 relative">
-              <label className="block text-sm font-medium text-foreground/90">Location / Platform</label>
-              <button
-                type="button"
-                onClick={() => { setShowLocationDropdown(!showLocationDropdown); setShowTypeDropdown(false); }}
-                className="glass-input w-full px-4 py-2.5 text-foreground flex items-center gap-2 cursor-pointer rounded-lg">
-                <MapPin className="w-4 h-4 text-muted-foreground" />
-                <span className="flex-1 text-left">{location || 'Select location'}</span>
-                <ChevronDown className="w-4 h-4 text-muted-foreground" />
-              </button>
-              {showLocationDropdown && (
-                <div
-                  className="absolute z-[100] w-full mt-1 rounded-xl overflow-hidden shadow-lg border border-border/30 bg-card"
-                  style={{ background: 'rgba(255, 255, 255, 0.75)', backdropFilter: 'blur(32px) saturate(1.3)', WebkitBackdropFilter: 'blur(32px) saturate(1.3)' }}>
-                  <div className="p-1 space-y-0.5">
-                    {LOCATIONS.map((loc) => (
-                      <div
-                        key={loc}
-                        onClick={() => {
-                          if (loc === 'Custom Location') {
-                            setIsCustomLocation(true);
-                            setLocation('');
-                          } else {
-                            setIsCustomLocation(false);
-                            setLocation(loc);
-                          }
-                          setShowLocationDropdown(false);
-                        }}
-                        className={`px-4 py-2 rounded-lg cursor-pointer text-sm transition-colors ${
-                          location === loc ? 'bg-primary/15 text-foreground font-medium' : 'hover:bg-accent/40 text-muted-foreground'
-                        }`}>
-                        {loc}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {isCustomLocation && (
-                <div className="relative mt-2">
-                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-                  <input
-                    className="glass-input w-full pl-10 pr-4 py-2.5 text-foreground placeholder:text-muted-foreground/50 rounded-lg"
-                    placeholder="Enter custom location..."
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    autoFocus />
-                </div>
-              )}
-            </div>
+            <NBDropdown
+              label="Location / Platform"
+              value={location}
+              options={LOCATIONS}
+              onSelect={(loc) => {
+                if (loc === 'Custom Location') {
+                  setIsCustomLocation(true);
+                  setLocation('');
+                } else {
+                  setIsCustomLocation(false);
+                  setLocation(loc);
+                }
+              }}
+              icon={<MapPin className="w-4 h-4" style={{ color: '#E98A3A' }} />}
+              placeholder="Select location"
+            />
+            {isCustomLocation && (
+              <div className="relative">
+                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style={{ color: '#E98A3A' }} />
+                <input
+                  className="w-full pl-10 pr-4 py-2.5"
+                  placeholder="Enter custom location..."
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  autoFocus
+                  style={nb.input}
+                />
+              </div>
+            )}
           </section>
 
-          {/* Column 2: Participant Settings & Description */}
-          <section className="glass-card rounded-3xl p-6 flex flex-col gap-5">
-            <h2 className="text-lg font-bold text-foreground mb-1">Participant Settings</h2>
+          {/* Column 2: Participant Settings */}
+          <section className="p-5 flex flex-col gap-4" style={nb.card}>
+            <h2 className="text-lg mb-1" style={nb.heading}>Participant Settings</h2>
 
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-foreground">Open to All Students</span>
+            <div className="flex items-center justify-between p-3 rounded-lg" style={{ background: '#FFF8F0', border: '2px solid #111' }}>
+              <span style={{ ...nb.label, fontSize: '14px' }}>Open to All Students</span>
               <Switch
                 checked={openToAll}
-                onCheckedChange={(val) => {setOpenToAll(val);if (val) setClubMembersOnly(false);}} />
-              
+                onCheckedChange={(val) => { setOpenToAll(val); if (val) setClubMembersOnly(false); }}
+              />
             </div>
 
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-foreground">Club Members Only</span>
+            <div className="flex items-center justify-between p-3 rounded-lg" style={{ background: '#FFF8F0', border: '2px solid #111' }}>
+              <span style={{ ...nb.label, fontSize: '14px' }}>Club Members Only</span>
               <Switch
                 checked={clubMembersOnly}
-                onCheckedChange={(val) => {setClubMembersOnly(val);if (val) setOpenToAll(false);}} />
+                onCheckedChange={(val) => { setClubMembersOnly(val); if (val) setOpenToAll(false); }}
+              />
             </div>
 
-            {/* Attendance Will Be Given */}
-            <div className="pt-3 border-t border-border/30">
+            <div className="p-3 rounded-lg" style={{ background: '#F6E1CF', border: '2px solid #111' }}>
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-sm font-medium text-foreground">Attendance Will Be Given</span>
-                  <p className="text-xs text-muted-foreground mt-0.5">Students will see if attendance is recorded</p>
+                  <span style={{ ...nb.label, fontSize: '14px' }}>Attendance Will Be Given</span>
+                  <p className="text-xs mt-0.5" style={{ color: '#555' }}>Students will see if attendance is recorded</p>
                 </div>
                 <Switch
                   checked={attendanceGiven}
-                  onCheckedChange={(val) => setAttendanceGiven(val)} />
+                  onCheckedChange={(val) => setAttendanceGiven(val)}
+                />
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-sm font-medium text-foreground/90">
-                Audience Capacity <span className="text-muted-foreground text-xs">(optional)</span>
+              <label style={nb.label}>
+                Audience Capacity <span style={{ color: '#999', fontWeight: 500, fontSize: '12px' }}>(optional)</span>
               </label>
               <input
                 type="number"
-                className="glass-input w-full px-4 py-2.5 text-foreground placeholder:text-muted-foreground/50 rounded-lg"
+                className="w-full px-4 py-2.5"
                 placeholder="e.g. 100"
                 value={capacity}
-                onChange={(e) => setCapacity(e.target.value)} />
-              
+                onChange={(e) => setCapacity(e.target.value)}
+                style={nb.input}
+              />
             </div>
 
             <div className="space-y-1.5 flex-1 flex flex-col">
-              <label className="block text-sm font-medium text-foreground/90">
-                Description <span className="text-muted-foreground text-xs">(optional)</span>
+              <label style={nb.label}>
+                Description <span style={{ color: '#999', fontWeight: 500, fontSize: '12px' }}>(optional)</span>
               </label>
               <textarea
-                className="glass-input w-full px-4 py-2.5 text-foreground placeholder:text-muted-foreground/50 rounded-lg flex-1 min-h-[120px] resize-none"
+                className="w-full px-4 py-2.5 flex-1 min-h-[100px] resize-none"
                 placeholder="Describe your event..."
                 value={description}
-                onChange={(e) => setDescription(e.target.value)} />
-              
+                onChange={(e) => setDescription(e.target.value)}
+                style={nb.input}
+              />
             </div>
           </section>
 
           {/* Column 3: QR Code */}
-          <section className="glass-card rounded-3xl p-6 flex flex-col gap-5">
-            <h2 className="text-lg font-bold text-foreground mb-1">Attendance & QR</h2>
+          <section className="p-5 flex flex-col gap-4" style={nb.card}>
+            <h2 className="text-lg mb-1" style={nb.heading}>Attendance & QR</h2>
 
-            <div className="flex-1 flex flex-col items-center justify-center p-8 bg-accent/10 backdrop-blur-md rounded-[24px] border border-border/40 shadow-inner">
-              {qrToken ?
-              <div className="qr-code-container bg-background p-4 rounded-2xl shadow-xl ring-1 ring-border/20">
-                  <QRCodeSVG value={`${window.location.origin}/mark-attendance/${qrToken}`} size={160} />
-                </div> :
-
-              <div className="text-center text-muted-foreground">
-                  <QrCode className="w-16 h-16 mx-auto mb-3 opacity-20" />
-                  <p className="text-sm">Click the button below to generate a QR code</p>
+            <div
+              className="flex-1 flex flex-col items-center justify-center p-6 rounded-xl"
+              style={{ background: '#FFF8F0', border: '2px dashed #111' }}
+            >
+              {qrToken ? (
+                <div className="qr-code-container p-4 rounded-xl" style={{ background: '#fff', border: '3px solid #111', boxShadow: '4px 4px 0px #111' }}>
+                  <QRCodeSVG value={`${window.location.origin}/mark-attendance/${qrToken}`} size={140} />
                 </div>
-              }
+              ) : (
+                <div className="text-center">
+                  <QrCode className="w-14 h-14 mx-auto mb-3" style={{ color: '#ccc' }} />
+                  <p className="text-sm" style={{ color: '#999', fontWeight: 500 }}>Click below to generate a QR code</p>
+                </div>
+              )}
             </div>
 
             <button
               type="button"
               onClick={generateQR}
-              className="w-full gradient-gold text-primary-foreground font-bold py-2.5 rounded-xl transition-all shadow-gold hover:shadow-elevated hover:-translate-y-0.5 font-display text-sm">
-              
+              className="w-full py-2.5 text-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all"
+              style={nb.btnOrange}
+            >
               Generate QR Code
             </button>
 
-            {qrToken &&
-            <button
-              type="button"
-              className="glass-card w-full flex items-center justify-center gap-2 py-3.5 hover:bg-accent/60 transition-all text-foreground font-semibold rounded-xl"
-              onClick={() => {
-                const svg = document.querySelector('.qr-code-container svg') as SVGElement;
-                if (!svg) { toast.error('QR code not found'); return; }
-                const canvas = document.createElement('canvas');
-                const size = 320;
-                canvas.width = size;
-                canvas.height = size;
-                const ctx = canvas.getContext('2d')!;
-                const svgData = new XMLSerializer().serializeToString(svg);
-                const img = new Image();
-                img.onload = () => {
-                  ctx.fillStyle = '#ffffff';
-                  ctx.fillRect(0, 0, size, size);
-                  ctx.drawImage(img, 0, 0, size, size);
-                  const link = document.createElement('a');
-                  link.download = `qr-code-${eventName || 'event'}.png`;
-                  link.href = canvas.toDataURL('image/png');
-                  link.click();
-                  toast.success('QR Code downloaded!');
-                };
-                img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
-              }}>
-              
+            {qrToken && (
+              <button
+                type="button"
+                className="w-full flex items-center justify-center gap-2 py-3 text-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all"
+                style={nb.btnBlack}
+                onClick={() => {
+                  const svg = document.querySelector('.qr-code-container svg') as SVGElement;
+                  if (!svg) { toast.error('QR code not found'); return; }
+                  const canvas = document.createElement('canvas');
+                  const size = 320;
+                  canvas.width = size;
+                  canvas.height = size;
+                  const ctx = canvas.getContext('2d')!;
+                  const svgData = new XMLSerializer().serializeToString(svg);
+                  const img = new Image();
+                  img.onload = () => {
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, size, size);
+                    ctx.drawImage(img, 0, 0, size, size);
+                    const link = document.createElement('a');
+                    link.download = `qr-code-${eventName || 'event'}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    toast.success('QR Code downloaded!');
+                  };
+                  img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+                }}
+              >
                 <Download className="w-4 h-4" />
-                <span className="text-sm">Download QR Code</span>
+                <span>Download QR Code</span>
               </button>
-            }
+            )}
           </section>
         </main>
 
-        {/* Publish Button - properly placed below the grid */}
+        {/* Publish Button */}
         <div className="flex justify-center mt-8 pb-8">
           <button
             type="button"
             onClick={handlePublish}
             disabled={publishing}
-            className="flex items-center gap-2 gradient-gold text-primary-foreground px-8 py-4 rounded-full shadow-lg transform hover:-translate-y-1 transition-all duration-300 font-bold text-base disabled:opacity-50">
-            
-            {publishing ?
-            <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" /> :
-
-            <CalendarIcon className="w-5 h-5" />
-            }
+            className="flex items-center gap-2 px-10 py-4 text-base disabled:opacity-50 hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all"
+            style={{
+              ...nb.btnOrange,
+              boxShadow: '6px 6px 0px #111',
+              fontSize: '16px',
+              borderRadius: '12px',
+            }}
+          >
+            {publishing ? (
+              <div className="w-5 h-5 border-2 border-[#111]/30 border-t-[#111] rounded-full animate-spin" />
+            ) : (
+              <CalendarIcon className="w-5 h-5" />
+            )}
             {publishing ? 'Publishing...' : 'Publish Event'}
           </button>
         </div>
       </div>
-    </div>);
-
+    </div>
+  );
 };
 
 export default CreateEvent;

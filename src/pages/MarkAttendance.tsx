@@ -137,12 +137,18 @@ const MarkAttendance = () => {
         return;
       }
 
-      // Check TTL
+      // Check if QR is still valid — use end_date if available, otherwise fallback to TTL or 24h
       const now = new Date();
-      const eventStart = new Date(event.event_date);
-      const eventEnd = event.qr_ttl_minutes
-        ? new Date(eventStart.getTime() + event.qr_ttl_minutes * 60000)
-        : new Date(eventStart.getTime() + 24 * 60 * 60000);
+      let eventEnd: Date;
+      if (event.end_date) {
+        eventEnd = new Date(event.end_date);
+      } else if (event.qr_ttl_minutes) {
+        const eventStart = new Date(event.event_date);
+        eventEnd = new Date(eventStart.getTime() + event.qr_ttl_minutes * 60000);
+      } else {
+        const eventStart = new Date(event.event_date);
+        eventEnd = new Date(eventStart.getTime() + 24 * 60 * 60000);
+      }
 
       if (now > eventEnd) {
         setStatus('expired');
