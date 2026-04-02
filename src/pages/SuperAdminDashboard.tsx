@@ -3,7 +3,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useSuperAdminStats } from '@/hooks/useSuperAdminStats';
-import { Search, Plus, Settings, TrendingUp, Users, Calendar, Building2, Clock, ChevronDown, Eye, UserCog, Shield, FileText, MoreVertical, Trash2, ChevronRight, Pencil, Download, Crown } from 'lucide-react';
+import { Search, Plus, Settings, TrendingUp, Users, Calendar, Building2, Clock, ChevronDown, Eye, UserCog, Shield, FileText, MoreVertical, Trash2, ChevronRight, Pencil, Download, Crown, Palette, Check } from 'lucide-react';
+import { useDesign } from '@/contexts/DesignContext';
 import VerifiedBadge, { getRoleBadgeVariant } from '@/components/ui/VerifiedBadge';
 import * as XLSX from 'xlsx';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -32,6 +33,7 @@ const roleLabelMap: Record<string, string> = {
 };
 
 const SuperAdminDashboard = () => {
+  const { activeDesign, setActiveDesign, designs } = useDesign();
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
