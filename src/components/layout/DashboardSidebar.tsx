@@ -32,9 +32,7 @@ import {
   useTransform,
   AnimatePresence,
 } from 'framer-motion';
-import AssignPowersModal from '@/components/dashboard/AssignPowersModal';
-import ClubSettingsModal from '@/components/dashboard/ClubSettingsModal';
-import { ChatPanel } from '@/components/chat/ChatPanel';
+// Modal imports removed — now using dedicated pages
 
 const personalNavItems = [
   { title: 'Dashboard', url: '/admin', icon: LayoutDashboard },
@@ -135,10 +133,6 @@ export function DashboardSidebar() {
   const { activeDesign } = useDesign();
   const mouseY = useMotionValue(Infinity);
 
-  // Contextual modals/panels
-  const [showPowersModal, setShowPowersModal] = useState(false);
-  const [showClubSettings, setShowClubSettings] = useState(false);
-  const [showChat, setShowChat] = useState(false);
   const [showClubSwitcher, setShowClubSwitcher] = useState(false);
 
   const isNeo = activeDesign === 'design-2';
