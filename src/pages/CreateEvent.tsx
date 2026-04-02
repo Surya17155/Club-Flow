@@ -386,7 +386,7 @@ const CreateEvent = () => {
             {/* Time */}
             <div className="space-y-1.5">
               <label style={nb.label}>Event Time</label>
-              <div className="flex gap-4">
+              <div className="flex flex-col gap-3">
                 <NBTimePicker
                   label="Start"
                   hour={startHour} minute={startMinute} period={startPeriod}
