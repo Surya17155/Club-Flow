@@ -224,7 +224,7 @@ export function ChatPanel({ open, onClose, activeClubId }: ChatPanelProps) {
           className="text-sm min-h-[40px] max-h-[120px] resize-none rounded-xl"
           rows={1}
         />
-        <Button size="icon" onClick={send} disabled={loading || (!input.trim() && !file)}>
+        <Button size="icon" onClick={send} disabled={loading || (!input.trim() && !file)} data-chat-send>
           <Send className="w-4 h-4" />
         </Button>
       </div>
