@@ -203,7 +203,7 @@ const NeoBrutalCalendar = ({ mode }: Props) => {
           {DAYS.map((day) => (
             <div
               key={day}
-              className="text-center text-[9px] uppercase leading-none"
+              className="text-center text-[8px] uppercase leading-none"
               style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, color: 'rgba(17,17,17,0.4)' }}
             >
               {day}
