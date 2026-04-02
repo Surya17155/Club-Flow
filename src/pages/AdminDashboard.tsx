@@ -338,44 +338,6 @@ const AdminDashboard = () => {
                   </button>
                 )}
 
-                <div
-                  className="inline-flex items-center p-1"
-                  style={{
-                    backgroundColor: '#FFFDF5',
-                    border: '2px solid #111111',
-                    borderRadius: '10px',
-                    boxShadow: '3px 3px 0px #111111',
-                  }}
-                >
-                  <button
-                    onClick={() => setViewMode("personal")}
-                    className="px-5 py-2 text-sm transition-all"
-                    style={{
-                      borderRadius: '8px',
-                      fontFamily: "'Space Grotesk', sans-serif",
-                      fontWeight: isPersonal ? 700 : 500,
-                      background: isPersonal ? '#E98A3A' : 'transparent',
-                      color: isPersonal ? '#111111' : '#888',
-                      border: isPersonal ? '2px solid #111111' : '2px solid transparent',
-                    }}
-                  >
-                    Personal
-                  </button>
-                  <button
-                    onClick={() => setViewMode("club")}
-                    className="px-5 py-2 text-sm transition-all"
-                    style={{
-                      borderRadius: '8px',
-                      fontFamily: "'Space Grotesk', sans-serif",
-                      fontWeight: !isPersonal ? 700 : 500,
-                      background: !isPersonal ? '#E98A3A' : 'transparent',
-                      color: !isPersonal ? '#111111' : '#888',
-                      border: !isPersonal ? '2px solid #111111' : '2px solid transparent',
-                    }}
-                  >
-                    Club
-                  </button>
-                </div>
               </div>
             </header>
 
@@ -671,24 +633,6 @@ const AdminDashboard = () => {
               {greeting}, <span style={{ color: '#3B82F6' }}>{fullName.split(" ")[0]}</span> 👋
             </h1>
 
-            <div className="inline-flex items-center rounded-full p-1 text-center shadow-sm" style={{ backgroundColor: '#F1F5F9' }}>
-              <button
-                onClick={() => setViewMode("personal")}
-                className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${
-                  isPersonal ? "shadow-sm bg-white text-[#0F172A]" : "text-[#6B7280]"
-                }`}
-              >
-                Personal
-              </button>
-              <button
-                onClick={() => setViewMode("club")}
-                className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${
-                  !isPersonal ? "shadow-sm bg-white text-[#0F172A]" : "text-[#6B7280]"
-                }`}
-              >
-                Club
-              </button>
-            </div>
 
             <div className="flex items-center gap-3">
               {!isPersonal && activeClub && (activeClub.role === "president" || activeClub.role === "admin") && (
