@@ -50,7 +50,7 @@ const nb = {
     background: '#E98A3A',
     border: '3px solid #111',
     boxShadow: '4px 4px 0px #111',
-    borderRadius: '8px',
+    borderRadius: '6px',
     fontFamily: "'Space Grotesk', sans-serif",
     fontWeight: 800,
     color: '#111',
@@ -60,8 +60,8 @@ const nb = {
   btnBlack: {
     background: '#111',
     border: '3px solid #111',
-    boxShadow: '4px 4px 0px #333',
-    borderRadius: '8px',
+    boxShadow: '4px 4px 0px #E98A3A',
+    borderRadius: '6px',
     fontFamily: "'Space Grotesk', sans-serif",
     fontWeight: 800,
     color: '#fff',
@@ -166,7 +166,7 @@ const NBTimePicker = ({
           <option value="">--</option>
           {MINUTES.map(m => <option key={m} value={m}>{m}</option>)}
         </select>
-        <div className="flex border-2 border-[#111] rounded-lg overflow-hidden" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+        <div className="flex border-2 border-[#111] rounded-md overflow-hidden" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
           <button
             type="button"
             onClick={() => onPeriodChange('AM')}
@@ -298,8 +298,8 @@ const CreateEvent = () => {
 
   return (
     <div
-      className="min-h-screen text-[#111]"
-      style={{ background: '#F4EFE7', fontFamily: "'Space Grotesk', sans-serif" }}
+      className="min-h-screen text-[#111] overflow-x-hidden"
+      style={{ background: '#F4EFE7', fontFamily: "'Space Grotesk', sans-serif", scrollbarWidth: 'none' }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Header */}
@@ -386,7 +386,7 @@ const CreateEvent = () => {
             {/* Time */}
             <div className="space-y-1.5">
               <label style={nb.label}>Event Time</label>
-              <div className="flex gap-4">
+              <div className="flex flex-col gap-3">
                 <NBTimePicker
                   label="Start"
                   hour={startHour} minute={startMinute} period={startPeriod}
