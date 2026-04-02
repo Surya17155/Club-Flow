@@ -771,133 +771,126 @@ const SuperAdminDashboard = () => {
   if (isMobile) {
     return (
       <div
-        className="min-h-screen pb-24 dashboard-corner-gradient overflow-x-hidden"
-        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+        className="min-h-screen pb-24 overflow-x-hidden"
+        style={{ background: NB.bg, scrollbarWidth: 'none', msOverflowStyle: 'none', fontFamily: NB.font }}>
         
         <style>{`div::-webkit-scrollbar { display: none; }`}</style>
 
-        {/* Background blobs */}
-        <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
-          <div className="absolute top-[-8%] left-[-8%] w-[300px] h-[300px] rounded-full mix-blend-multiply filter blur-[80px] opacity-60 animate-blob" style={{ backgroundColor: 'hsl(45 90% 85% / 0.9)' }} />
-          <div className="absolute bottom-[20%] right-[-10%] w-[250px] h-[250px] rounded-full mix-blend-multiply filter blur-[80px] opacity-50 animate-blob animation-delay-2000" style={{ backgroundColor: 'hsl(25 80% 82% / 0.8)' }} />
-        </div>
-
         {/* Fixed mobile header */}
-        <header className="fixed top-0 left-0 right-0 z-40 px-4 pt-4 pb-3 safe-area-top">
-          <div className="flex items-center justify-between mb-2">
+        <header className="fixed top-0 left-0 right-0 z-40 px-4 pt-4 pb-3 safe-area-top" style={{ background: NB.bg, borderBottom: `2px solid ${NB.border}` }}>
+          <div className="flex items-center justify-between mb-1">
             <div className="w-9" />
-            <h1 className="text-lg font-bold font-display text-foreground">IILM Club</h1>
+            <h1 className="text-lg font-black" style={{ fontFamily: NB.font, color: NB.border }}>IILM Club</h1>
             <ProfileDropdown viewMode="personal" />
           </div>
-          <p className="text-center text-muted-foreground mb-1 text-base font-extrabold font-sans">
-            Super Admin <span className="text-gradient-gold font-semibold">Command Center</span>
+          <p className="text-center text-sm font-black" style={{ color: NB.border }}>
+            Super Admin <span style={{ color: NB.orange }}>Command Center</span>
           </p>
         </header>
 
         {/* Spacer for fixed header */}
-        <div className="h-[120px] safe-area-top" />
+        <div className="h-[110px] safe-area-top" />
 
         <main className="px-4 py-2 space-y-5">
           {/* Search bar */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: '#888' }} />
             <input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search clubs, members..."
-              className="glass-input rounded-full py-2.5 pl-10 pr-4 w-full focus:outline-none focus:ring-2 focus:ring-ring text-sm" />
-            
+              className="py-2.5 pl-10 pr-4 w-full text-sm outline-none"
+              style={{ border: `2px solid ${NB.border}`, borderRadius: '10px', background: NB.card, fontFamily: NB.font }} />
           </div>
 
           {/* Quick actions row */}
           <div className="flex gap-2">
             <button
               onClick={() => navigate('/global-reports')}
-              className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-full gradient-gold text-primary-foreground text-xs font-semibold shadow-gold">
-              <FileText className="w-3.5 h-3.5" /> Global Reports
+              className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-bold"
+              style={{ background: NB.orange, color: NB.border, border: `2px solid ${NB.border}`, borderRadius: '8px', boxShadow: `3px 3px 0px ${NB.border}`, fontFamily: NB.font }}>
+              <FileText className="w-3.5 h-3.5" /> Reports
             </button>
             <button
               onClick={() => setCreateClubOpen(true)}
-              className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-full glass-card text-foreground text-xs font-semibold">
+              className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-bold"
+              style={{ background: NB.card, color: NB.border, border: `2px solid ${NB.border}`, borderRadius: '8px', boxShadow: `3px 3px 0px ${NB.border}`, fontFamily: NB.font }}>
               <Plus className="w-3.5 h-3.5" /> Add Club
             </button>
             <button
               onClick={handleExportData}
               disabled={exporting}
-              className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-full glass-card text-foreground text-xs font-semibold">
+              className="flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-bold"
+              style={{ background: NB.card, color: NB.border, border: `2px solid ${NB.border}`, borderRadius: '8px', boxShadow: `3px 3px 0px ${NB.border}`, fontFamily: NB.font }}>
               <Download className="w-3.5 h-3.5" /> {exporting ? '...' : 'Export'}
             </button>
           </div>
 
-          {/* Stats Row – 2 col grid */}
+          {/* Stats Row */}
           <div className="grid grid-cols-2 gap-3">
             {statsCards.map((stat, i) => {
               const Icon = statIcons[i % statIcons.length];
               return (
-                <div key={i} className="glass-card p-4 text-center">
-                  <Icon className="w-5 h-5 text-primary mx-auto mb-1.5" />
-                  <h3 className="text-2xl font-bold text-primary">{loading ? '...' : stat.value}</h3>
-                  <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mt-0.5">
+                <div key={i} className="p-4 text-center" style={{ background: NB.card, border: `2px solid ${NB.border}`, borderRadius: '10px', boxShadow: `3px 3px 0px ${NB.border}` }}>
+                  <div className="w-9 h-9 mx-auto mb-1.5 flex items-center justify-center" style={{ background: `${NB.orange}30`, border: `2px solid ${NB.border}`, borderRadius: '8px' }}>
+                    <Icon className="w-4 h-4" style={{ color: NB.orange }} />
+                  </div>
+                  <h3 className="text-2xl font-black" style={{ fontFamily: NB.font, color: NB.border }}>{loading ? '...' : stat.value}</h3>
+                  <p className="text-[11px] font-semibold uppercase tracking-wider mt-0.5" style={{ color: '#888' }}>
                     {stat.label}
                   </p>
                 </div>);
-
             })}
           </div>
 
           {/* Club Management */}
           <section>
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-base font-bold font-display text-foreground">Club Management</h3>
+              <h3 className="text-base font-black" style={{ fontFamily: NB.font }}>Club Management</h3>
               <button
                 onClick={() => setCreateClubOpen(true)}
-                className="text-xs font-semibold text-primary flex items-center">
-                
+                className="text-xs font-bold flex items-center"
+                style={{ color: NB.orange }}>
                 Add New <ChevronRight className="w-3 h-3 ml-0.5" />
               </button>
             </div>
             <div className="space-y-3">
               {loading ?
-              <div className="glass-card p-6 text-center">
-                  <p className="text-sm text-muted-foreground">Loading clubs...</p>
+              <div className="p-6 text-center" style={{ background: NB.card, border: `2px solid ${NB.border}`, borderRadius: '10px' }}>
+                  <p className="text-sm" style={{ color: '#888' }}>Loading clubs...</p>
                 </div> :
               filteredClubs.length === 0 ?
-              <div className="glass-card p-6 text-center">
-                  <Building2 className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground">No clubs found</p>
+              <div className="p-6 text-center" style={{ background: NB.card, border: `2px solid ${NB.border}`, borderRadius: '10px' }}>
+                  <Building2 className="w-8 h-8 mx-auto mb-2" style={{ color: '#888' }} />
+                  <p className="text-sm" style={{ color: '#888' }}>No clubs found</p>
                 </div> :
-
               filteredClubs.map((club) =>
-              <div key={club.id} className="glass-card p-4">
+              <div key={club.id} className="p-4" style={{ background: NB.card, border: `2px solid ${NB.border}`, borderRadius: '10px', boxShadow: `3px 3px 0px ${NB.border}` }}>
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                      <div className="w-10 h-10 flex items-center justify-center shrink-0" style={{ background: `${NB.orange}30`, border: `2px solid ${NB.border}`, borderRadius: '8px' }}>
                         {club.logo_url ?
                     <img src={club.logo_url} alt={club.name} className="w-7 h-7 rounded-lg object-cover" /> :
-
-                    <span className="text-primary font-bold text-lg">{club.name[0]}</span>
+                    <span className="font-black text-lg" style={{ color: NB.orange }}>{club.name[0]}</span>
                     }
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className="text-sm font-bold text-foreground truncate">{club.name}</h4>
-                        <p className="text-xs text-muted-foreground">
+                        <h4 className="text-sm font-bold truncate" style={{ fontFamily: NB.font }}>{club.name}</h4>
+                        <p className="text-xs" style={{ color: '#888' }}>
                           {club.memberCount} Members • {club.eventCount} Events
                         </p>
                       </div>
                       <DropdownMenu>
-                        <DropdownMenuTrigger className="p-1.5 rounded-lg hover:bg-accent/50 transition-colors outline-none">
-                          <MoreVertical className="w-4 h-4 text-muted-foreground" />
+                        <DropdownMenuTrigger className="p-1.5 outline-none" style={{ borderRadius: '6px' }}>
+                          <MoreVertical className="w-4 h-4" style={{ color: '#888' }} />
                         </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-40">
+                        <DropdownMenuContent align="end" className="w-40">
                           <DropdownMenuItem onClick={() => handleEditClub(club)}>
                             <Pencil className="mr-2 h-4 w-4" /> Edit Club
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleOpenPresidentDialog(club)}>
                             <Crown className="mr-2 h-4 w-4" /> Manage President
                           </DropdownMenuItem>
-                          <DropdownMenuItem
-                        onClick={() => handleDeleteClub(club.id, club.name)}
-                        className="text-destructive focus:text-destructive">
-                        
+                          <DropdownMenuItem onClick={() => handleDeleteClub(club.id, club.name)} className="text-destructive focus:text-destructive">
                             <Trash2 className="mr-2 h-4 w-4" /> Delete Club
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -905,8 +898,8 @@ const SuperAdminDashboard = () => {
                     </div>
                     <button
                   onClick={() => navigate(`/club/${club.id}`, { state: { from: 'super-admin' } })}
-                  className="w-full text-center text-xs px-3 py-2 rounded-xl font-medium transition-colors bg-accent hover:bg-accent/80 text-accent-foreground">
-                  
+                  className="w-full text-center text-xs px-3 py-2 font-bold transition-all"
+                  style={{ background: NB.border, color: NB.card, border: `2px solid ${NB.border}`, borderRadius: '8px', boxShadow: `3px 3px 0px ${NB.orange}`, fontFamily: NB.font }}>
                       View More
                     </button>
                   </div>
@@ -920,40 +913,37 @@ const SuperAdminDashboard = () => {
 
           {/* Global Event Feed */}
           <section>
-            <h3 className="text-base font-bold font-display text-foreground mb-3">Global Event Feed</h3>
+            <h3 className="text-base font-black mb-3" style={{ fontFamily: NB.font }}>Global Event Feed</h3>
             <div className="space-y-3">
               {loading ?
-              <div className="glass-card p-6 text-center">
-                  <p className="text-sm text-muted-foreground">Loading events...</p>
+              <div className="p-6 text-center" style={{ background: NB.card, border: `2px solid ${NB.border}`, borderRadius: '10px' }}>
+                  <p className="text-sm" style={{ color: '#888' }}>Loading events...</p>
                 </div> :
               upcomingEvents.length === 0 ?
-              <div className="glass-card p-6 text-center">
-                  <Calendar className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground">No upcoming events</p>
+              <div className="p-6 text-center" style={{ background: NB.card, border: `2px solid ${NB.border}`, borderRadius: '10px' }}>
+                  <Calendar className="w-8 h-8 mx-auto mb-2" style={{ color: '#888' }} />
+                  <p className="text-sm" style={{ color: '#888' }}>No upcoming events</p>
                 </div> :
-
               upcomingEvents.slice(0, 8).map((event) => {
                 const d = new Date(event.event_date);
                 const month = d.toLocaleDateString('en-US', { month: 'short' }).toUpperCase();
                 const day = d.getDate();
                 return (
-                  <div key={event.id} className="glass-card p-4 flex items-center gap-3">
-                      <div className="flex flex-col items-center justify-center w-12 h-14 rounded-2xl bg-primary/10 shrink-0">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-primary">{month}</span>
-                        <span className="text-xl font-bold leading-none text-primary">{day}</span>
+                  <div key={event.id} className="p-4 flex items-center gap-3" style={{ background: NB.card, border: `2px solid ${NB.border}`, borderRadius: '10px', boxShadow: `3px 3px 0px ${NB.border}` }}>
+                      <div className="flex flex-col items-center justify-center w-12 h-14 shrink-0" style={{ background: `${NB.orange}30`, border: `2px solid ${NB.border}`, borderRadius: '8px' }}>
+                        <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: NB.orange }}>{month}</span>
+                        <span className="text-xl font-black leading-none" style={{ color: NB.border }}>{day}</span>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className="text-sm font-bold text-foreground truncate">{event.name}</h4>
-                        <p className="text-xs text-muted-foreground mt-0.5">
+                        <h4 className="text-sm font-bold truncate" style={{ fontFamily: NB.font }}>{event.name}</h4>
+                        <p className="text-xs mt-0.5" style={{ color: '#888' }}>
                           {event.club_name} • {d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                         </p>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-xs" style={{ color: '#888' }}>
                           {event.participant_count} participants
                         </p>
                       </div>
-                      <div className="w-2 h-2 rounded-full bg-primary/60 shrink-0" />
                     </div>);
-
               })
               }
             </div>
