@@ -30,6 +30,13 @@ const Dashboard = () => {
 
   if (!user) return <Navigate to="/" replace />;
 
+  // Check for pending redirect (e.g., QR attendance after OAuth login)
+  const pendingRedirect = sessionStorage.getItem('pendingRedirect');
+  if (pendingRedirect) {
+    sessionStorage.removeItem('pendingRedirect');
+    return <Navigate to={pendingRedirect} replace />;
+  }
+
   // Admins go to Super Admin dashboard, everyone else to regular dashboard
   if (isAdmin) return <Navigate to="/super-admin" replace />;
   return <Navigate to="/admin" replace />;

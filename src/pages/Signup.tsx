@@ -80,11 +80,15 @@ const Signup = () => {
         return;
       }
 
+      // Auto-confirm is enabled — user should be logged in now
       toast({
         title: 'Account created!',
-        description: 'Please check your email to verify your account.',
+        description: 'Welcome to IILM ClubSync!',
       });
       const redirectPath = searchParams.get('redirect');
+      if (redirectPath) {
+        sessionStorage.removeItem('pendingRedirect');
+      }
       navigate(redirectPath || '/dashboard', { replace: true });
     } catch (error: any) {
       // Handle "User already registered" error
@@ -214,7 +218,10 @@ const Signup = () => {
 
               <p className="text-sm text-muted-foreground text-center">
                 Already have an account?{' '}
-                <Link to="/" className="text-primary font-medium hover:underline">
+                <Link
+                  to={searchParams.get('redirect') ? `/login?redirect=${encodeURIComponent(searchParams.get('redirect')!)}` : '/login'}
+                  className="text-primary font-medium hover:underline"
+                >
                   Sign in
                 </Link>
               </p>

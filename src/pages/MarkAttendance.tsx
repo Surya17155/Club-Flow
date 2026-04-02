@@ -108,8 +108,11 @@ const MarkAttendance = () => {
     if (authLoading) return;
 
     if (!user) {
+      // Store the attendance URL so login/signup can redirect back
+      const attendancePath = `/mark-attendance/${token}`;
+      sessionStorage.setItem('pendingRedirect', attendancePath);
       toast({ title: 'Please sign up or log in', description: 'You need an account to mark attendance.' });
-      navigate(`/signup?redirect=/mark-attendance/${token}`);
+      navigate(`/signup?redirect=${encodeURIComponent(attendancePath)}`);
       return;
     }
 
