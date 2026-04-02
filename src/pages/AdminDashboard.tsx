@@ -80,7 +80,17 @@ const AdminDashboard = () => {
   const setViewMode = (mode: ViewMode) => {
     setViewModeState(mode);
     localStorage.setItem('dashboardViewMode', mode);
+    window.dispatchEvent(new Event('viewModeChanged'));
   };
+
+  // Listen for sidebar toggle changes
+  useEffect(() => {
+    const handler = () => {
+      setViewModeState((localStorage.getItem('dashboardViewMode') as ViewMode) || 'personal');
+    };
+    window.addEventListener('viewModeChanged', handler);
+    return () => window.removeEventListener('viewModeChanged', handler);
+  }, []);
   const navigate = useNavigate();
   const greeting = useMemo(() => getRandomGreeting(), []);
   const isMobile = useIsMobile();
