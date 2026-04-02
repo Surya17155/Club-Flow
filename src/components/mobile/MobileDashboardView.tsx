@@ -214,34 +214,19 @@ export function MobileDashboardView({
               </button>
             )}
             {!isPersonal && canManageEvents && (
-              <>
-                <button
-                  onClick={() => navigate('/create-event')}
-                  className="flex items-center gap-2 px-4 py-2.5 text-xs font-bold uppercase whitespace-nowrap active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
-                  style={{
-                    background: '#fff',
-                    color: '#111',
-                    border: '2px solid #111',
-                    boxShadow: '3px 3px 0px #111',
-                    fontFamily: "'Space Grotesk', sans-serif",
-                  }}
-                >
-                  <Edit3 className="w-4 h-4" /> Create Event
-                </button>
-                <button
-                  onClick={onManageEventsOpen}
-                  className="flex items-center gap-2 px-4 py-2.5 text-xs font-bold uppercase whitespace-nowrap active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
-                  style={{
-                    background: '#fff',
-                    color: '#111',
-                    border: '2px solid #111',
-                    boxShadow: '3px 3px 0px #111',
-                    fontFamily: "'Space Grotesk', sans-serif",
-                  }}
-                >
-                  <ClipboardList className="w-4 h-4" /> Manage Events
-                </button>
-              </>
+              <button
+                onClick={onManageEventsOpen}
+                className="flex items-center gap-2 px-4 py-2.5 text-xs font-bold uppercase whitespace-nowrap active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+                style={{
+                  background: '#fff',
+                  color: '#111',
+                  border: '2px solid #111',
+                  boxShadow: '3px 3px 0px #111',
+                  fontFamily: "'Space Grotesk', sans-serif",
+                }}
+              >
+                <ClipboardList className="w-4 h-4" /> Manage Events
+              </button>
             )}
           </div>
 
