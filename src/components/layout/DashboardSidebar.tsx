@@ -146,9 +146,25 @@ export function DashboardSidebar() {
   const isSuperAdminEmail = user?.email === SUPER_ADMIN_EMAIL;
   const isSuperAdminMode = location.pathname === '/super-admin' || location.pathname === '/global-reports' || location.pathname.startsWith('/club/');
 
-  // Determine view mode from localStorage
-  const viewMode = (localStorage.getItem('dashboardViewMode') as 'personal' | 'club') || 'personal';
+  // Determine view mode from localStorage, listen for changes
+  const [viewMode, setViewModeLocal] = useState<'personal' | 'club'>(
+    () => (localStorage.getItem('dashboardViewMode') as 'personal' | 'club') || 'personal'
+  );
   const isClubMode = viewMode === 'club';
+
+  useEffect(() => {
+    const handler = () => {
+      setViewModeLocal((localStorage.getItem('dashboardViewMode') as 'personal' | 'club') || 'personal');
+    };
+    window.addEventListener('viewModeChanged', handler);
+    return () => window.removeEventListener('viewModeChanged', handler);
+  }, []);
+
+  const handleViewModeToggle = (mode: 'personal' | 'club') => {
+    localStorage.setItem('dashboardViewMode', mode);
+    setViewModeLocal(mode);
+    window.dispatchEvent(new Event('viewModeChanged'));
+  };
 
   // Build contextual nav items
   const contextItems: { title: string; icon: any; action: () => void }[] = [];
@@ -227,6 +243,60 @@ export function DashboardSidebar() {
                 {profile?.full_name || user?.user_metadata?.full_name || 'User'}
               </p>
               <p className="text-[11px] truncate" style={{ color: inactiveText }}>{user?.email}</p>
+            </div>
+          )}
+        </div>
+
+        {/* View mode toggle */}
+        <div className="px-3 mb-2">
+          {collapsed ? (
+            <button
+              onClick={() => handleViewModeToggle(isClubMode ? 'personal' : 'club')}
+              className="flex items-center justify-center w-10 h-10 rounded-full mx-auto transition-colors"
+              style={{ color: isNeo ? '#E98A3A' : '#8A8F98' }}
+              title={isClubMode ? 'Switch to Personal' : 'Switch to Club'}
+              onMouseEnter={(e) => { e.currentTarget.style.background = hoverBg; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+            >
+              <ArrowRightLeft className="w-[18px] h-[18px]" />
+            </button>
+          ) : (
+            <div
+              className="inline-flex items-center p-1 w-full"
+              style={{
+                backgroundColor: isNeo ? '#2A2A2A' : 'rgba(255,255,255,0.08)',
+                border: isNeo ? '2px solid #333' : '1px solid rgba(255,255,255,0.1)',
+                borderRadius: isNeo ? '10px' : '999px',
+              }}
+            >
+              <button
+                onClick={() => handleViewModeToggle('personal')}
+                className="flex-1 py-1.5 text-xs transition-all text-center"
+                style={{
+                  borderRadius: isNeo ? '8px' : '999px',
+                  fontFamily: isNeo ? "'Space Grotesk', sans-serif" : undefined,
+                  fontWeight: !isClubMode ? 700 : 500,
+                  background: !isClubMode ? (isNeo ? '#E98A3A' : '#FFFFFF') : 'transparent',
+                  color: !isClubMode ? '#111111' : '#888',
+                  border: !isClubMode && isNeo ? '2px solid #111111' : '2px solid transparent',
+                }}
+              >
+                Personal
+              </button>
+              <button
+                onClick={() => handleViewModeToggle('club')}
+                className="flex-1 py-1.5 text-xs transition-all text-center"
+                style={{
+                  borderRadius: isNeo ? '8px' : '999px',
+                  fontFamily: isNeo ? "'Space Grotesk', sans-serif" : undefined,
+                  fontWeight: isClubMode ? 700 : 500,
+                  background: isClubMode ? (isNeo ? '#E98A3A' : '#FFFFFF') : 'transparent',
+                  color: isClubMode ? '#111111' : '#888',
+                  border: isClubMode && isNeo ? '2px solid #111111' : '2px solid transparent',
+                }}
+              >
+                Club
+              </button>
             </div>
           )}
         </div>
