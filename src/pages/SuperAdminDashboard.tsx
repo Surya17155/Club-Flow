@@ -966,34 +966,37 @@ const SuperAdminDashboard = () => {
 
   }
 
-  // ──── DESKTOP VIEW (unchanged) ────
+  // ──── DESKTOP VIEW (New Brutalism) ────
   return (
-    <div className="h-full overflow-auto antialiased p-1 text-foreground" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+    <div className="h-full overflow-auto antialiased p-1" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', fontFamily: NB.font, color: NB.border }}>
       <style>{`div::-webkit-scrollbar { display: none; }`}</style>
 
       {/* Header */}
       <header className="relative z-20 flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-        <h1 className="text-2xl font-bold font-display text-foreground">
-          Super Admin <span className="text-gradient-gold">Command Center</span>
+        <h1 className="text-2xl font-black" style={{ fontFamily: NB.font }}>
+          Super Admin <span style={{ color: NB.orange }}>Command Center</span>
         </h1>
         <div className="flex items-center gap-3">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: '#888' }} />
             <input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search..."
-              className="glass-input rounded-full py-2 pl-10 pr-4 w-64 focus:outline-none focus:ring-2 focus:ring-ring text-sm" />
+              className="py-2 pl-10 pr-4 w-64 text-sm outline-none"
+              style={{ border: `2px solid ${NB.border}`, borderRadius: '10px', background: NB.card, fontFamily: NB.font }} />
           </div>
           <button
             onClick={() => navigate('/global-reports')}
-            className="px-4 py-2 rounded-full font-medium flex items-center gap-2 text-sm bg-primary hover:bg-primary/90 text-primary-foreground transition-colors">
+            className="px-4 py-2 font-bold flex items-center gap-2 text-sm transition-all"
+            style={{ background: NB.orange, color: NB.border, border: `2px solid ${NB.border}`, borderRadius: '10px', boxShadow: `3px 3px 0px ${NB.border}`, fontFamily: NB.font }}>
             <FileText className="w-4 h-4" /> Global Reports
           </button>
           <button
             onClick={handleExportData}
             disabled={exporting}
-            className="px-4 py-2 rounded-full font-medium flex items-center gap-2 text-sm bg-accent hover:bg-accent/80 text-accent-foreground transition-colors">
+            className="px-4 py-2 font-bold flex items-center gap-2 text-sm transition-all"
+            style={{ background: NB.card, color: NB.border, border: `2px solid ${NB.border}`, borderRadius: '10px', boxShadow: `3px 3px 0px ${NB.border}`, fontFamily: NB.font }}>
             <Download className="w-4 h-4" /> {exporting ? 'Exporting...' : 'Export Data'}
           </button>
           <ProfileDropdown viewMode="personal" />
@@ -1001,88 +1004,82 @@ const SuperAdminDashboard = () => {
       </header>
 
       {/* Stats Row */}
-      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {statsCards.map((stat, i) =>
-        <div key={i} className="glass-card p-6 flex flex-col justify-between h-32 relative overflow-hidden group hover:bg-white/50 transition-colors">
-            <div>
-              <p className="text-sm mb-1 text-muted-foreground">{stat.label}</p>
-              <div className="flex items-center gap-2">
-                <h3 className="text-3xl font-bold text-foreground">{loading ? '...' : stat.value}</h3>
-                <TrendingUp className="w-5 h-5 text-primary" />
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+        {statsCards.map((stat, i) => {
+          const Icon = statIcons[i % statIcons.length];
+          return (
+            <div key={i} className="p-5 flex items-center gap-4" style={{ background: NB.card, border: `2px solid ${NB.border}`, borderRadius: '12px', boxShadow: `4px 4px 0px ${NB.border}` }}>
+              <div className="w-12 h-12 flex items-center justify-center shrink-0" style={{ background: NB.orange, border: `2px solid ${NB.border}`, borderRadius: '10px' }}>
+                <Icon className="w-6 h-6" style={{ color: NB.border }} />
+              </div>
+              <div>
+                <h3 className="text-3xl font-black" style={{ fontFamily: NB.font }}>{loading ? '...' : stat.value}</h3>
+                <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#888' }}>{stat.label}</p>
               </div>
             </div>
-            <svg className="absolute bottom-4 right-4 w-24 h-12 text-primary/50" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 100 30">
-              <path d={stat.path} strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </div>
-        )}
+          );
+        })}
       </section>
-
 
       {/* Club Management */}
       <div className="mb-6">
-        <section className="glass-card p-5 flex flex-col max-h-[500px]">
+        <div className="p-5 flex flex-col max-h-[500px]" style={{ background: NB.card, border: `2px solid ${NB.border}`, borderRadius: '12px', boxShadow: `4px 4px 0px ${NB.border}` }}>
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold text-foreground">Club Management</h2>
+            <h2 className="text-lg font-black" style={{ fontFamily: NB.font }}>Club Management</h2>
             <button
               onClick={() => setCreateClubOpen(true)}
-              className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg font-medium transition-colors gradient-gold text-primary-foreground shadow-gold">
-              
+              className="flex items-center gap-1.5 text-xs px-3 py-1.5 font-bold transition-all"
+              style={{ background: NB.orange, color: NB.border, border: `2px solid ${NB.border}`, borderRadius: '8px', boxShadow: `3px 3px 0px ${NB.border}`, fontFamily: NB.font }}>
               <Plus className="w-3.5 h-3.5" /> Add Club
             </button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 overflow-y-auto pr-2 flex-1" style={{ scrollbarWidth: 'none' }}>
             {loading ?
-            <p className="text-muted-foreground col-span-3 text-center py-8">Loading clubs...</p> :
+            <p className="col-span-3 text-center py-8" style={{ color: '#888' }}>Loading clubs...</p> :
             filteredClubs.length === 0 ?
-            <p className="text-muted-foreground col-span-3 text-center py-8">No clubs found</p> :
-
+            <p className="col-span-3 text-center py-8" style={{ color: '#888' }}>No clubs found</p> :
             filteredClubs.map((club) =>
-            <div key={club.id} className="rounded-xl p-4 border border-border/50 bg-card shadow-card relative">
+            <div key={club.id} className="p-4 relative" style={{ background: NB.bg, border: `2px solid ${NB.border}`, borderRadius: '10px', boxShadow: `3px 3px 0px ${NB.border}` }}>
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 flex items-center justify-center shrink-0" style={{ background: `${NB.orange}30`, border: `2px solid ${NB.border}`, borderRadius: '8px' }}>
                       {club.logo_url ?
-                  <img src={club.logo_url} alt={club.name} className="w-8 h-8 rounded-full object-cover" /> :
-                  <span className="text-primary font-bold text-lg">{club.name[0]}</span>
+                  <img src={club.logo_url} alt={club.name} className="w-7 h-7 rounded-lg object-cover" /> :
+                  <span className="font-black text-lg" style={{ color: NB.orange }}>{club.name[0]}</span>
                   }
                     </div>
-                    <h4 className="font-bold text-foreground leading-tight flex-1">{club.name}</h4>
+                    <h4 className="font-bold leading-tight flex-1" style={{ fontFamily: NB.font }}>{club.name}</h4>
                     <DropdownMenu>
-                      <DropdownMenuTrigger className="p-1 rounded-lg hover:bg-accent/50 transition-colors outline-none">
-                        <MoreVertical className="w-4 h-4 text-muted-foreground" />
+                      <DropdownMenuTrigger className="p-1 outline-none" style={{ borderRadius: '6px' }}>
+                        <MoreVertical className="w-4 h-4" style={{ color: '#888' }} />
                       </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-40">
+                      <DropdownMenuContent align="end" className="w-40">
                         <DropdownMenuItem onClick={() => handleEditClub(club)}>
                           <Pencil className="mr-2 h-4 w-4" /> Edit Club
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => handleOpenPresidentDialog(club)}>
                           <Crown className="mr-2 h-4 w-4" /> Manage President
                         </DropdownMenuItem>
-                        <DropdownMenuItem
-                      onClick={() => handleDeleteClub(club.id, club.name)}
-                      className="text-destructive focus:text-destructive">
-                      
+                        <DropdownMenuItem onClick={() => handleDeleteClub(club.id, club.name)} className="text-destructive focus:text-destructive">
                           <Trash2 className="mr-2 h-4 w-4" /> Delete Club
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
-                  <div className="text-xs text-muted-foreground space-y-1 mb-4">
+                  <div className="text-xs space-y-1 mb-4" style={{ color: '#888' }}>
                     <p>Members: {club.memberCount}</p>
                     <p>Events: {club.eventCount}</p>
                   </div>
-                  <div className="flex gap-2">
-                    <button
-                  onClick={() => navigate(`/club/${club.id}`, { state: { from: 'super-admin' } })}
-                  className="flex-[1.5] text-center text-xs px-3 py-1.5 rounded-lg font-medium transition-colors bg-accent hover:bg-accent/80 text-accent-foreground">
-                      View More
-                    </button>
-                  </div>
+                  <button
+                onClick={() => navigate(`/club/${club.id}`, { state: { from: 'super-admin' } })}
+                className="w-full text-center text-xs px-3 py-2 font-bold transition-all"
+                style={{ background: NB.border, color: NB.card, border: `2px solid ${NB.border}`, borderRadius: '8px', boxShadow: `3px 3px 0px ${NB.orange}`, fontFamily: NB.font }}>
+                    View More
+                  </button>
                 </div>
             )
             }
           </div>
-        </section>
+        </div>
       </div>
 
       {/* Platform-wide Event Calendar */}
@@ -1091,33 +1088,31 @@ const SuperAdminDashboard = () => {
       </div>
 
       {/* Global Event Feed */}
-      <section className="glass-card p-5">
-        <h2 className="text-lg font-semibold text-foreground mb-4">Global Event Feed</h2>
+      <div className="p-5" style={{ background: NB.card, border: `2px solid ${NB.border}`, borderRadius: '12px', boxShadow: `4px 4px 0px ${NB.border}` }}>
+        <h2 className="text-lg font-black mb-4" style={{ fontFamily: NB.font }}>Global Event Feed</h2>
         <div className="flex gap-6 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
           {loading ?
-          <p className="text-muted-foreground py-4">Loading events...</p> :
+          <p style={{ color: '#888' }} className="py-4">Loading events...</p> :
           upcomingEvents.length === 0 ?
-          <p className="text-muted-foreground py-4">No upcoming events</p> :
-
-          upcomingEvents.map((event, i) => {
+          <p style={{ color: '#888' }} className="py-4">No upcoming events</p> :
+          upcomingEvents.map((event) => {
             const d = new Date(event.event_date);
             return (
-              <div key={event.id} className="shrink-0 border-l-2 pl-4 py-1" style={{ borderColor: i === 0 ? 'hsl(var(--primary))' : 'hsl(var(--border))' }}>
-                  <h4 className="font-semibold text-foreground text-sm mb-1">
-                    {event.name} ({event.club_name}) - {d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                  </h4>
-                  <div className="flex items-center text-xs text-muted-foreground gap-4">
-                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
-                    <span className="flex items-center gap-1"><Users className="w-3 h-3" /> {event.participant_count} Participants</span>
-                  </div>
-                </div>);
+              <div key={event.id} className="shrink-0 pl-4 py-1" style={{ borderLeft: `3px solid ${NB.orange}` }}>
+                <h4 className="font-bold text-sm mb-1" style={{ fontFamily: NB.font }}>
+                  {event.name} ({event.club_name}) - {d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                </h4>
+                <div className="flex items-center text-xs gap-4" style={{ color: '#888' }}>
+                  <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
+                  <span className="flex items-center gap-1"><Users className="w-3 h-3" /> {event.participant_count} Participants</span>
+                </div>
+              </div>);
           })
           }
         </div>
-      </section>
+      </div>
 
       {renderDialogs()}
-      
     </div>);
 };
 
