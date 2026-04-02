@@ -5,19 +5,18 @@ import { useDelegatedPowers } from "@/hooks/useDelegatedPowers";
 
 const personalTabs = [
   { label: "Home", icon: Home, path: "/admin" },
-  { label: "Clubs", icon: Users, path: "/discover" },
-  { label: "Calendar", icon: Calendar, path: "/calendar" },
   { label: "Events", icon: Calendar, path: "/events" },
+  { label: "Clubs", icon: Users, path: "/discover" },
   { label: "Profile", icon: User, path: "/profile" },
 ] as const;
 
 const clubLeftTabs = [
   { label: "Home", icon: Home, path: "/admin" },
-  { label: "Clubs", icon: Users, path: "/discover" },
+  { label: "Events", icon: Calendar, path: "/events" },
 ] as const;
 
 const clubRightTabs = [
-  { label: "Events", icon: Calendar, path: "/events" },
+  { label: "Club", icon: Users, path: "/clubs" },
   { label: "Profile", icon: User, path: "/profile" },
 ] as const;
 
@@ -34,12 +33,8 @@ function MobileBottomNavInner() {
       setViewMode((localStorage.getItem('dashboardViewMode') as 'personal' | 'club') || 'personal');
     };
     window.addEventListener('storage', handler);
-    // Poll at lower frequency to reduce main thread work
-    const interval = setInterval(() => {
-      const current = (localStorage.getItem('dashboardViewMode') as 'personal' | 'club') || 'personal';
-      setViewMode(prev => prev !== current ? current : prev);
-    }, 1000);
-    return () => { window.removeEventListener('storage', handler); clearInterval(interval); };
+    window.addEventListener('viewModeChanged', handler);
+    return () => { window.removeEventListener('storage', handler); window.removeEventListener('viewModeChanged', handler); };
   }, []);
 
   let canCreateEvent = false;
@@ -51,7 +46,6 @@ function MobileBottomNavInner() {
   }
 
   const isClubMode = viewMode === 'club';
-
   const handleNav = useCallback((path: string) => navigate(path), [navigate]);
 
   const renderTab = useCallback(({ label, icon: Icon, path }: { label: string; icon: any; path: string }) => {
@@ -60,18 +54,24 @@ function MobileBottomNavInner() {
       <button
         key={path + label}
         onClick={() => handleNav(path)}
-        className="flex flex-col items-center gap-0.5 px-3 py-1.5"
+        className="flex flex-col items-center justify-center px-3 py-2 transition-transform active:scale-95"
+        style={{
+          background: active ? '#E98A3A' : 'transparent',
+          border: active ? '2px solid #111' : '2px solid transparent',
+          boxShadow: active ? '2px 2px 0px #111' : 'none',
+        }}
       >
         <Icon
           className="w-5 h-5"
-          style={{ color: active ? "hsl(var(--primary))" : "#8A8A8A" }}
+          style={{ color: active ? '#111' : '#6B7280' }}
           strokeWidth={active ? 2.5 : 2}
         />
         <span
-          className="text-[10px] tracking-wide"
+          className="text-[10px] uppercase mt-0.5"
           style={{
-            color: active ? "hsl(var(--primary))" : "#8A8A8A",
-            fontWeight: active ? 700 : 500,
+            fontFamily: "'Space Grotesk', sans-serif",
+            fontWeight: active ? 800 : 600,
+            color: active ? '#111' : '#6B7280',
           }}
         >
           {label}
@@ -81,21 +81,19 @@ function MobileBottomNavInner() {
   }, [location.pathname, handleNav]);
 
   return (
-    <div className="fixed left-0 right-0 z-50 flex justify-center px-4 md:hidden pointer-events-none gpu-fixed" style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 12px)" }}>
+    <div
+      className="fixed left-0 right-0 z-50 md:hidden"
+      style={{
+        bottom: 0,
+        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+      }}
+    >
       <nav
-        className="relative flex items-center justify-evenly pointer-events-auto"
+        className="flex items-center justify-evenly px-2"
         style={{
-          width: "100%",
-          maxWidth: "380px",
-          height: "52px",
-          borderRadius: "36px",
-          background: "rgba(255, 255, 255, 0.18)",
-          backdropFilter: "blur(18px)",
-          WebkitBackdropFilter: "blur(18px)",
-          border: "1px solid rgba(255, 255, 255, 0.35)",
-          boxShadow: "0px 10px 30px rgba(0, 0, 0, 0.15)",
-          padding: "0 18px",
-          transform: "translateZ(0)",
+          background: '#F4EFE7',
+          borderTop: '2px solid #111',
+          minHeight: '56px',
         }}
       >
         {isClubMode ? (
@@ -105,16 +103,16 @@ function MobileBottomNavInner() {
             {canCreateEvent ? (
               <button
                 onClick={() => navigate("/create-event")}
-                className="relative -mt-6 flex items-center justify-center transition-transform duration-200 active:scale-95"
+                className="relative -mt-5 flex items-center justify-center transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
                 style={{
-                  width: "50px",
-                  height: "50px",
-                  borderRadius: "50%",
-                  background: "hsl(var(--primary))",
-                  boxShadow: "0px 8px 20px hsla(var(--primary) / 0.45)",
+                  width: '52px',
+                  height: '52px',
+                  background: '#E98A3A',
+                  border: '2px solid #111',
+                  boxShadow: '3px 3px 0px #111',
                 }}
               >
-                <Plus className="w-6 h-6 text-primary-foreground" strokeWidth={2.5} />
+                <Plus className="w-6 h-6" style={{ color: '#111' }} strokeWidth={3} />
               </button>
             ) : (
               <div className="w-6" />
@@ -123,9 +121,7 @@ function MobileBottomNavInner() {
             {clubRightTabs.map(renderTab)}
           </>
         ) : (
-          <>
-            {personalTabs.map(renderTab)}
-          </>
+          personalTabs.map(renderTab)
         )}
       </nav>
     </div>

@@ -4,20 +4,14 @@ import { AttendanceHistoryModal } from './AttendanceHistoryModal';
 import { useNavigate } from 'react-router-dom';
 import { MobileProfileCard } from './MobileProfileCard';
 import { MobileBottomNav } from './MobileBottomNav';
+import { MobileSideDrawer } from './MobileSideDrawer';
 import {
-  Users,
-  Calendar,
-  CheckCircle,
-  TrendingUp,
-  Clock,
-  ChevronRight,
-  Compass,
-  Edit3,
-  ClipboardList,
-  Settings2 } from
-'lucide-react';
+  Users, Calendar, CheckCircle, TrendingUp, Clock, ChevronRight,
+  Compass, Edit3, ClipboardList, Settings2, Menu,
+} from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import ProfileDropdown from '@/components/dashboard/ProfileDropdown';
+import { useProfile } from '@/hooks/useProfile';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface MobileDashboardViewProps {
   fullName: string;
@@ -30,9 +24,9 @@ interface MobileDashboardViewProps {
   isPersonal: boolean;
   viewMode: 'personal' | 'club';
   setViewMode: (m: 'personal' | 'club') => void;
-  statsCards: {label: string;value: string;clickable?: boolean;clickAction?: string;}[];
+  statsCards: { label: string; value: string; clickable?: boolean; clickAction?: string }[];
   upcomingEvents: any[];
-  clubs: {club_id: string;club_name: string;role: string;logo_url?: string;}[];
+  clubs: { club_id: string; club_name: string; role: string; logo_url?: string }[];
   attendanceRecords?: any[];
   onEventClick: (event: any) => void;
   canManageClub: boolean;
@@ -45,43 +39,26 @@ interface MobileDashboardViewProps {
 }
 
 const roleLabelMap: Record<string, string> = {
-  admin: 'Admin',
-  president: 'President',
-  vice_president: 'Vice President',
-  secretary: 'Secretary',
-  social_media_head: 'Social Media Head',
-  member: 'Member'
+  admin: 'Admin', president: 'President', vice_president: 'Vice President',
+  secretary: 'Secretary', social_media_head: 'Social Media Head', member: 'Member',
 };
 
 const statIcons = [Users, Calendar, CheckCircle, TrendingUp];
 
 export function MobileDashboardView({
-  fullName,
-  roleLabel,
-  clubName,
-  avatarUrl,
-  programme,
-  year,
-  about,
-  isPersonal,
-  viewMode,
-  setViewMode,
-  statsCards,
-  upcomingEvents,
-  clubs,
-  onEventClick,
-  canManageClub,
-  canManageEvents,
-  onManageEventsOpen,
-  socialLinkedin,
-  socialInstagram,
-  socialGmail,
-  attendanceRecords = [],
-  role,
+  fullName, roleLabel, clubName, avatarUrl, programme, year, about,
+  isPersonal, viewMode, setViewMode, statsCards, upcomingEvents, clubs,
+  onEventClick, canManageClub, canManageEvents, onManageEventsOpen,
+  socialLinkedin, socialInstagram, socialGmail, attendanceRecords = [], role,
 }: MobileDashboardViewProps) {
   const navigate = useNavigate();
+  const { profile } = useProfile();
+  const { user } = useAuth();
   const [expandedClubId, setExpandedClubId] = useState<string | null>(null);
   const [activeStatModal, setActiveStatModal] = useState<string | null>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const initials = (profile?.full_name || 'U').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
 
   const handleStatClick = useCallback((stat: typeof statsCards[0]) => {
     if (stat.clickable && stat.clickAction) {
@@ -95,60 +72,130 @@ export function MobileDashboardView({
 
   return (
     <>
-      {/* Fixed top elements — GPU-accelerated */}
-      <div className="fixed top-0 left-0 right-0 z-40 px-4 pb-3 pointer-events-none gpu-fixed" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}>
-        <div className="pointer-events-auto">
-          {/* Top row: centered app name, profile avatar pinned right */}
-          <div className="relative flex items-center justify-center mb-2">
-            <h1 className="text-lg font-bold font-display text-foreground">IILM Club</h1>
-            <div className="absolute right-0 top-1">
-              <ProfileDropdown viewMode={viewMode} />
-            </div>
-          </div>
+      {/* Side Drawer */}
+      <MobileSideDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        viewMode={viewMode}
+        setViewMode={setViewMode}
+      />
 
-          {/* Greeting */}
-          <p className="text-center text-base text-muted-foreground mb-4">
-            Hi, <span className="font-semibold text-foreground">{fullName?.split(' ')[0] || 'there'}</span> 👋
-          </p>
-
-          {/* Mode toggle pill */}
-          <div className="mt-2 mb-4">
-            <div className="glass-card flex p-1 rounded-full max-w-[240px] mx-auto">
-              <button
-                onClick={() => setViewMode('personal')}
-                className={`flex-1 py-2 px-4 rounded-full text-sm font-semibold transition-all duration-300 ${
-                isPersonal ? 'bg-white shadow-sm text-primary' : 'text-muted-foreground'}`
-                }>
-                Personal
-              </button>
-              <button
-                onClick={() => setViewMode('club')}
-                className={`flex-1 py-2 px-4 rounded-full text-sm font-semibold transition-all duration-300 ${
-                !isPersonal ? 'bg-white shadow-sm text-primary' : 'text-muted-foreground'}`
-                }>
-                Club
-              </button>
+      {/* Fixed Header — Neo Brutalism */}
+      <div
+        className="fixed top-0 left-0 right-0 z-40"
+        style={{
+          background: '#F4EFE7',
+          borderBottom: '2px solid #111',
+          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 8px)',
+        }}
+      >
+        <div className="flex items-center justify-between px-5 py-3">
+          {/* Profile button (left) */}
+          <button
+            onClick={() => setDrawerOpen(true)}
+            className="flex items-center gap-3"
+          >
+            <div
+              className="w-10 h-10 overflow-hidden flex items-center justify-center"
+              style={{ border: '2px solid #111' }}
+            >
+              {profile?.avatar_url ? (
+                <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-xs font-black" style={{ color: '#111' }}>{initials}</span>
+              )}
             </div>
+            <h1
+              className="text-xl font-black uppercase tracking-tighter"
+              style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#111' }}
+            >
+              IILM CLUB
+            </h1>
+          </button>
+        </div>
+
+        {/* Mode Toggle */}
+        <div className="flex justify-center pb-3 px-5">
+          <div
+            className="flex p-1"
+            style={{
+              border: '2px solid #111',
+              background: '#fff',
+              boxShadow: '3px 3px 0px #111',
+            }}
+          >
+            <button
+              onClick={() => setViewMode('personal')}
+              className="px-6 py-2 text-xs font-bold uppercase transition-all"
+              style={{
+                fontFamily: "'Space Grotesk', sans-serif",
+                background: isPersonal ? '#E98A3A' : 'transparent',
+                color: '#111',
+                border: isPersonal ? '2px solid #111' : '2px solid transparent',
+              }}
+            >
+              Personal
+            </button>
+            <button
+              onClick={() => setViewMode('club')}
+              className="px-6 py-2 text-xs font-bold uppercase transition-all"
+              style={{
+                fontFamily: "'Space Grotesk', sans-serif",
+                background: !isPersonal ? '#E98A3A' : 'transparent',
+                color: '#111',
+                border: !isPersonal ? '2px solid #111' : '2px solid transparent',
+              }}
+            >
+              Clubs
+            </button>
           </div>
         </div>
       </div>
 
-      <div className="min-h-screen pb-20 dashboard-corner-gradient overflow-x-hidden gpu-scroll" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', paddingTop: '180px' }}>
-        {/* Background blobs — GPU layer */}
-        <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden gpu-fixed">
-          <div
-            className="absolute top-[-8%] left-[-8%] w-[300px] h-[300px] rounded-full mix-blend-multiply filter blur-[80px] opacity-60 animate-blob"
-            style={{ backgroundColor: 'hsl(45 90% 85% / 0.9)' }} />
-          
-          <div
-            className="absolute bottom-[20%] right-[-10%] w-[250px] h-[250px] rounded-full mix-blend-multiply filter blur-[80px] opacity-50 animate-blob animation-delay-2000"
-            style={{ backgroundColor: 'hsl(25 80% 82% / 0.8)' }} />
-          
-        </div>
+      {/* Scrollable Content */}
+      <div
+        className="min-h-screen pb-24 overflow-x-hidden"
+        style={{
+          background: '#F4EFE7',
+          paddingTop: '140px',
+          scrollbarWidth: 'none',
+        }}
+      >
+        <main className="px-5 py-4 space-y-6">
+          {/* Greeting */}
+          <p
+            className="text-lg"
+            style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#111' }}
+          >
+            Hi, <span className="font-black">{fullName?.split(' ')[0] || 'there'}</span> 👋
+          </p>
 
-        <main className="px-4 py-4 space-y-5">
-        {/* Profile Card */}
-        <MobileProfileCard
+          {/* Stats Row */}
+          <div className="grid grid-cols-3 gap-3">
+            {statsCards.slice(0, 3).map((stat, i) => (
+              <div
+                key={i}
+                className={`flex flex-col items-center justify-center text-center p-3 ${stat.clickable ? 'cursor-pointer active:translate-x-[2px] active:translate-y-[2px] active:shadow-none' : ''}`}
+                style={{
+                  background: '#fff',
+                  border: '2px solid #111',
+                  boxShadow: '4px 4px 0px #111',
+                  transition: 'all 0.15s',
+                }}
+                onClick={() => handleStatClick(stat)}
+              >
+                <span className="text-[10px] font-bold uppercase" style={{ color: '#6B7280', fontFamily: "'Space Grotesk', sans-serif" }}>
+                  {stat.label.split(':')[0] || stat.label}
+                </span>
+                <span className="text-2xl font-black leading-none mt-1" style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#111' }}>
+                  {stat.value}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {/* Profile Card */}
+          <MobileProfileCard
             fullName={fullName}
             roleLabel={roleLabel}
             clubName={clubName}
@@ -161,154 +208,217 @@ export function MobileDashboardView({
             socialLinkedin={socialLinkedin}
             socialInstagram={socialInstagram}
             socialGmail={socialGmail}
-            role={role} />
-          
+            role={role}
+          />
 
-        {/* Stats Row */}
-        <div className="grid grid-cols-2 gap-3">
-          {statsCards.map((stat, i) => {
-              const Icon = statIcons[i % statIcons.length];
-              const isClickable = stat.clickable;
-              return (
-                <div
-                  key={i}
-                  className={`glass-card p-4 text-center ${isClickable ? 'cursor-pointer ring-primary/20 active:scale-[0.97] transition-transform' : ''}`}
-                  onClick={() => handleStatClick(stat)}
+          {/* Quick Actions */}
+          <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
+            {isPersonal && (
+              <button
+                onClick={() => navigate('/discover')}
+                className="flex items-center gap-2 px-4 py-2.5 text-xs font-bold uppercase whitespace-nowrap active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+                style={{
+                  background: '#E98A3A',
+                  color: '#111',
+                  border: '2px solid #111',
+                  boxShadow: '3px 3px 0px #111',
+                  fontFamily: "'Space Grotesk', sans-serif",
+                }}
+              >
+                <Compass className="w-4 h-4" /> Discover Clubs
+              </button>
+            )}
+            {!isPersonal && canManageClub && (
+              <button
+                onClick={() => navigate('/clubs')}
+                className="flex items-center gap-2 px-4 py-2.5 text-xs font-bold uppercase whitespace-nowrap active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+                style={{
+                  background: '#E98A3A',
+                  color: '#111',
+                  border: '2px solid #111',
+                  boxShadow: '3px 3px 0px #111',
+                  fontFamily: "'Space Grotesk', sans-serif",
+                }}
+              >
+                <Settings2 className="w-4 h-4" /> Manage Club
+              </button>
+            )}
+            {!isPersonal && canManageEvents && (
+              <>
+                <button
+                  onClick={() => navigate('/create-event')}
+                  className="flex items-center gap-2 px-4 py-2.5 text-xs font-bold uppercase whitespace-nowrap active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+                  style={{
+                    background: '#fff',
+                    color: '#111',
+                    border: '2px solid #111',
+                    boxShadow: '3px 3px 0px #111',
+                    fontFamily: "'Space Grotesk', sans-serif",
+                  }}
                 >
-                <Icon className="w-5 h-5 text-primary mx-auto mb-1.5" />
-                <h3 className="text-2xl font-bold text-primary">{stat.value}</h3>
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mt-0.5">
-                  {stat.label.replace(':', '')}
-                </p>
-                {isClickable && (
-                  <p className="text-[9px] text-primary font-medium mt-1">Tap to view →</p>
-                )}
-              </div>);
+                  <Edit3 className="w-4 h-4" /> Create Event
+                </button>
+                <button
+                  onClick={onManageEventsOpen}
+                  className="flex items-center gap-2 px-4 py-2.5 text-xs font-bold uppercase whitespace-nowrap active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+                  style={{
+                    background: '#fff',
+                    color: '#111',
+                    border: '2px solid #111',
+                    boxShadow: '3px 3px 0px #111',
+                    fontFamily: "'Space Grotesk', sans-serif",
+                  }}
+                >
+                  <ClipboardList className="w-4 h-4" /> Manage Events
+                </button>
+              </>
+            )}
+          </div>
 
-            })}
-        </div>
-
-        {/* Quick Actions */}
-        <div className="flex gap-2 overflow-x-auto pb-1">
-          {isPersonal &&
-            <button
-              onClick={() => navigate('/discover')}
-              className="flex items-center gap-1.5 px-4 py-2.5 rounded-full gradient-gold text-primary-foreground text-xs font-semibold shadow-gold whitespace-nowrap">
-              
-              <Compass className="w-3.5 h-3.5" /> Discover Clubs
-            </button>
-            }
-          {!isPersonal && canManageClub &&
-            <button
-              onClick={() => navigate('/clubs')}
-              className="flex items-center gap-1.5 px-4 py-2.5 rounded-full gradient-gold text-primary-foreground text-xs font-semibold shadow-gold whitespace-nowrap">
-              
-              <Settings2 className="w-3.5 h-3.5" /> Manage Club
-            </button>
-            }
-          {!isPersonal && canManageEvents &&
-            <>
+          {/* Upcoming Events */}
+          <section className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3
+                className="text-xl font-black uppercase"
+                style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#111' }}
+              >
+                Upcoming Events
+              </h3>
               <button
-                onClick={() => navigate('/create-event')}
-                className="flex items-center gap-1.5 px-4 py-2.5 rounded-full glass-card text-foreground text-xs font-semibold whitespace-nowrap">
-                
-                <Edit3 className="w-3.5 h-3.5" /> Create Event
-              </button>
-              <button
-                onClick={onManageEventsOpen}
-                className="flex items-center gap-1.5 px-4 py-2.5 rounded-full glass-card text-foreground text-xs font-semibold whitespace-nowrap">
-                
-                <ClipboardList className="w-3.5 h-3.5" /> Manage Events
-              </button>
-            </>
-            }
-        </div>
-
-        {/* Upcoming Events */}
-        <section>
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-base font-bold font-display text-foreground">Upcoming Events</h3>
-            <button
                 onClick={() => navigate('/calendar')}
-                className="text-xs font-semibold text-primary flex items-center">
-                
-              View Full Calendar <ChevronRight className="w-3 h-3 ml-0.5" />
-            </button>
-          </div>
+                className="text-[10px] font-bold uppercase px-2 py-1"
+                style={{
+                  background: '#111',
+                  color: '#fff',
+                  fontFamily: "'Space Grotesk', sans-serif",
+                }}
+              >
+                Calendar
+              </button>
+            </div>
 
-          <div className="space-y-3">
-            {upcomingEvents.length > 0 ?
-              upcomingEvents.slice(0, 5).map((event) =>
-              <div
-                key={event.id}
-                className="glass-card p-4 flex items-center gap-3 active:scale-[0.98] transition-transform cursor-pointer"
-                onClick={() => onEventClick(event)}>
-                
-                  {/* Date badge */}
-                  <div className="flex flex-col items-center justify-center w-12 h-14 rounded-2xl bg-primary/10 shrink-0">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
-                      {event.month}
-                    </span>
-                    <span className="text-xl font-bold leading-none text-primary">{event.day}</span>
+            <div className="space-y-3">
+              {upcomingEvents.length > 0 ? (
+                upcomingEvents.slice(0, 5).map(event => (
+                  <div
+                    key={event.id}
+                    className="flex items-center gap-4 p-4 cursor-pointer active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
+                    style={{
+                      background: '#fff',
+                      border: '2px solid #111',
+                      boxShadow: '4px 4px 0px #111',
+                    }}
+                    onClick={() => onEventClick(event)}
+                  >
+                    <div
+                      className="flex-shrink-0 w-14 h-14 flex flex-col items-center justify-center"
+                      style={{
+                        border: '2px solid #111',
+                        background: '#F6E1CF',
+                      }}
+                    >
+                      <span className="text-lg font-black leading-none" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                        {event.day}
+                      </span>
+                      <span className="text-[9px] font-bold uppercase" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                        {event.month}
+                      </span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4
+                        className="text-sm font-bold uppercase truncate"
+                        style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#111' }}
+                      >
+                        {event.name}
+                      </h4>
+                      <p className="text-xs mt-0.5" style={{ color: '#6B7280', fontFamily: "'Space Grotesk', sans-serif" }}>
+                        {event.club_name} • {event.time}
+                      </p>
+                    </div>
+                    {event.attendance_given && (
+                      <span
+                        className="text-[9px] font-bold uppercase px-1.5 py-0.5"
+                        style={{ background: '#E6F4EA', color: '#111', border: '1.5px solid #111' }}
+                      >
+                        ✓ Att.
+                      </span>
+                    )}
+                    <ChevronRight className="w-5 h-5 shrink-0" style={{ color: '#111' }} />
                   </div>
-
-                  <div className="flex-1 min-w-0">
-                    <h4 className="text-sm font-bold text-foreground truncate">{event.name}</h4>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      {event.club_name} • {event.time}
-                    </p>
-                  </div>
-
-                  {event.attendance_given && (
-                    <Badge variant="outline" className="text-[9px] bg-success/15 text-success border-success/20 shrink-0 px-1.5">
-                      ✓ Att.
-                    </Badge>
-                  )}
-                </div>
-              ) :
-
-              <div className="glass-card p-6 text-center">
-                <Calendar className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                <p className="text-sm text-muted-foreground">No upcoming events</p>
-              </div>
-              }
-          </div>
-        </section>
-
-        {/* My Clubs (personal mode) */}
-        {isPersonal && clubs.length > 0 &&
-          <section id="mobile-my-clubs">
-            <h3 className="text-base font-bold font-display text-foreground mb-3">My Clubs</h3>
-            <div className="space-y-2">
-              {clubs.map((club) =>
-              <div key={club.club_id} className="glass-card p-4 flex items-center gap-3 cursor-pointer active:scale-[0.98] transition-transform duration-150" onClick={() => setExpandedClubId(club.club_id)}>
-                  <div className="w-10 h-10 rounded-xl bg-white/50 border border-border flex items-center justify-center shrink-0">
-                    {club.logo_url ?
-                  <img src={club.logo_url} alt={club.club_name} className="w-7 h-7 rounded object-cover" /> :
-
-                  <Users className="w-4 h-4 text-primary" />
-                  }
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="text-sm font-semibold text-foreground truncate">{club.club_name}</h4>
-                    <p className="text-xs text-muted-foreground">{roleLabelMap[club.role] ?? club.role}</p>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+                ))
+              ) : (
+                <div
+                  className="p-8 text-center"
+                  style={{
+                    background: '#fff',
+                    border: '2px solid #111',
+                    boxShadow: '4px 4px 0px #111',
+                  }}
+                >
+                  <Calendar className="w-8 h-8 mx-auto mb-2" style={{ color: '#6B7280' }} />
+                  <p className="text-sm" style={{ color: '#6B7280', fontFamily: "'Space Grotesk', sans-serif" }}>
+                    No upcoming events
+                  </p>
                 </div>
               )}
             </div>
           </section>
-          }
-      </main>
 
-      <MobileBottomNav />
-      <ClubDetailOverlay clubId={expandedClubId} onClose={() => setExpandedClubId(null)} />
-      <AttendanceHistoryModal
-        open={activeStatModal === 'attendance_history' || activeStatModal === 'events_attended'}
-        onClose={() => setActiveStatModal(null)}
-        records={attendanceRecords}
-      />
-    </div>
-    </>);
+          {/* My Clubs (personal mode) */}
+          {isPersonal && clubs.length > 0 && (
+            <section id="mobile-my-clubs" className="space-y-3">
+              <h3
+                className="text-xl font-black uppercase"
+                style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#111' }}
+              >
+                My Clubs
+              </h3>
+              <div className="space-y-2">
+                {clubs.map(club => (
+                  <div
+                    key={club.club_id}
+                    className="flex items-center gap-3 p-4 cursor-pointer active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
+                    style={{
+                      background: '#fff',
+                      border: '2px solid #111',
+                      boxShadow: '4px 4px 0px #111',
+                    }}
+                    onClick={() => setExpandedClubId(club.club_id)}
+                  >
+                    <div
+                      className="w-10 h-10 flex items-center justify-center shrink-0"
+                      style={{ border: '2px solid #111', background: '#F6E1CF' }}
+                    >
+                      {club.logo_url ? (
+                        <img src={club.logo_url} alt={club.club_name} className="w-7 h-7 object-cover" />
+                      ) : (
+                        <Users className="w-4 h-4" style={{ color: '#111' }} />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-sm font-bold truncate" style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#111' }}>
+                        {club.club_name}
+                      </h4>
+                      <p className="text-xs" style={{ color: '#6B7280', fontFamily: "'Space Grotesk', sans-serif" }}>
+                        {roleLabelMap[club.role] ?? club.role}
+                      </p>
+                    </div>
+                    <ChevronRight className="w-4 h-4 shrink-0" style={{ color: '#111' }} />
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+        </main>
 
+        <MobileBottomNav />
+        <ClubDetailOverlay clubId={expandedClubId} onClose={() => setExpandedClubId(null)} />
+        <AttendanceHistoryModal
+          open={activeStatModal === 'attendance_history' || activeStatModal === 'events_attended'}
+          onClose={() => setActiveStatModal(null)}
+          records={attendanceRecords}
+        />
+      </div>
+    </>
+  );
 }
