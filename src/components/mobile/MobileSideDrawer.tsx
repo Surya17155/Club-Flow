@@ -7,8 +7,9 @@ import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   LayoutDashboard, Calendar, Compass, UserCircle, Settings, LogOut,
-  Shield, Settings2, Bot, ArrowRightLeft, Building2, X, Check, ChevronDown,
+  Shield, Settings2, Bot, ArrowRightLeft, Building2, X, Check, ChevronDown, Crown,
 } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
 
 const SUPER_ADMIN_EMAIL = 'suryakant.gnbba2029@iilm.edu';
 
@@ -255,6 +256,37 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
                       </AnimatePresence>
                     </>
                   )}
+                </>
+              )}
+
+              {/* Super Admin Toggle */}
+              {isSuperAdmin && (
+                <>
+                  <div className="my-2 mx-2" style={{ borderTop: '2px solid #ddd' }} />
+                  <div
+                    className="flex items-center justify-between w-full px-4 py-3"
+                    style={{
+                      fontFamily: "'Space Grotesk', sans-serif",
+                      fontWeight: 700,
+                      color: '#111',
+                    }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Crown className="w-5 h-5 text-amber-500" />
+                      <span className="text-sm">Super Admin</span>
+                    </div>
+                    <Switch
+                      checked={location.pathname === '/super-admin' || location.pathname === '/global-reports'}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          nav('/super-admin');
+                        } else {
+                          nav('/admin');
+                        }
+                      }}
+                      className="scale-90"
+                    />
+                  </div>
                 </>
               )}
             </nav>
