@@ -276,147 +276,217 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen relative antialiased p-6 md:p-8 dashboard-corner-gradient text-foreground">
-      {/* Background blobs */}
-      <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
-        <div
-          className="absolute top-[-8%] left-[-8%] w-[550px] h-[550px] rounded-full mix-blend-multiply filter blur-[100px] opacity-80 animate-blob"
-          style={{ backgroundColor: "hsl(45 90% 85% / 0.9)" }}
-        />
-        <div
-          className="absolute top-[-5%] right-[-5%] w-[450px] h-[450px] rounded-full mix-blend-multiply filter blur-[90px] opacity-70 animate-blob animation-delay-2000"
-          style={{ backgroundColor: "hsl(25 80% 82% / 0.8)" }}
-        />
-        <div
-          className="absolute bottom-[-8%] left-[-5%] w-[500px] h-[500px] rounded-full mix-blend-multiply filter blur-[100px] opacity-60 animate-blob animation-delay-4000"
-          style={{ backgroundColor: "hsl(35 75% 78% / 0.6)" }}
-        />
-        <div
-          className="absolute bottom-[-10%] right-[-5%] w-[600px] h-[600px] rounded-full mix-blend-multiply filter blur-[100px] opacity-70 animate-blob"
-          style={{ backgroundColor: "hsl(28 70% 70% / 0.45)", animationDelay: "3s" }}
-        />
-        <div
-          className="absolute top-[40%] left-[30%] w-[300px] h-[300px] rounded-full filter blur-[120px] opacity-30"
-          style={{ backgroundColor: "hsl(40 80% 88%)" }}
-        />
-      </div>
+    <div className="min-h-screen flex antialiased" style={{ backgroundColor: '#EAF1F7' }}>
+      {/* Sidebar */}
+      <DashboardSidebar />
 
-      {/* Header */}
-      <header className="relative z-20 flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-        <h1 className="text-xl md:text-2xl font-bold font-display text-foreground">
-          {greeting}, <span className="text-primary">{fullName.split(" ")[0]}</span> 👋
-        </h1>
+      {/* Main content container */}
+      <div className="flex-1 flex flex-col min-h-screen p-4">
+        <div
+          className="flex-1 flex flex-col overflow-hidden"
+          style={{
+            background: '#FFFFFF',
+            borderRadius: '24px',
+            padding: '24px 28px',
+            boxShadow: '0px 20px 60px rgba(0,0,0,0.08)',
+          }}
+        >
+          {/* Header */}
+          <header className="flex justify-between items-center mb-6">
+            <h1 className="text-xl font-bold font-display" style={{ color: '#0F172A' }}>
+              {greeting}, <span className="text-primary">{fullName.split(" ")[0]}</span> 👋
+            </h1>
 
-        {/* Functional Toggle */}
-        <div className="inline-flex items-center rounded-[20px] p-1 bg-muted">
-          <button
-            onClick={() => setViewMode("personal")}
-            className={`px-4 py-1.5 rounded-2xl text-sm font-semibold transition-all ${
-              isPersonal ? "shadow-sm bg-white text-primary" : "text-muted-foreground"
-            }`}
-          >
-            Personal
-          </button>
-          <button
-            onClick={() => setViewMode("club")}
-            className={`px-4 py-1.5 rounded-2xl text-sm font-semibold transition-all ${
-              !isPersonal ? "shadow-sm bg-white text-primary" : "text-muted-foreground"
-            }`}
-          >
-            Club
-          </button>
-        </div>
+            <div className="inline-flex items-center rounded-[20px] p-1" style={{ backgroundColor: '#F7F9FC' }}>
+              <button
+                onClick={() => setViewMode("personal")}
+                className={`px-4 py-1.5 rounded-2xl text-sm font-semibold transition-all ${
+                  isPersonal ? "shadow-sm bg-white text-primary" : "text-muted-foreground"
+                }`}
+              >
+                Personal
+              </button>
+              <button
+                onClick={() => setViewMode("club")}
+                className={`px-4 py-1.5 rounded-2xl text-sm font-semibold transition-all ${
+                  !isPersonal ? "shadow-sm bg-white text-primary" : "text-muted-foreground"
+                }`}
+              >
+                Club
+              </button>
+            </div>
 
-        <div className="flex items-center gap-4">
-          {isPersonal && (
-            <button
-              onClick={() => navigate("/discover")}
-              className="text-primary-foreground text-sm font-medium px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-transform active:scale-95 gradient-gold"
-            >
-              <Compass className="w-4 h-4" /> Discover Clubs
-            </button>
-          )}
-          {!isPersonal && activeClub && (activeClub.role === "president" || activeClub.role === "admin") && (
-            <button
-              onClick={() => navigate("/clubs")}
-              className="text-primary-foreground text-sm font-medium px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-transform active:scale-95 gradient-gold"
-            >
-              <Users className="w-4 h-4" /> Manage Club
-            </button>
-          )}
-          {!isPersonal && activeClub && hasPower("create_event") && (
-            <DropdownMenu>
-              <DropdownMenuTrigger className="text-primary-foreground text-sm font-medium px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition-transform active:scale-95 gradient-gold">
-                <Calendar className="w-4 h-4" /> Events <ChevronDown className="w-3 h-3" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem onSelect={() => navigate("/create-event")}>
-                  <Edit3 className="mr-2 h-4 w-4" /> Create Event
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setManageEventsOpen(true)}>
-                  <ClipboardList className="mr-2 h-4 w-4" /> Manage Events
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
-          <ProfileDropdown viewMode={viewMode} />
-        </div>
-      </header>
+            <div className="flex items-center gap-3">
+              {isPersonal && (
+                <button
+                  onClick={() => navigate("/discover")}
+                  className="text-primary-foreground text-sm font-medium px-5 py-2 rounded-full shadow-md flex items-center gap-2 transition-transform active:scale-95 gradient-gold"
+                >
+                  <Compass className="w-4 h-4" /> Discover Clubs
+                </button>
+              )}
+              {!isPersonal && activeClub && (activeClub.role === "president" || activeClub.role === "admin") && (
+                <button
+                  onClick={() => navigate("/clubs")}
+                  className="text-primary-foreground text-sm font-medium px-5 py-2 rounded-full shadow-md flex items-center gap-2 transition-transform active:scale-95 gradient-gold"
+                >
+                  <Users className="w-4 h-4" /> Manage Club
+                </button>
+              )}
+              {!isPersonal && activeClub && hasPower("create_event") && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="text-primary-foreground text-sm font-medium px-5 py-2 rounded-full shadow-md flex items-center gap-2 transition-transform active:scale-95 gradient-gold">
+                    <Calendar className="w-4 h-4" /> Events <ChevronDown className="w-3 h-3" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuItem onSelect={() => navigate("/create-event")}>
+                      <Edit3 className="mr-2 h-4 w-4" /> Create Event
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => setManageEventsOpen(true)}>
+                      <ClipboardList className="mr-2 h-4 w-4" /> Manage Events
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+              <ProfileDropdown viewMode={viewMode} />
+            </div>
+          </header>
 
-      {/* Stats Row */}
-      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {statsCards.map((stat, i) => (
-          <div
-            key={i}
-            className={`glass-card p-6 flex flex-col justify-between h-32 relative overflow-hidden group hover:bg-white/50 transition-colors ${'clickable' in stat && stat.clickable ? 'cursor-pointer ring-primary/20 hover:ring-2' : ''}`}
-            onClick={() => {
-              if ('clickAction' in stat && stat.clickAction) setActiveStatModal(stat.clickAction);
-            }}
-          >
-            <div>
-              <p className="text-sm mb-1 text-muted-foreground">{stat.label}</p>
-              <div className="flex items-center gap-2">
-                <h3 className="text-3xl font-bold text-foreground">{stat.value}</h3>
-                {"isGrowth" in stat && stat.isGrowth && (
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="hsl(var(--success))" strokeWidth={3}>
-                    <path d="M5 15l7-7 7 7" />
-                  </svg>
+          {/* Stats Row — 3 cards */}
+          <section className="grid grid-cols-3 gap-5 mb-6">
+            {(isPersonal
+              ? [
+                  { label: 'Clubs Joined', value: String(personalStats.clubCount), clickAction: 'clubs_joined' as const },
+                  { label: 'Events Attended', value: String(personalStats.eventsAttended), clickAction: 'events_attended' as const },
+                  { label: 'Upcoming Events', value: String(upcomingEvents.length), clickAction: null },
+                ]
+              : [
+                  { label: 'Total Members', value: String(clubStats.totalMembers), clickAction: null },
+                  { label: 'Total Events', value: String(clubStats.totalEvents), clickAction: null },
+                  { label: 'Avg. Attendance', value: `${clubStats.avgAttendanceRate}%`, clickAction: null },
+                ]
+            ).map((stat, i) => (
+              <div
+                key={i}
+                onClick={() => { if (stat.clickAction) setActiveStatModal(stat.clickAction); }}
+                className={`flex flex-col justify-center px-5 py-4 rounded-2xl transition-all duration-200 ${stat.clickAction ? 'cursor-pointer hover:shadow-md' : ''}`}
+                style={{
+                  backgroundColor: '#F7F9FC',
+                  height: 100,
+                  boxShadow: '0px 6px 20px rgba(0,0,0,0.04)',
+                }}
+              >
+                <p className="text-xs font-medium mb-1" style={{ color: '#6B7280' }}>{stat.label}</p>
+                <p className="text-3xl font-bold" style={{ color: '#0F172A' }}>{stat.value}</p>
+                {stat.clickAction && (
+                  <p className="text-[10px] text-primary font-medium mt-0.5">View details →</p>
                 )}
               </div>
-              {'clickable' in stat && stat.clickable && (
-                <p className="text-[10px] text-primary font-medium mt-1">Click to view details →</p>
+            ))}
+          </section>
+
+          {/* Main content grid */}
+          <div className="flex-1 overflow-auto" style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 20 }}>
+            {/* Left: Calendar or Analytics */}
+            <div
+              className="rounded-2xl overflow-hidden"
+              style={{
+                backgroundColor: '#F7F9FC',
+                padding: 18,
+                boxShadow: '0px 6px 20px rgba(0,0,0,0.04)',
+              }}
+            >
+              {isPersonal ? (
+                <EventCalendar mode="personal" />
+              ) : (
+                <div>
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="font-bold text-base" style={{ color: '#0F172A' }}>Attendance Analytics</h3>
+                    <div className="px-3 py-1 rounded-lg text-xs flex items-center gap-1 cursor-pointer" style={{ backgroundColor: '#FFFFFF', color: '#6B7280' }}>
+                      Last 30 Days <ChevronDown className="w-3 h-3" />
+                    </div>
+                  </div>
+                  <ResponsiveContainer width="100%" height={280}>
+                    <ComposedChart data={clubStats.chartData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                      <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#6B7280" }} />
+                      <YAxis tick={{ fontSize: 11, fill: "#6B7280" }} domain={[0, 100]} />
+                      <Tooltip
+                        contentStyle={{
+                          background: "#FFFFFF",
+                          border: "1px solid #E5E7EB",
+                          borderRadius: "12px",
+                          fontSize: "12px",
+                        }}
+                      />
+                      <defs>
+                        <linearGradient id="barGradient" x1="0" y1="1" x2="0" y2="0">
+                          <stop offset="0%" stopColor="#dfa579" />
+                          <stop offset="100%" stopColor="#eacda3" />
+                        </linearGradient>
+                      </defs>
+                      <Bar dataKey="attendance" fill="url(#barGradient)" radius={[8, 8, 0, 0]} name="Attendance %" />
+                      <Line
+                        type="monotone"
+                        dataKey="engagement"
+                        stroke="#bf7e54"
+                        strokeWidth={2.5}
+                        dot={{ fill: "#FFFFFF", stroke: "#bf7e54", strokeWidth: 2, r: 5 }}
+                        name="Engagement Score"
+                      />
+                    </ComposedChart>
+                  </ResponsiveContainer>
+                </div>
               )}
             </div>
-            <svg
-              className="absolute bottom-4 right-4 w-24 h-12 text-primary/50"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="3"
-              viewBox="0 0 100 30"
-            >
-              <path d={stat.path} strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </div>
-        ))}
-      </section>
 
-      {/* Main grid */}
-      <main className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* LEFT: Profile */}
-        <div className="lg:col-span-3 h-full">
-          <div className="glass-card p-6 h-full flex flex-col items-center text-center">
-            <div className="relative mb-4">
-              <div
-                className="absolute inset-0 rounded-full blur-xl transform scale-110"
-                style={{ backgroundColor: "hsl(30 70% 80% / 0.5)" }}
-              />
-              {profile?.avatar_url ? (
-                <img
-                  src={profile.avatar_url}
-                  alt={fullName}
-                  className="w-[120px] h-[120px] rounded-full border-4 border-white shadow-lg relative z-10 object-cover"
-                />
-              ) : (
+            {/* Right: Upcoming Events */}
+            <div
+              className="rounded-2xl overflow-y-auto"
+              style={{
+                backgroundColor: '#F7F9FC',
+                padding: 18,
+                boxShadow: '0px 6px 20px rgba(0,0,0,0.04)',
+                maxHeight: 'calc(100vh - 340px)',
+              }}
+            >
+              <h3 className="font-bold text-base mb-4" style={{ color: '#0F172A' }}>Upcoming Events</h3>
+              <div className="space-y-3">
+                {upcomingEvents.length > 0 ? (
+                  upcomingEvents.map((event) => (
+                    <div
+                      key={event.id}
+                      className="flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-colors hover:bg-white"
+                      onClick={() => {
+                        setSelectedEvent(event);
+                        setEventDialogOpen(true);
+                      }}
+                    >
+                      <div
+                        className="rounded-xl w-11 h-11 flex flex-col items-center justify-center shrink-0"
+                        style={{ backgroundColor: '#DDEBFF' }}
+                      >
+                        <span className="text-[9px] font-bold uppercase" style={{ color: '#3B82F6' }}>
+                          {event.month}
+                        </span>
+                        <span className="text-sm font-bold leading-none" style={{ color: '#1E40AF' }}>
+                          {event.day}
+                        </span>
+                      </div>
+                      <div className="min-w-0">
+                        <h4 className="text-sm font-semibold truncate" style={{ color: '#0F172A' }}>{event.name}</h4>
+                        <span className="text-xs" style={{ color: '#6B7280' }}>{event.club_name}</span>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm italic text-center py-6" style={{ color: '#6B7280' }}>No upcoming events</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
                 <div className="w-[120px] h-[120px] rounded-full border-4 border-white shadow-lg relative z-10 flex items-center justify-center text-3xl font-bold bg-primary text-primary-foreground">
                   {initials}
                 </div>
