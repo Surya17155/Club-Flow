@@ -306,7 +306,7 @@ export function DashboardSidebar() {
 
         {/* Nav items */}
         <nav className="flex-1 flex flex-col gap-1 px-3 mt-2 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
-          {coreNavItems.map((item, index) => {
+          {coreNavItems.filter(item => !(item.url === '/clubs' && !isClubMode)).map((item, index) => {
             const active = isActive(item.url);
 
             if (collapsed) {
