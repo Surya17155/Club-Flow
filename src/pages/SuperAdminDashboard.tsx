@@ -1026,6 +1026,48 @@ const SuperAdminDashboard = () => {
         )}
       </section>
 
+      {/* Design Theme Switcher */}
+      <div className="mb-6">
+        <section className="glass-card p-5">
+          <div className="flex items-center gap-3 mb-4">
+            <Palette className="w-5 h-5 text-primary" />
+            <h2 className="text-lg font-semibold text-foreground">App Design Theme</h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+            {designs.map((design) => {
+              const isActive = activeDesign === design.id;
+              return (
+                <div
+                  key={design.id}
+                  className={`relative rounded-xl p-4 border-2 transition-all cursor-pointer ${
+                    isActive
+                      ? 'border-primary bg-primary/5 shadow-gold'
+                      : 'border-border/50 bg-card hover:border-primary/30 hover:shadow-card'
+                  }`}
+                  onClick={() => setActiveDesign(design.id)}
+                >
+                  {isActive && (
+                    <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-primary flex items-center justify-center">
+                      <Check className="w-3.5 h-3.5 text-primary-foreground" />
+                    </div>
+                  )}
+                  <h4 className="font-bold text-foreground mb-1">{design.name}</h4>
+                  <p className="text-xs text-muted-foreground leading-relaxed">{design.description}</p>
+                  {isActive && (
+                    <span className="inline-block mt-2 text-xs font-semibold text-primary">Currently Active</span>
+                  )}
+                </div>
+              );
+            })}
+            {/* Placeholder for future designs */}
+            <div className="rounded-xl p-4 border-2 border-dashed border-border/40 flex flex-col items-center justify-center text-center min-h-[100px]">
+              <Plus className="w-5 h-5 text-muted-foreground/50 mb-1" />
+              <p className="text-xs text-muted-foreground/60">More designs coming soon</p>
+            </div>
+          </div>
+        </section>
+      </div>
+
       {/* Club Management */}
       <div className="mb-6">
         <section className="glass-card p-5 flex flex-col max-h-[500px]">
