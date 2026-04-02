@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Lock, Loader2 } from 'lucide-react';
+import { MobileBottomNav } from '@/components/mobile/MobileBottomNav';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -159,7 +160,12 @@ const Settings = () => {
     );
   }
 
-  return <div className="min-h-screen dashboard-corner-gradient p-6 md:p-10">{content}</div>;
+  return (
+    <div className="min-h-screen pb-24" style={{ background: isNeo ? '#F4EFE7' : undefined }}>
+      <div className="p-6 md:p-10">{content}</div>
+      <MobileBottomNav />
+    </div>
+  );
 };
 
 export default Settings;
