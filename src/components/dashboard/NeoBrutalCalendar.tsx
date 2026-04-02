@@ -149,11 +149,11 @@ const NeoBrutalCalendar = ({ mode }: Props) => {
   return (
     <div className="flex flex-col">
       <div
-        className="px-5 py-4 flex justify-between items-center gap-2"
+        className="px-4 py-3 flex justify-between items-center gap-2"
         style={{ borderBottom: '2px solid #111111', background: 'rgba(246,225,207,0.3)' }}
       >
-        <h3
-          className="text-lg uppercase tracking-wide"
+          <h3
+            className="text-base uppercase tracking-wide"
           style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, color: '#111111', letterSpacing: '-0.5px' }}
         >
           Attendance Calendar
@@ -175,7 +175,7 @@ const NeoBrutalCalendar = ({ mode }: Props) => {
             <ChevronLeft className="w-4 h-4" />
           </button>
           <span
-            className="text-sm px-4 text-center"
+            className="text-sm px-3 text-center"
             style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, color: '#111111' }}
           >
             {MONTHS[month].toUpperCase()} {year}
@@ -198,12 +198,12 @@ const NeoBrutalCalendar = ({ mode }: Props) => {
         </div>
       </div>
 
-      <div className="p-5">
-        <div className="grid grid-cols-7 gap-3 mb-3">
+      <div className="p-4">
+        <div className="grid grid-cols-7 gap-2 mb-2.5">
           {DAYS.map((day) => (
             <div
               key={day}
-              className="text-center text-[10px] uppercase leading-none"
+              className="text-center text-[9px] uppercase leading-none"
               style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, color: 'rgba(17,17,17,0.4)' }}
             >
               {day}
@@ -211,7 +211,7 @@ const NeoBrutalCalendar = ({ mode }: Props) => {
           ))}
         </div>
 
-        <div className="grid grid-cols-7 gap-3">
+        <div className="grid grid-cols-7 gap-2 auto-rows-[clamp(72px,8vw,108px)]">
           {calendarCells.map((cell) => {
             const hasEvents = cell.events.length > 0;
 
@@ -219,12 +219,12 @@ const NeoBrutalCalendar = ({ mode }: Props) => {
               return (
                 <div
                   key={cell.key}
-                  className="aspect-square flex items-center justify-center"
+                  className="h-full flex items-center justify-center"
                   style={{
                     fontFamily: "'Space Grotesk', sans-serif",
                     fontWeight: 700,
                     color: 'rgba(17,17,17,0.2)',
-                    fontSize: '14px',
+                     fontSize: '12px',
                   }}
                 >
                   {cell.day}
@@ -236,10 +236,10 @@ const NeoBrutalCalendar = ({ mode }: Props) => {
               <div
                 key={cell.key}
                 onClick={() => handleDayClick(cell.day, cell.events)}
-                className="aspect-square flex flex-col items-center justify-center transition-all duration-200 select-none"
+                className="h-full min-h-0 flex flex-col items-center justify-center transition-all duration-200 select-none"
                 style={{
                   border: '2px solid #111111',
-                  borderRadius: '10px',
+                  borderRadius: '8px',
                   background: cell.isToday ? '#E98A3A' : hasEvents ? '#F6E1CF' : '#FFFFFF',
                   cursor: hasEvents ? 'pointer' : 'default',
                   fontFamily: "'Space Grotesk', sans-serif",
@@ -253,15 +253,15 @@ const NeoBrutalCalendar = ({ mode }: Props) => {
                   e.currentTarget.style.boxShadow = 'none';
                 }}
               >
-                <span className="font-bold text-sm leading-none" style={{ color: '#111111' }}>
+                 <span className="font-bold text-xs leading-none" style={{ color: '#111111' }}>
                   {cell.day}
                 </span>
                 {cell.isToday ? (
-                  <span className="text-[7px] font-bold leading-none mt-1" style={{ color: '#111111' }}>
+                   <span className="text-[6px] font-bold leading-none mt-1" style={{ color: '#111111' }}>
                     TODAY
                   </span>
                 ) : hasEvents ? (
-                  <div className="w-1.5 h-1.5 rounded-full mt-1" style={{ background: '#E98A3A' }} />
+                   <div className="w-1.5 h-1.5 rounded-full mt-1" style={{ background: '#E98A3A' }} />
                 ) : null}
               </div>
             );
