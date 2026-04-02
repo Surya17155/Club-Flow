@@ -660,7 +660,7 @@ If the file contains emails and class_coordinator names (or other profile fields
 
 3. After using fetch_event_data, output the result as:
 \`\`\`event-data-json
-{"event_name":"Hackathon","event_date":"2026-03-15","total_attendees":25,"attendees":[{"name":"John","email":"john@iilm.edu","roll_no":"123","phone":"9876543210","programme":"BBA","year":"2","section":"A","class_coordinator":"Dr. Smith","scanned_at":"2026-03-15T10:30:00","method":"QR Scan"}]}
+{"event_name":"Hackathon","event_date":"2026-03-15T10:00:00","end_date":"2026-03-15T16:00:00","event_type":"Workshop","category":"Technical","access_type":"Open to All","attendance_given":true,"description":"Annual coding competition","total_attendees":25,"attendees":[{"name":"John","email":"john@iilm.edu","roll_no":"123","phone":"9876543210","programme":"BBA","year":"2","section":"A","class_coordinator":"Dr. Smith","scanned_at":"2026-03-15T10:30:00","method":"QR Scan"}]}
 \`\`\`
 
 4. When you use any action tool, wrap the result in a \`\`\`tool-result block.
