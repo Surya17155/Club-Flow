@@ -298,8 +298,8 @@ const CreateEvent = () => {
 
   return (
     <div
-      className="min-h-screen text-[#111]"
-      style={{ background: '#F4EFE7', fontFamily: "'Space Grotesk', sans-serif" }}
+      className="min-h-screen text-[#111] overflow-x-hidden"
+      style={{ background: '#F4EFE7', fontFamily: "'Space Grotesk', sans-serif", scrollbarWidth: 'none' }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Header */}
