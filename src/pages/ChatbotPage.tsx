@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { DashboardSidebar } from '@/components/layout/DashboardSidebar';
 import { Send, Bot, User, Paperclip, FileText } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useClub } from '@/contexts/ClubContext';
