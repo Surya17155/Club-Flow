@@ -38,6 +38,18 @@ export function ChatPanel({ open, onClose, activeClubId }: ChatPanelProps) {
     }
   }, [messages, open]);
 
+  const handleFormSubmit = (data: any) => {
+    const details = Object.entries(data)
+      .filter(([_, v]) => v)
+      .map(([k, v]) => `${k}: ${v}`)
+      .join(', ');
+    setInput(`Add this member with these details: ${details}`);
+    setTimeout(() => {
+      const sendBtn = document.querySelector('[data-chat-send]') as HTMLButtonElement;
+      sendBtn?.click();
+    }, 100);
+  };
+
   const send = async () => {
     const text = input.trim();
     if ((!text && !file) || loading || !session?.access_token) return;
