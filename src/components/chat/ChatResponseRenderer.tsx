@@ -53,6 +53,7 @@ interface MemberFormData {
 }
 
 interface EventData {
+  club_name?: string;
   event_name: string;
   event_date: string;
   end_date?: string;
@@ -71,6 +72,7 @@ interface EventData {
     year: string;
     section: string;
     class_coordinator: string;
+    avatar_url?: string;
     scanned_at: string;
     method: string;
   }>;
@@ -521,32 +523,37 @@ const MemberFormComponent = memo(function MemberFormComponent({ data, onSubmit }
   );
 });
 
-// ── Event Data Download Component ──
+// ── Label helpers ──
+
+function normalizeAccessType(raw?: string): string {
+  if (!raw) return '';
+  const v = raw.toLowerCase().replace(/[_-]/g, ' ').trim();
+  if (v.includes('all') || v === 'open') return 'Open to All';
+  if (v.includes('club')) return 'Club Members Only';
+  if (v.includes('invite')) return 'Invite Only';
+  return raw;
+}
+
+function normalizeEventType(raw?: string): string {
+  if (!raw) return '';
+  return raw.charAt(0).toUpperCase() + raw.slice(1);
+}
+
+// ── Event Data Component (flat card with in-card attendance panel) ──
 
 const EventDataComponent = memo(function EventDataComponent({ data }: { data: EventData }) {
-  const [showExportMenu, setShowExportMenu] = useState(false);
   const [showAttendance, setShowAttendance] = useState(false);
   const [expandedAttendee, setExpandedAttendee] = useState<number | null>(null);
-  const [showAttExport, setShowAttExport] = useState(false);
+  const [showExportMenu, setShowExportMenu] = useState(false);
 
   const formatDate = (d: string) => {
-    try { return new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }); }
+    try { return new Date(d).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }); }
     catch { return d; }
   };
-
   const formatTime = (d: string) => {
     try { return new Date(d).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }); }
     catch { return ''; }
   };
-
-  const generateExportRows = useCallback(() => {
-    return data.attendees.map((a, i) => ({
-      'S.No': i + 1, 'Student Name': a.name, 'Email': a.email, 'Roll No': a.roll_no || '—',
-      'Phone': a.phone || '—', 'Programme': a.programme || '—', 'Year': a.year || '—',
-      'Section': a.section || '—', 'Class Coordinator': a.class_coordinator || '—',
-      'Scan Time': new Date(a.scanned_at).toLocaleString(), 'Method': a.method,
-    }));
-  }, [data.attendees]);
 
   const downloadCSV = useCallback(() => {
     const headers = ['S.No', 'Student Name', 'Email', 'Roll No', 'Phone', 'Programme', 'Year', 'Section', 'Class Coordinator', 'Scan Time', 'Method'];
@@ -554,7 +561,7 @@ const EventDataComponent = memo(function EventDataComponent({ data }: { data: Ev
       i + 1, a.name, a.email, a.roll_no, a.phone, a.programme, a.year, a.section, a.class_coordinator,
       new Date(a.scanned_at).toLocaleString(), a.method,
     ]);
-    const csv = [headers.join(','), ...rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(','))].join('\n');
+    const csv = [headers.join(','), ...rows.map(r => r.map(c => `"${String(c ?? '').replace(/"/g, '""')}"`).join(','))].join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -563,11 +570,15 @@ const EventDataComponent = memo(function EventDataComponent({ data }: { data: Ev
     a.click();
     URL.revokeObjectURL(url);
     setShowExportMenu(false);
-    setShowAttExport(false);
   }, [data]);
 
   const downloadXLSX = useCallback(() => {
-    const rows = generateExportRows();
+    const rows = data.attendees.map((a, i) => ({
+      'S.No': i + 1, 'Student Name': a.name, 'Email': a.email, 'Roll No': a.roll_no || '—',
+      'Phone': a.phone || '—', 'Programme': a.programme || '—', 'Year': a.year || '—',
+      'Section': a.section || '—', 'Class Coordinator': a.class_coordinator || '—',
+      'Scan Time': new Date(a.scanned_at).toLocaleString(), 'Method': a.method,
+    }));
     const ws = XLSX.utils.json_to_sheet(rows);
     const colWidths = Object.keys(rows[0] || {}).map(key => ({
       wch: Math.max(key.length, ...rows.map(row => String((row as any)[key]).length)) + 2,
@@ -577,50 +588,160 @@ const EventDataComponent = memo(function EventDataComponent({ data }: { data: Ev
     XLSX.utils.book_append_sheet(wb, ws, 'Attendance');
     XLSX.writeFile(wb, `${data.event_name.replace(/[^a-zA-Z0-9]/g, '_')}_attendance.xlsx`);
     setShowExportMenu(false);
-    setShowAttExport(false);
-  }, [data, generateExportRows]);
+  }, [data]);
 
-  const ExportDropdown = ({ show, onClose }: { show: boolean; onClose: () => void }) => (
-    <AnimatePresence>
-      {show && (
-        <>
-          <div className="fixed inset-0 z-40" onClick={onClose} />
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: -4 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: -4 }}
-            className="absolute right-0 top-full mt-1 z-50 w-40 rounded-xl border border-border bg-card shadow-lg overflow-hidden"
-          >
-            <button onClick={downloadCSV} className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-foreground hover:bg-muted transition-colors">
-              <FileSpreadsheet className="w-4 h-4 text-emerald-500" /> Download CSV
-            </button>
-            <button onClick={downloadXLSX} className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-foreground hover:bg-muted transition-colors border-t border-border/50">
-              <FileText className="w-4 h-4 text-blue-500" /> Download Excel
-            </button>
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
-  );
+  const accessLabel = normalizeAccessType(data.access_type);
+  const typeLabel = normalizeEventType(data.event_type);
 
+  // ── Attendance Panel (in-card) ──
+  if (showAttendance) {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="rounded-2xl border border-border bg-card shadow-md overflow-hidden"
+        style={{ minHeight: 380 }}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-border/50">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => { setShowAttendance(false); setExpandedAttendee(null); }}
+              className="w-7 h-7 rounded-full bg-muted flex items-center justify-center hover:bg-muted/80 transition-colors"
+            >
+              <X className="w-4 h-4 text-foreground" />
+            </button>
+            <div>
+              <p className="text-sm font-semibold text-foreground">Attendance</p>
+              <p className="text-xs text-muted-foreground">{data.total_attendees} attendees</p>
+            </div>
+          </div>
+          <div className="relative">
+            <Button size="sm" variant="outline" className="gap-1.5 text-xs rounded-xl" onClick={() => setShowExportMenu(!showExportMenu)}>
+              <Download className="w-3.5 h-3.5" /> Export
+            </Button>
+            <AnimatePresence>
+              {showExportMenu && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setShowExportMenu(false)} />
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95, y: -4 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: -4 }}
+                    className="absolute right-0 top-full mt-1 z-50 w-40 rounded-xl border border-border bg-card shadow-lg overflow-hidden"
+                  >
+                    <button onClick={downloadCSV} className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-foreground hover:bg-muted transition-colors">
+                      <FileSpreadsheet className="w-4 h-4 text-emerald-500" /> Download CSV
+                    </button>
+                    <button onClick={downloadXLSX} className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-foreground hover:bg-muted transition-colors border-t border-border/50">
+                      <FileText className="w-4 h-4 text-blue-500" /> Download Excel
+                    </button>
+                  </motion.div>
+                </>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+
+        {/* Attendee list with scrollbar */}
+        <div className="overflow-y-auto p-3 space-y-2" style={{ maxHeight: 320 }}>
+          {data.attendees.length === 0 && (
+            <p className="text-sm text-muted-foreground text-center py-8">No attendees recorded</p>
+          )}
+          {data.attendees.map((attendee, idx) => (
+            <div key={idx}>
+              <button
+                onClick={() => setExpandedAttendee(expandedAttendee === idx ? null : idx)}
+                className="w-full text-left rounded-xl p-3 bg-muted/40 border border-border/30 hover:bg-muted/60 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  {attendee.avatar_url ? (
+                    <img src={attendee.avatar_url} alt="" className="w-9 h-9 rounded-full object-cover shrink-0" />
+                  ) : (
+                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary/60 to-primary flex items-center justify-center text-primary-foreground font-bold text-sm shrink-0">
+                      {attendee.name?.[0]?.toUpperCase() || '?'}
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">{attendee.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {attendee.programme}{attendee.programme && attendee.section ? ' • ' : ''}{attendee.section ? `Section ${attendee.section}` : ''}
+                    </p>
+                  </div>
+                  <ChevronDown className={`w-4 h-4 text-muted-foreground shrink-0 transition-transform duration-200 ${expandedAttendee === idx ? 'rotate-180' : ''}`} />
+                </div>
+              </button>
+              <AnimatePresence>
+                {expandedAttendee === idx && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="px-3 py-2 mt-1 rounded-xl bg-muted/30 border border-border/20 space-y-1.5">
+                      {attendee.email && (
+                        <div className="flex items-center gap-2 text-xs">
+                          <Mail className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                          <span className="text-foreground truncate">{attendee.email}</span>
+                        </div>
+                      )}
+                      {attendee.roll_no && (
+                        <div className="flex items-center gap-2 text-xs">
+                          <Info className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                          <span className="text-foreground">Roll No: {attendee.roll_no}</span>
+                        </div>
+                      )}
+                      {attendee.phone && (
+                        <div className="flex items-center gap-2 text-xs">
+                          <Phone className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                          <span className="text-foreground">{attendee.phone}</span>
+                        </div>
+                      )}
+                      {attendee.year && (
+                        <div className="flex items-center gap-2 text-xs">
+                          <GraduationCap className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                          <span className="text-foreground">Year {attendee.year}</span>
+                        </div>
+                      )}
+                      {attendee.class_coordinator && (
+                        <div className="flex items-center gap-2 text-xs">
+                          <User className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                          <span className="text-foreground">CC: {attendee.class_coordinator}</span>
+                        </div>
+                      )}
+                      <div className="flex items-center gap-2 text-xs">
+                        <Clock className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                        <span className="text-muted-foreground">{new Date(attendee.scanned_at).toLocaleString()} • {attendee.method}</span>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          ))}
+        </div>
+      </motion.div>
+    );
+  }
+
+  // ── Event Summary View ──
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       className="rounded-2xl border border-border bg-card shadow-md overflow-hidden"
     >
-      {/* Header: Event Name + Export */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border/50">
-        <h3 className="font-bold text-base text-foreground">{data.event_name}</h3>
-        <div className="relative">
-          <Button size="sm" variant="outline" className="gap-1.5 text-xs rounded-xl" onClick={() => setShowExportMenu(!showExportMenu)}>
-            <Download className="w-3.5 h-3.5" /> Export
-          </Button>
-          <ExportDropdown show={showExportMenu} onClose={() => setShowExportMenu(false)} />
-        </div>
-      </div>
-
       <div className="p-4 space-y-3">
+        {/* Club name */}
+        {data.club_name && (
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{data.club_name}</p>
+        )}
+
+        {/* Event title */}
+        <h3 className="font-bold text-lg text-foreground leading-tight">{data.event_name}</h3>
+
         {/* Date */}
         <div className="flex items-center gap-2 text-sm text-foreground">
           <Calendar className="w-4 h-4 text-primary shrink-0" />
@@ -636,40 +757,34 @@ const EventDataComponent = memo(function EventDataComponent({ data }: { data: Ev
           </span>
         </div>
 
-        {/* Description */}
+        {/* Description as plain text */}
         {data.description && (
-          <div className="p-3 rounded-xl bg-muted/50 border border-border/30">
-            <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider mb-1">Description</p>
-            <p className="text-sm text-foreground">{data.description}</p>
-          </div>
+          <p className="text-sm text-foreground/80 leading-relaxed">{data.description}</p>
         )}
 
-        {/* Event Details */}
-        <div className="p-3 rounded-xl bg-muted/50 border border-border/30 space-y-2">
-          <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Event Details</p>
-          <div className="flex flex-wrap gap-2">
-            {data.event_type && (
-              <span className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-400/20">
-                <Tag className="w-3 h-3" /> {data.event_type}
-              </span>
-            )}
-            {data.category && (
-              <span className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full bg-muted text-muted-foreground border border-border/30">
-                {data.category}
-              </span>
-            )}
-            {data.access_type && (
-              <span className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full bg-violet-500/10 text-violet-700 dark:text-violet-300 border border-violet-400/20">
-                <Globe className="w-3 h-3" /> {data.access_type}
-              </span>
-            )}
-            <span className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full border ${data.attendance_given ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-400/20' : 'bg-muted text-muted-foreground border-border/30'}`}>
-              <CheckCircle2 className="w-3 h-3" /> Attendance {data.attendance_given ? 'Yes' : 'No'}
+        {/* Event details badges */}
+        <div className="flex flex-wrap gap-2">
+          {typeLabel && (
+            <span className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-400/20">
+              <Tag className="w-3 h-3" /> {typeLabel}
             </span>
-          </div>
+          )}
+          {data.category && (
+            <span className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full bg-muted text-muted-foreground border border-border/30">
+              {data.category}
+            </span>
+          )}
+          {accessLabel && (
+            <span className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full bg-violet-500/10 text-violet-700 dark:text-violet-300 border border-violet-400/20">
+              <Globe className="w-3 h-3" /> {accessLabel}
+            </span>
+          )}
+          <span className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full border ${data.attendance_given ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-400/20' : 'bg-muted text-muted-foreground border-border/30'}`}>
+            <CheckCircle2 className="w-3 h-3" /> Attendance: {data.attendance_given ? 'Yes' : 'No'}
+          </span>
         </div>
 
-        {/* Attendance Button */}
+        {/* Attendance button */}
         <button
           onClick={() => setShowAttendance(true)}
           className="w-full flex items-center justify-between p-3 rounded-xl bg-primary/5 border border-primary/20 hover:bg-primary/10 transition-colors"
@@ -681,129 +796,6 @@ const EventDataComponent = memo(function EventDataComponent({ data }: { data: Ev
           <span className="text-sm font-semibold text-primary">{data.total_attendees} attendees</span>
         </button>
       </div>
-
-      {/* Attendance Popup Overlay */}
-      <AnimatePresence>
-        {showAttendance && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm"
-            onClick={() => { setShowAttendance(false); setExpandedAttendee(null); }}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-              onClick={e => e.stopPropagation()}
-              className="w-full max-w-md max-h-[80vh] rounded-2xl border border-border bg-card shadow-2xl overflow-hidden flex flex-col"
-            >
-              {/* Popup Header */}
-              <div className="flex items-center justify-between px-4 py-3 border-b border-border/50 shrink-0">
-                <div className="flex items-center gap-2">
-                  <button onClick={() => { setShowAttendance(false); setExpandedAttendee(null); }} className="w-7 h-7 rounded-full bg-muted flex items-center justify-center hover:bg-muted/80 transition-colors">
-                    <X className="w-4 h-4 text-foreground" />
-                  </button>
-                  <div>
-                    <p className="text-sm font-semibold text-foreground">Attendance</p>
-                    <p className="text-xs text-muted-foreground">{data.total_attendees} attendees</p>
-                  </div>
-                </div>
-                <div className="relative">
-                  <Button size="sm" variant="outline" className="gap-1.5 text-xs rounded-xl" onClick={() => setShowAttExport(!showAttExport)}>
-                    <Download className="w-3.5 h-3.5" /> Export
-                  </Button>
-                  <ExportDropdown show={showAttExport} onClose={() => setShowAttExport(false)} />
-                </div>
-              </div>
-
-              {/* Attendee Tiles */}
-              <div className="flex-1 overflow-y-auto p-3 space-y-2">
-                {data.attendees.length === 0 && (
-                  <p className="text-sm text-muted-foreground text-center py-8">No attendees recorded</p>
-                )}
-                {data.attendees.map((attendee, idx) => (
-                  <motion.div
-                    key={idx}
-                    initial={{ opacity: 0, y: 4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: idx * 0.02 }}
-                  >
-                    <button
-                      onClick={() => setExpandedAttendee(expandedAttendee === idx ? null : idx)}
-                      className="w-full text-left rounded-xl p-3 bg-muted/40 border border-border/30 hover:bg-muted/60 transition-colors"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary/60 to-primary flex items-center justify-center text-primary-foreground font-bold text-sm shrink-0">
-                          {attendee.name?.[0]?.toUpperCase() || '?'}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-foreground truncate">{attendee.name}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {attendee.programme}{attendee.programme && attendee.section ? ' • ' : ''}{attendee.section ? `Section ${attendee.section}` : ''}
-                          </p>
-                        </div>
-                        <ChevronDown className={`w-4 h-4 text-muted-foreground shrink-0 transition-transform duration-200 ${expandedAttendee === idx ? 'rotate-180' : ''}`} />
-                      </div>
-                    </button>
-
-                    <AnimatePresence>
-                      {expandedAttendee === idx && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: 'auto', opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.2 }}
-                          className="overflow-hidden"
-                        >
-                          <div className="px-3 py-2 mt-1 rounded-xl bg-muted/30 border border-border/20 space-y-1.5">
-                            {attendee.email && (
-                              <div className="flex items-center gap-2 text-xs">
-                                <Mail className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                                <span className="text-foreground truncate">{attendee.email}</span>
-                              </div>
-                            )}
-                            {attendee.roll_no && (
-                              <div className="flex items-center gap-2 text-xs">
-                                <Info className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                                <span className="text-foreground">Roll No: {attendee.roll_no}</span>
-                              </div>
-                            )}
-                            {attendee.phone && (
-                              <div className="flex items-center gap-2 text-xs">
-                                <Phone className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                                <span className="text-foreground">{attendee.phone}</span>
-                              </div>
-                            )}
-                            {attendee.year && (
-                              <div className="flex items-center gap-2 text-xs">
-                                <GraduationCap className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                                <span className="text-foreground">Year {attendee.year}</span>
-                              </div>
-                            )}
-                            {attendee.class_coordinator && (
-                              <div className="flex items-center gap-2 text-xs">
-                                <User className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                                <span className="text-foreground">CC: {attendee.class_coordinator}</span>
-                              </div>
-                            )}
-                            <div className="flex items-center gap-2 text-xs">
-                              <Clock className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                              <span className="text-muted-foreground">{new Date(attendee.scanned_at).toLocaleString()} • {attendee.method}</span>
-                            </div>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </motion.div>
   );
 });
