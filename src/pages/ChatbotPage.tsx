@@ -94,8 +94,13 @@ const ChatbotPage = () => {
     }
   };
 
+  const isMobile = useIsMobile();
+
   return (
-    <div className="flex flex-col h-full max-w-3xl mx-auto" style={{ minHeight: 'calc(100vh - 120px)' }}>
+    <div className="min-h-screen flex antialiased" style={{ backgroundColor: '#F4EFE7' }}>
+      {!isMobile && <DashboardSidebar />}
+      <div className="flex-1 overflow-y-auto" style={{ padding: '24px 28px' }}>
+        <div className="flex flex-col h-full max-w-3xl mx-auto" style={{ minHeight: 'calc(100vh - 120px)' }}>
       {/* Header */}
       <div className="flex items-center gap-3 mb-4">
         <div
@@ -267,6 +272,8 @@ const ChatbotPage = () => {
         >
           <Send className="w-4 h-4" style={{ color: '#111' }} />
         </button>
+      </div>
+        </div>
       </div>
     </div>
   );

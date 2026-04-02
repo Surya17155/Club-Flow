@@ -86,16 +86,24 @@ const AssignPowersPage = () => {
     setToggling(null);
   };
 
+  const isMobile = useIsMobile();
+
   if (loading || powersLoading) {
     return (
-      <div className="flex items-center justify-center py-24">
-        <Loader2 className="w-8 h-8 animate-spin" style={{ color: '#E98A3A' }} />
+      <div className="min-h-screen flex antialiased" style={{ backgroundColor: '#F4EFE7' }}>
+        {!isMobile && <DashboardSidebar />}
+        <div className="flex-1 flex items-center justify-center" style={{ padding: '24px 28px' }}>
+          <Loader2 className="w-8 h-8 animate-spin" style={{ color: '#E98A3A' }} />
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="min-h-screen flex antialiased" style={{ backgroundColor: '#F4EFE7' }}>
+      {!isMobile && <DashboardSidebar />}
+      <div className="flex-1 overflow-y-auto" style={{ padding: '24px 28px' }}>
+        <div className="max-w-2xl mx-auto space-y-6">
       <div className="flex items-center gap-3 mb-2">
         <Shield className="w-6 h-6" style={{ color: '#E98A3A' }} />
         <div>
@@ -220,6 +228,8 @@ const AssignPowersPage = () => {
           })}
         </div>
       )}
+        </div>
+      </div>
     </div>
   );
 };
