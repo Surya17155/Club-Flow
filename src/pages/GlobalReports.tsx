@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import ProfileDropdown from '@/components/dashboard/ProfileDropdown';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const roleLabelMap: Record<string, string> = {
   admin: 'Admin', president: 'President', vice_president: 'Vice President',
@@ -31,6 +32,7 @@ interface ReportRow {
 const GlobalReports = () => {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [clubFilter, setClubFilter] = useState('all');
@@ -180,12 +182,13 @@ const GlobalReports = () => {
   }
 
   return (
-    <div className="min-h-screen relative antialiased p-6 md:p-8 dashboard-corner-gradient text-foreground">
-      {/* Background blobs */}
-      <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
-        <div className="absolute top-[-8%] left-[-8%] w-[550px] h-[550px] rounded-full mix-blend-multiply filter blur-[100px] opacity-80 animate-blob" style={{ backgroundColor: 'hsl(45 90% 85% / 0.9)' }} />
-        <div className="absolute bottom-[-10%] right-[-5%] w-[600px] h-[600px] rounded-full mix-blend-multiply filter blur-[100px] opacity-70 animate-blob animation-delay-2000" style={{ backgroundColor: 'hsl(28 70% 70% / 0.45)' }} />
-      </div>
+    <div className={isMobile ? 'min-h-screen relative antialiased p-6 md:p-8 dashboard-corner-gradient text-foreground' : 'h-full overflow-auto p-1 text-foreground'}>
+      {isMobile && (
+        <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
+          <div className="absolute top-[-8%] left-[-8%] w-[550px] h-[550px] rounded-full mix-blend-multiply filter blur-[100px] opacity-80 animate-blob" style={{ backgroundColor: 'hsl(45 90% 85% / 0.9)' }} />
+          <div className="absolute bottom-[-10%] right-[-5%] w-[600px] h-[600px] rounded-full mix-blend-multiply filter blur-[100px] opacity-70 animate-blob animation-delay-2000" style={{ backgroundColor: 'hsl(28 70% 70% / 0.45)' }} />
+        </div>
+      )}
 
       {/* Header */}
       <header className="relative z-20 flex flex-col md:flex-row justify-between items-center mb-6 gap-4">

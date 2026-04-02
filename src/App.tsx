@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ClubProvider } from "@/contexts/ClubContext";
 import { DesignProvider } from "@/contexts/DesignContext";
+import { DesktopFrame } from "@/components/layout/DesktopFrame";
 
 // Eager-load critical routes
 import LandingPage from "./pages/LandingPage";
@@ -72,14 +73,14 @@ const App = () => (
                 <Route path="/mark-attendance/:token" element={<MarkAttendance />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/settings" element={<Settings />} />
-                <Route path="/create-event" element={<CreateEvent />} />
-                <Route path="/super-admin" element={<SuperAdminDashboard />} />
-                <Route path="/global-reports" element={<GlobalReports />} />
+                <Route path="/create-event" element={<DesktopFrame><CreateEvent /></DesktopFrame>} />
+                <Route path="/super-admin" element={<DesktopFrame><SuperAdminDashboard /></DesktopFrame>} />
+                <Route path="/global-reports" element={<DesktopFrame><GlobalReports /></DesktopFrame>} />
                 <Route path="/discover" element={<DiscoverClubs />} />
-                <Route path="/calendar" element={<MobileCalendar />} />
-                <Route path="/chat" element={<MobileChat />} />
+                <Route path="/calendar" element={<DesktopFrame><MobileCalendar /></DesktopFrame>} />
+                <Route path="/chat" element={<DesktopFrame><MobileChat /></DesktopFrame>} />
                 <Route path="/scan" element={<Events />} />
-                <Route path="/manage-outsiders" element={<ManageOutsiders />} />
+                <Route path="/manage-outsiders" element={<DesktopFrame><ManageOutsiders /></DesktopFrame>} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

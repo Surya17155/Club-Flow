@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { MobileBottomNav } from '@/components/mobile/MobileBottomNav';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface CalendarEvent {
   id: string;
@@ -38,6 +39,7 @@ const MobileCalendar = () => {
   const { user } = useAuth();
   const { activeClub } = useClub();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   const [viewMode] = useState<'personal' | 'club'>(() => {
     return (localStorage.getItem('dashboardViewMode') as 'personal' | 'club') || 'personal';
@@ -128,7 +130,7 @@ const MobileCalendar = () => {
 
   return (
     <div
-      className="min-h-screen pb-24 dashboard-corner-gradient"
+      className={isMobile ? 'min-h-screen pb-24 dashboard-corner-gradient' : 'h-full overflow-auto bg-background text-foreground'}
       style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
     >
       <style>{`::-webkit-scrollbar { display: none; }`}</style>
@@ -340,7 +342,7 @@ const MobileCalendar = () => {
         </DialogContent>
       </Dialog>
 
-      <MobileBottomNav />
+      {isMobile && <MobileBottomNav />}
     </div>
   );
 };

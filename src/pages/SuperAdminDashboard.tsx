@@ -969,15 +969,8 @@ const SuperAdminDashboard = () => {
 
   // ──── DESKTOP VIEW (unchanged) ────
   return (
-    <div className="min-h-screen relative antialiased p-6 md:p-8 dashboard-corner-gradient text-foreground" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+    <div className="h-full overflow-auto antialiased p-1 text-foreground" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
       <style>{`div::-webkit-scrollbar { display: none; }`}</style>
-
-      {/* Background blobs */}
-      <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
-        <div className="absolute top-[-8%] left-[-8%] w-[550px] h-[550px] rounded-full mix-blend-multiply filter blur-[100px] opacity-80 animate-blob" style={{ backgroundColor: 'hsl(45 90% 85% / 0.9)' }} />
-        <div className="absolute top-[-5%] right-[-5%] w-[450px] h-[450px] rounded-full mix-blend-multiply filter blur-[90px] opacity-70 animate-blob animation-delay-2000" style={{ backgroundColor: 'hsl(25 80% 82% / 0.8)' }} />
-        <div className="absolute bottom-[-8%] left-[-5%] w-[500px] h-[500px] rounded-full mix-blend-multiply filter blur-[100px] opacity-60 animate-blob animation-delay-4000" style={{ backgroundColor: 'hsl(35 75% 78% / 0.6)' }} />
-      </div>
 
       {/* Header */}
       <header className="relative z-20 flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
