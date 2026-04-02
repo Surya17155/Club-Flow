@@ -1,5 +1,6 @@
 import { memo } from "react";
 import { Instagram, Linkedin, Mail } from "lucide-react";
+import VerifiedBadge, { getRoleBadgeVariant } from "@/components/ui/VerifiedBadge";
 
 interface MobileProfileCardProps {
   fullName: string;
@@ -17,143 +18,125 @@ interface MobileProfileCardProps {
   role?: string;
 }
 
-import VerifiedBadge, { getRoleBadgeVariant } from "@/components/ui/VerifiedBadge";
-
 export const MobileProfileCard = memo(function MobileProfileCard({
-  fullName,
-  roleLabel,
-  clubName,
-  avatarUrl,
-  programme,
-  year,
-  about,
-  isPersonal,
-  viewMode = "personal",
-  socialLinkedin,
-  socialInstagram,
-  socialGmail,
-  role,
+  fullName, roleLabel, clubName, avatarUrl, programme, year, about,
+  isPersonal, viewMode = "personal", socialLinkedin, socialInstagram, socialGmail, role,
 }: MobileProfileCardProps) {
-  const initials = fullName
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-
+  const initials = fullName.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase();
   const hasSocials = socialLinkedin || socialInstagram || socialGmail;
 
   return (
     <div
-      className="relative mx-auto overflow-hidden"
+      className="overflow-hidden"
       style={{
-        width: "100%",
-        maxWidth: "320px",
-        aspectRatio: "3 / 4",
-        borderRadius: "28px",
-        background: "#111",
-        boxShadow: "0 20px 40px rgba(0,0,0,0.35), 0 8px 16px rgba(0,0,0,0.25)",
+        background: '#F6E1CF',
+        border: '2px solid #111',
+        boxShadow: '6px 6px 0px #111',
       }}
     >
-      {/* Layer 1: Profile Image */}
-      {avatarUrl ? (
-        <img
-          src={avatarUrl}
-          alt={fullName}
-          loading="lazy"
-          decoding="async"
-          className="absolute inset-0 w-full h-full"
-          style={{ objectFit: "cover", objectPosition: "center", zIndex: 1 }}
-        />
-      ) : (
-        <div
-          className="absolute inset-0 w-full h-full flex items-center justify-center text-5xl font-bold text-white"
-          style={{
-            background: "linear-gradient(145deg, hsl(30 60% 78%), hsl(36 55% 72%), hsl(25 50% 68%))",
-            zIndex: 1,
-          }}
+      {/* Image */}
+      <div className="w-full" style={{ aspectRatio: '4/5', borderBottom: '2px solid #111' }}>
+        {avatarUrl ? (
+          <img
+            src={avatarUrl}
+            alt={fullName}
+            loading="lazy"
+            decoding="async"
+            className="w-full h-full object-cover"
+            style={{ filter: 'grayscale(0.3) contrast(1.1)' }}
+          />
+        ) : (
+          <div
+            className="w-full h-full flex items-center justify-center"
+            style={{ background: '#E98A3A' }}
+          >
+            <span className="text-6xl font-black" style={{ color: '#111' }}>{initials}</span>
+          </div>
+        )}
+      </div>
+
+      {/* Details */}
+      <div className="p-5">
+        <h2
+          className="text-3xl font-black uppercase leading-none flex items-center gap-1"
+          style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#111' }}
         >
-          {initials}
-        </div>
-      )}
-
-      {/* Layer 2: Smooth Progressive Blur */}
-      <div
-        className="absolute bottom-0 left-0 w-full pointer-events-none"
-        style={{
-          height: "60%",
-          zIndex: 2,
-          borderRadius: "0 0 28px 28px",
-          backdropFilter: "blur(20px)",
-          WebkitBackdropFilter: "blur(20px)",
-          background: "linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 25%, rgba(0,0,0,0.18) 45%, rgba(0,0,0,0.08) 60%, rgba(0,0,0,0.02) 75%, rgba(0,0,0,0) 90%)",
-          maskImage: "linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.9) 20%, rgba(0,0,0,0.7) 40%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0.15) 75%, rgba(0,0,0,0) 90%)",
-          WebkitMaskImage: "linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.9) 20%, rgba(0,0,0,0.7) 40%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0.15) 75%, rgba(0,0,0,0) 90%)",
-        }}
-      />
-
-      {/* Layer 3: Content Layer */}
-      <div
-        className="absolute bottom-0 left-0 right-0 px-5 pb-5 flex flex-col justify-end"
-        style={{ zIndex: 3, height: "35%" }}
-      >
-        {/* Name */}
-        <h2 className="text-xl font-bold font-display text-white drop-shadow-md flex items-center">
           {fullName}
           {role && getRoleBadgeVariant(role) && (
-            <VerifiedBadge variant={getRoleBadgeVariant(role)!} size={18} />
+            <VerifiedBadge variant={getRoleBadgeVariant(role)!} size={20} />
           )}
         </h2>
 
-        {/* Role */}
-        <p className="text-sm font-medium text-white/75 mt-0.5">
-          {isPersonal ? "Student" : `${roleLabel} • ${clubName}`}
+        {/* Role Badge */}
+        <div className="mt-2">
+          <span
+            className="inline-block px-3 py-1 text-xs font-bold uppercase tracking-widest"
+            style={{
+              background: '#111',
+              color: '#E98A3A',
+              fontFamily: "'Space Grotesk', sans-serif",
+            }}
+          >
+            {isPersonal ? 'Student' : `${roleLabel}`}
+          </span>
+        </div>
+
+        {/* Info */}
+        <p
+          className="mt-4 text-sm leading-relaxed"
+          style={{ color: '#333', fontFamily: "'Space Grotesk', sans-serif" }}
+        >
+          {[programme, year ? `Semester ${year}` : null, about].filter(Boolean).join(' • ') || 'No details available'}
         </p>
 
-        {/* Programme & Year */}
-        {(programme || year) && (
-          <div className="flex gap-4 mt-2 text-xs text-white/60">
-            {year && <span>{year}</span>}
-            {programme && <span>{programme}</span>}
-          </div>
-        )}
-
-        {/* Social icons — below programme/year */}
+        {/* Social Icons */}
         {hasSocials && (
-          <div className="flex gap-3 mt-3">
-            {socialLinkedin && (
-              <a
-                href={socialLinkedin.startsWith("http") ? socialLinkedin : `https://${socialLinkedin}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center hover:bg-white/40 transition-colors"
-              >
-                <Linkedin className="w-4 h-4 text-white" />
-              </a>
-            )}
+          <div className="flex gap-3 mt-5">
             {socialInstagram && (
               <a
-                href={socialInstagram.startsWith("http") ? socialInstagram : `https://${socialInstagram}`}
+                href={socialInstagram.startsWith('http') ? socialInstagram : `https://${socialInstagram}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center hover:bg-white/40 transition-colors"
+                className="w-10 h-10 flex items-center justify-center cursor-pointer active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+                style={{
+                  background: '#fff',
+                  border: '2px solid #111',
+                  boxShadow: '2px 2px 0px #111',
+                }}
               >
-                <Instagram className="w-4 h-4 text-white" />
+                <Instagram className="w-4 h-4" style={{ color: '#111' }} />
+              </a>
+            )}
+            {socialLinkedin && (
+              <a
+                href={socialLinkedin.startsWith('http') ? socialLinkedin : `https://${socialLinkedin}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 flex items-center justify-center cursor-pointer active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+                style={{
+                  background: '#fff',
+                  border: '2px solid #111',
+                  boxShadow: '2px 2px 0px #111',
+                }}
+              >
+                <Linkedin className="w-4 h-4" style={{ color: '#111' }} />
               </a>
             )}
             {socialGmail && (
               <a
                 href={`mailto:${socialGmail}`}
-                className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center hover:bg-white/40 transition-colors"
+                className="w-10 h-10 flex items-center justify-center cursor-pointer active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+                style={{
+                  background: '#fff',
+                  border: '2px solid #111',
+                  boxShadow: '2px 2px 0px #111',
+                }}
               >
-                <Mail className="w-4 h-4 text-white" />
+                <Mail className="w-4 h-4" style={{ color: '#111' }} />
               </a>
             )}
           </div>
         )}
-
-        {/* About */}
-        {about && <p className="text-xs text-white/55 mt-2 line-clamp-2 leading-relaxed">{about}</p>}
       </div>
     </div>
   );
