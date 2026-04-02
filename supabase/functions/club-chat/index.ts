@@ -652,7 +652,7 @@ If the file contains emails and class_coordinator names (or other profile fields
 - remove_member: remove a member by email
 - update_member: update a member's profile or role
 - update_profiles_bulk: bulk update profile fields (e.g. class_coordinator) from a file
-- fetch_event_data: get detailed attendance data for an event. After fetching, output the result as an \`\`\`event-data-json block so the user can download it.
+- fetch_event_data: get detailed attendance data for an event. **CRITICAL**: You MUST use this tool whenever the user asks for event details, event report, attendance data, attendance report, download event info, export attendance, or anything related to viewing/downloading a specific event's information. After calling this tool, you MUST output the result ONLY as an \`\`\`event-data-json block. NEVER output event details as plain text or as \`\`\`events-json when the user is asking about a specific event's details/report/attendance.
 - create_event: create a new event
 
 **IMPORTANT RULES FOR ACTIONS**:
@@ -663,12 +663,13 @@ If the file contains emails and class_coordinator names (or other profile fields
 
 2. When adding MULTIPLE members (bulk), just use import_members — no form needed, email is sufficient.
 
-3. After using fetch_event_data, output the result as:
+3. **CRITICAL EVENT DATA RULE**: After using fetch_event_data, you MUST output the first matched event as an \`\`\`event-data-json block. Use the exact fields from the tool result. The format MUST be:
 \`\`\`event-data-json
-{"event_name":"Hackathon","event_date":"2026-03-15T10:00:00","end_date":"2026-03-15T16:00:00","event_type":"Workshop","category":"Technical","access_type":"Open to All","attendance_given":true,"description":"Annual coding competition","total_attendees":25,"attendees":[{"name":"John","email":"john@iilm.edu","roll_no":"123","phone":"9876543210","programme":"BBA","year":"2","section":"A","class_coordinator":"Dr. Smith","scanned_at":"2026-03-15T10:30:00","method":"QR Scan"}]}
+{"club_name":"Club Name","event_name":"Event Name","event_date":"...","end_date":"...","event_type":"...","category":"...","access_type":"...","attendance_given":true,"description":"...","total_attendees":25,"attendees":[{"name":"...","email":"...","roll_no":"...","phone":"...","programme":"...","year":"...","section":"...","class_coordinator":"...","avatar_url":"...","scanned_at":"...","method":"QR Scan"}]}
 \`\`\`
+Do NOT add any text before or after this block. The frontend will render it as an interactive card.
 
-4. When you use any action tool, wrap the result in a \`\`\`tool-result block.
+4. When you use any action tool (except fetch_event_data), wrap the result in a \`\`\`tool-result block.
 5. After executing a tool, summarize what was done clearly.
 6. NEVER hallucinate data. Only use real data from the database.`
       : "\n\n**NOTE**: You are in read-only mode. You can answer questions but cannot perform actions.";

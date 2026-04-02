@@ -53,6 +53,7 @@ interface MemberFormData {
 }
 
 interface EventData {
+  club_name?: string;
   event_name: string;
   event_date: string;
   end_date?: string;
@@ -71,6 +72,7 @@ interface EventData {
     year: string;
     section: string;
     class_coordinator: string;
+    avatar_url?: string;
     scanned_at: string;
     method: string;
   }>;
