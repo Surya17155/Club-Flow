@@ -478,15 +478,6 @@ export function DashboardSidebar() {
           </button>
         </div>
       </div>
-
-      {/* Modals */}
-      <AssignPowersModal open={showPowersModal} onOpenChange={setShowPowersModal} />
-      <ClubSettingsModal open={showClubSettings} onOpenChange={setShowClubSettings} />
-      <ChatPanel
-        open={showChat}
-        onClose={() => setShowChat(false)}
-        activeClubId={(isSuperAdminEmail && isSuperAdminMode) ? undefined : activeClub?.club_id}
-      />
     </>
   );
 }

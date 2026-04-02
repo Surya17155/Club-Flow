@@ -31,6 +31,9 @@ const DiscoverClubs = lazy(() => import("./pages/DiscoverClubs"));
 const MobileCalendar = lazy(() => import("./pages/MobileCalendar"));
 const MobileChat = lazy(() => import("./pages/MobileChat"));
 const ManageOutsiders = lazy(() => import("./pages/ManageOutsiders"));
+const ClubSettingsPage = lazy(() => import("./pages/ClubSettingsPage"));
+const AssignPowersPage = lazy(() => import("./pages/AssignPowersPage"));
+const ChatbotPage = lazy(() => import("./pages/ChatbotPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
