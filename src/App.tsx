@@ -31,6 +31,9 @@ const DiscoverClubs = lazy(() => import("./pages/DiscoverClubs"));
 const MobileCalendar = lazy(() => import("./pages/MobileCalendar"));
 const MobileChat = lazy(() => import("./pages/MobileChat"));
 const ManageOutsiders = lazy(() => import("./pages/ManageOutsiders"));
+const ClubSettingsPage = lazy(() => import("./pages/ClubSettingsPage"));
+const AssignPowersPage = lazy(() => import("./pages/AssignPowersPage"));
+const ChatbotPage = lazy(() => import("./pages/ChatbotPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
@@ -80,6 +83,9 @@ const App = () => (
                 <Route path="/calendar" element={<DesktopFrame><MobileCalendar /></DesktopFrame>} />
                 <Route path="/chat" element={<DesktopFrame><MobileChat /></DesktopFrame>} />
                 <Route path="/scan" element={<Events />} />
+                <Route path="/club-settings" element={<ClubSettingsPage />} />
+                <Route path="/assign-powers" element={<AssignPowersPage />} />
+                <Route path="/chatbot" element={<ChatbotPage />} />
                 <Route path="/manage-outsiders" element={<DesktopFrame><ManageOutsiders /></DesktopFrame>} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
