@@ -318,7 +318,7 @@ const AdminDashboard = () => {
               {greeting}, <span style={{ color: '#3B82F6' }}>{fullName.split(" ")[0]}</span> 👋
             </h1>
 
-            <div className="inline-flex items-center rounded-full p-1" style={{ backgroundColor: '#F1F5F9' }}>
+            <div className="inline-flex items-center rounded-full p-1 text-center shadow-sm" style={{ backgroundColor: '#F1F5F9' }}>
               <button
                 onClick={() => setViewMode("personal")}
                 className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${
