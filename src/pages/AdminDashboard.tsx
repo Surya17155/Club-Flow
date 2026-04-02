@@ -43,6 +43,7 @@ import {
 } from "recharts";
 import ProfileDropdown from "@/components/dashboard/ProfileDropdown";
 import EventCalendar from "@/components/dashboard/EventCalendar";
+import NeoBrutalCalendar from "@/components/dashboard/NeoBrutalCalendar";
 import ManageEventsModal from "@/components/dashboard/ManageEventsModal";
 import {
   DropdownMenu,
