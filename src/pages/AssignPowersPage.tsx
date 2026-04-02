@@ -88,6 +88,7 @@ const AssignPowersPage = () => {
   };
 
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
 
   if (loading || powersLoading) {
     return (
@@ -99,8 +100,6 @@ const AssignPowersPage = () => {
       </div>
     );
   }
-
-  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen flex antialiased" style={{ backgroundColor: '#F4EFE7' }}>
