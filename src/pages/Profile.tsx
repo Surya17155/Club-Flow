@@ -140,6 +140,10 @@ const Profile = () => {
               <Label>Year</Label>
               <Input value={val('year')} onChange={e => setForm({ ...form, year: e.target.value })} className="mt-1.5" />
             </div>
+            <div>
+              <Label>Class Coordinator</Label>
+              <Input value={val('class_coordinator')} onChange={e => setForm({ ...form, class_coordinator: e.target.value })} className="mt-1.5" placeholder="Enter class coordinator name" />
+            </div>
           </div>
           <div className="mt-5">
             <Label>About</Label>
