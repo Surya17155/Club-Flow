@@ -66,14 +66,8 @@ const Profile = () => {
 
   const val = (key: string) => form[key] ?? (profile as any)?.[key] ?? '';
 
-  if (authLoading || profileLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: isNeo ? '#F4EFE7' : undefined }}>
-        <div className="w-8 h-8 border-[3px] border-[#E98A3A]/30 border-t-[#E98A3A] rounded-full animate-spin" />
-      </div>
-    );
-  }
-  if (!user) return <Navigate to="/" replace />;
+  if (!user && !authLoading) return <Navigate to="/" replace />;
+  const isLoading = authLoading || profileLoading;
 
   const handleSave = async () => {
     setSaving(true);

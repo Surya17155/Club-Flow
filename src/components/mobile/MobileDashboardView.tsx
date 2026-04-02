@@ -1,4 +1,4 @@
-import { useState, useCallback, memo } from 'react';
+import { useState, useCallback } from 'react';
 import { ClubDetailOverlay } from './ClubDetailOverlay';
 import { AttendanceHistoryModal } from './AttendanceHistoryModal';
 import { useNavigate } from 'react-router-dom';
@@ -6,10 +6,9 @@ import { MobileProfileCard } from './MobileProfileCard';
 import { MobileBottomNav } from './MobileBottomNav';
 import { MobileSideDrawer } from './MobileSideDrawer';
 import {
-  Users, Calendar, CheckCircle, TrendingUp, Clock, ChevronRight,
-  Compass, Edit3, ClipboardList, Settings2, Menu,
+  Users, Calendar, CheckCircle, TrendingUp, ChevronRight,
+  Compass, Edit3, ClipboardList, Settings2, ChevronRight as Arrow,
 } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import { useProfile } from '@/hooks/useProfile';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -43,8 +42,6 @@ const roleLabelMap: Record<string, string> = {
   secretary: 'Secretary', social_media_head: 'Social Media Head', member: 'Member',
 };
 
-const statIcons = [Users, Calendar, CheckCircle, TrendingUp];
-
 export function MobileDashboardView({
   fullName, roleLabel, clubName, avatarUrl, programme, year, about,
   isPersonal, viewMode, setViewMode, statsCards, upcomingEvents, clubs,
@@ -58,7 +55,11 @@ export function MobileDashboardView({
   const [activeStatModal, setActiveStatModal] = useState<string | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  const initials = (profile?.full_name || 'U').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  // Filter stats to only "Clubs Joined" and "Events Attended"
+  const filteredStats = statsCards.filter(stat => {
+    const label = stat.label.toLowerCase();
+    return label.includes('club') || label.includes('events attended');
+  }).slice(0, 2);
 
   const handleStatClick = useCallback((stat: typeof statsCards[0]) => {
     if (stat.clickable && stat.clickAction) {
@@ -70,6 +71,9 @@ export function MobileDashboardView({
     }
   }, []);
 
+  // Light orange color shades for the two cards
+  const cardColors = ['#FFF0DE', '#FFE4C8'];
+
   return (
     <>
       {/* Side Drawer */}
@@ -80,7 +84,7 @@ export function MobileDashboardView({
         setViewMode={setViewMode}
       />
 
-      {/* Fixed Header — Neo Brutalism */}
+      {/* Fixed Header — minimal */}
       <div
         className="fixed top-0 left-0 right-0 z-40"
         style={{
@@ -89,95 +93,61 @@ export function MobileDashboardView({
           paddingTop: 'calc(env(safe-area-inset-top, 0px) + 8px)',
         }}
       >
-        <div className="flex items-center justify-between px-5 py-3">
-          {/* Profile button (left) */}
+        <div className="flex items-center px-5 py-3">
+          {/* Side panel trigger arrow */}
           <button
             onClick={() => setDrawerOpen(true)}
-            className="flex items-center gap-3"
-          >
-            <div
-              className="w-10 h-10 overflow-hidden flex items-center justify-center"
-              style={{ border: '2px solid #111' }}
-            >
-              {profile?.avatar_url ? (
-                <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-xs font-black" style={{ color: '#111' }}>{initials}</span>
-              )}
-            </div>
-            <h1
-              className="text-xl font-black uppercase tracking-tighter"
-              style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#111' }}
-            >
-              IILM CLUB
-            </h1>
-          </button>
-        </div>
-
-        {/* Mode Toggle */}
-        <div className="flex justify-center pb-3 px-5">
-          <div
-            className="flex p-1"
+            className="flex items-center justify-center"
             style={{
+              width: '36px',
+              height: '36px',
+              background: '#E98A3A',
               border: '2px solid #111',
-              background: '#fff',
-              boxShadow: '3px 3px 0px #111',
+              boxShadow: '2px 2px 0px #111',
+              borderRadius: '0 8px 8px 0',
+              marginLeft: '-20px',
+              animation: 'sideDrawerPulse 2.5s ease-in-out infinite',
             }}
           >
-            <button
-              onClick={() => setViewMode('personal')}
-              className="px-6 py-2 text-xs font-bold uppercase transition-all"
-              style={{
-                fontFamily: "'Space Grotesk', sans-serif",
-                background: isPersonal ? '#E98A3A' : 'transparent',
-                color: '#111',
-                border: isPersonal ? '2px solid #111' : '2px solid transparent',
-              }}
-            >
-              Personal
-            </button>
-            <button
-              onClick={() => setViewMode('club')}
-              className="px-6 py-2 text-xs font-bold uppercase transition-all"
-              style={{
-                fontFamily: "'Space Grotesk', sans-serif",
-                background: !isPersonal ? '#E98A3A' : 'transparent',
-                color: '#111',
-                border: !isPersonal ? '2px solid #111' : '2px solid transparent',
-              }}
-            >
-              Clubs
-            </button>
-          </div>
+            <ChevronRight className="w-5 h-5" style={{ color: '#111' }} strokeWidth={3} />
+          </button>
         </div>
       </div>
+
+      {/* Pulse animation keyframes */}
+      <style>{`
+        @keyframes sideDrawerPulse {
+          0%, 100% { transform: scale(1); box-shadow: 2px 2px 0px #111; }
+          50% { transform: scale(1.08); box-shadow: 3px 3px 0px #111; }
+        }
+      `}</style>
 
       {/* Scrollable Content */}
       <div
         className="min-h-screen pb-24 overflow-x-hidden"
         style={{
           background: '#F4EFE7',
-          paddingTop: '140px',
+          paddingTop: '80px',
           scrollbarWidth: 'none',
         }}
       >
         <main className="px-5 py-4 space-y-6">
-          {/* Greeting */}
+          {/* Greeting — larger, no emoji */}
           <p
-            className="text-lg"
+            className="text-xl"
             style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#111' }}
           >
-            Hi, <span className="font-black">{fullName?.split(' ')[0] || 'there'}</span> 👋
+            Hi, <span className="font-black text-2xl">{fullName?.split(' ')[0] || 'there'}</span>
           </p>
 
-          {/* Stats Row */}
-          <div className="grid grid-cols-3 gap-3">
-            {statsCards.slice(0, 3).map((stat, i) => (
+          {/* Stats Row — only 2 cards, centered */}
+          <div className="flex justify-center gap-4">
+            {filteredStats.map((stat, i) => (
               <div
                 key={i}
-                className={`flex flex-col items-center justify-center text-center p-3 ${stat.clickable ? 'cursor-pointer active:translate-x-[2px] active:translate-y-[2px] active:shadow-none' : ''}`}
+                className={`flex flex-col items-center justify-center text-center p-4 flex-1 max-w-[160px] ${stat.clickable ? 'cursor-pointer active:translate-x-[2px] active:translate-y-[2px] active:shadow-none' : ''}`}
                 style={{
-                  background: '#fff',
+                  background: cardColors[i] || cardColors[0],
                   border: '2px solid #111',
                   boxShadow: '4px 4px 0px #111',
                   transition: 'all 0.15s',
