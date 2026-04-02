@@ -39,7 +39,7 @@ import { ChatPanel } from '@/components/chat/ChatPanel';
 const coreNavItems = [
   { title: 'Dashboard', url: '/admin', icon: LayoutDashboard },
   { title: 'Events', url: '/events', icon: Calendar },
-  { title: 'Clubs', url: '/clubs', icon: Building2 },
+  { title: 'Club', url: '/clubs', icon: Building2 },
   { title: 'Discover', url: '/discover', icon: Compass },
   { title: 'Profile', url: '/profile', icon: UserCircle },
   { title: 'Settings', url: '/settings', icon: Settings },
