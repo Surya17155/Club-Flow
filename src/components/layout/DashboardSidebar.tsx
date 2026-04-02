@@ -41,7 +41,6 @@ const coreNavItems = [
   { title: 'Events', url: '/events', icon: Calendar },
   { title: 'Clubs', url: '/clubs', icon: Building2 },
   { title: 'Discover', url: '/discover', icon: Compass },
-  { title: 'Calendar', url: '/calendar', icon: CalendarDays },
   { title: 'Profile', url: '/profile', icon: UserCircle },
   { title: 'Settings', url: '/settings', icon: Settings },
 ];
@@ -201,14 +200,17 @@ export function DashboardSidebar() {
   return (
     <>
       <div
-        className="flex flex-col shrink-0 h-screen overflow-hidden"
+        className="flex flex-col shrink-0 overflow-hidden"
         onMouseMove={(e) => { if (collapsed) mouseY.set(e.clientY); }}
         onMouseLeave={() => mouseY.set(Infinity)}
         style={{
           width: collapsed ? 64 : 220,
           background: sidebarBg,
           transition: 'width 0.25s ease',
-          borderRight: isNeo ? '3px solid #111111' : 'none',
+          borderRadius: isNeo ? '16px' : '16px',
+          border: isNeo ? '3px solid #111111' : 'none',
+          margin: '12px',
+          height: 'calc(100vh - 24px)',
         }}
       >
         {/* Profile avatar */}
