@@ -38,6 +38,18 @@ export function ChatPanel({ open, onClose, activeClubId }: ChatPanelProps) {
     }
   }, [messages, open]);
 
+  const handleFormSubmit = (data: any) => {
+    const details = Object.entries(data)
+      .filter(([_, v]) => v)
+      .map(([k, v]) => `${k}: ${v}`)
+      .join(', ');
+    setInput(`Add this member with these details: ${details}`);
+    setTimeout(() => {
+      const sendBtn = document.querySelector('[data-chat-send]') as HTMLButtonElement;
+      sendBtn?.click();
+    }, 100);
+  };
+
   const send = async () => {
     const text = input.trim();
     if ((!text && !file) || loading || !session?.access_token) return;
@@ -159,7 +171,7 @@ export function ChatPanel({ open, onClose, activeClubId }: ChatPanelProps) {
               }`}
             >
               {msg.role === 'assistant' ? (
-                <ChatResponseRenderer content={msg.content} />
+                <ChatResponseRenderer content={msg.content} onFormSubmit={handleFormSubmit} />
               ) : (
                 msg.content
               )}
@@ -212,7 +224,7 @@ export function ChatPanel({ open, onClose, activeClubId }: ChatPanelProps) {
           className="text-sm min-h-[40px] max-h-[120px] resize-none rounded-xl"
           rows={1}
         />
-        <Button size="icon" onClick={send} disabled={loading || (!input.trim() && !file)}>
+        <Button size="icon" onClick={send} disabled={loading || (!input.trim() && !file)} data-chat-send>
           <Send className="w-4 h-4" />
         </Button>
       </div>
