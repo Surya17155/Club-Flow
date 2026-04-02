@@ -6,8 +6,8 @@ import { MobileProfileCard } from './MobileProfileCard';
 import { MobileBottomNav } from './MobileBottomNav';
 import { MobileSideDrawer } from './MobileSideDrawer';
 import {
-  Users, Calendar, CheckCircle, TrendingUp, ChevronRight,
-  Compass, Edit3, ClipboardList, Settings2, ChevronRight as Arrow,
+  Users, Calendar, ChevronRight,
+  Compass, ClipboardList, Settings2,
 } from 'lucide-react';
 import { useProfile } from '@/hooks/useProfile';
 import { useAuth } from '@/contexts/AuthContext';
@@ -84,34 +84,28 @@ export function MobileDashboardView({
         setViewMode={setViewMode}
       />
 
-      {/* Fixed Header — minimal */}
+      {/* Side panel trigger — no header bar */}
       <div
-        className="fixed top-0 left-0 right-0 z-40"
+        className="fixed top-0 left-0 z-40"
         style={{
-          background: '#F4EFE7',
-          borderBottom: '2px solid #111',
-          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 8px)',
+          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)',
         }}
       >
-        <div className="flex items-center px-5 py-3">
-          {/* Side panel trigger arrow */}
-          <button
-            onClick={() => setDrawerOpen(true)}
-            className="flex items-center justify-center"
-            style={{
-              width: '36px',
-              height: '36px',
-              background: '#E98A3A',
-              border: '2px solid #111',
-              boxShadow: '2px 2px 0px #111',
-              borderRadius: '0 8px 8px 0',
-              marginLeft: '-20px',
-              animation: 'sideDrawerPulse 2.5s ease-in-out infinite',
-            }}
-          >
-            <ChevronRight className="w-5 h-5" style={{ color: '#111' }} strokeWidth={3} />
-          </button>
-        </div>
+        <button
+          onClick={() => setDrawerOpen(true)}
+          className="flex items-center justify-center"
+          style={{
+            width: '36px',
+            height: '36px',
+            background: '#E98A3A',
+            border: '2px solid #111',
+            boxShadow: '2px 2px 0px #111',
+            borderRadius: '0 8px 8px 0',
+            animation: 'sideDrawerPulse 2.5s ease-in-out infinite',
+          }}
+        >
+          <ChevronRight className="w-5 h-5" style={{ color: '#111' }} strokeWidth={3} />
+        </button>
       </div>
 
       {/* Pulse animation keyframes */}
@@ -127,7 +121,7 @@ export function MobileDashboardView({
         className="min-h-screen pb-24 overflow-x-hidden"
         style={{
           background: '#F4EFE7',
-          paddingTop: '80px',
+          paddingTop: '60px',
           scrollbarWidth: 'none',
         }}
       >
@@ -214,34 +208,19 @@ export function MobileDashboardView({
               </button>
             )}
             {!isPersonal && canManageEvents && (
-              <>
-                <button
-                  onClick={() => navigate('/create-event')}
-                  className="flex items-center gap-2 px-4 py-2.5 text-xs font-bold uppercase whitespace-nowrap active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
-                  style={{
-                    background: '#fff',
-                    color: '#111',
-                    border: '2px solid #111',
-                    boxShadow: '3px 3px 0px #111',
-                    fontFamily: "'Space Grotesk', sans-serif",
-                  }}
-                >
-                  <Edit3 className="w-4 h-4" /> Create Event
-                </button>
-                <button
-                  onClick={onManageEventsOpen}
-                  className="flex items-center gap-2 px-4 py-2.5 text-xs font-bold uppercase whitespace-nowrap active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
-                  style={{
-                    background: '#fff',
-                    color: '#111',
-                    border: '2px solid #111',
-                    boxShadow: '3px 3px 0px #111',
-                    fontFamily: "'Space Grotesk', sans-serif",
-                  }}
-                >
-                  <ClipboardList className="w-4 h-4" /> Manage Events
-                </button>
-              </>
+              <button
+                onClick={onManageEventsOpen}
+                className="flex items-center gap-2 px-4 py-2.5 text-xs font-bold uppercase whitespace-nowrap active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+                style={{
+                  background: '#fff',
+                  color: '#111',
+                  border: '2px solid #111',
+                  boxShadow: '3px 3px 0px #111',
+                  fontFamily: "'Space Grotesk', sans-serif",
+                }}
+              >
+                <ClipboardList className="w-4 h-4" /> Manage Events
+              </button>
             )}
           </div>
 
