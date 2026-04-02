@@ -56,7 +56,7 @@ const ChatbotPage = () => {
     let fileName: string | undefined;
 
     if (file) {
-      fileUrl = file.url;
+      fileUrl = file.storageUrl;
       fileName = file.name;
       if (!userMsg) userMsg = `[Uploaded file: ${file.name}]`;
       clearFile();
