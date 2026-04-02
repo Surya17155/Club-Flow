@@ -199,7 +199,7 @@ const NeoBrutalCalendar = ({ mode }: Props) => {
       </div>
 
       <div className="p-4">
-        <div className="grid grid-cols-7 gap-2 mb-2.5">
+        <div className="grid grid-cols-7 gap-1.5 mb-1.5">
           {DAYS.map((day) => (
             <div
               key={day}
