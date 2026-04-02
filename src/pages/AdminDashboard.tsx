@@ -407,65 +407,20 @@ const AdminDashboard = () => {
                   ))}
                 </section>
 
-                {/* Profile + Upcoming Events 50/50 */}
-                <section className="flex-1 grid grid-cols-2 gap-6 min-h-0">
-                  {/* Profile Card — neo-brutalist with blur */}
+                {/* Calendar + Upcoming Events */}
+                <section className="flex-1 grid gap-6 min-h-0" style={{ gridTemplateColumns: '1fr 320px' }}>
+                  {/* Attendance Calendar */}
                   <div
-                    className="relative overflow-hidden flex flex-col justify-end"
+                    className="flex flex-col overflow-hidden"
                     style={{
                       borderRadius: '16px',
                       border: '3px solid #111111',
                       boxShadow: '4px 4px 0px #111111',
-                      background: '#111',
-                      minHeight: '340px',
+                      background: '#FFFFFF',
                     }}
                   >
-                    {profile?.avatar_url ? (
-                      <img
-                        src={profile.avatar_url}
-                        alt={fullName}
-                        className="absolute inset-0 w-full h-full object-cover"
-                        style={{ zIndex: 1 }}
-                      />
-                    ) : (
-                      <div
-                        className="absolute inset-0 w-full h-full flex items-center justify-center text-5xl font-bold text-white"
-                        style={{ background: 'linear-gradient(145deg, #E98A3A, #D4742A)', zIndex: 1 }}
-                      >
-                        {initials}
-                      </div>
-                    )}
-                    {/* Blur overlay */}
-                    <div
-                      className="absolute bottom-0 left-0 w-full pointer-events-none"
-                      style={{
-                        height: '60%',
-                        zIndex: 2,
-                        backdropFilter: 'blur(20px)',
-                        WebkitBackdropFilter: 'blur(20px)',
-                        background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 25%, rgba(0,0,0,0.18) 45%, rgba(0,0,0,0.08) 60%, rgba(0,0,0,0) 90%)',
-                        maskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.9) 20%, rgba(0,0,0,0.7) 40%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0) 90%)',
-                        WebkitMaskImage: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.9) 20%, rgba(0,0,0,0.7) 40%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0) 90%)',
-                      }}
-                    />
-                    {/* Content */}
-                    <div className="relative px-5 pb-5 flex flex-col justify-end" style={{ zIndex: 3 }}>
-                      <h2 className="text-xl font-bold text-white flex items-center" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-                        {fullName}
-                        {activeClub?.role && getRoleBadgeVariant(activeClub.role) && (
-                          <VerifiedBadge variant={getRoleBadgeVariant(activeClub.role)!} size={18} />
-                        )}
-                      </h2>
-                      <p className="text-sm font-medium text-white/75 mt-0.5">Student</p>
-                      {(programme || year) && (
-                        <div className="flex gap-4 mt-2 text-xs text-white/60">
-                          {year && <span>{year}</span>}
-                          {programme && <span>{programme}</span>}
-                        </div>
-                      )}
-                      {about && <p className="text-xs text-white/55 mt-2 line-clamp-2 leading-relaxed">{about}</p>}
-                    </div>
-                  </div>
+                    <div className="flex-1 overflow-auto p-4">
+                      <EventCalendar />
 
                   {/* Upcoming Events */}
                   <div
