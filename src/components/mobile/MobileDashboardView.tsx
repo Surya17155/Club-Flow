@@ -6,8 +6,8 @@ import { MobileProfileCard } from './MobileProfileCard';
 import { MobileBottomNav } from './MobileBottomNav';
 import { MobileSideDrawer } from './MobileSideDrawer';
 import {
-  Users, Calendar, CheckCircle, TrendingUp, ChevronRight,
-  Compass, Edit3, ClipboardList, Settings2, ChevronRight as Arrow,
+  Users, Calendar, ChevronRight,
+  Compass, ClipboardList, Settings2,
 } from 'lucide-react';
 import { useProfile } from '@/hooks/useProfile';
 import { useAuth } from '@/contexts/AuthContext';
