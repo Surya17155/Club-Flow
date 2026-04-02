@@ -696,7 +696,7 @@ ${JSON.stringify(clubSummaries, null, 2)}${fileContext}
 
 **EVENT DATA (for download)**: After using fetch_event_data, output as:
 \`\`\`event-data-json
-{"event_name":"Event Name","event_date":"2026-03-15","total_attendees":25,"attendees":[...]}
+{"event_name":"Event Name","event_date":"2026-03-15T10:00:00","end_date":"2026-03-15T16:00:00","event_type":"Workshop","category":"Technical","access_type":"Open to All","attendance_given":true,"description":"Event description here","total_attendees":25,"attendees":[...]}
 \`\`\`
 
 **MEMBER FORM**: When showing an add-member form, output as:
