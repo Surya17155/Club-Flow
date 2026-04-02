@@ -83,6 +83,8 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const greeting = useMemo(() => getRandomGreeting(), []);
   const isMobile = useIsMobile();
+  const { activeDesign } = useDesign();
+  const isNeo = activeDesign === 'design-2';
 
   const [upcomingEvents, setUpcomingEvents] = useState<any[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
