@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { lovable } from '@/integrations/lovable/index';
 import { Button } from '@/components/ui/button';
@@ -19,7 +19,17 @@ const Login = () => {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const { signIn, resetPassword } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
+
+  const getRedirectPath = () => {
+    // Check URL param first, then sessionStorage
+    const fromParam = searchParams.get('redirect');
+    if (fromParam) return fromParam;
+    const fromStorage = sessionStorage.getItem('pendingRedirect');
+    if (fromStorage) return fromStorage;
+    return '/dashboard';
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,7 +37,9 @@ const Login = () => {
     try {
       await signIn(email, password);
       toast({ title: 'Welcome back!', description: 'Successfully logged in.' });
-      navigate('/dashboard');
+      const redirectPath = getRedirectPath();
+      sessionStorage.removeItem('pendingRedirect');
+      navigate(redirectPath, { replace: true });
     } catch (error: any) {
       toast({ title: 'Login failed', description: error.message, variant: 'destructive' });
     } finally {
@@ -56,6 +68,11 @@ const Login = () => {
   const handleGoogleLogin = async () => {
     setIsGoogleLoading(true);
     try {
+      // Preserve redirect for after OAuth
+      const redirectPath = getRedirectPath();
+      if (redirectPath !== '/dashboard') {
+        sessionStorage.setItem('pendingRedirect', redirectPath);
+      }
       const result = await lovable.auth.signInWithOAuth("google", {
         redirect_uri: window.location.origin,
       });
@@ -70,7 +87,9 @@ const Login = () => {
       }
 
       toast({ title: 'Welcome!', description: 'Successfully logged in with Google.' });
-      navigate('/dashboard');
+      const rPath = getRedirectPath();
+      sessionStorage.removeItem('pendingRedirect');
+      navigate(rPath, { replace: true });
     } catch (error: any) {
       toast({ title: 'Google login failed', description: error.message, variant: 'destructive' });
     } finally {
