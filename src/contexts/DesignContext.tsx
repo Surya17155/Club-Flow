@@ -1,6 +1,6 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, ReactNode } from 'react';
 
-export type DesignTheme = 'design-1' | 'design-2';
+export type DesignTheme = 'design-2';
 
 interface DesignContextType {
   activeDesign: DesignTheme;
@@ -9,24 +9,18 @@ interface DesignContextType {
 }
 
 const designs = [
-  { id: 'design-1' as const, name: 'Design 1', description: 'Modern SaaS — Black sidebar, white floating card, colored stat cards, Lexend typography' },
-  { id: 'design-2' as const, name: 'Design 2', description: 'New Brutalism Style — Cream background, thick borders, hard shadows, Space Grotesk typography' },
+  { id: 'design-2' as const, name: 'New Brutalism', description: 'Cream background, thick borders, hard shadows, Space Grotesk typography' },
 ];
 
 const DesignContext = createContext<DesignContextType | undefined>(undefined);
 
 export function DesignProvider({ children }: { children: ReactNode }) {
-  const [activeDesign, setActiveDesignState] = useState<DesignTheme>(() => {
-    return (localStorage.getItem('app-design-theme') as DesignTheme) || 'design-1';
-  });
-
-  const setActiveDesign = (design: DesignTheme) => {
-    setActiveDesignState(design);
-    localStorage.setItem('app-design-theme', design);
+  const setActiveDesign = (_design: DesignTheme) => {
+    // No-op: single design system
   };
 
   return (
-    <DesignContext.Provider value={{ activeDesign, setActiveDesign, designs }}>
+    <DesignContext.Provider value={{ activeDesign: 'design-2', setActiveDesign, designs }}>
       {children}
     </DesignContext.Provider>
   );
