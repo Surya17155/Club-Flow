@@ -188,7 +188,7 @@ const ManageOutsiders = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className={isMobile ? 'min-h-screen bg-background' : 'h-full overflow-auto bg-background rounded-3xl border border-border/40'}>
       {/* Header */}
       <div className="sticky top-0 z-40 px-4 pt-[calc(env(safe-area-inset-top)+12px)] pb-3 backdrop-blur-md bg-background/70">
         <div className="flex items-center gap-3">

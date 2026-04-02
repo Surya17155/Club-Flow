@@ -9,6 +9,7 @@ import { useLocation } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
 import { ChatResponseRenderer } from '@/components/chat/ChatResponseRenderer';
 import { useChatFileUpload } from '@/hooks/useChatFileUpload';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 type Msg = { role: 'user' | 'assistant'; content: string };
 
@@ -21,6 +22,7 @@ const MobileChat = () => {
   const location = useLocation();
   const { session, user } = useAuth();
   const { activeClub } = useClub();
+  const isMobile = useIsMobile();
   const isSuperAdminMode = location.state?.superAdmin === true;
   const isSuperAdmin = user?.email === SUPER_ADMIN_EMAIL && isSuperAdminMode;
   const effectiveClubId = isSuperAdmin ? undefined : activeClub?.club_id;
@@ -131,7 +133,7 @@ const MobileChat = () => {
   }
 
   return (
-    <div className="flex flex-col h-dvh bg-background">
+    <div className={isMobile ? 'flex flex-col h-dvh bg-background' : 'flex flex-col h-full min-h-0 bg-background rounded-3xl border border-border/50 overflow-hidden'}>
       <div className="flex items-center gap-3 px-4 py-3 border-b border-border bg-card/80 backdrop-blur-sm safe-area-top shrink-0">
         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigate(-1)}>
           <ArrowLeft className="w-5 h-5" />
