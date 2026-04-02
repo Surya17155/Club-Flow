@@ -147,21 +147,21 @@ const NeoBrutalCalendar = ({ mode }: Props) => {
   };
 
   return (
-    <div className="flex flex-col h-full min-h-0">
+    <div className="flex flex-col">
       <div
-        className="px-4 py-3 flex justify-between items-center gap-2"
+        className="px-5 py-4 flex justify-between items-center gap-2"
         style={{ borderBottom: '2px solid #111111', background: 'rgba(246,225,207,0.3)' }}
       >
         <h3
-          className="text-base uppercase tracking-wide"
+          className="text-lg uppercase tracking-wide"
           style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, color: '#111111', letterSpacing: '-0.5px' }}
         >
           Attendance Calendar
         </h3>
-        <div className="flex items-center gap-1.5 shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={prevMonth}
-            className="p-1 transition-all"
+            className="p-1.5 transition-all"
             style={{ border: '2px solid #111111', borderRadius: '6px', background: 'transparent' }}
             onMouseEnter={(e) => {
               e.currentTarget.style.background = '#111111';
@@ -172,17 +172,17 @@ const NeoBrutalCalendar = ({ mode }: Props) => {
               e.currentTarget.style.color = '#111111';
             }}
           >
-            <ChevronLeft className="w-3.5 h-3.5" />
+            <ChevronLeft className="w-4 h-4" />
           </button>
           <span
-            className="text-[11px] px-2 text-center"
+            className="text-sm px-4 text-center"
             style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, color: '#111111' }}
           >
             {MONTHS[month].toUpperCase()} {year}
           </span>
           <button
             onClick={nextMonth}
-            className="p-1 transition-all"
+            className="p-1.5 transition-all"
             style={{ border: '2px solid #111111', borderRadius: '6px', background: 'transparent' }}
             onMouseEnter={(e) => {
               e.currentTarget.style.background = '#111111';
@@ -193,28 +193,25 @@ const NeoBrutalCalendar = ({ mode }: Props) => {
               e.currentTarget.style.color = '#111111';
             }}
           >
-            <ChevronRight className="w-3.5 h-3.5" />
+            <ChevronRight className="w-4 h-4" />
           </button>
         </div>
       </div>
 
-      <div className="flex-1 px-2.5 py-2 flex flex-col min-h-0">
-        <div className="grid grid-cols-7 gap-1 mb-1.5">
+      <div className="p-5">
+        <div className="grid grid-cols-7 gap-3 mb-3">
           {DAYS.map((day) => (
             <div
               key={day}
-              className="text-center text-[7px] uppercase leading-none"
-              style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, color: 'rgba(17,17,17,0.45)' }}
+              className="text-center text-[10px] uppercase leading-none"
+              style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, color: 'rgba(17,17,17,0.4)' }}
             >
               {day}
             </div>
           ))}
         </div>
 
-        <div
-          className="grid grid-cols-7 gap-1 flex-1 min-h-0"
-          style={{ gridTemplateRows: 'repeat(6, minmax(0, 1fr))' }}
-        >
+        <div className="grid grid-cols-7 gap-3">
           {calendarCells.map((cell) => {
             const hasEvents = cell.events.length > 0;
 
@@ -222,11 +219,12 @@ const NeoBrutalCalendar = ({ mode }: Props) => {
               return (
                 <div
                   key={cell.key}
-                  className="min-h-0 flex items-center justify-center text-[9px]"
+                  className="aspect-square flex items-center justify-center"
                   style={{
                     fontFamily: "'Space Grotesk', sans-serif",
                     fontWeight: 700,
-                    color: 'rgba(17,17,17,0.24)',
+                    color: 'rgba(17,17,17,0.2)',
+                    fontSize: '14px',
                   }}
                 >
                   {cell.day}
@@ -238,35 +236,32 @@ const NeoBrutalCalendar = ({ mode }: Props) => {
               <div
                 key={cell.key}
                 onClick={() => handleDayClick(cell.day, cell.events)}
-                className="min-h-0 flex flex-col items-center justify-center transition-all duration-200 select-none"
+                className="aspect-square flex flex-col items-center justify-center transition-all duration-200 select-none"
                 style={{
-                  border: '1.5px solid #111111',
-                  borderRadius: '8px',
+                  border: '2px solid #111111',
+                  borderRadius: '10px',
                   background: cell.isToday ? '#E98A3A' : hasEvents ? '#F6E1CF' : '#FFFFFF',
                   cursor: hasEvents ? 'pointer' : 'default',
                   fontFamily: "'Space Grotesk', sans-serif",
-                  padding: '2px 1px',
                 }}
                 onMouseEnter={(e) => {
-                  if (hasEvents || cell.isToday) {
-                    e.currentTarget.style.transform = 'translate(-1px, -1px)';
-                    e.currentTarget.style.boxShadow = '3px 3px 0px #111111';
-                  }
+                  e.currentTarget.style.transform = 'translate(-2px, -2px)';
+                  e.currentTarget.style.boxShadow = '4px 4px 0px #111111';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = 'translate(0, 0)';
                   e.currentTarget.style.boxShadow = 'none';
                 }}
               >
-                <span className="font-bold text-[10px] leading-none" style={{ color: '#111111' }}>
+                <span className="font-bold text-sm leading-none" style={{ color: '#111111' }}>
                   {cell.day}
                 </span>
                 {cell.isToday ? (
-                  <span className="text-[5px] font-bold leading-none mt-0.5" style={{ color: '#111111' }}>
+                  <span className="text-[7px] font-bold leading-none mt-1" style={{ color: '#111111' }}>
                     TODAY
                   </span>
                 ) : hasEvents ? (
-                  <div className="w-1 h-1 rounded-full mt-1" style={{ background: '#E98A3A' }} />
+                  <div className="w-1.5 h-1.5 rounded-full mt-1" style={{ background: '#E98A3A' }} />
                 ) : null}
               </div>
             );
