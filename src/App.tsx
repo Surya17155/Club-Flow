@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ClubProvider } from "@/contexts/ClubContext";
+import { DesignProvider } from "@/contexts/DesignContext";
 
 // Eager-load critical routes
 import LandingPage from "./pages/LandingPage";
@@ -54,6 +55,7 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <ClubProvider>
+            <DesignProvider>
             <Suspense fallback={<PageFallback />}>
               <Routes>
                 <Route path="/" element={<LandingPage />} />
@@ -82,6 +84,7 @@ const App = () => (
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
+            </DesignProvider>
           </ClubProvider>
         </AuthProvider>
       </BrowserRouter>
