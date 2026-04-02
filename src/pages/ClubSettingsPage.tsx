@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useNavigate } from 'react-router-dom';
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -9,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { supabase } from '@/integrations/supabase/client';
 import { useClub } from '@/contexts/ClubContext';
 import { toast } from 'sonner';
-import { Settings, Upload, Loader2, Instagram, Linkedin } from 'lucide-react';
+import { Settings, Upload, Loader2, Instagram, Linkedin, ChevronLeft } from 'lucide-react';
 
 const CLUB_CATEGORIES = ['Arts & Culture', 'Technology', 'Business', 'Sports', 'Social Service', 'Media', 'Academic', 'Other'];
 
