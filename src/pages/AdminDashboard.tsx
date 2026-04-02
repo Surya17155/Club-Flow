@@ -52,6 +52,7 @@ import {
 
 import { MobileDashboardView } from "@/components/mobile/MobileDashboardView";
 import { AttendanceHistoryModal } from "@/components/mobile/AttendanceHistoryModal";
+import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 
 const roleLabelMap: Record<string, string> = {
   admin: "Admin",
