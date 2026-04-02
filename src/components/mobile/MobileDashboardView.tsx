@@ -121,7 +121,7 @@ export function MobileDashboardView({
         className="min-h-screen pb-24 overflow-x-hidden"
         style={{
           background: '#F4EFE7',
-          paddingTop: '80px',
+          paddingTop: '60px',
           scrollbarWidth: 'none',
         }}
       >
