@@ -3,6 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { Search, Users, ArrowLeft, Send, Check, Clock, X } from 'lucide-react';
+import { MobileBottomNav } from '@/components/mobile/MobileBottomNav';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
@@ -352,7 +353,12 @@ const DiscoverClubs = () => {
     );
   }
 
-  return <div className="min-h-screen relative antialiased p-4 sm:p-6 md:p-8 dashboard-corner-gradient">{content}</div>;
+  return (
+    <div className="min-h-screen pb-24" style={{ background: isNeo ? '#F4EFE7' : undefined }}>
+      <div className="relative antialiased p-4 sm:p-6 md:p-8">{content}</div>
+      <MobileBottomNav />
+    </div>
+  );
 };
 
 export default DiscoverClubs;

@@ -4,6 +4,7 @@ import { useProfile } from '@/hooks/useProfile';
 import { useUserClubs } from '@/hooks/useUserClubs';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Camera, Linkedin, Instagram, Mail, Save, Loader2 } from 'lucide-react';
+import { MobileBottomNav } from '@/components/mobile/MobileBottomNav';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -245,7 +246,16 @@ const Profile = () => {
     );
   }
 
-  return <div className="min-h-screen dashboard-corner-gradient p-6 md:p-10">{content}</div>;
+  return (
+    <div className="min-h-screen pb-24" style={{ background: isNeo ? '#F4EFE7' : undefined }}>
+      <div className="p-6 md:p-10">{isLoading ? (
+        <div className="flex justify-center py-12">
+          <div className="w-8 h-8 border-[3px] border-[#E98A3A]/30 border-t-[#E98A3A] rounded-full animate-spin" />
+        </div>
+      ) : content}</div>
+      <MobileBottomNav />
+    </div>
+  );
 };
 
 export default Profile;
