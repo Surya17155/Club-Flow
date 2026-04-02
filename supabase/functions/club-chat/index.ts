@@ -700,10 +700,11 @@ ${JSON.stringify(clubSummaries, null, 2)}${fileContext}
 {"action":"import_members","title":"Members Imported","summary":"Successfully processed 15 members","details":{"added":12,"updated":2,"skipped":1,"failed":0},"items":[{"name":"John Doe","status":"added"},{"name":"Jane Doe","status":"already_exists"}]}
 \`\`\`
 
-**EVENT DATA (for download)**: After using fetch_event_data, output as:
+**EVENT DATA (for download)**: After using fetch_event_data, output the FIRST matched event as:
 \`\`\`event-data-json
-{"event_name":"Event Name","event_date":"2026-03-15T10:00:00","end_date":"2026-03-15T16:00:00","event_type":"Workshop","category":"Technical","access_type":"Open to All","attendance_given":true,"description":"Event description here","total_attendees":25,"attendees":[...]}
+{"club_name":"Club Name","event_name":"Event Name","event_date":"2026-03-15T10:00:00","end_date":"2026-03-15T16:00:00","event_type":"Workshop","category":"Technical","access_type":"Open to All","attendance_given":true,"description":"Event description here","total_attendees":25,"attendees":[{"name":"...","email":"...","roll_no":"...","phone":"...","programme":"...","year":"...","section":"...","class_coordinator":"...","avatar_url":"...","scanned_at":"...","method":"QR Scan"}]}
 \`\`\`
+Do NOT output any text before or after this block. Map the tool result fields: name→event_name, date→event_date, club_name→club_name.
 
 **MEMBER FORM**: When showing an add-member form, output as:
 \`\`\`member-form-json
