@@ -415,6 +415,7 @@ async function executeTool(
           type: event.event_type,
           category: event.category,
           access_type: event.access_type,
+          attendance_given: event.attendance_given,
           description: event.description,
           total_attendees: attendees.length,
           attendees,
