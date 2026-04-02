@@ -84,34 +84,28 @@ export function MobileDashboardView({
         setViewMode={setViewMode}
       />
 
-      {/* Fixed Header — minimal */}
+      {/* Side panel trigger — no header bar */}
       <div
-        className="fixed top-0 left-0 right-0 z-40"
+        className="fixed top-0 left-0 z-40"
         style={{
-          background: '#F4EFE7',
-          borderBottom: '2px solid #111',
-          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 8px)',
+          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)',
         }}
       >
-        <div className="flex items-center px-5 py-3">
-          {/* Side panel trigger arrow */}
-          <button
-            onClick={() => setDrawerOpen(true)}
-            className="flex items-center justify-center"
-            style={{
-              width: '36px',
-              height: '36px',
-              background: '#E98A3A',
-              border: '2px solid #111',
-              boxShadow: '2px 2px 0px #111',
-              borderRadius: '0 8px 8px 0',
-              marginLeft: '-20px',
-              animation: 'sideDrawerPulse 2.5s ease-in-out infinite',
-            }}
-          >
-            <ChevronRight className="w-5 h-5" style={{ color: '#111' }} strokeWidth={3} />
-          </button>
-        </div>
+        <button
+          onClick={() => setDrawerOpen(true)}
+          className="flex items-center justify-center"
+          style={{
+            width: '36px',
+            height: '36px',
+            background: '#E98A3A',
+            border: '2px solid #111',
+            boxShadow: '2px 2px 0px #111',
+            borderRadius: '0 8px 8px 0',
+            animation: 'sideDrawerPulse 2.5s ease-in-out infinite',
+          }}
+        >
+          <ChevronRight className="w-5 h-5" style={{ color: '#111' }} strokeWidth={3} />
+        </button>
       </div>
 
       {/* Pulse animation keyframes */}
