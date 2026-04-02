@@ -60,8 +60,8 @@ const nb = {
   btnBlack: {
     background: '#111',
     border: '3px solid #111',
-    boxShadow: '4px 4px 0px #333',
-    borderRadius: '8px',
+    boxShadow: '4px 4px 0px #E98A3A',
+    borderRadius: '6px',
     fontFamily: "'Space Grotesk', sans-serif",
     fontWeight: 800,
     color: '#fff',
