@@ -86,7 +86,7 @@ export const MobileProfileCard = memo(function MobileProfileCard({
           className="mt-4 text-sm leading-relaxed"
           style={{ color: '#333', fontFamily: "'Space Grotesk', sans-serif" }}
         >
-          {[programme, year ? `${year} Year` : null, about].filter(Boolean).join(' • ') || 'No details available'}
+          {[programme, year, about].filter(Boolean).join(' • ') || 'No details available'}
         </p>
 
         {/* Social Icons */}
