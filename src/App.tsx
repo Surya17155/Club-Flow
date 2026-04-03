@@ -89,6 +89,7 @@ const App = () => (
                 <Route path="/club-settings" element={<ClubSettingsPage />} />
                 <Route path="/assign-powers" element={<AssignPowersPage />} />
                 <Route path="/chatbot" element={<ChatbotPage />} />
+                <Route path="/attendance-history" element={<AttendanceHistory />} />
                 <Route path="/manage-outsiders" element={<DesktopFrame><ManageOutsiders /></DesktopFrame>} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />

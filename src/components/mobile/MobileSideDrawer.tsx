@@ -7,7 +7,7 @@ import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   LayoutDashboard, Calendar, Compass, UserCircle, Settings, LogOut,
-  Shield, Settings2, Bot, ArrowRightLeft, Building2, X, Check, ChevronDown, Crown,
+  Shield, Settings2, Bot, ArrowRightLeft, Building2, X, Check, ChevronDown, Crown, ClipboardList,
 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 
