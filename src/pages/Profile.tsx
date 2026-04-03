@@ -197,7 +197,7 @@ const Profile = () => {
   const initials = val('full_name').split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase();
 
   const content = (
-    <div className="max-w-3xl mx-auto grid gap-6">
+    <div className="max-w-3xl mx-auto grid gap-6 w-full overflow-hidden box-border">
       {isMobile && (
         <div className="flex items-center gap-4 mb-2">
           <button onClick={() => navigate(-1)} className="p-2 rounded-full" style={isNeo ? { border: '2px solid #111', background: '#FFFDF5' } : {}}>
@@ -239,7 +239,7 @@ const Profile = () => {
       </div>
 
       {/* Personal Info */}
-      <div style={isNeo ? NEO.card : undefined} className={isNeo ? '' : 'glass-card p-8'}>
+      <div style={isNeo ? { ...NEO.card, padding: '20px', boxSizing: 'border-box' as const } : undefined} className={isNeo ? 'w-full' : 'glass-card p-6 w-full'}>
         <h2 className="text-lg font-bold mb-6" style={isNeo ? { fontFamily: NEO.font, color: '#111' } : {}}>Personal Information</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {[
@@ -280,7 +280,7 @@ const Profile = () => {
       </div>
 
       {/* Social Links */}
-      <div style={isNeo ? NEO.card : undefined} className={isNeo ? '' : 'glass-card p-8'}>
+      <div style={isNeo ? { ...NEO.card, padding: '20px', boxSizing: 'border-box' as const } : undefined} className={isNeo ? 'w-full' : 'glass-card p-6 w-full'}>
         <h2 className="text-lg font-bold mb-6" style={isNeo ? { fontFamily: NEO.font, color: '#111' } : {}}>Social Links</h2>
         <div className="space-y-4">
           {/* LinkedIn */}
@@ -332,7 +332,7 @@ const Profile = () => {
 
       {/* Club Memberships */}
       {clubs.length > 0 && (
-        <div style={isNeo ? NEO.card : undefined} className={isNeo ? '' : 'glass-card p-8'}>
+        <div style={isNeo ? { ...NEO.card, padding: '20px', boxSizing: 'border-box' as const } : undefined} className={isNeo ? 'w-full' : 'glass-card p-6 w-full'}>
           <h2 className="text-lg font-bold mb-6" style={isNeo ? { fontFamily: NEO.font, color: '#111' } : {}}>Club Memberships</h2>
           <div className="space-y-3">
             {clubs.map(club => (
@@ -393,7 +393,7 @@ const Profile = () => {
       )}
 
       {/* Save */}
-      <div className="flex justify-end pb-8">
+      <div className="flex justify-center pb-8">
         <button
           onClick={handleSave}
           disabled={saving}
@@ -482,8 +482,8 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen pb-24" style={{ background: isNeo ? '#F4EFE7' : undefined }}>
-      <div className="p-6 md:p-10">{isLoading ? (
+    <div className="min-h-screen pb-24 overflow-x-hidden" style={{ background: isNeo ? '#F4EFE7' : undefined }}>
+      <div className="px-4 py-6 md:p-10 w-full overflow-hidden">{isLoading ? (
         <div className="flex justify-center py-12">
           <div className="w-8 h-8 border-[3px] border-[#E98A3A]/30 border-t-[#E98A3A] rounded-full animate-spin" />
         </div>
