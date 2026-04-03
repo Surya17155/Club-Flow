@@ -494,7 +494,7 @@ const MemberManagement = ({ clubId, isSuperAdmin = false }: Props) => {
             <h4 className="text-xs font-black text-[#111]/50 uppercase tracking-wider mb-3">Members ({regularMembers.length})</h4>
             <div className="space-y-2">
               {regularMembers.length > 0 ? regularMembers.map(m => (
-                <MemberRow key={m.id} member={m} onView={() => setViewMember(m)} onRemove={() => handleRemoveMember(m)} onChangeRole={() => openRoleDialog(m)} removing={removing === m.id} isSuperAdmin={isSuperAdmin} onEdit={() => openEditDialog(m)} />
+                <MemberRow key={m.id} member={m} onView={() => handleViewMember(m)} onRemove={() => handleRemoveMember(m)} onChangeRole={() => openRoleDialog(m)} removing={removing === m.id} isSuperAdmin={isSuperAdmin} onEdit={() => openEditDialog(m)} />
               )) : (
                 <p className="text-sm text-[#111]/40 font-medium text-center py-4">No members found</p>
               )}
