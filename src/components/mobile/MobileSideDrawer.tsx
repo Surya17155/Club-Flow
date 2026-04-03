@@ -50,7 +50,7 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
     { title: 'Dashboard', icon: LayoutDashboard, url: '/admin' },
     { title: 'Events', icon: Calendar, url: '/events' },
     { title: 'Club', icon: Building2, url: '/clubs' },
-    { title: 'Club Settings', icon: Settings2, url: '/club-settings' },
+    ...(isPresident ? [{ title: 'Club Settings', icon: Settings2, url: '/club-settings' }] : []),
     { title: 'Settings', icon: Settings, url: '/settings' },
   ];
 
