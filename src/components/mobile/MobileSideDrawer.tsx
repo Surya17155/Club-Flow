@@ -40,6 +40,7 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
   const personalItems = [
     { title: 'Dashboard', icon: LayoutDashboard, url: '/admin' },
     { title: 'Events', icon: Calendar, url: '/events' },
+    { title: 'Attendance History', icon: ClipboardList, url: '/attendance-history' },
     { title: 'Discover', icon: Compass, url: '/discover' },
     { title: 'Profile', icon: UserCircle, url: '/profile' },
     { title: 'Settings', icon: Settings, url: '/settings' },
