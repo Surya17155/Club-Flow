@@ -280,7 +280,7 @@ const Profile = () => {
       </div>
 
       {/* Social Links */}
-      <div style={isNeo ? { ...NEO.card, padding: '20px', boxSizing: 'border-box' as const } : undefined} className={isNeo ? 'w-full' : 'glass-card p-6 w-full'}>
+      <div style={isNeo ? { ...NEO.card, padding: isMobile ? '16px' : '20px', boxSizing: 'border-box' as const } : undefined} className={isNeo ? 'w-full min-w-0 overflow-hidden' : 'glass-card p-6 w-full min-w-0 overflow-hidden'}>
         <h2 className="text-lg font-bold mb-6" style={isNeo ? { fontFamily: NEO.font, color: '#111' } : {}}>Social Links</h2>
         <div className="space-y-4">
           {/* LinkedIn */}
