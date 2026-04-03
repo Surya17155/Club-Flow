@@ -80,6 +80,7 @@ const NB_BTN_ORANGE = "bg-[#E98A3A] text-[#111] font-bold border-[2px] border-[#
 const NB_BTN_BLACK = "bg-[#111] text-white font-bold border-[2px] border-[#111] rounded-[6px] hover:translate-y-[1px] hover:shadow-none transition-all";
 
 const MemberManagement = ({ clubId, isSuperAdmin = false }: Props) => {
+  const { user } = useAuth();
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
