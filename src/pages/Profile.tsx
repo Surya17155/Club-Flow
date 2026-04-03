@@ -393,7 +393,7 @@ const Profile = () => {
       )}
 
       {/* Save */}
-      <div className="flex justify-end pb-8">
+      <div className="flex justify-center pb-8">
         <button
           onClick={handleSave}
           disabled={saving}
