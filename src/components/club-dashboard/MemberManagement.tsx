@@ -691,31 +691,59 @@ const MemberManagement = ({ clubId, isSuperAdmin = false }: Props) => {
       </Dialog>
 
       {/* View Profile Dialog */}
-      <Dialog open={!!viewMember} onOpenChange={() => setViewMember(null)}>
-        <DialogContent className={`${NB_CARD} max-w-md`} style={NB_SHADOW}>
+      <Dialog open={!!viewMember} onOpenChange={() => { setViewMember(null); setViewMemberClubs([]); }}>
+        <DialogContent className={`${NB_CARD} max-w-md max-h-[85vh] overflow-y-auto`} style={{ ...NB_SHADOW, scrollbarWidth: 'none' }}>
           <DialogHeader>
-            <DialogTitle className="font-black text-lg text-[#111]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Member Profile</DialogTitle>
+            <DialogTitle className="font-black text-lg text-[#111]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>View Profile</DialogTitle>
           </DialogHeader>
           {viewMember && (
             <div className="flex flex-col items-center text-center space-y-4 mt-2">
-              <div className="w-20 h-20 rounded-[6px] overflow-hidden border-[3px] border-[#111]" style={{ boxShadow: '3px 3px 0px #E98A3A' }}>
+              {/* Profile Photo */}
+              <div className="w-24 h-24 rounded-full overflow-hidden border-[3px] border-[#111]" style={{ boxShadow: '3px 3px 0px #E98A3A' }}>
                 {viewMember.avatar_url ? (
                   <img src={viewMember.avatar_url} alt={viewMember.full_name} className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full bg-[#FDE8D0] flex items-center justify-center text-[#111] text-2xl font-black">
-                    {viewMember.full_name[0]}
+                    {viewMember.full_name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
                   </div>
                 )}
               </div>
+
+              {/* Name & Role */}
               <div>
-                <h3 className="text-lg font-black text-[#111] inline-flex items-center">{viewMember.full_name}{getRoleBadgeVariant(viewMember.role) && getRoleBadgeVariant(viewMember.role) !== 'gray' && <VerifiedBadge variant={getRoleBadgeVariant(viewMember.role)!} />}</h3>
-                <div className="mt-1">
+                <h3 className="text-xl font-black text-[#111] inline-flex items-center gap-1">
+                  {viewMember.full_name}
+                  {getRoleBadgeVariant(viewMember.role) && getRoleBadgeVariant(viewMember.role) !== 'gray' && <VerifiedBadge variant={getRoleBadgeVariant(viewMember.role)!} />}
+                </h3>
+                <div className="mt-1.5">
                   <span className="px-3 py-1 text-xs font-black border-[2px] border-[#111] rounded-[4px] bg-[#E98A3A] text-[#111]">
                     {roleLabelMap[viewMember.role] ?? viewMember.role}
                   </span>
                 </div>
               </div>
 
+              {/* Social Media Icons */}
+              {(viewMember.social_linkedin || viewMember.social_instagram || viewMember.social_gmail) && (
+                <div className="flex gap-3 items-center">
+                  {viewMember.social_linkedin && (
+                    <a href={viewMember.social_linkedin.startsWith('http') ? viewMember.social_linkedin : `https://${viewMember.social_linkedin}`} target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-[4px] border-[2px] border-[#111] bg-white flex items-center justify-center hover:bg-[#FDE8D0] transition-colors" style={{ boxShadow: '2px 2px 0px #111' }}>
+                      <Linkedin className="w-4 h-4 text-[#111]" />
+                    </a>
+                  )}
+                  {viewMember.social_instagram && (
+                    <a href={viewMember.social_instagram.startsWith('http') ? viewMember.social_instagram : `https://instagram.com/${viewMember.social_instagram}`} target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-[4px] border-[2px] border-[#111] bg-white flex items-center justify-center hover:bg-[#FDE8D0] transition-colors" style={{ boxShadow: '2px 2px 0px #111' }}>
+                      <Instagram className="w-4 h-4 text-[#111]" />
+                    </a>
+                  )}
+                  {viewMember.social_gmail && (
+                    <a href={`mailto:${viewMember.social_gmail}`} className="w-9 h-9 rounded-[4px] border-[2px] border-[#111] bg-white flex items-center justify-center hover:bg-[#FDE8D0] transition-colors" style={{ boxShadow: '2px 2px 0px #111' }}>
+                      <Mail className="w-4 h-4 text-[#111]" />
+                    </a>
+                  )}
+                </div>
+              )}
+
+              {/* About */}
               {viewMember.about && (
                 <div className="w-full text-left bg-[#FDE8D0] rounded-[6px] p-3 border-[2px] border-[#111]">
                   <h4 className="text-xs font-black text-[#111]/50 uppercase tracking-wider mb-1">About</h4>
@@ -723,24 +751,53 @@ const MemberManagement = ({ clubId, isSuperAdmin = false }: Props) => {
                 </div>
               )}
 
+              {/* Academic Details */}
               <div className="w-full text-left space-y-2 bg-white rounded-[6px] p-4 text-sm border-[2px] border-[#111]">
-                {viewMember.email && <InfoRow label="Email" value={viewMember.email} />}
-                {viewMember.roll_no && <InfoRow label="Roll No" value={viewMember.roll_no} />}
+                <h4 className="text-xs font-black text-[#111]/50 uppercase tracking-wider mb-2">Academic Details</h4>
                 {viewMember.programme && <InfoRow label="Programme" value={viewMember.programme} />}
                 {viewMember.year && <InfoRow label="Year" value={viewMember.year} />}
                 {viewMember.section && <InfoRow label="Section" value={viewMember.section} />}
-                {viewMember.phone && <InfoRow label="Phone" value={viewMember.phone} />}
-                <InfoRow label="Joined" value={new Date(viewMember.joined_at).toLocaleDateString()} />
+                {viewMember.roll_no && <InfoRow label="Roll No" value={viewMember.roll_no} />}
               </div>
 
-              {(viewMember.social_linkedin || viewMember.social_instagram || viewMember.social_gmail) && (
+              {/* Contact Details */}
+              {(viewMember.email || viewMember.phone) && (
                 <div className="w-full text-left space-y-2 bg-white rounded-[6px] p-4 text-sm border-[2px] border-[#111]">
-                  <h4 className="text-xs font-black text-[#111]/50 uppercase tracking-wider mb-1">Social Profiles</h4>
-                  {viewMember.social_linkedin && <InfoRow label="LinkedIn" value={viewMember.social_linkedin} />}
-                  {viewMember.social_instagram && <InfoRow label="Instagram" value={viewMember.social_instagram} />}
-                  {viewMember.social_gmail && <InfoRow label="Gmail" value={viewMember.social_gmail} />}
+                  <h4 className="text-xs font-black text-[#111]/50 uppercase tracking-wider mb-2">Contact</h4>
+                  {viewMember.email && (
+                    <div className="flex items-center gap-2">
+                      <Mail className="w-3.5 h-3.5 text-[#111]/40 shrink-0" />
+                      <span className="text-[#111] font-medium break-all">{viewMember.email}</span>
+                    </div>
+                  )}
+                  {viewMember.phone && (
+                    <div className="flex items-center gap-2">
+                      <Phone className="w-3.5 h-3.5 text-[#111]/40 shrink-0" />
+                      <span className="text-[#111] font-medium">{viewMember.phone}</span>
+                    </div>
+                  )}
                 </div>
               )}
+
+              {/* Club Memberships */}
+              {viewMemberClubs.length > 0 && (
+                <div className="w-full text-left space-y-2 bg-white rounded-[6px] p-4 text-sm border-[2px] border-[#111]">
+                  <h4 className="text-xs font-black text-[#111]/50 uppercase tracking-wider mb-2">Club Memberships</h4>
+                  <div className="space-y-2">
+                    {viewMemberClubs.map((c, i) => (
+                      <div key={i} className="flex items-center justify-between p-2.5 rounded-[4px] border-[1.5px] border-[#111] bg-[#FFFDF5]">
+                        <span className="font-bold text-[#111] text-sm">{c.club_name}</span>
+                        <span className="text-[10px] px-2 py-0.5 font-black border-[1.5px] border-[#111] rounded-[3px] bg-[#E98A3A]/20 text-[#111]">
+                          {roleLabelMap[c.role] ?? c.role}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <InfoRow label="Member Since" value={new Date(viewMember.joined_at).toLocaleDateString()} />
+
               {isSuperAdmin && viewMember && (
                 <button onClick={() => { openEditDialog(viewMember); }} className={`w-full ${NB_BTN_BLACK} px-4 py-2.5 text-sm flex items-center justify-center gap-2 mt-2`} style={{ boxShadow: '2px 2px 0px #E98A3A' }}>
                   <Pencil className="w-4 h-4" /> Edit Profile
