@@ -1038,13 +1038,8 @@ const MemberRow = ({ member, onView, onRemove, onChangeRole, removing, isSuperAd
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-44 border-[2px] border-[#111] rounded-[6px] bg-white" style={{ boxShadow: '3px 3px 0px #111' }}>
           <DropdownMenuItem onClick={onView} className="font-medium text-[#111] hover:bg-[#FDE8D0] cursor-pointer">
-            <Eye className="w-4 h-4 mr-2" /> View Details
+            <Eye className="w-4 h-4 mr-2" /> View Profile
           </DropdownMenuItem>
-          {isSuperAdmin && onEdit && (
-            <DropdownMenuItem onClick={onEdit} className="font-medium text-[#111] hover:bg-[#FDE8D0] cursor-pointer">
-              <Pencil className="w-4 h-4 mr-2" /> Edit Profile
-            </DropdownMenuItem>
-          )}
           {member.role !== 'president' && (
             <>
               <DropdownMenuItem onClick={onChangeRole} className="font-medium text-[#111] hover:bg-[#FDE8D0] cursor-pointer">
