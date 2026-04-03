@@ -114,9 +114,7 @@ function MobileBottomNavInner() {
               >
                 <Plus className="w-6 h-6" style={{ color: '#111' }} strokeWidth={3} />
               </button>
-            ) : (
-              <div className="w-6" />
-            )}
+            ) : null}
 
             {clubRightTabs.map(renderTab)}
           </>

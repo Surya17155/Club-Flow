@@ -57,7 +57,7 @@ const VerifiedBadge = ({ variant, size = 16 }: VerifiedBadgeProps) => {
 
 export const getRoleBadgeVariant = (role: string): 'purple' | 'blue' | 'gray' | null => {
   if (role === 'president' || role === 'vice_president') return 'purple';
-  if (role === 'member') return 'gray';
+  if (role === 'member') return null;
   if ([
     'secretary', 'general_secretary', 'deputy_secretary',
     'social_media_head', 'social_media_coordinator',
