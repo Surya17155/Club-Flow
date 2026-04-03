@@ -483,7 +483,7 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen pb-24 overflow-x-hidden" style={{ background: isNeo ? '#F4EFE7' : undefined }}>
-      <div className="px-4 py-6 md:p-10 w-full overflow-hidden">{isLoading ? (
+      <div className="px-4 py-6 md:px-8 md:py-8 lg:px-10 lg:py-10 w-full overflow-hidden" style={{ paddingRight: isMobile && isNeo ? 'calc(1rem + 6px)' : undefined }}>{isLoading ? (
         <div className="flex justify-center py-12">
           <div className="w-8 h-8 border-[3px] border-[#E98A3A]/30 border-t-[#E98A3A] rounded-full animate-spin" />
         </div>
