@@ -145,6 +145,28 @@ const MemberManagement = ({ clubId, isSuperAdmin = false }: Props) => {
     setSaving(false);
   };
 
+  const handleViewMember = async (member: Member) => {
+    setViewMember(member);
+    // Fetch all clubs this member belongs to
+    const { data: memberClubs } = await supabase
+      .from('club_members')
+      .select('club_id, role')
+      .eq('user_id', member.user_id);
+    if (memberClubs && memberClubs.length > 0) {
+      const clubIds = memberClubs.map(c => c.club_id);
+      const { data: clubs } = await supabase
+        .from('clubs')
+        .select('id, name')
+        .in('id', clubIds);
+      if (clubs) {
+        setViewMemberClubs(memberClubs.map(mc => ({
+          club_name: clubs.find(c => c.id === mc.club_id)?.name || 'Unknown',
+          role: mc.role,
+        })));
+      }
+    }
+  };
+
   const [userSearchQuery, setUserSearchQuery] = useState('');
   const [userSearchResults, setUserSearchResults] = useState<SearchedUser[]>([]);
   const [searchingUsers, setSearchingUsers] = useState(false);
