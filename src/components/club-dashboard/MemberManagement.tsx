@@ -822,7 +822,7 @@ const MemberManagement = ({ clubId, isSuperAdmin = false }: Props) => {
 
               <InfoRow label="Member Since" value={new Date(viewMember.joined_at).toLocaleDateString()} />
 
-              {isSuperAdmin && viewMember && (
+              {isSuperAdmin && viewMember && user && viewMember.user_id === user.id && (
                 <button onClick={() => { openEditDialog(viewMember); }} className={`w-full ${NB_BTN_BLACK} px-4 py-2.5 text-sm flex items-center justify-center gap-2 mt-2`} style={{ boxShadow: '2px 2px 0px #E98A3A' }}>
                   <Pencil className="w-4 h-4" /> Edit Profile
                 </button>
