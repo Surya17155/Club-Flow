@@ -239,7 +239,7 @@ const Profile = () => {
       </div>
 
       {/* Personal Info */}
-      <div style={isNeo ? { ...NEO.card, padding: '20px', boxSizing: 'border-box' as const } : undefined} className={isNeo ? 'w-full' : 'glass-card p-6 w-full'}>
+      <div style={isNeo ? { ...NEO.card, padding: isMobile ? '16px' : '20px', boxSizing: 'border-box' as const } : undefined} className={isNeo ? 'w-full min-w-0 overflow-hidden' : 'glass-card p-6 w-full min-w-0 overflow-hidden'}>
         <h2 className="text-lg font-bold mb-6" style={isNeo ? { fontFamily: NEO.font, color: '#111' } : {}}>Personal Information</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {[
