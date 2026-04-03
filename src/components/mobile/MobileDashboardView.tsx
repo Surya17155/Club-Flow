@@ -65,11 +65,13 @@ export function MobileDashboardView({
     if (stat.clickable && stat.clickAction) {
       if (stat.clickAction === 'clubs_joined') {
         document.getElementById('mobile-my-clubs')?.scrollIntoView({ behavior: 'smooth' });
+      } else if (stat.clickAction === 'events_attended' || stat.label.toLowerCase().includes('events attended')) {
+        navigate('/attendance-history');
       } else {
         setActiveStatModal(stat.clickAction);
       }
     }
-  }, []);
+  }, [navigate]);
 
   // Light orange color shades for the two cards
   const cardColors = ['#FFF0DE', '#FFE4C8'];
