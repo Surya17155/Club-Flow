@@ -197,7 +197,7 @@ const Profile = () => {
   const initials = val('full_name').split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase();
 
   const content = (
-    <div className="max-w-3xl mx-auto grid gap-6 w-full overflow-hidden box-border" style={{ paddingRight: isMobile && isNeo ? '6px' : undefined }}>
+    <div className="max-w-3xl mx-auto grid gap-6 overflow-hidden box-border" style={{ width: isMobile && isNeo ? 'calc(100% - 6px)' : '100%' }}>
       {isMobile && (
         <div className="flex items-center gap-4 mb-2">
           <button onClick={() => navigate(-1)} className="p-2 rounded-full" style={isNeo ? { border: '2px solid #111', background: '#FFFDF5' } : {}}>
