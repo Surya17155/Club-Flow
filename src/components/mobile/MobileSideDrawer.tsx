@@ -7,7 +7,7 @@ import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   LayoutDashboard, Calendar, Compass, UserCircle, Settings, LogOut,
-  Shield, Settings2, Bot, ArrowRightLeft, Building2, X, Check, ChevronDown, Crown,
+  Shield, Settings2, Bot, ArrowRightLeft, Building2, X, Check, ChevronDown, Crown, ClipboardList,
 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 
@@ -40,6 +40,7 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
   const personalItems = [
     { title: 'Dashboard', icon: LayoutDashboard, url: '/admin' },
     { title: 'Events', icon: Calendar, url: '/events' },
+    { title: 'Attendance History', icon: ClipboardList, url: '/attendance-history' },
     { title: 'Discover', icon: Compass, url: '/discover' },
     { title: 'Profile', icon: UserCircle, url: '/profile' },
     { title: 'Settings', icon: Settings, url: '/settings' },
