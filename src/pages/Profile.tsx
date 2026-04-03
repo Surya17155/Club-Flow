@@ -332,7 +332,7 @@ const Profile = () => {
 
       {/* Club Memberships */}
       {clubs.length > 0 && (
-        <div style={isNeo ? NEO.card : undefined} className={isNeo ? '' : 'glass-card p-8'}>
+        <div style={isNeo ? { ...NEO.card, padding: '20px', boxSizing: 'border-box' as const } : undefined} className={isNeo ? 'w-full' : 'glass-card p-6 w-full'}>
           <h2 className="text-lg font-bold mb-6" style={isNeo ? { fontFamily: NEO.font, color: '#111' } : {}}>Club Memberships</h2>
           <div className="space-y-3">
             {clubs.map(club => (
