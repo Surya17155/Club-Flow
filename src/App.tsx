@@ -30,6 +30,7 @@ import MobileChat from "./pages/MobileChat";
 import ClubSettingsPage from "./pages/ClubSettingsPage";
 import AssignPowersPage from "./pages/AssignPowersPage";
 import ChatbotPage from "./pages/ChatbotPage";
+import AttendanceHistory from "./pages/AttendanceHistory";
 
 // Lazy-load rarely visited routes
 const MarkAttendance = lazy(() => import("./pages/MarkAttendance"));
