@@ -99,6 +99,7 @@ const MemberManagement = ({ clubId, isSuperAdmin = false }: Props) => {
   const [editTarget, setEditTarget] = useState<Member | null>(null);
   const [editForm, setEditForm] = useState({ full_name: '', programme: '', section: '', year: '', roll_no: '', phone: '' });
   const [saving, setSaving] = useState(false);
+  const [viewMemberClubs, setViewMemberClubs] = useState<{club_name: string; role: string}[]>([]);
 
   const openEditDialog = (member: Member) => {
     setEditTarget(member);
