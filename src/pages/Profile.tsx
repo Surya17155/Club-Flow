@@ -197,7 +197,7 @@ const Profile = () => {
   const initials = val('full_name').split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase();
 
   const content = (
-    <div className="max-w-3xl mx-auto grid gap-6 overflow-hidden box-border" style={{ width: isMobile && isNeo ? 'calc(100% - 6px)' : '100%' }}>
+    <div className="max-w-3xl mx-auto grid gap-6 overflow-hidden box-border w-full">
       {isMobile && (
         <div className="flex items-center gap-4 mb-2">
           <button onClick={() => navigate(-1)} className="p-2 rounded-full" style={isNeo ? { border: '2px solid #111', background: '#FFFDF5' } : {}}>
@@ -239,7 +239,7 @@ const Profile = () => {
       </div>
 
       {/* Personal Info */}
-      <div style={isNeo ? { ...NEO.card, padding: '20px', boxSizing: 'border-box' as const } : undefined} className={isNeo ? 'w-full' : 'glass-card p-6 w-full'}>
+      <div style={isNeo ? { ...NEO.card, padding: isMobile ? '16px' : '20px', boxSizing: 'border-box' as const } : undefined} className={isNeo ? 'w-full min-w-0 overflow-hidden' : 'glass-card p-6 w-full min-w-0 overflow-hidden'}>
         <h2 className="text-lg font-bold mb-6" style={isNeo ? { fontFamily: NEO.font, color: '#111' } : {}}>Personal Information</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {[
@@ -280,7 +280,7 @@ const Profile = () => {
       </div>
 
       {/* Social Links */}
-      <div style={isNeo ? { ...NEO.card, padding: '20px', boxSizing: 'border-box' as const } : undefined} className={isNeo ? 'w-full' : 'glass-card p-6 w-full'}>
+      <div style={isNeo ? { ...NEO.card, padding: isMobile ? '16px' : '20px', boxSizing: 'border-box' as const } : undefined} className={isNeo ? 'w-full min-w-0 overflow-hidden' : 'glass-card p-6 w-full min-w-0 overflow-hidden'}>
         <h2 className="text-lg font-bold mb-6" style={isNeo ? { fontFamily: NEO.font, color: '#111' } : {}}>Social Links</h2>
         <div className="space-y-4">
           {/* LinkedIn */}
@@ -332,7 +332,7 @@ const Profile = () => {
 
       {/* Club Memberships */}
       {clubs.length > 0 && (
-        <div style={isNeo ? { ...NEO.card, padding: '20px', boxSizing: 'border-box' as const } : undefined} className={isNeo ? 'w-full' : 'glass-card p-6 w-full'}>
+        <div style={isNeo ? { ...NEO.card, padding: isMobile ? '16px' : '20px', boxSizing: 'border-box' as const } : undefined} className={isNeo ? 'w-full min-w-0 overflow-hidden' : 'glass-card p-6 w-full min-w-0 overflow-hidden'}>
           <h2 className="text-lg font-bold mb-6" style={isNeo ? { fontFamily: NEO.font, color: '#111' } : {}}>Club Memberships</h2>
           <div className="space-y-3">
             {clubs.map(club => (
@@ -483,7 +483,7 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen pb-24 overflow-x-hidden" style={{ background: isNeo ? '#F4EFE7' : undefined }}>
-      <div className="px-4 py-6 md:p-10 w-full overflow-hidden">{isLoading ? (
+      <div className="px-4 py-6 md:px-8 md:py-8 lg:px-10 lg:py-10 w-full overflow-hidden" style={{ paddingRight: isMobile && isNeo ? 'calc(1rem + 6px)' : undefined }}>{isLoading ? (
         <div className="flex justify-center py-12">
           <div className="w-8 h-8 border-[3px] border-[#E98A3A]/30 border-t-[#E98A3A] rounded-full animate-spin" />
         </div>
