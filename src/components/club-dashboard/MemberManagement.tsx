@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -79,6 +80,7 @@ const NB_BTN_ORANGE = "bg-[#E98A3A] text-[#111] font-bold border-[2px] border-[#
 const NB_BTN_BLACK = "bg-[#111] text-white font-bold border-[2px] border-[#111] rounded-[6px] hover:translate-y-[1px] hover:shadow-none transition-all";
 
 const MemberManagement = ({ clubId, isSuperAdmin = false }: Props) => {
+  const { user } = useAuth();
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -820,7 +822,7 @@ const MemberManagement = ({ clubId, isSuperAdmin = false }: Props) => {
 
               <InfoRow label="Member Since" value={new Date(viewMember.joined_at).toLocaleDateString()} />
 
-              {isSuperAdmin && viewMember && (
+              {isSuperAdmin && viewMember && user && viewMember.user_id === user.id && (
                 <button onClick={() => { openEditDialog(viewMember); }} className={`w-full ${NB_BTN_BLACK} px-4 py-2.5 text-sm flex items-center justify-center gap-2 mt-2`} style={{ boxShadow: '2px 2px 0px #E98A3A' }}>
                   <Pencil className="w-4 h-4" /> Edit Profile
                 </button>
