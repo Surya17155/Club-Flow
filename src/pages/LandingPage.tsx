@@ -145,7 +145,6 @@ const LandingPage = () => {
               <div className="space-y-2 text-center md:text-left">
                 <h1 className="text-4xl md:text-6xl lg:text-8xl font-semibold leading-[0.9] tracking-tighter uppercase text-[#111111]">
                   ATTENDANCE IN SECONDS<br /><span className="text-[#E98A3A]">NOT MINUTES</span>
-                  ATTENDANCE IN SECONDS<br /><span className="text-[#E98A3A]">NOT MINUTES</span>
                 </h1>
                 <p className="text-base md:text-xl text-[#2A2A2A] font-medium max-w-xl leading-relaxed mx-auto md:mx-0">
                   Replace manual attendance with one simple scan.
