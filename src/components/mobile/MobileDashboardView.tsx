@@ -178,7 +178,7 @@ export function MobileDashboardView({
             )}
             {!isPersonal && canManageEvents && (
               <button
-                onClick={onManageEventsOpen}
+                onClick={() => navigate('/events')}
                 className="flex items-center gap-2 px-4 py-2.5 text-xs font-bold uppercase whitespace-nowrap active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
                 style={{
                   background: '#fff',
