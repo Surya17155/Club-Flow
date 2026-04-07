@@ -137,19 +137,19 @@ const LandingPage = () => {
         {activePage === "home" && (
           <div>
             {/* Hero */}
-            <section className="max-w-screen-2xl mx-auto px-6 pt-12 pb-10 md:py-20 lg:py-32 min-h-screen md:min-h-auto flex flex-col justify-center">
+            <section className="max-w-screen-2xl mx-auto px-6 pt-4 pb-4 md:py-20 lg:py-32 md:min-h-auto flex flex-col justify-start md:justify-center">
               {/* Hero illustration - mobile only */}
-              <div className="flex justify-center mb-6 md:hidden">
-                <img src={heroIllustration} alt="Student scanning QR code for attendance" className="w-56 h-auto" />
+              <div className="flex justify-center mb-1 md:hidden">
+                <img src={heroIllustration} alt="Student scanning QR code for attendance" className="w-48 h-auto" />
               </div>
-              <div className="space-y-2 text-center md:text-left">
+              <div className="space-y-1 text-center md:text-left">
                 <h1 className="text-4xl md:text-6xl lg:text-8xl font-semibold leading-[0.9] tracking-tighter uppercase text-[#111111]">
                   ATTENDANCE IN SECONDS<br /><span className="text-[#E98A3A]">NOT MINUTES</span>
                 </h1>
-                <p className="text-base md:text-xl text-[#2A2A2A] font-medium max-w-xl leading-relaxed mx-auto md:mx-0">
+                <p className="text-base md:text-xl text-[#2A2A2A] font-medium max-w-xl leading-relaxed mx-auto md:mx-0 pt-2">
                   Replace manual attendance with one simple scan.
                 </p>
-                <div className="pt-4">
+                <div className="pt-3">
                   <button
                     onClick={() => navigate("/auth?mode=signup")}
                     className="bg-[#E98A3A] text-[#111111] border-2 border-[#111111] text-sm md:text-xl font-['Space_Grotesk'] font-black tracking-widest uppercase py-3 px-4 md:py-6 md:px-10 neo-brutal-shadow neo-brutal-shadow-hover transition-all inline-flex w-full md:w-auto items-center justify-center md:justify-start gap-4 whitespace-nowrap"
@@ -158,7 +158,7 @@ const LandingPage = () => {
                     <span className="material-symbols-outlined font-bold">arrow_forward</span>
                   </button>
                 </div>
-                <div className="flex items-center gap-6 pt-8">
+                <div className="flex items-center gap-6 pt-4">
                   <p className="text-sm font-bold uppercase tracking-widest text-[#2A2A2A]">
                     Run Your Club Like a System, Not a Spreadsheet.
                   </p>
