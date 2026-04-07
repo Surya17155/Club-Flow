@@ -175,6 +175,101 @@ const Events = () => {
 
   useEffect(() => { fetchEvents(); }, [viewMode, activeClub?.club_id]);
 
+  const fetchAttendees = async (eventId: string) => {
+    setLoadingAttendees(true);
+    setAttendees([]);
+    const { data: attData } = await supabase
+      .from('attendance')
+      .select('student_id, scanned_at, status, manually_added')
+      .eq('event_id', eventId);
+    if (attData && attData.length > 0) {
+      const studentIds = attData.map(a => a.student_id);
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('user_id, full_name, roll_no, phone, programme, section, year, class_coordinator, email')
+        .in('user_id', studentIds);
+      const profileMap = new Map((profiles ?? []).map(p => [p.user_id, p]));
+      const merged: AttendeeDetail[] = attData.map(a => {
+        const p = profileMap.get(a.student_id);
+        return {
+          full_name: p?.full_name ?? 'Unknown',
+          roll_no: p?.roll_no ?? null,
+          phone: p?.phone ?? null,
+          programme: p?.programme ?? null,
+          section: p?.section ?? null,
+          year: p?.year ?? null,
+          class_coordinator: p?.class_coordinator ?? null,
+          scanned_at: a.scanned_at,
+          status: a.status,
+          manually_added: a.manually_added,
+          email: p?.email ?? null,
+        };
+      });
+      setAttendees(merged);
+    }
+    setLoadingAttendees(false);
+  };
+
+  const handleViewEvent = (event: EventRow) => {
+    setSelectedEvent(event);
+    setViewDialogOpen(true);
+    fetchAttendees(event.id);
+  };
+
+  const exportCSV = () => {
+    if (!selectedEvent || attendees.length === 0) return;
+    const headers = ['S.No', 'Name', 'Roll No', 'Phone', 'Email', 'Programme', 'Year', 'Section', 'Class Coordinator', 'Scan Time', 'Method'];
+    const rows = attendees.map((a, i) => [
+      i + 1,
+      a.full_name,
+      a.roll_no || '—',
+      a.phone || '—',
+      a.email || '—',
+      a.programme || '—',
+      a.year || '—',
+      a.section || '—',
+      a.class_coordinator || '—',
+      new Date(a.scanned_at).toLocaleString(),
+      a.manually_added ? 'Manual' : 'QR Scan',
+    ]);
+    const csv = [headers, ...rows].map(r => r.map(c => `"${c}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${selectedEvent.name.replace(/[^a-zA-Z0-9]/g, '_')}_attendees.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const exportPDF = () => {
+    if (!selectedEvent || attendees.length === 0) return;
+    const printWin = window.open('', '_blank');
+    if (!printWin) return;
+    const rows = attendees.map((a, i) => `<tr>
+      <td>${i + 1}</td><td>${a.full_name}</td><td>${a.roll_no || '—'}</td>
+      <td>${a.phone || '—'}</td><td>${a.email || '—'}</td><td>${a.programme || '—'}</td>
+      <td>${a.year || '—'}</td><td>${a.section || '—'}</td><td>${a.class_coordinator || '—'}</td>
+      <td>${new Date(a.scanned_at).toLocaleString()}</td><td>${a.manually_added ? 'Manual' : 'QR Scan'}</td>
+    </tr>`).join('');
+    printWin.document.write(`<!DOCTYPE html><html><head><title>${selectedEvent.name} - Attendees</title>
+      <style>body{font-family:Arial,sans-serif;padding:20px}h1{font-size:18px}h2{font-size:14px;color:#666}
+      table{width:100%;border-collapse:collapse;margin-top:16px;font-size:11px}
+      th,td{border:1px solid #333;padding:6px 8px;text-align:left}
+      th{background:#111;color:#fff;font-weight:700}tr:nth-child(even){background:#f9f9f9}</style></head>
+      <body><h1>${selectedEvent.name}</h1>
+      <h2>${new Date(selectedEvent.event_date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })} • ${attendees.length} Attendees</h2>
+      <table><thead><tr><th>S.No</th><th>Name</th><th>Roll No</th><th>Phone</th><th>Email</th><th>Programme</th><th>Year</th><th>Section</th><th>Coordinator</th><th>Scan Time</th><th>Method</th></tr></thead>
+      <tbody>${rows}</tbody></table></body></html>`);
+    printWin.document.close();
+    setTimeout(() => printWin.print(), 500);
+  };
+
+  const exportXLSX = () => {
+    if (!selectedEvent || attendees.length === 0) return;
+    exportAttendanceXLSX(attendees, selectedEvent.name, selectedEvent.event_date);
+  };
+
   const handleDelete = async (eventId: string) => {
     const { error } = await supabase.from('events').delete().eq('id', eventId);
     if (error) {
