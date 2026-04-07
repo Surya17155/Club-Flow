@@ -2,9 +2,9 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Clock, Eye, QrCode, Trash2, Plus, MessageSquare, CheckCircle } from 'lucide-react';
+import { Calendar, Clock, Eye, QrCode, Trash2, Plus, MessageSquare, CheckCircle, Users, Download, FileText, FileSpreadsheet } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -14,6 +14,21 @@ import { useNavigate } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import EventFeedbackModal from '@/components/dashboard/EventFeedbackModal';
 import { useDesign } from '@/contexts/DesignContext';
+import { exportAttendanceXLSX } from '@/utils/exportAttendance';
+
+interface AttendeeDetail {
+  full_name: string;
+  roll_no: string | null;
+  phone: string | null;
+  programme: string | null;
+  section: string | null;
+  year: string | null;
+  class_coordinator: string | null;
+  scanned_at: string;
+  status: string;
+  manually_added: boolean | null;
+  email: string | null;
+}
 
 interface EventRow {
   id: string;
