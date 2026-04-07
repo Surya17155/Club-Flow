@@ -377,7 +377,7 @@ const Events = () => {
                         {(event as any).clubs?.name && <div className="text-xs text-muted-foreground">Club: {(event as any).clubs.name}</div>}
                       </div>
                       <div className="flex gap-2 mt-4 flex-wrap">
-                        <Button variant="outline" size="sm" className="flex-1" onClick={() => { setSelectedEvent(event); setViewDialogOpen(true); }}><Eye className="w-3.5 h-3.5 mr-1" /> View</Button>
+                        <Button variant="outline" size="sm" className="flex-1" onClick={() => handleViewEvent(event)}><Eye className="w-3.5 h-3.5 mr-1" /> View</Button>
                         {isPast && <Button variant="outline" size="sm" onClick={() => { setFeedbackEvent({ id: event.id, name: event.name }); setFeedbackOpen(true); }}><MessageSquare className="w-3.5 h-3.5" /></Button>}
                         {canManageEvents && event.qr_token && <Button variant="outline" size="sm" onClick={() => { setSelectedEvent(event); setQrDialogOpen(true); }}><QrCode className="w-3.5 h-3.5" /></Button>}
                         {canManageEvents && <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" onClick={() => handleDelete(event.id)}><Trash2 className="w-3.5 h-3.5" /></Button>}
@@ -432,7 +432,7 @@ const Events = () => {
                     <button
                       className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs transition-all"
                       style={NEO.btnOutline}
-                      onClick={() => { setSelectedEvent(event); setViewDialogOpen(true); }}
+                      onClick={() => handleViewEvent(event)}
                       onMouseEnter={(e) => { e.currentTarget.style.transform = 'translate(-1px, -1px)'; e.currentTarget.style.boxShadow = '3px 3px 0px #111'; }}
                       onMouseLeave={(e) => { e.currentTarget.style.transform = 'translate(0,0)'; e.currentTarget.style.boxShadow = '2px 2px 0px #111'; }}
                     >
@@ -480,9 +480,9 @@ const Events = () => {
       </div>
 
       {/* View Event Dialog */}
-      <Dialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
+      <Dialog open={viewDialogOpen} onOpenChange={(open) => { setViewDialogOpen(open); if (!open) setAttendees([]); }}>
         <DialogContent
-          className="sm:max-w-md"
+          className="w-[calc(100vw-2rem)] max-w-2xl max-h-[85vh] overflow-y-auto"
           style={isNeo ? { border: '3px solid #111', borderRadius: '16px', boxShadow: '6px 6px 0px #111', background: '#FFFDF5' } : {}}
         >
           <DialogHeader>
@@ -490,16 +490,108 @@ const Events = () => {
               <p className="text-xs font-bold uppercase tracking-wider" style={{ color: '#E98A3A' }}>{(selectedEvent as any).clubs.name}</p>
             )}
             <DialogTitle style={isNeo ? { fontFamily: NEO.font } : {}}>{selectedEvent?.name}</DialogTitle>
+            <DialogDescription className="sr-only">Event details and attendee list</DialogDescription>
           </DialogHeader>
           {selectedEvent && (
-            <div className="space-y-3 text-sm">
-              <p><strong>Date:</strong> {new Date(selectedEvent.event_date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
-              <p><strong>Time:</strong> {new Date(selectedEvent.event_date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}{selectedEvent.end_date ? ` – ${new Date(selectedEvent.end_date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}` : ''}</p>
-              {selectedEvent.description && (
-                <div style={isNeo ? { borderTop: '2px solid #111', paddingTop: '12px' } : { borderTop: '1px solid var(--border)', paddingTop: '12px' }}>
-                  <p style={{ color: '#555' }}>{selectedEvent.description}</p>
+            <div className="space-y-4">
+              {/* Event Info */}
+              <div className="space-y-2 text-sm">
+                <div className="flex flex-wrap gap-2">
+                  <span className="text-[11px] font-bold px-2.5 py-1" style={isNeo ? { ...NEO.badge, background: '#FFF8E1' } : { border: '1px solid var(--border)', borderRadius: '6px', fontSize: '11px' }}>{selectedEvent.event_type}</span>
+                  <span className="text-[11px] font-bold px-2.5 py-1" style={isNeo ? { ...NEO.badge, background: selectedEvent.category === 'Mandatory' ? '#FFEBEE' : '#E8F5E9' } : { border: '1px solid var(--border)', borderRadius: '6px', fontSize: '11px' }}>{selectedEvent.category}</span>
+                  <span className="text-[11px] font-bold px-2.5 py-1" style={isNeo ? { ...NEO.badge, background: '#E3F2FD' } : { border: '1px solid var(--border)', borderRadius: '6px', fontSize: '11px' }}>{selectedEvent.access_type === 'open' ? 'Open for All' : 'Club Members Only'}</span>
                 </div>
-              )}
+                <div className="flex items-center gap-2"><Calendar className="w-3.5 h-3.5 shrink-0" style={{ color: isNeo ? '#E98A3A' : undefined }} /><span><strong>Date:</strong> {new Date(selectedEvent.event_date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span></div>
+                <div className="flex items-center gap-2"><Clock className="w-3.5 h-3.5 shrink-0" style={{ color: isNeo ? '#E98A3A' : undefined }} /><span><strong>Time:</strong> {new Date(selectedEvent.event_date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}{selectedEvent.end_date ? ` – ${new Date(selectedEvent.end_date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}` : ''}</span></div>
+                {selectedEvent.description && (
+                  <div style={isNeo ? { borderTop: '2px solid #111', paddingTop: '12px', marginTop: '8px' } : { borderTop: '1px solid var(--border)', paddingTop: '12px', marginTop: '8px' }}>
+                    <p style={{ color: '#555' }}>{selectedEvent.description}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Attendees Section */}
+              <div style={isNeo ? { borderTop: '2px solid #111', paddingTop: '16px' } : { borderTop: '1px solid var(--border)', paddingTop: '16px' }}>
+                <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+                  <div className="flex items-center gap-2">
+                    <Users className="w-4 h-4" style={{ color: isNeo ? '#E98A3A' : undefined }} />
+                    <span className="text-sm font-bold" style={isNeo ? { fontFamily: NEO.font, color: '#111' } : {}}>
+                      {loadingAttendees ? 'Loading...' : `${attendees.length} Attendee${attendees.length !== 1 ? 's' : ''}`}
+                    </span>
+                  </div>
+                  {attendees.length > 0 && (
+                    <div className="flex gap-1.5">
+                      <button
+                        className="flex items-center gap-1 px-2.5 py-1.5 text-[11px] transition-all"
+                        style={isNeo ? { ...NEO.btnOutline, fontSize: '11px', padding: '6px 10px' } : { border: '1px solid var(--border)', borderRadius: '6px', fontSize: '11px', padding: '6px 10px', background: 'transparent' }}
+                        onClick={exportCSV}
+                        title="Export as CSV"
+                      >
+                        <FileText className="w-3 h-3" /> CSV
+                      </button>
+                      <button
+                        className="flex items-center gap-1 px-2.5 py-1.5 text-[11px] transition-all"
+                        style={isNeo ? { ...NEO.btnOutline, fontSize: '11px', padding: '6px 10px' } : { border: '1px solid var(--border)', borderRadius: '6px', fontSize: '11px', padding: '6px 10px', background: 'transparent' }}
+                        onClick={exportXLSX}
+                        title="Export as Excel"
+                      >
+                        <FileSpreadsheet className="w-3 h-3" /> Excel
+                      </button>
+                      <button
+                        className="flex items-center gap-1 px-2.5 py-1.5 text-[11px] transition-all"
+                        style={isNeo ? { ...NEO.btnPrimary, fontSize: '11px', padding: '6px 10px' } : { border: '1px solid var(--border)', borderRadius: '6px', fontSize: '11px', padding: '6px 10px', background: 'var(--primary)', color: 'white' }}
+                        onClick={exportPDF}
+                        title="Export as PDF"
+                      >
+                        <Download className="w-3 h-3" /> PDF
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {loadingAttendees ? (
+                  <div className="flex justify-center py-6">
+                    <div className="w-6 h-6 border-[3px] border-[#E98A3A]/30 border-t-[#E98A3A] rounded-full animate-spin" />
+                  </div>
+                ) : attendees.length === 0 ? (
+                  <p className="text-center py-4 text-sm" style={{ color: '#888' }}>No attendees yet.</p>
+                ) : (
+                  <div className="overflow-x-auto rounded-lg" style={isNeo ? { border: '2px solid #111' } : { border: '1px solid var(--border)' }}>
+                    <table className="w-full text-xs" style={{ minWidth: '600px' }}>
+                      <thead>
+                        <tr style={isNeo ? { background: '#111', color: '#FFFDF5' } : { background: 'var(--muted)' }}>
+                          <th className="px-3 py-2 text-left font-bold">#</th>
+                          <th className="px-3 py-2 text-left font-bold">Name</th>
+                          <th className="px-3 py-2 text-left font-bold">Roll No</th>
+                          <th className="px-3 py-2 text-left font-bold">Phone</th>
+                          <th className="px-3 py-2 text-left font-bold">Programme</th>
+                          <th className="px-3 py-2 text-left font-bold">Year</th>
+                          <th className="px-3 py-2 text-left font-bold">Section</th>
+                          <th className="px-3 py-2 text-left font-bold">Method</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {attendees.map((a, i) => (
+                          <tr key={i} style={{ borderTop: isNeo ? '1px solid #ddd' : '1px solid var(--border)', background: i % 2 === 0 ? (isNeo ? '#FFFDF5' : 'transparent') : (isNeo ? '#FFF8EE' : 'var(--muted)') }}>
+                            <td className="px-3 py-2">{i + 1}</td>
+                            <td className="px-3 py-2 font-medium whitespace-nowrap">{a.full_name}</td>
+                            <td className="px-3 py-2 whitespace-nowrap">{a.roll_no || '—'}</td>
+                            <td className="px-3 py-2 whitespace-nowrap">{a.phone || '—'}</td>
+                            <td className="px-3 py-2 whitespace-nowrap">{a.programme || '—'}</td>
+                            <td className="px-3 py-2">{a.year || '—'}</td>
+                            <td className="px-3 py-2">{a.section || '—'}</td>
+                            <td className="px-3 py-2">
+                              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded" style={isNeo ? { ...NEO.badge, background: a.manually_added ? '#FFF8E1' : '#E8F5E9', fontSize: '10px' } : { border: '1px solid var(--border)', fontSize: '10px' }}>
+                                {a.manually_added ? 'Manual' : 'QR'}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </DialogContent>
