@@ -8,6 +8,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ClubProvider } from "@/contexts/ClubContext";
 import { DesignProvider } from "@/contexts/DesignContext";
 import { DesktopFrame } from "@/components/layout/DesktopFrame";
+import { MobileNavigationOverlay } from "@/components/mobile/MobileNavigationOverlay";
 
 // Eager-load critical routes
 import LandingPage from "./pages/LandingPage";
@@ -64,6 +65,7 @@ const App = () => (
           <ClubProvider>
             <DesignProvider>
             <Suspense fallback={<PageFallback />}>
+              <MobileNavigationOverlay />
               <Routes>
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/login" element={<AuthPage />} />
