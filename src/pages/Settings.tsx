@@ -91,7 +91,7 @@ const Settings = () => {
   const content = (
     <div className="max-w-xl mx-auto grid gap-6">
       {isMobile && (
-        <div className="flex items-center gap-4 mb-2">
+        <div className="text-center mb-2">
           <h1 className="text-2xl font-bold" style={isNeo ? { fontFamily: NEO.font, color: '#111' } : {}}>Settings</h1>
         </div>
       )}

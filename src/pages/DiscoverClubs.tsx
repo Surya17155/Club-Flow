@@ -149,9 +149,9 @@ const DiscoverClubs = () => {
 
   const content = (
     <>
-      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+      <header className="flex flex-col sm:flex-row justify-between items-center sm:items-center mb-6 gap-4">
         <div className="flex items-center gap-3">
-          <div>
+          <div className="text-center md:text-left">
             <h1 className="text-xl md:text-2xl font-bold" style={isNeo ? { fontFamily: NEO.font, color: '#111', letterSpacing: '-0.02em' } : {}}>
               Discover Clubs
             </h1>

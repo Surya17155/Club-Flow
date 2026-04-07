@@ -104,14 +104,14 @@ const ChatbotPage = () => {
       <div className="flex-1 overflow-y-auto" style={{ padding: isMobile ? '60px 16px 24px' : '24px 28px' }}>
         <div className="flex flex-col h-full max-w-3xl mx-auto" style={{ minHeight: 'calc(100vh - 120px)' }}>
       {/* Header */}
-      <div className="flex items-center gap-3 mb-4">
+      <div className="flex items-center justify-center md:justify-start gap-3 mb-4">
         <div
           className="w-10 h-10 rounded-full flex items-center justify-center"
           style={{ background: '#E98A3A', border: '2px solid #111' }}
         >
           <Bot className="w-5 h-5" style={{ color: '#111' }} />
         </div>
-        <div>
+        <div className="text-center md:text-left">
           <h1 className="text-xl font-black" style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#111' }}>
             AI Chatbot
           </h1>

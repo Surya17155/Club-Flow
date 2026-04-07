@@ -106,9 +106,9 @@ const AssignPowersPage = () => {
       {!isMobile && <DashboardSidebar />}
       <div className="flex-1 overflow-y-auto" style={{ padding: isMobile ? '60px 16px 24px' : '24px 28px' }}>
         <div className="max-w-2xl mx-auto space-y-6">
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
             <Shield className="w-6 h-6" style={{ color: '#E98A3A' }} />
-            <div>
+            <div className="text-center md:text-left">
               <h1 className="text-2xl font-black" style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#111' }}>
                 Assign Powers
               </h1>
