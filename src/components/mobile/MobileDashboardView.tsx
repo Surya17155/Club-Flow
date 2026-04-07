@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { MobileProfileCard } from './MobileProfileCard';
 import { MobileBottomNav } from './MobileBottomNav';
 import {
-  Users, Calendar,
+  Users, Calendar, ChevronRight,
   Compass, ClipboardList, Settings2,
 } from 'lucide-react';
 import { useProfile } from '@/hooks/useProfile';
