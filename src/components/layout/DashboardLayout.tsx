@@ -1,5 +1,5 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { Navigate, useNavigate, useLocation } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { ArrowLeft, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -28,7 +28,6 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children, showHeader = true }: DashboardLayoutProps) {
   const { user, loading } = useAuth();
-  const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useIsMobile();
   const { activeDesign } = useDesign();
