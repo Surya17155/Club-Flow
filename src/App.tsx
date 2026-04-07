@@ -11,7 +11,7 @@ import { DesktopFrame } from "@/components/layout/DesktopFrame";
 
 // Eager-load critical routes
 import LandingPage from "./pages/LandingPage";
-import Login from "./pages/Login";
+import AuthPage from "./pages/AuthPage";
 import AdminDashboard from "./pages/AdminDashboard";
 
 // Eager-load frequently visited routes to eliminate loading delays
@@ -66,8 +66,9 @@ const App = () => (
             <Suspense fallback={<PageFallback />}>
               <Routes>
                 <Route path="/" element={<LandingPage />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<Signup />} />
+                <Route path="/login" element={<AuthPage />} />
+                <Route path="/signup" element={<AuthPage />} />
+                <Route path="/auth" element={<AuthPage />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/admin" element={<AdminDashboard />} />
