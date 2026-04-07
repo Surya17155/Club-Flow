@@ -35,7 +35,7 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
   const initials = (profile?.full_name || 'U')
     .split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
 
-  const nav = (path: string) => { navigate(path); onClose(); };
+  const nav = (path: string) => { navigate(path); };
 
   const personalItems = [
     { title: 'Dashboard', icon: LayoutDashboard, url: '/admin' },
