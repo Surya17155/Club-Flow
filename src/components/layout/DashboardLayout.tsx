@@ -103,19 +103,7 @@ export function DashboardLayout({ children, showHeader = true }: DashboardLayout
 
   return (
     <div className="min-h-screen flex flex-col w-full" style={{ background: isNeo ? '#F4EFE7' : undefined }}>
-      {/* Sticky page title header */}
-      <div
-        className="sticky top-0 z-30 pt-3 pb-2 text-center"
-        style={{ background: isNeo ? '#F4EFE7' : '#fff' }}
-      >
-        <h1
-          className="text-lg font-black"
-          style={isNeo ? { fontFamily: "'Space Grotesk', sans-serif", color: '#111' } : {}}
-        >
-          {pageTitle}
-        </h1>
-      </div>
-      <main className="flex-1 overflow-auto p-4 md:p-6 pb-20">{children}</main>
+      <main className="flex-1 overflow-auto p-4 md:p-6 pb-20 pt-4">{children}</main>
       <MobileBottomNav />
     </div>
   );
