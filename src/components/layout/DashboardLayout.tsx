@@ -103,7 +103,7 @@ export function DashboardLayout({ children, showHeader = true }: DashboardLayout
 
   return (
     <div className="min-h-screen flex flex-col w-full" style={{ background: isNeo ? '#F4EFE7' : undefined }}>
-      <main className="flex-1 overflow-auto p-4 md:p-6 pb-20 pt-4">{children}</main>
+      <main className="flex-1 overflow-auto px-4 md:p-6 pb-20" style={{ paddingTop: '52px' }}>{children}</main>
       <MobileBottomNav />
     </div>
   );
