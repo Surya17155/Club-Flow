@@ -158,7 +158,7 @@ const LandingPage = () => {
                     <span className="material-symbols-outlined font-bold">arrow_forward</span>
                   </button>
                 </div>
-                <div className="flex items-center gap-6 pt-16 md:pt-4">
+                <div className="flex items-center gap-6 pt-3 md:pt-4">
                   <p className="text-sm font-bold uppercase tracking-widest text-[#2A2A2A]">
                     Run Your Club Like a System, Not a Spreadsheet.
                   </p>
