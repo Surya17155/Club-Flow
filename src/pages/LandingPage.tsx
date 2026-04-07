@@ -33,7 +33,9 @@ const LandingPage = () => {
     <button
       onClick={() => setActivePage(page)}
       className={`font-['Space_Grotesk'] font-bold tracking-tighter uppercase hover:-translate-y-0.5 transition-transform duration-100 ${
-        activePage === page ? "text-[#E98A3A] border-b-2 border-[#E98A3A] pb-1" : "text-[#111111] hover:text-[#E98A3A]"
+        activePage === page
+          ? "text-[#E98A3A] border-b-2 border-[#E98A3A] pb-1"
+          : "text-[#111111] hover:text-[#E98A3A]"
       }`}
     >
       {label}
@@ -42,10 +44,7 @@ const LandingPage = () => {
 
   const mobileNavLink = (page: PageName, label: string) => (
     <button
-      onClick={() => {
-        setActivePage(page);
-        setMobileMenuOpen(false);
-      }}
+      onClick={() => { setActivePage(page); setMobileMenuOpen(false); }}
       className={`text-lg font-['Space_Grotesk'] font-bold uppercase text-left ${
         activePage === page ? "text-[#E98A3A]" : "text-[#111111] hover:text-[#E98A3A]"
       }`}
@@ -55,10 +54,7 @@ const LandingPage = () => {
   );
 
   return (
-    <div
-      className="min-h-screen scroll-smooth"
-      style={{ background: "#F4EFE7", fontFamily: "'Plus Jakarta Sans', sans-serif", color: "#111111" }}
-    >
+    <div className="min-h-screen scroll-smooth" style={{ background: "#F4EFE7", fontFamily: "'Plus Jakarta Sans', sans-serif", color: "#111111" }}>
       <style>{`
         .neo-brutal-shadow { box-shadow: 4px 4px 0px #111111; }
         .neo-brutal-shadow-hover:hover { box-shadow: 6px 6px 0px #111111; transform: translate(-2px, -2px); }
@@ -72,17 +68,9 @@ const LandingPage = () => {
       `}</style>
 
       {/* Header */}
-      <header
-        className="border-b-2 border-[#111111] w-full px-6 py-4 sticky top-0 z-50"
-        style={{ background: "#F4EFE7" }}
-      >
+      <header className="border-b-2 border-[#111111] w-full px-6 py-4 sticky top-0 z-50" style={{ background: "#F4EFE7" }}>
         <div className="max-w-screen-2xl mx-auto flex justify-between items-center">
-          <div
-            className="text-2xl font-black text-[#111111] tracking-tighter uppercase"
-            style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-          >
-            ATTENDLY
-          </div>
+          <div className="text-2xl font-black text-[#111111] tracking-tighter uppercase" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>ATTENDLY</div>
           <nav className="hidden md:flex gap-8 items-center">
             {navLink("home", "HOME")}
             {navLink("pricing", "PRICING")}
@@ -128,19 +116,13 @@ const LandingPage = () => {
               {mobileNavLink("pricing", "Pricing")}
               {mobileNavLink("about", "About")}
               <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  navigate("/auth?mode=login");
-                }}
+                onClick={() => { setMobileMenuOpen(false); navigate("/auth?mode=login"); }}
                 className="font-['Space_Grotesk'] font-bold text-sm tracking-widest uppercase py-3 px-6 border-2 border-[#111111] neo-brutal-shadow mt-2 text-left"
               >
                 LOG IN
               </button>
               <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  navigate("/auth?mode=signup");
-                }}
+                onClick={() => { setMobileMenuOpen(false); navigate("/auth?mode=signup"); }}
                 className="bg-[#E98A3A] text-[#111111] border-2 border-[#111111] font-['Space_Grotesk'] font-bold text-sm tracking-widest uppercase py-3 px-6 neo-brutal-shadow neo-brutal-shadow-hover transition-all"
               >
                 GET STARTED
@@ -155,21 +137,19 @@ const LandingPage = () => {
         {activePage === "home" && (
           <div>
             {/* Hero */}
-            <section className="max-w-screen-2xl mx-auto px-6 pt-12 pb-10 md:py-20 lg:py-32 min-h-screen md:min-h-auto flex flex-col justify-center">
+            <section className="max-w-screen-2xl mx-auto px-6 pt-4 pb-4 md:py-20 lg:py-32 md:min-h-auto flex flex-col justify-start md:justify-center">
               {/* Hero illustration - mobile only */}
-              <div className="flex justify-center mb-6 md:hidden">
-                <img src={heroIllustration} alt="Student scanning QR code for attendance" className="w-50 h-auto" />
+              <div className="flex justify-center md:hidden mb-2">
+                <img src={heroIllustration} alt="Student scanning QR code for attendance" className="w-44 h-auto" />
               </div>
-              <div className="space-y-2 text-center md:text-left">
-                <h1 className="text-4xl md:text-6xl lg:text-8xl font-semibold leading-[0.9] tracking-tighter uppercase text-[#111111]">
-                  ATTENDANCE IN SECONDS
-                  <br />
-                  <span className="text-[#E98A3A]">NOT MINUTES</span>
+              <div className="space-y-1 text-center md:text-left">
+                <h1 className="text-5xl md:text-6xl lg:text-8xl font-semibold leading-[0.85] tracking-tighter uppercase text-[#111111]">
+                  ATTENDANCE IN SECONDS<br /><span className="text-[#E98A3A]">NOT MINUTES</span>
                 </h1>
-                <p className="text-base md:text-xl text-[#2A2A2A] font-medium max-w-xl leading-relaxed mx-auto md:mx-0">
-                  Replace manual attendance with one simple scan.
+                <p className="text-base md:text-xl text-[#2A2A2A] font-medium max-w-xl leading-relaxed mx-auto md:mx-0 pt-2">
+                  Manual attendance with one simple scan.
                 </p>
-                <div className="pt-4">
+                <div className="pt-3">
                   <button
                     onClick={() => navigate("/auth?mode=signup")}
                     className="bg-[#E98A3A] text-[#111111] border-2 border-[#111111] text-sm md:text-xl font-['Space_Grotesk'] font-black tracking-widest uppercase py-3 px-4 md:py-6 md:px-10 neo-brutal-shadow neo-brutal-shadow-hover transition-all inline-flex w-full md:w-auto items-center justify-center md:justify-start gap-4 whitespace-nowrap"
@@ -178,7 +158,7 @@ const LandingPage = () => {
                     <span className="material-symbols-outlined font-bold">arrow_forward</span>
                   </button>
                 </div>
-                <div className="flex items-center gap-6 pt-3">
+                <div className="flex items-center gap-6 pt-16 md:pt-4">
                   <p className="text-sm font-bold uppercase tracking-widest text-[#2A2A2A]">
                     Run Your Club Like a System, Not a Spreadsheet.
                   </p>
@@ -196,37 +176,12 @@ const LandingPage = () => {
                 </div>
                 <div className="grid md:grid-cols-3 gap-8">
                   {[
-                    {
-                      icon: "qr_code",
-                      title: "Seamless Attendance",
-                      desc: "Generate dynamic QR codes for every event. Students scan, and you're done. No paper, no errors, no excuses.",
-                      module: "01",
-                      bg: "#F6E1CF",
-                    },
-                    {
-                      icon: "groups",
-                      title: "Club Management",
-                      desc: "Centralize member directories, member roles, and event calendars. Keep your entire club in sync.",
-                      module: "02",
-                      bg: "#E98A3A",
-                      lift: true,
-                    },
-                    {
-                      icon: "bar_chart",
-                      title: "Real-time Analytics",
-                      desc: "Track growth trends and attendance rates over time. Export data in one click.",
-                      module: "03",
-                      bg: "#F6E1CF",
-                    },
+                    { icon: "qr_code", title: "Seamless Attendance", desc: "Generate dynamic QR codes for every event. Students scan, and you're done. No paper, no errors, no excuses.", module: "01", bg: "#F6E1CF" },
+                    { icon: "groups", title: "Club Management", desc: "Centralize member directories, member roles, and event calendars. Keep your entire club in sync.", module: "02", bg: "#E98A3A", lift: true },
+                    { icon: "bar_chart", title: "Real-time Analytics", desc: "Track growth trends and attendance rates over time. Export data in one click.", module: "03", bg: "#F6E1CF" },
                   ].map((f) => (
-                    <div
-                      key={f.module}
-                      className={`bg-white border-2 border-[#111111] p-10 rounded-xl neo-brutal-shadow neo-brutal-shadow-hover transition-all flex flex-col gap-6 ${f.lift ? "transform md:-translate-y-4" : ""}`}
-                    >
-                      <div
-                        className="w-16 h-16 border-2 border-[#111111] flex items-center justify-center"
-                        style={{ background: f.bg }}
-                      >
+                    <div key={f.module} className={`bg-white border-2 border-[#111111] p-10 rounded-xl neo-brutal-shadow neo-brutal-shadow-hover transition-all flex flex-col gap-6 ${f.lift ? "transform md:-translate-y-4" : ""}`}>
+                      <div className="w-16 h-16 border-2 border-[#111111] flex items-center justify-center" style={{ background: f.bg }}>
                         <span className="material-symbols-outlined text-4xl text-[#111111]">{f.icon}</span>
                       </div>
                       <h3 className="text-3xl font-bold uppercase tracking-tight">{f.title}</h3>
@@ -248,9 +203,7 @@ const LandingPage = () => {
                   <div key={i} className="flex gap-12 items-center pr-12">
                     {["FAST", "SIMPLE", "STUDENT-FIRST", "ACCURATE"].map((word) => (
                       <span key={word + i} className="contents">
-                        <span className="text-[#F4EFE7] font-['Space_Grotesk'] font-black text-4xl uppercase tracking-tighter italic">
-                          {word}
-                        </span>
+                        <span className="text-[#F4EFE7] font-['Space_Grotesk'] font-black text-4xl uppercase tracking-tighter italic">{word}</span>
                         <span className="material-symbols-outlined text-4xl text-[#E98A3A]">star</span>
                       </span>
                     ))}
@@ -262,9 +215,7 @@ const LandingPage = () => {
             {/* CTA */}
             <section className="max-w-screen-2xl mx-auto px-6 py-24 text-center">
               <div className="bg-[#E98A3A] border-4 border-[#111111] p-12 md:p-24 neo-brutal-shadow">
-                <h2 className="text-4xl md:text-5xl lg:text-8xl font-black uppercase tracking-tighter text-[#111111] mb-8">
-                  START WITH ATTENDLY
-                </h2>
+                <h2 className="text-4xl md:text-5xl lg:text-8xl font-black uppercase tracking-tighter text-[#111111] mb-8">START WITH ATTENDLY</h2>
                 <p className="text-base md:text-3xl font-bold uppercase tracking-tight text-[#111111] mb-12 max-w-2xl mx-auto">
                   Generate a QR. Let the system handle the rest.
                 </p>
@@ -286,26 +237,14 @@ const LandingPage = () => {
             <footer className="border-t-2 border-[#111111] w-full py-12 px-6" style={{ background: "#F4EFE7" }}>
               <div className="max-w-screen-2xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
                 <div className="flex flex-col items-center md:items-start gap-4">
-                  <div className="text-lg font-bold text-[#111111] uppercase tracking-tighter font-['Space_Grotesk']">
-                    ATTENDLY
-                  </div>
-                  <p className="text-sm font-medium uppercase tracking-widest text-[#2A2A2A] text-center md:text-left">
-                    © 2026 ATTENDLY. BUILT FOR THE STUDENTS.
-                  </p>
+                  <div className="text-lg font-bold text-[#111111] uppercase tracking-tighter font-['Space_Grotesk']">ATTENDLY</div>
+                  <p className="text-sm font-medium uppercase tracking-widest text-[#2A2A2A] text-center md:text-left">© 2026 ATTENDLY. BUILT FOR THE STUDENTS.</p>
                 </div>
                 <nav className="flex flex-wrap justify-center gap-4 md:gap-8 text-xs md:text-sm font-medium uppercase tracking-widest">
-                  <a className="text-[#2A2A2A] hover:text-[#E98A3A] transition-colors" href="#">
-                    Privacy Policy
-                  </a>
-                  <a className="text-[#2A2A2A] hover:text-[#E98A3A] transition-colors" href="#">
-                    Terms of Service
-                  </a>
-                  <a className="text-[#2A2A2A] hover:text-[#E98A3A] transition-colors" href="#">
-                    Github
-                  </a>
-                  <a className="text-[#2A2A2A] hover:text-[#E98A3A] transition-colors" href="#">
-                    Documentation
-                  </a>
+                  <a className="text-[#2A2A2A] hover:text-[#E98A3A] transition-colors" href="#">Privacy Policy</a>
+                  <a className="text-[#2A2A2A] hover:text-[#E98A3A] transition-colors" href="#">Terms of Service</a>
+                  <a className="text-[#2A2A2A] hover:text-[#E98A3A] transition-colors" href="#">Github</a>
+                  <a className="text-[#2A2A2A] hover:text-[#E98A3A] transition-colors" href="#">Documentation</a>
                 </nav>
                 <div className="flex gap-4">
                   <div className="w-10 h-10 bg-white border-2 border-[#111111] flex items-center justify-center neo-brutal-shadow cursor-pointer hover:bg-[#E98A3A] transition-colors">
@@ -328,36 +267,23 @@ const LandingPage = () => {
           <div>
             <div className="max-w-7xl mx-auto px-6 py-16 md:py-24">
               <div className="text-center mb-20 space-y-6">
-                <h1 className="font-bold text-4xl md:text-7xl leading-tight tracking-tighter uppercase max-w-4xl mx-auto">
-                  CHILL OUT, THE APP IS ACTUALLY FREE
-                </h1>
-                <p className="text-xl md:text-2xl max-w-2xl mx-auto" style={{ color: "#544338" }}>
-                  It's ₹0. Forever. We're just here for you.
-                </p>
+                <h1 className="font-bold text-4xl md:text-7xl leading-tight tracking-tighter uppercase max-w-4xl mx-auto">CHILL OUT, THE APP IS ACTUALLY FREE</h1>
+                <p className="text-xl md:text-2xl max-w-2xl mx-auto" style={{ color: "#544338" }}>It's ₹0. Forever. We're just here for you.</p>
               </div>
 
               {/* Free plan card */}
               <div className="max-w-2xl mx-auto mb-24">
                 <div className="bg-white border-2 border-[#111111] rounded-lg neo-shadow p-8 md:p-12 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 bg-[#E98A3A] border-l-2 border-b-2 border-[#111111] px-4 py-2 font-['Space_Grotesk'] font-bold uppercase tracking-widest text-xs">
-                    BEST VALUE
-                  </div>
+                  <div className="absolute top-0 right-0 bg-[#E98A3A] border-l-2 border-b-2 border-[#111111] px-4 py-2 font-['Space_Grotesk'] font-bold uppercase tracking-widest text-xs">BEST VALUE</div>
                   <div className="mb-10">
                     <h2 className="text-2xl font-bold uppercase mb-2">THE FREE PLAN</h2>
                     <div className="flex items-baseline gap-2">
                       <span className="text-6xl font-black tracking-tighter">₹0</span>
-                      <span className="text-xl" style={{ color: "#544338" }}>
-                        for everyone
-                      </span>
+                      <span className="text-xl" style={{ color: "#544338" }}>for everyone</span>
                     </div>
                   </div>
                   <div className="space-y-6 mb-12">
-                    {[
-                      "Unlimited club drama",
-                      "AI Agent access",
-                      "Keep Attendance history",
-                      "No credit card required",
-                    ].map((item) => (
+                    {["Unlimited club drama", "AI Agent access", "Keep Attendance history", "No credit card required"].map((item) => (
                       <div key={item} className="flex items-center gap-4">
                         <div className="w-8 h-8 bg-[#E98A3A] border-2 border-[#111111] flex items-center justify-center">
                           <span className="material-symbols-outlined text-sm font-bold">check</span>
@@ -372,9 +298,7 @@ const LandingPage = () => {
                   >
                     START FOR FREE
                   </button>
-                  <p className="text-center mt-6 text-sm italic" style={{ color: "#544338" }}>
-                    *No Terms & Conditions apply
-                  </p>
+                  <p className="text-center mt-6 text-sm italic" style={{ color: "#544338" }}>*No Terms & Conditions apply</p>
                 </div>
               </div>
 
@@ -388,9 +312,7 @@ const LandingPage = () => {
                 <div className="bg-white border-2 border-[#111111] rounded-lg p-6 neo-shadow">
                   <span className="material-symbols-outlined text-4xl mb-4 block">bolt</span>
                   <h3 className="font-bold text-xl uppercase mb-2">ishowspeed</h3>
-                  <p className="text-sm">
-                    Marking attendance takes just <b>1 second</b>. Way much faster than manual, isn't it?
-                  </p>
+                  <p className="text-sm">Marking attendance takes just <b>1 second</b>. Way much faster than manual, isn't it?</p>
                 </div>
                 <div className="bg-[#E98A3A] border-2 border-[#111111] rounded-lg p-6 neo-shadow">
                   <span className="material-symbols-outlined text-4xl mb-4 block">verified</span>
@@ -403,13 +325,9 @@ const LandingPage = () => {
               <div className="border-4 border-[#111111] rounded-lg p-12 bg-white flex flex-col md:flex-row items-center justify-between gap-8 neo-shadow">
                 <div className="max-w-xl text-center md:text-left">
                   <h2 className="font-black text-3xl uppercase mb-4 tracking-tighter">Enterprise Plan</h2>
-                  <p className="text-xl italic" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-                    For Clubs with too much budget: Please just buy me a pizza instead.
-                  </p>
+                  <p className="text-xl italic" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>For Clubs with too much budget: Please just buy me a pizza instead.</p>
                 </div>
-                <button className="border-2 border-[#111111] px-8 py-4 font-bold uppercase neo-shadow neo-shadow-hover transition-all">
-                  Contact US
-                </button>
+                <button className="border-2 border-[#111111] px-8 py-4 font-bold uppercase neo-shadow neo-shadow-hover transition-all">Contact US</button>
               </div>
             </div>
 
@@ -417,19 +335,11 @@ const LandingPage = () => {
             <footer className="flex flex-col md:flex-row justify-between items-center px-8 py-12 w-full gap-4 bg-[#111111] border-t-2 border-[#111111]">
               <div className="text-lg font-black text-[#E98A3A]">ATTENDLY</div>
               <div className="flex gap-8 font-['Space_Grotesk'] uppercase text-xs tracking-widest text-[#F4EFE7]">
-                <a className="hover:text-[#E98A3A] transition-colors" href="#">
-                  Privacy Policy
-                </a>
-                <a className="hover:text-[#E98A3A] transition-colors" href="#">
-                  Terms of Service
-                </a>
-                <a className="hover:text-[#E98A3A] transition-colors" href="#">
-                  Campus Ethics
-                </a>
+                <a className="hover:text-[#E98A3A] transition-colors" href="#">Privacy Policy</a>
+                <a className="hover:text-[#E98A3A] transition-colors" href="#">Terms of Service</a>
+                <a className="hover:text-[#E98A3A] transition-colors" href="#">Campus Ethics</a>
               </div>
-              <div className="font-['Space_Grotesk'] uppercase text-xs tracking-widest text-[#F4EFE7]">
-                © 2026 THE ATTENDLY. NO REGRETS.
-              </div>
+              <div className="font-['Space_Grotesk'] uppercase text-xs tracking-widest text-[#F4EFE7]">© 2026 THE ATTENDLY. NO REGRETS.</div>
             </footer>
           </div>
         )}
@@ -442,9 +352,7 @@ const LandingPage = () => {
               <div className="max-w-screen-2xl mx-auto px-6 lg:px-12 grid lg:grid-cols-2 gap-16 items-center">
                 <div className="space-y-8">
                   <h1 className="text-6xl md:text-8xl font-black leading-[0.9] tracking-tighter uppercase">
-                    Managing
-                    <br />
-                    <span className="text-[#E98A3A]">CLUBS</span>
+                    Managing<br /><span className="text-[#E98A3A]">CLUBS</span>
                   </h1>
                   <p className="text-xl md:text-2xl font-medium max-w-xl" style={{ color: "#544338" }}>
                     Manage attendance, members, and events without spreadsheets or manual work.
@@ -472,39 +380,16 @@ const LandingPage = () => {
                     ].map((n) => (
                       <div key={n.label} className={`absolute ${n.pos} flex flex-col items-center`}>
                         <div className="w-16 h-16 md:w-20 md:h-20 bg-white border-2 border-[#111111] flex items-center justify-center neo-brutal-shadow">
-                          <span className="material-symbols-outlined text-3xl md:text-4xl text-[#E98A3A]">
-                            {n.icon}
-                          </span>
+                          <span className="material-symbols-outlined text-3xl md:text-4xl text-[#E98A3A]">{n.icon}</span>
                         </div>
-                        <span className="mt-2 font-['Space_Grotesk'] font-black text-[10px] md:text-xs uppercase">
-                          {n.label}
-                        </span>
+                        <span className="mt-2 font-['Space_Grotesk'] font-black text-[10px] md:text-xs uppercase">{n.label}</span>
                       </div>
                     ))}
-                    <svg
-                      className="hidden md:block absolute inset-0 w-full h-full -z-0 opacity-20"
-                      viewBox="0 0 400 400"
-                    >
+                    <svg className="hidden md:block absolute inset-0 w-full h-full -z-0 opacity-20" viewBox="0 0 400 400">
                       <line stroke="#111111" strokeDasharray="8 8" strokeWidth="4" x1="200" x2="200" y1="200" y2="50" />
-                      <line
-                        stroke="#111111"
-                        strokeDasharray="8 8"
-                        strokeWidth="4"
-                        x1="200"
-                        x2="200"
-                        y1="200"
-                        y2="350"
-                      />
+                      <line stroke="#111111" strokeDasharray="8 8" strokeWidth="4" x1="200" x2="200" y1="200" y2="350" />
                       <line stroke="#111111" strokeDasharray="8 8" strokeWidth="4" x1="200" x2="50" y1="200" y2="200" />
-                      <line
-                        stroke="#111111"
-                        strokeDasharray="8 8"
-                        strokeWidth="4"
-                        x1="200"
-                        x2="350"
-                        y1="200"
-                        y2="200"
-                      />
+                      <line stroke="#111111" strokeDasharray="8 8" strokeWidth="4" x1="200" x2="350" y1="200" y2="200" />
                     </svg>
                   </div>
                 </div>
@@ -520,29 +405,11 @@ const LandingPage = () => {
                 </h2>
                 <div className="grid grid-cols-1 gap-6">
                   {[
-                    {
-                      num: "01",
-                      icon: "event_available",
-                      title: "Create Event",
-                      desc: "Club presidents enter key event details: Name, Category, and Target Audience. One tap and the system generates a high-definition, unique QR code instantly.",
-                    },
-                    {
-                      num: "02",
-                      icon: "qr_code_scanner",
-                      title: "Instant Attendance",
-                      desc: "Students scan the QR code. The system automatically fetches their student ID and metadata, recording their participation in milliseconds without manual data entry.",
-                    },
-                    {
-                      num: "03",
-                      icon: "file_download",
-                      title: "Manage & Export",
-                      desc: "Admins view live attendee lists in real-time. Need a report for the faculty? Export beautifully formatted CSV or Excel data with a single click.",
-                    },
+                    { num: "01", icon: "event_available", title: "Create Event", desc: "Club presidents enter key event details: Name, Category, and Target Audience. One tap and the system generates a high-definition, unique QR code instantly." },
+                    { num: "02", icon: "qr_code_scanner", title: "Instant Attendance", desc: "Students scan the QR code. The system automatically fetches their student ID and metadata, recording their participation in milliseconds without manual data entry." },
+                    { num: "03", icon: "file_download", title: "Manage & Export", desc: "Admins view live attendee lists in real-time. Need a report for the faculty? Export beautifully formatted CSV or Excel data with a single click." },
                   ].map((s) => (
-                    <div
-                      key={s.num}
-                      className="bg-white border-2 border-[#111111] p-6 sm:p-8 neo-brutal-shadow neo-brutal-shadow-hover"
-                    >
+                    <div key={s.num} className="bg-white border-2 border-[#111111] p-6 sm:p-8 neo-brutal-shadow neo-brutal-shadow-hover">
                       <div className="mb-5 flex items-center justify-between gap-4">
                         <span className="text-4xl sm:text-5xl font-black text-[#E98A3A]">{s.num}</span>
                         <div className="bg-[#F6E1CF] border-2 border-[#111111] p-3">
@@ -550,9 +417,7 @@ const LandingPage = () => {
                         </div>
                       </div>
                       <h3 className="text-2xl font-bold uppercase mb-4">{s.title}</h3>
-                      <p className="font-medium leading-relaxed text-sm sm:text-base" style={{ color: "#544338" }}>
-                        {s.desc}
-                      </p>
+                      <p className="font-medium leading-relaxed text-sm sm:text-base" style={{ color: "#544338" }}>{s.desc}</p>
                     </div>
                   ))}
                 </div>
@@ -562,55 +427,24 @@ const LandingPage = () => {
             {/* Desktop: The Journey */}
             <section className="mb-32 relative hidden md:block">
               <div className="text-center mb-24">
-                <h2 className="text-5xl font-black uppercase tracking-tighter inline-block border-b-8 border-[#E98A3A] pb-2">
-                  THE JOURNEY
-                </h2>
+                <h2 className="text-5xl font-black uppercase tracking-tighter inline-block border-b-8 border-[#E98A3A] pb-2">THE JOURNEY</h2>
               </div>
               <div className="max-w-4xl mx-auto space-y-24 relative">
                 <div className="absolute left-1/2 top-0 bottom-0 journey-line -translate-x-1/2 hidden md:block" />
                 {[
-                  {
-                    num: "01",
-                    icon: "add_task",
-                    title: "Create Event",
-                    desc: "Club presidents enter event details: Name, Category, and Target Audience. Our system crafts a unique QR code in an instant.",
-                    align: "right",
-                  },
-                  {
-                    num: "02",
-                    icon: "qr_code_2",
-                    title: "Instant Check-in",
-                    desc: "Students scan, and they're in. The app automatically captures student ID and participation data in milliseconds.",
-                    align: "left",
-                  },
-                  {
-                    num: "03",
-                    icon: "analytics",
-                    title: "Manage & Export",
-                    desc: "Monitor live data as it happens. Generate professional attendance reports and export them as CSV/Excel with one click.",
-                    align: "right",
-                  },
+                  { num: "01", icon: "add_task", title: "Create Event", desc: "Club presidents enter event details: Name, Category, and Target Audience. Our system crafts a unique QR code in an instant.", align: "right" },
+                  { num: "02", icon: "qr_code_2", title: "Instant Check-in", desc: "Students scan, and they're in. The app automatically captures student ID and participation data in milliseconds.", align: "left" },
+                  { num: "03", icon: "analytics", title: "Manage & Export", desc: "Monitor live data as it happens. Generate professional attendance reports and export them as CSV/Excel with one click.", align: "right" },
                 ].map((s, i) => (
-                  <div
-                    key={s.num}
-                    className={`relative flex flex-col ${s.align === "left" ? "md:flex-row-reverse" : "md:flex-row"} items-center gap-12 group`}
-                  >
-                    <div
-                      className={`md:w-1/2 ${s.align === "left" ? "md:pl-12 text-center md:text-left" : "md:pr-12 text-center md:text-right"}`}
-                    >
+                  <div key={s.num} className={`relative flex flex-col ${s.align === "left" ? "md:flex-row-reverse" : "md:flex-row"} items-center gap-12 group`}>
+                    <div className={`md:w-1/2 ${s.align === "left" ? "md:pl-12 text-center md:text-left" : "md:pr-12 text-center md:text-right"}`}>
                       <div className="inline-block p-6 bg-white border-2 border-[#111111] neo-brutal-shadow mb-6">
                         <span className="material-symbols-outlined text-6xl text-[#E98A3A]">{s.icon}</span>
                       </div>
-                      <h3 className="text-3xl font-black uppercase mb-4">
-                        {s.num}. {s.title}
-                      </h3>
-                      <p className="text-lg font-medium leading-relaxed" style={{ color: "#544338" }}>
-                        {s.desc}
-                      </p>
+                      <h3 className="text-3xl font-black uppercase mb-4">{s.num}. {s.title}</h3>
+                      <p className="text-lg font-medium leading-relaxed" style={{ color: "#544338" }}>{s.desc}</p>
                     </div>
-                    <div
-                      className={`hidden md:flex absolute left-1/2 -translate-x-1/2 w-8 h-8 ${i % 2 === 0 ? "bg-[#111111]" : "bg-[#E98A3A]"} border-4 border-[#F4EFE7] rounded-full z-10`}
-                    />
+                    <div className={`hidden md:flex absolute left-1/2 -translate-x-1/2 w-8 h-8 ${i % 2 === 0 ? "bg-[#111111]" : "bg-[#E98A3A]"} border-4 border-[#F4EFE7] rounded-full z-10`} />
                     <div className="md:w-1/2" />
                   </div>
                 ))}
@@ -620,22 +454,15 @@ const LandingPage = () => {
             {/* AI Agent Section */}
             <section className="mb-32">
               <div className="px-4 sm:px-6 lg:px-4 xl:px-6">
-                <div
-                  className="mx-auto max-w-[calc(100%-2rem)] sm:max-w-[calc(100%-3rem)] lg:max-w-[calc(100%-5rem)] xl:max-w-[calc(100%-7rem)] border-4 border-[#111111] neo-brutal-shadow overflow-hidden"
-                  style={{ background: "#F4EFE7" }}
-                >
+                <div className="mx-auto max-w-[calc(100%-2rem)] sm:max-w-[calc(100%-3rem)] lg:max-w-[calc(100%-5rem)] xl:max-w-[calc(100%-7rem)] border-4 border-[#111111] neo-brutal-shadow overflow-hidden" style={{ background: "#F4EFE7" }}>
                   <div className="bg-[#111111] text-white px-8 py-4 flex justify-between items-center">
                     <div className="flex items-center gap-3">
                       <span className="w-3 h-3 rounded-full bg-red-500" />
                       <span className="w-3 h-3 rounded-full bg-yellow-500" />
                       <span className="w-3 h-3 rounded-full bg-green-500" />
-                      <span className="ml-4 font-['Space_Grotesk'] uppercase text-sm font-bold tracking-widest">
-                        AI Command Center V2.0
-                      </span>
+                      <span className="ml-4 font-['Space_Grotesk'] uppercase text-sm font-bold tracking-widest">AI Command Center V2.0</span>
                     </div>
-                    <span className="font-['Space_Grotesk'] font-bold text-xs bg-[#E98A3A] text-black px-2 py-0.5">
-                      ONLINE
-                    </span>
+                    <span className="font-['Space_Grotesk'] font-bold text-xs bg-[#E98A3A] text-black px-2 py-0.5">ONLINE</span>
                   </div>
                   <div className="p-8 md:p-12">
                     <div className="grid lg:grid-cols-12 gap-12 min-w-0">
@@ -645,36 +472,18 @@ const LandingPage = () => {
                             Meet Your <span className="text-[#E98A3A]">AI AGENT</span>
                           </h2>
                           <p className="text-xl font-medium max-w-xl" style={{ color: "#544338" }}>
-                            Our AI Agent acts as your club's personal digital strategist, managing your member base and
-                            extracting insights effortlessly.
+                            Our AI Agent acts as your club's personal digital strategist, managing your member base and extracting insights effortlessly.
                           </p>
                         </div>
                         <div className="grid sm:grid-cols-2 gap-6">
                           {[
-                            {
-                              icon: "forum",
-                              title: "Talk to Data",
-                              desc: "Natural language queries for instant reports.",
-                            },
-                            {
-                              icon: "upload_file",
-                              title: "Bulk Processing",
-                              desc: "Add 1000s of members by dragging a file.",
-                            },
-                            {
-                              icon: "vpn_key",
-                              title: "Smart Delegation",
-                              desc: "Grant access to specific team members.",
-                            },
+                            { icon: "forum", title: "Talk to Data", desc: "Natural language queries for instant reports." },
+                            { icon: "upload_file", title: "Bulk Processing", desc: "Add 1000s of members by dragging a file." },
+                            { icon: "vpn_key", title: "Smart Delegation", desc: "Grant access to specific team members." },
                             { icon: "bolt", title: "Instant Fetch", desc: "No searching, just asking and receiving." },
                           ].map((f) => (
-                            <div
-                              key={f.title}
-                              className="bg-white p-6 border-2 border-[#111111] neo-brutal-shadow min-w-0"
-                            >
-                              <span className="material-symbols-outlined text-[#E98A3A] text-3xl mb-3 block">
-                                {f.icon}
-                              </span>
+                            <div key={f.title} className="bg-white p-6 border-2 border-[#111111] neo-brutal-shadow min-w-0">
+                              <span className="material-symbols-outlined text-[#E98A3A] text-3xl mb-3 block">{f.icon}</span>
                               <h4 className="font-black uppercase text-lg mb-1">{f.title}</h4>
                               <p className="text-sm opacity-70">{f.desc}</p>
                             </div>
@@ -684,10 +493,7 @@ const LandingPage = () => {
                       {/* Chat Preview */}
                       <div className="lg:col-span-5 min-w-0">
                         <div className="bg-white border-2 border-[#111111] neo-brutal-shadow h-full flex flex-col min-w-0">
-                          <div
-                            className="p-4 border-b-2 border-[#111111] flex items-center gap-4"
-                            style={{ background: "#F6E1CF" }}
-                          >
+                          <div className="p-4 border-b-2 border-[#111111] flex items-center gap-4" style={{ background: "#F6E1CF" }}>
                             <div className="w-10 h-10 bg-[#E98A3A] border-2 border-[#111111] flex items-center justify-center">
                               <span className="material-symbols-outlined text-white">smart_toy</span>
                             </div>
@@ -705,20 +511,14 @@ const LandingPage = () => {
                             <div className="flex flex-col items-start min-w-0">
                               <div className="bg-white p-3 border-2 border-[#111111] rounded-tr-xl rounded-tl-xl rounded-br-xl max-w-full sm:max-w-[85%] neo-brutal-shadow break-words">
                                 Scanning archives... <br />
-                                <span className="font-bold text-[#E98A3A]">69 students</span> attended. Attendance was
-                                7% higher than the previous event.
+                                <span className="font-bold text-[#E98A3A]">69 students</span> attended. Attendance was 7% higher than the previous event.
                               </div>
                             </div>
                           </div>
                           <div className="p-4 border-t-2 border-[#111111] bg-white">
                             <div className="flex items-center gap-2 border-2 border-[#111111] rounded-full px-3 py-2 min-w-0">
                               <span className="material-symbols-outlined text-2xl text-[#111111]">attach_file</span>
-                              <input
-                                type="text"
-                                placeholder="Ask Attendly"
-                                className="flex-1 min-w-0 bg-transparent outline-none border-none text-xs sm:text-sm text-center sm:text-left"
-                                readOnly
-                              />
+                              <input type="text" placeholder="Ask Attendly" className="flex-1 min-w-0 bg-transparent outline-none border-none text-xs sm:text-sm text-center sm:text-left" readOnly />
                               <button className="bg-[#E98A3A] text-[#111111] text-sm font-bold w-10 h-10 rounded-full border-2 border-[#111111] neo-brutal-shadow uppercase flex items-center justify-center">
                                 <span className="material-symbols-outlined text-base">north_east</span>
                               </button>
@@ -736,9 +536,7 @@ const LandingPage = () => {
             <section className="mb-32">
               <div className="px-4 sm:px-6 lg:px-0">
                 <div className="mx-auto max-w-[calc(100%-2rem)] sm:max-w-[calc(100%-3rem)] lg:max-w-none text-center py-10 md:py-24 bg-[#E98A3A] border-4 border-[#111111] neo-brutal-shadow">
-                  <h2 className="text-4xl md:text-5xl lg:text-7xl font-black uppercase mb-6 md:mb-8 text-white">
-                    Ready to Change?
-                  </h2>
+                  <h2 className="text-4xl md:text-5xl lg:text-7xl font-black uppercase mb-6 md:mb-8 text-white">Ready to Change?</h2>
                   <p className="text-base sm:text-lg md:text-2xl font-bold mb-8 md:mb-12 max-w-xl md:max-w-2xl mx-auto text-[#111111]">
                     The easier way to manage your club starts here.
                   </p>
@@ -756,35 +554,13 @@ const LandingPage = () => {
             <footer className="bg-[#111111] text-[#E98A3A] font-['Space_Grotesk'] text-sm uppercase tracking-widest flex flex-col md:flex-row justify-between items-center px-12 py-16 w-full mt-auto border-t-4 border-[#E98A3A]">
               <div className="text-2xl font-black text-white mb-8 md:mb-0">Attendly</div>
               <div className="flex flex-wrap justify-center gap-8 mb-8 md:mb-0">
-                <a
-                  className="text-white hover:text-[#E98A3A] transition-colors underline decoration-2 underline-offset-4"
-                  href="#"
-                >
-                  Mission
-                </a>
-                <a
-                  className="text-white hover:text-[#E98A3A] transition-colors underline decoration-2 underline-offset-4"
-                  href="#"
-                >
-                  Security
-                </a>
-                <a
-                  className="text-white hover:text-[#E98A3A] transition-colors underline decoration-2 underline-offset-4"
-                  href="#"
-                >
-                  Privacy
-                </a>
-                <a
-                  className="text-white hover:text-[#E98A3A] transition-colors underline decoration-2 underline-offset-4"
-                  href="#"
-                >
-                  Support
-                </a>
+                <a className="text-white hover:text-[#E98A3A] transition-colors underline decoration-2 underline-offset-4" href="#">Mission</a>
+                <a className="text-white hover:text-[#E98A3A] transition-colors underline decoration-2 underline-offset-4" href="#">Security</a>
+                <a className="text-white hover:text-[#E98A3A] transition-colors underline decoration-2 underline-offset-4" href="#">Privacy</a>
+                <a className="text-white hover:text-[#E98A3A] transition-colors underline decoration-2 underline-offset-4" href="#">Support</a>
               </div>
               <div className="text-white/50 text-[10px] text-center md:text-right">
-                © 2026 Attendly.
-                <br />
-                ALL RIGHTS RESERVED.
+                © 2026 Attendly.<br />ALL RIGHTS RESERVED.
               </div>
             </footer>
           </div>
