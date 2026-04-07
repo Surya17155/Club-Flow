@@ -143,6 +143,8 @@ const Events = () => {
   const [attendanceCounts, setAttendanceCounts] = useState<Record<string, number>>({});
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [feedbackEvent, setFeedbackEvent] = useState<{ id: string; name: string } | null>(null);
+  const [attendees, setAttendees] = useState<AttendeeDetail[]>([]);
+  const [loadingAttendees, setLoadingAttendees] = useState(false);
 
   const fetchEvents = async () => {
     setLoading(true);
