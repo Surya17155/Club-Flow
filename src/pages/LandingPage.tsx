@@ -155,21 +155,25 @@ const LandingPage = () => {
         {activePage === "home" && (
           <div>
             {/* Hero */}
-            <section className="max-w-screen-2xl mx-auto px-6 pt-12 pb-10 md:py-20 lg:py-32 min-h-screen md:min-h-auto flex flex-col justify-center">
-              {/* Hero illustration - mobile only */}
-              <div className="flex justify-center mb-6 md:hidden">
-                <img src={heroIllustration} alt="Student scanning QR code for attendance" className="w-50 h-auto" />
+            <section className="max-w-screen-2xl mx-auto px-6 pt-6 pb-10 md:py-20 lg:py-32 md:min-h-auto flex flex-col">
+              {/* Hero illustration - mobile only, fills most of viewport */}
+              <div className="flex justify-center md:hidden" style={{ minHeight: '40vh' }}>
+                <img src={heroIllustration} alt="Student scanning QR code for attendance" className="w-44 h-auto object-contain" />
               </div>
-              <div className="space-y-2 text-center md:text-left">
-                <h1 className="text-4xl md:text-6xl lg:text-8xl font-semibold leading-[0.9] tracking-tighter uppercase text-[#111111]">
+              {/* Heading right below image, visible on first screen */}
+              <div className="text-center md:text-left mt-0 md:mt-0">
+                <h1 className="text-[2.75rem] md:text-6xl lg:text-8xl font-semibold leading-[0.85] tracking-tighter uppercase text-[#111111]">
                   ATTENDANCE IN SECONDS
                   <br />
                   <span className="text-[#E98A3A]">NOT MINUTES</span>
                 </h1>
+              </div>
+              {/* Below the fold - visible on scroll */}
+              <div className="text-center md:text-left mt-8 space-y-4">
                 <p className="text-base md:text-xl text-[#2A2A2A] font-medium max-w-xl leading-relaxed mx-auto md:mx-0">
                   Replace manual attendance with one simple scan.
                 </p>
-                <div className="pt-4">
+                <div className="pt-2">
                   <button
                     onClick={() => navigate("/auth?mode=signup")}
                     className="bg-[#E98A3A] text-[#111111] border-2 border-[#111111] text-sm md:text-xl font-['Space_Grotesk'] font-black tracking-widest uppercase py-3 px-4 md:py-6 md:px-10 neo-brutal-shadow neo-brutal-shadow-hover transition-all inline-flex w-full md:w-auto items-center justify-center md:justify-start gap-4 whitespace-nowrap"
@@ -178,7 +182,7 @@ const LandingPage = () => {
                     <span className="material-symbols-outlined font-bold">arrow_forward</span>
                   </button>
                 </div>
-                <div className="flex items-center gap-6 pt-8">
+                <div className="flex items-center justify-center md:justify-start gap-6 pt-4">
                   <p className="text-sm font-bold uppercase tracking-widest text-[#2A2A2A]">
                     Run Your Club Like a System, Not a Spreadsheet.
                   </p>
