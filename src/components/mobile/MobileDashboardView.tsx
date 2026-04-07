@@ -89,7 +89,7 @@ export function MobileDashboardView({
         <main className="px-5 pt-2 pb-4 space-y-6">
           {/* Dashboard Heading */}
           <h1
-            className="text-2xl font-black text-center"
+            className="text-center text-3xl font-semibold rounded-none my-0"
             style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#111' }}
           >
             Dashboard
