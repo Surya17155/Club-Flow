@@ -614,6 +614,7 @@ const Events = () => {
               </div>
             </div>
           )}
+          </div>
         </DialogContent>
       </Dialog>
 
