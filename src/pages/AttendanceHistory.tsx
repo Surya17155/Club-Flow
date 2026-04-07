@@ -155,7 +155,7 @@ export default function AttendanceHistory() {
     <div className="min-h-screen" style={{ background: '#F4EFE7' }}>
 
       {/* Header */}
-      <div className="pt-16 px-5 pb-4">
+      <div className="pt-16 px-5 pb-4 text-center">
         <h1 className="text-2xl font-black" style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#111' }}>
           Attendance History
         </h1>

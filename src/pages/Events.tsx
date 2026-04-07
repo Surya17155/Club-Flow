@@ -179,8 +179,8 @@ const Events = () => {
     <DashboardLayout>
       <div className="space-y-5 animate-fade-in">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <div>
+        <div className="flex flex-col sm:flex-row items-center sm:items-center justify-between gap-3">
+          <div className="text-center md:text-left">
             <h1
               className="text-xl sm:text-2xl font-bold"
               style={isNeo ? { fontFamily: NEO.font, color: '#111111', letterSpacing: '-0.02em' } : {}}
