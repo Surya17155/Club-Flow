@@ -138,16 +138,16 @@ const LandingPage = () => {
           <div>
             {/* Hero */}
             <section className="max-w-screen-2xl mx-auto px-6 pt-4 pb-4 md:py-20 lg:py-32 md:min-h-auto flex flex-col justify-start md:justify-center">
-              {/* Hero illustration - mobile only */}
-              <div className="flex justify-center mb-1 md:hidden">
-                <img src={heroIllustration} alt="Student scanning QR code for attendance" className="w-48 h-auto" />
+              {/* Hero illustration - mobile only, forwarded layer overlapping heading */}
+              <div className="flex justify-center md:hidden relative z-10 -mb-6">
+                <img src={heroIllustration} alt="Student scanning QR code for attendance" className="w-56 h-auto" />
               </div>
-              <div className="space-y-1 text-center md:text-left">
-                <h1 className="text-4xl md:text-6xl lg:text-8xl font-semibold leading-[0.9] tracking-tighter uppercase text-[#111111]">
+              <div className="space-y-1 text-center md:text-left relative z-0">
+                <h1 className="text-5xl md:text-6xl lg:text-8xl font-semibold leading-[0.85] tracking-tighter uppercase text-[#111111]">
                   ATTENDANCE IN SECONDS<br /><span className="text-[#E98A3A]">NOT MINUTES</span>
                 </h1>
                 <p className="text-base md:text-xl text-[#2A2A2A] font-medium max-w-xl leading-relaxed mx-auto md:mx-0 pt-2">
-                  Replace manual attendance with one simple scan.
+                  Manual attendance with one simple scan.
                 </p>
                 <div className="pt-3">
                   <button
@@ -158,7 +158,7 @@ const LandingPage = () => {
                     <span className="material-symbols-outlined font-bold">arrow_forward</span>
                   </button>
                 </div>
-                <div className="flex items-center gap-6 pt-4">
+                <div className="flex items-center gap-6 pt-16 md:pt-4">
                   <p className="text-sm font-bold uppercase tracking-widest text-[#2A2A2A]">
                     Run Your Club Like a System, Not a Spreadsheet.
                   </p>
