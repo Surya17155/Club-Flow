@@ -2,9 +2,9 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Clock, Eye, QrCode, Trash2, Plus, MessageSquare, CheckCircle } from 'lucide-react';
+import { Calendar, Clock, Eye, QrCode, Trash2, Plus, MessageSquare, CheckCircle, Users, Download, FileText, FileSpreadsheet } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -14,6 +14,21 @@ import { useNavigate } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import EventFeedbackModal from '@/components/dashboard/EventFeedbackModal';
 import { useDesign } from '@/contexts/DesignContext';
+import { exportAttendanceXLSX } from '@/utils/exportAttendance';
+
+interface AttendeeDetail {
+  full_name: string;
+  roll_no: string | null;
+  phone: string | null;
+  programme: string | null;
+  section: string | null;
+  year: string | null;
+  class_coordinator: string | null;
+  scanned_at: string;
+  status: string;
+  manually_added: boolean | null;
+  email: string | null;
+}
 
 interface EventRow {
   id: string;
@@ -128,6 +143,8 @@ const Events = () => {
   const [attendanceCounts, setAttendanceCounts] = useState<Record<string, number>>({});
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [feedbackEvent, setFeedbackEvent] = useState<{ id: string; name: string } | null>(null);
+  const [attendees, setAttendees] = useState<AttendeeDetail[]>([]);
+  const [loadingAttendees, setLoadingAttendees] = useState(false);
 
   const fetchEvents = async () => {
     setLoading(true);
@@ -157,6 +174,101 @@ const Events = () => {
   };
 
   useEffect(() => { fetchEvents(); }, [viewMode, activeClub?.club_id]);
+
+  const fetchAttendees = async (eventId: string) => {
+    setLoadingAttendees(true);
+    setAttendees([]);
+    const { data: attData } = await supabase
+      .from('attendance')
+      .select('student_id, scanned_at, status, manually_added')
+      .eq('event_id', eventId);
+    if (attData && attData.length > 0) {
+      const studentIds = attData.map(a => a.student_id);
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('user_id, full_name, roll_no, phone, programme, section, year, class_coordinator, email')
+        .in('user_id', studentIds);
+      const profileMap = new Map((profiles ?? []).map(p => [p.user_id, p]));
+      const merged: AttendeeDetail[] = attData.map(a => {
+        const p = profileMap.get(a.student_id);
+        return {
+          full_name: p?.full_name ?? 'Unknown',
+          roll_no: p?.roll_no ?? null,
+          phone: p?.phone ?? null,
+          programme: p?.programme ?? null,
+          section: p?.section ?? null,
+          year: p?.year ?? null,
+          class_coordinator: p?.class_coordinator ?? null,
+          scanned_at: a.scanned_at,
+          status: a.status,
+          manually_added: a.manually_added,
+          email: p?.email ?? null,
+        };
+      });
+      setAttendees(merged);
+    }
+    setLoadingAttendees(false);
+  };
+
+  const handleViewEvent = (event: EventRow) => {
+    setSelectedEvent(event);
+    setViewDialogOpen(true);
+    fetchAttendees(event.id);
+  };
+
+  const exportCSV = () => {
+    if (!selectedEvent || attendees.length === 0) return;
+    const headers = ['S.No', 'Name', 'Roll No', 'Phone', 'Email', 'Programme', 'Year', 'Section', 'Class Coordinator', 'Scan Time', 'Method'];
+    const rows = attendees.map((a, i) => [
+      i + 1,
+      a.full_name,
+      a.roll_no || '—',
+      a.phone || '—',
+      a.email || '—',
+      a.programme || '—',
+      a.year || '—',
+      a.section || '—',
+      a.class_coordinator || '—',
+      new Date(a.scanned_at).toLocaleString(),
+      a.manually_added ? 'Manual' : 'QR Scan',
+    ]);
+    const csv = [headers, ...rows].map(r => r.map(c => `"${c}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${selectedEvent.name.replace(/[^a-zA-Z0-9]/g, '_')}_attendees.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const exportPDF = () => {
+    if (!selectedEvent || attendees.length === 0) return;
+    const printWin = window.open('', '_blank');
+    if (!printWin) return;
+    const rows = attendees.map((a, i) => `<tr>
+      <td>${i + 1}</td><td>${a.full_name}</td><td>${a.roll_no || '—'}</td>
+      <td>${a.phone || '—'}</td><td>${a.email || '—'}</td><td>${a.programme || '—'}</td>
+      <td>${a.year || '—'}</td><td>${a.section || '—'}</td><td>${a.class_coordinator || '—'}</td>
+      <td>${new Date(a.scanned_at).toLocaleString()}</td><td>${a.manually_added ? 'Manual' : 'QR Scan'}</td>
+    </tr>`).join('');
+    printWin.document.write(`<!DOCTYPE html><html><head><title>${selectedEvent.name} - Attendees</title>
+      <style>body{font-family:Arial,sans-serif;padding:20px}h1{font-size:18px}h2{font-size:14px;color:#666}
+      table{width:100%;border-collapse:collapse;margin-top:16px;font-size:11px}
+      th,td{border:1px solid #333;padding:6px 8px;text-align:left}
+      th{background:#111;color:#fff;font-weight:700}tr:nth-child(even){background:#f9f9f9}</style></head>
+      <body><h1>${selectedEvent.name}</h1>
+      <h2>${new Date(selectedEvent.event_date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })} • ${attendees.length} Attendees</h2>
+      <table><thead><tr><th>S.No</th><th>Name</th><th>Roll No</th><th>Phone</th><th>Email</th><th>Programme</th><th>Year</th><th>Section</th><th>Coordinator</th><th>Scan Time</th><th>Method</th></tr></thead>
+      <tbody>${rows}</tbody></table></body></html>`);
+    printWin.document.close();
+    setTimeout(() => printWin.print(), 500);
+  };
+
+  const exportXLSX = () => {
+    if (!selectedEvent || attendees.length === 0) return;
+    exportAttendanceXLSX(attendees, selectedEvent.name, selectedEvent.event_date);
+  };
 
   const handleDelete = async (eventId: string) => {
     const { error } = await supabase.from('events').delete().eq('id', eventId);
@@ -265,7 +377,7 @@ const Events = () => {
                         {(event as any).clubs?.name && <div className="text-xs text-muted-foreground">Club: {(event as any).clubs.name}</div>}
                       </div>
                       <div className="flex gap-2 mt-4 flex-wrap">
-                        <Button variant="outline" size="sm" className="flex-1" onClick={() => { setSelectedEvent(event); setViewDialogOpen(true); }}><Eye className="w-3.5 h-3.5 mr-1" /> View</Button>
+                        <Button variant="outline" size="sm" className="flex-1" onClick={() => handleViewEvent(event)}><Eye className="w-3.5 h-3.5 mr-1" /> View</Button>
                         {isPast && <Button variant="outline" size="sm" onClick={() => { setFeedbackEvent({ id: event.id, name: event.name }); setFeedbackOpen(true); }}><MessageSquare className="w-3.5 h-3.5" /></Button>}
                         {canManageEvents && event.qr_token && <Button variant="outline" size="sm" onClick={() => { setSelectedEvent(event); setQrDialogOpen(true); }}><QrCode className="w-3.5 h-3.5" /></Button>}
                         {canManageEvents && <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" onClick={() => handleDelete(event.id)}><Trash2 className="w-3.5 h-3.5" /></Button>}
@@ -320,7 +432,7 @@ const Events = () => {
                     <button
                       className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs transition-all"
                       style={NEO.btnOutline}
-                      onClick={() => { setSelectedEvent(event); setViewDialogOpen(true); }}
+                      onClick={() => handleViewEvent(event)}
                       onMouseEnter={(e) => { e.currentTarget.style.transform = 'translate(-1px, -1px)'; e.currentTarget.style.boxShadow = '3px 3px 0px #111'; }}
                       onMouseLeave={(e) => { e.currentTarget.style.transform = 'translate(0,0)'; e.currentTarget.style.boxShadow = '2px 2px 0px #111'; }}
                     >
@@ -368,9 +480,9 @@ const Events = () => {
       </div>
 
       {/* View Event Dialog */}
-      <Dialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
+      <Dialog open={viewDialogOpen} onOpenChange={(open) => { setViewDialogOpen(open); if (!open) setAttendees([]); }}>
         <DialogContent
-          className="sm:max-w-md"
+          className="w-[calc(100vw-2rem)] max-w-2xl max-h-[85vh] overflow-y-auto"
           style={isNeo ? { border: '3px solid #111', borderRadius: '16px', boxShadow: '6px 6px 0px #111', background: '#FFFDF5' } : {}}
         >
           <DialogHeader>
@@ -378,16 +490,108 @@ const Events = () => {
               <p className="text-xs font-bold uppercase tracking-wider" style={{ color: '#E98A3A' }}>{(selectedEvent as any).clubs.name}</p>
             )}
             <DialogTitle style={isNeo ? { fontFamily: NEO.font } : {}}>{selectedEvent?.name}</DialogTitle>
+            <DialogDescription className="sr-only">Event details and attendee list</DialogDescription>
           </DialogHeader>
           {selectedEvent && (
-            <div className="space-y-3 text-sm">
-              <p><strong>Date:</strong> {new Date(selectedEvent.event_date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
-              <p><strong>Time:</strong> {new Date(selectedEvent.event_date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}{selectedEvent.end_date ? ` – ${new Date(selectedEvent.end_date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}` : ''}</p>
-              {selectedEvent.description && (
-                <div style={isNeo ? { borderTop: '2px solid #111', paddingTop: '12px' } : { borderTop: '1px solid var(--border)', paddingTop: '12px' }}>
-                  <p style={{ color: '#555' }}>{selectedEvent.description}</p>
+            <div className="space-y-4">
+              {/* Event Info */}
+              <div className="space-y-2 text-sm">
+                <div className="flex flex-wrap gap-2">
+                  <span className="text-[11px] font-bold px-2.5 py-1" style={isNeo ? { ...NEO.badge, background: '#FFF8E1' } : { border: '1px solid var(--border)', borderRadius: '6px', fontSize: '11px' }}>{selectedEvent.event_type}</span>
+                  <span className="text-[11px] font-bold px-2.5 py-1" style={isNeo ? { ...NEO.badge, background: selectedEvent.category === 'Mandatory' ? '#FFEBEE' : '#E8F5E9' } : { border: '1px solid var(--border)', borderRadius: '6px', fontSize: '11px' }}>{selectedEvent.category}</span>
+                  <span className="text-[11px] font-bold px-2.5 py-1" style={isNeo ? { ...NEO.badge, background: '#E3F2FD' } : { border: '1px solid var(--border)', borderRadius: '6px', fontSize: '11px' }}>{selectedEvent.access_type === 'open' ? 'Open for All' : 'Club Members Only'}</span>
                 </div>
-              )}
+                <div className="flex items-center gap-2"><Calendar className="w-3.5 h-3.5 shrink-0" style={{ color: isNeo ? '#E98A3A' : undefined }} /><span><strong>Date:</strong> {new Date(selectedEvent.event_date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span></div>
+                <div className="flex items-center gap-2"><Clock className="w-3.5 h-3.5 shrink-0" style={{ color: isNeo ? '#E98A3A' : undefined }} /><span><strong>Time:</strong> {new Date(selectedEvent.event_date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}{selectedEvent.end_date ? ` – ${new Date(selectedEvent.end_date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}` : ''}</span></div>
+                {selectedEvent.description && (
+                  <div style={isNeo ? { borderTop: '2px solid #111', paddingTop: '12px', marginTop: '8px' } : { borderTop: '1px solid var(--border)', paddingTop: '12px', marginTop: '8px' }}>
+                    <p style={{ color: '#555' }}>{selectedEvent.description}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Attendees Section */}
+              <div style={isNeo ? { borderTop: '2px solid #111', paddingTop: '16px' } : { borderTop: '1px solid var(--border)', paddingTop: '16px' }}>
+                <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+                  <div className="flex items-center gap-2">
+                    <Users className="w-4 h-4" style={{ color: isNeo ? '#E98A3A' : undefined }} />
+                    <span className="text-sm font-bold" style={isNeo ? { fontFamily: NEO.font, color: '#111' } : {}}>
+                      {loadingAttendees ? 'Loading...' : `${attendees.length} Attendee${attendees.length !== 1 ? 's' : ''}`}
+                    </span>
+                  </div>
+                  {attendees.length > 0 && (
+                    <div className="flex gap-1.5">
+                      <button
+                        className="flex items-center gap-1 px-2.5 py-1.5 text-[11px] transition-all"
+                        style={isNeo ? { ...NEO.btnOutline, fontSize: '11px', padding: '6px 10px' } : { border: '1px solid var(--border)', borderRadius: '6px', fontSize: '11px', padding: '6px 10px', background: 'transparent' }}
+                        onClick={exportCSV}
+                        title="Export as CSV"
+                      >
+                        <FileText className="w-3 h-3" /> CSV
+                      </button>
+                      <button
+                        className="flex items-center gap-1 px-2.5 py-1.5 text-[11px] transition-all"
+                        style={isNeo ? { ...NEO.btnOutline, fontSize: '11px', padding: '6px 10px' } : { border: '1px solid var(--border)', borderRadius: '6px', fontSize: '11px', padding: '6px 10px', background: 'transparent' }}
+                        onClick={exportXLSX}
+                        title="Export as Excel"
+                      >
+                        <FileSpreadsheet className="w-3 h-3" /> Excel
+                      </button>
+                      <button
+                        className="flex items-center gap-1 px-2.5 py-1.5 text-[11px] transition-all"
+                        style={isNeo ? { ...NEO.btnPrimary, fontSize: '11px', padding: '6px 10px' } : { border: '1px solid var(--border)', borderRadius: '6px', fontSize: '11px', padding: '6px 10px', background: 'var(--primary)', color: 'white' }}
+                        onClick={exportPDF}
+                        title="Export as PDF"
+                      >
+                        <Download className="w-3 h-3" /> PDF
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {loadingAttendees ? (
+                  <div className="flex justify-center py-6">
+                    <div className="w-6 h-6 border-[3px] border-[#E98A3A]/30 border-t-[#E98A3A] rounded-full animate-spin" />
+                  </div>
+                ) : attendees.length === 0 ? (
+                  <p className="text-center py-4 text-sm" style={{ color: '#888' }}>No attendees yet.</p>
+                ) : (
+                  <div className="overflow-x-auto rounded-lg" style={isNeo ? { border: '2px solid #111' } : { border: '1px solid var(--border)' }}>
+                    <table className="w-full text-xs" style={{ minWidth: '600px' }}>
+                      <thead>
+                        <tr style={isNeo ? { background: '#111', color: '#FFFDF5' } : { background: 'var(--muted)' }}>
+                          <th className="px-3 py-2 text-left font-bold">#</th>
+                          <th className="px-3 py-2 text-left font-bold">Name</th>
+                          <th className="px-3 py-2 text-left font-bold">Roll No</th>
+                          <th className="px-3 py-2 text-left font-bold">Phone</th>
+                          <th className="px-3 py-2 text-left font-bold">Programme</th>
+                          <th className="px-3 py-2 text-left font-bold">Year</th>
+                          <th className="px-3 py-2 text-left font-bold">Section</th>
+                          <th className="px-3 py-2 text-left font-bold">Method</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {attendees.map((a, i) => (
+                          <tr key={i} style={{ borderTop: isNeo ? '1px solid #ddd' : '1px solid var(--border)', background: i % 2 === 0 ? (isNeo ? '#FFFDF5' : 'transparent') : (isNeo ? '#FFF8EE' : 'var(--muted)') }}>
+                            <td className="px-3 py-2">{i + 1}</td>
+                            <td className="px-3 py-2 font-medium whitespace-nowrap">{a.full_name}</td>
+                            <td className="px-3 py-2 whitespace-nowrap">{a.roll_no || '—'}</td>
+                            <td className="px-3 py-2 whitespace-nowrap">{a.phone || '—'}</td>
+                            <td className="px-3 py-2 whitespace-nowrap">{a.programme || '—'}</td>
+                            <td className="px-3 py-2">{a.year || '—'}</td>
+                            <td className="px-3 py-2">{a.section || '—'}</td>
+                            <td className="px-3 py-2">
+                              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded" style={isNeo ? { ...NEO.badge, background: a.manually_added ? '#FFF8E1' : '#E8F5E9', fontSize: '10px' } : { border: '1px solid var(--border)', fontSize: '10px' }}>
+                                {a.manually_added ? 'Manual' : 'QR'}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </DialogContent>
