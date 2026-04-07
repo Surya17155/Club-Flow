@@ -137,12 +137,12 @@ const LandingPage = () => {
         {activePage === "home" && (
           <div>
             {/* Hero */}
-            <section className="max-w-screen-2xl mx-auto px-6 pt-4 pb-4 md:py-20 lg:py-32 md:min-h-auto flex flex-col justify-start md:justify-center">
+            <section className="max-w-screen-2xl mx-auto px-6 pt-4 pb-4 md:py-20 lg:py-32 min-h-[calc(100svh-64px)] md:min-h-auto flex flex-col justify-start md:justify-center">
               {/* Hero illustration - mobile only */}
               <div className="flex justify-center md:hidden mb-2">
                 <img src={heroIllustration} alt="Student scanning QR code for attendance" className="w-44 h-auto" />
               </div>
-              <div className="space-y-1 text-center md:text-left">
+              <div className="space-y-1 text-center md:text-left flex-1 md:flex-none flex flex-col md:block justify-center">
                 <h1 className="text-5xl md:text-6xl lg:text-8xl font-semibold leading-[0.85] tracking-tighter uppercase text-[#111111]">
                   ATTENDANCE IN SECONDS<br /><span className="text-[#E98A3A]">NOT MINUTES</span>
                 </h1>
@@ -158,7 +158,7 @@ const LandingPage = () => {
                     <span className="material-symbols-outlined font-bold">arrow_forward</span>
                   </button>
                 </div>
-                <div className="flex items-center gap-6 pt-3 md:pt-4">
+                <div className="flex items-center gap-6 pt-6 md:pt-4">
                   <p className="text-sm font-bold uppercase tracking-widest text-[#2A2A2A]">
                     Run Your Club Like a System, Not a Spreadsheet.
                   </p>
