@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import heroIllustration from "@/assets/hero-illustration.png";
 
 type PageName = "home" | "pricing" | "about";
 
