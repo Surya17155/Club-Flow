@@ -482,24 +482,44 @@ const Events = () => {
       {/* View Event Dialog */}
       <Dialog open={viewDialogOpen} onOpenChange={(open) => { setViewDialogOpen(open); if (!open) setAttendees([]); }}>
         <DialogContent
-          className="w-[calc(100vw-2rem)] max-w-2xl max-h-[85vh] overflow-y-auto"
+          className="w-[calc(100vw-2rem)] max-w-2xl max-h-[85vh] overflow-hidden p-0 [&>button]:hidden"
           style={isNeo ? { border: '3px solid #111', borderRadius: '16px', boxShadow: '6px 6px 0px #111', background: '#FFFDF5' } : {}}
         >
-          <DialogHeader>
-            {selectedEvent && (selectedEvent as any).clubs?.name && (
-              <p className="text-xs font-bold uppercase tracking-wider" style={{ color: '#E98A3A' }}>{(selectedEvent as any).clubs.name}</p>
-            )}
-            <DialogTitle style={isNeo ? { fontFamily: NEO.font } : {}}>{selectedEvent?.name}</DialogTitle>
-            <DialogDescription className="sr-only">Event details and attendee list</DialogDescription>
+          {/* Sticky header: club name, event name, close button */}
+          <div className="sticky top-0 z-10 px-6 pt-6 pb-3" style={{ background: isNeo ? '#FFFDF5' : 'var(--card)', borderBottom: isNeo ? '2px solid #111' : '1px solid var(--border)' }}>
+            <div className="flex items-start justify-between">
+              <div className="text-left min-w-0 flex-1">
+                {selectedEvent && (selectedEvent as any).clubs?.name && (
+                  <p className="text-xs font-bold uppercase tracking-wider" style={{ color: '#E98A3A' }}>{(selectedEvent as any).clubs.name}</p>
+                )}
+                <h2 className="text-lg font-semibold leading-tight truncate" style={isNeo ? { fontFamily: NEO.font } : {}}>{selectedEvent?.name}</h2>
+              </div>
+              <button
+                onClick={() => setViewDialogOpen(false)}
+                className="shrink-0 ml-3 flex items-center justify-center w-8 h-8 font-bold text-sm"
+                style={isNeo ? { background: '#E98A3A', border: '2px solid #111', borderRadius: '6px', boxShadow: '2px 2px 0px #111', color: '#111' } : { background: 'var(--muted)', borderRadius: '6px' }}
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+          <DialogHeader className="sr-only">
+            <DialogTitle>{selectedEvent?.name}</DialogTitle>
+            <DialogDescription>Event details and attendee list</DialogDescription>
           </DialogHeader>
+          {/* Scrollable content */}
+          <div className="overflow-y-auto px-6 pb-6" style={{ maxHeight: 'calc(85vh - 80px)' }}>
           {selectedEvent && (
-            <div className="space-y-4">
+            <div className="space-y-4 pt-3">
               {/* Event Info */}
               <div className="space-y-2 text-sm">
                 <div className="flex flex-wrap gap-2">
                   <span className="text-[11px] font-bold px-2.5 py-1" style={isNeo ? { ...NEO.badge, background: '#FFF8E1' } : { border: '1px solid var(--border)', borderRadius: '6px', fontSize: '11px' }}>{selectedEvent.event_type}</span>
                   <span className="text-[11px] font-bold px-2.5 py-1" style={isNeo ? { ...NEO.badge, background: selectedEvent.category === 'Mandatory' ? '#FFEBEE' : '#E8F5E9' } : { border: '1px solid var(--border)', borderRadius: '6px', fontSize: '11px' }}>{selectedEvent.category}</span>
                   <span className="text-[11px] font-bold px-2.5 py-1" style={isNeo ? { ...NEO.badge, background: '#E3F2FD' } : { border: '1px solid var(--border)', borderRadius: '6px', fontSize: '11px' }}>{selectedEvent.access_type === 'open' ? 'Open for All' : 'Club Members Only'}</span>
+                  <span className="text-[11px] font-bold px-2.5 py-1" style={isNeo ? { ...NEO.badge, background: selectedEvent.attendance_given ? '#E8F5E9' : '#FFEBEE' } : { border: '1px solid var(--border)', borderRadius: '6px', fontSize: '11px', background: selectedEvent.attendance_given ? '#E8F5E9' : '#FFEBEE' }}>
+                    {selectedEvent.attendance_given ? 'Attendance: Yes' : 'Attendance: No'}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2"><Calendar className="w-3.5 h-3.5 shrink-0" style={{ color: isNeo ? '#E98A3A' : undefined }} /><span><strong>Date:</strong> {new Date(selectedEvent.event_date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span></div>
                 <div className="flex items-center gap-2"><Clock className="w-3.5 h-3.5 shrink-0" style={{ color: isNeo ? '#E98A3A' : undefined }} /><span><strong>Time:</strong> {new Date(selectedEvent.event_date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}{selectedEvent.end_date ? ` – ${new Date(selectedEvent.end_date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}` : ''}</span></div>
@@ -594,6 +614,7 @@ const Events = () => {
               </div>
             </div>
           )}
+          </div>
         </DialogContent>
       </Dialog>
 
