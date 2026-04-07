@@ -156,7 +156,7 @@ export default function AttendanceHistory() {
       {/* Back Button */}
       <button
         onClick={() => navigate(-1)}
-        className="fixed top-4 left-0 z-50 flex items-center justify-center transition-all active:translate-x-[1px] active:translate-y-[1px]"
+        className="fixed top-4 left-12 z-50 flex items-center justify-center transition-all active:translate-x-[1px] active:translate-y-[1px]"
         style={{
           width: '44px',
           height: '44px',

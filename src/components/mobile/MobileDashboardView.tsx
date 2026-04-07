@@ -4,9 +4,8 @@ import { AttendanceHistoryModal } from './AttendanceHistoryModal';
 import { useNavigate } from 'react-router-dom';
 import { MobileProfileCard } from './MobileProfileCard';
 import { MobileBottomNav } from './MobileBottomNav';
-import { MobileSideDrawer } from './MobileSideDrawer';
 import {
-  Users, Calendar, ChevronRight,
+  Users, Calendar,
   Compass, ClipboardList, Settings2,
 } from 'lucide-react';
 import { useProfile } from '@/hooks/useProfile';
@@ -53,7 +52,6 @@ export function MobileDashboardView({
   const { user } = useAuth();
   const [expandedClubId, setExpandedClubId] = useState<string | null>(null);
   const [activeStatModal, setActiveStatModal] = useState<string | null>(null);
-  const [drawerOpen, setDrawerOpen] = useState(false);
 
   // Filter stats to only "Clubs Joined" and "Events Attended"
   const filteredStats = statsCards.filter(stat => {
@@ -78,45 +76,6 @@ export function MobileDashboardView({
 
   return (
     <>
-      {/* Side Drawer */}
-      <MobileSideDrawer
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        viewMode={viewMode}
-        setViewMode={setViewMode}
-      />
-
-      {/* Side panel trigger — no header bar */}
-      <div
-        className="fixed top-0 left-0 z-40"
-        style={{
-          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)',
-        }}
-      >
-        <button
-          onClick={() => setDrawerOpen(true)}
-          className="flex items-center justify-center"
-          style={{
-            width: '36px',
-            height: '36px',
-            background: '#E98A3A',
-            border: '2px solid #111',
-            boxShadow: '2px 2px 0px #111',
-            borderRadius: '0 8px 8px 0',
-            animation: 'sideDrawerPulse 2.5s ease-in-out infinite',
-          }}
-        >
-          <ChevronRight className="w-5 h-5" style={{ color: '#111' }} strokeWidth={3} />
-        </button>
-      </div>
-
-      {/* Pulse animation keyframes */}
-      <style>{`
-        @keyframes sideDrawerPulse {
-          0%, 100% { transform: scale(1); box-shadow: 2px 2px 0px #111; }
-          50% { transform: scale(1.08); box-shadow: 3px 3px 0px #111; }
-        }
-      `}</style>
 
       {/* Scrollable Content */}
       <div
