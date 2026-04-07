@@ -82,14 +82,22 @@ export function MobileDashboardView({
         className="min-h-screen pb-24 overflow-x-hidden"
         style={{
           background: '#F4EFE7',
-          paddingTop: '60px',
+          paddingTop: '48px',
           scrollbarWidth: 'none',
         }}
       >
         <main className="px-5 py-4 space-y-6">
-          {/* Greeting — larger, no emoji */}
+          {/* Dashboard Heading */}
+          <h1
+            className="text-xl font-black text-center"
+            style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#111' }}
+          >
+            Dashboard
+          </h1>
+
+          {/* Greeting */}
           <p
-            className="text-xl"
+            className="text-xl text-center"
             style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#111' }}
           >
             Hi, <span className="font-black text-2xl">{fullName?.split(' ')[0] || 'there'}</span>
