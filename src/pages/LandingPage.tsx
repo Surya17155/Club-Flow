@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import heroIllustration from "@/assets/hero-illustration.png";
 
 type PageName = "home" | "pricing" | "about";
 
@@ -136,9 +137,14 @@ const LandingPage = () => {
         {activePage === "home" && (
           <div>
             {/* Hero */}
-            <section className="max-w-screen-2xl mx-auto px-6 pt-48 pb-10 md:py-20 lg:py-32 min-h-screen md:min-h-auto flex flex-col justify-center">
+            <section className="max-w-screen-2xl mx-auto px-6 pt-12 pb-10 md:py-20 lg:py-32 min-h-screen md:min-h-auto flex flex-col justify-center">
+              {/* Hero illustration - mobile only */}
+              <div className="flex justify-center mb-6 md:hidden">
+                <img src={heroIllustration} alt="Student scanning QR code for attendance" className="w-56 h-auto" />
+              </div>
               <div className="space-y-2 text-center md:text-left">
                 <h1 className="text-4xl md:text-6xl lg:text-8xl font-semibold leading-[0.9] tracking-tighter uppercase text-[#111111]">
+                  ATTENDANCE IN SECONDS<br /><span className="text-[#E98A3A]">NOT MINUTES</span>
                   ATTENDANCE IN SECONDS<br /><span className="text-[#E98A3A]">NOT MINUTES</span>
                 </h1>
                 <p className="text-base md:text-xl text-[#2A2A2A] font-medium max-w-xl leading-relaxed mx-auto md:mx-0">
