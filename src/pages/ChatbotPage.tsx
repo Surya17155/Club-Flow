@@ -101,7 +101,7 @@ const ChatbotPage = () => {
   return (
     <div className="min-h-screen flex antialiased" style={{ backgroundColor: '#F4EFE7' }}>
       {!isMobile && <DashboardSidebar />}
-      <div className="flex-1 overflow-y-auto" style={{ padding: isMobile ? '60px 16px 24px' : '24px 28px' }}>
+      <div className="flex-1 overflow-y-auto" style={{ padding: isMobile ? '48px 16px 24px' : '24px 28px' }}>
         <div className="flex flex-col h-full max-w-3xl mx-auto" style={{ minHeight: 'calc(100vh - 120px)' }}>
       {/* Header */}
       <div className="flex items-center justify-center md:justify-start gap-3 mb-4">
