@@ -82,14 +82,14 @@ export function MobileDashboardView({
         className="min-h-screen pb-24 overflow-x-hidden"
         style={{
           background: '#F4EFE7',
-          paddingTop: '48px',
+          paddingTop: '40px',
           scrollbarWidth: 'none',
         }}
       >
-        <main className="px-5 py-4 space-y-6">
+        <main className="px-5 pt-2 pb-4 space-y-6">
           {/* Dashboard Heading */}
           <h1
-            className="text-xl font-black text-center"
+            className="text-2xl font-black text-center"
             style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#111' }}
           >
             Dashboard
