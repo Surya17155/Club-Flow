@@ -113,24 +113,6 @@ const ClubSettingsPage = () => {
   return (
     <div className="min-h-screen flex antialiased" style={{ backgroundColor: '#F4EFE7' }}>
       {!isMobile && <DashboardSidebar />}
-      {isMobile && (
-        <div className="fixed top-0 left-0 z-40" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}>
-          <button
-            onClick={() => navigate(-1)}
-            className="flex items-center justify-center"
-            style={{
-              width: '36px',
-              height: '36px',
-              background: '#E98A3A',
-              border: '2px solid #111',
-              boxShadow: '2px 2px 0px #111',
-              borderRadius: '0 8px 8px 0',
-            }}
-          >
-            <ChevronLeft className="w-5 h-5" style={{ color: '#111' }} strokeWidth={3} />
-          </button>
-        </div>
-      )}
       <div className="flex-1 overflow-y-auto" style={{ padding: isMobile ? '60px 16px 24px' : '24px 28px' }}>
         <div className="max-w-2xl mx-auto space-y-6">
       <div className="flex items-center gap-3 mb-2">
