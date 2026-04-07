@@ -153,20 +153,6 @@ export default function AttendanceHistory() {
 
   return (
     <div className="min-h-screen" style={{ background: '#F4EFE7' }}>
-      {/* Back Button */}
-      <button
-        onClick={() => navigate(-1)}
-        className="fixed top-4 left-12 z-50 flex items-center justify-center transition-all active:translate-x-[1px] active:translate-y-[1px]"
-        style={{
-          width: '44px',
-          height: '44px',
-          background: '#111',
-          borderRadius: '0 8px 8px 0',
-          boxShadow: '3px 3px 0px #E98A3A',
-        }}
-      >
-        <ChevronLeft className="w-5 h-5" style={{ color: '#fff' }} />
-      </button>
 
       {/* Header */}
       <div className="pt-16 px-5 pb-4">

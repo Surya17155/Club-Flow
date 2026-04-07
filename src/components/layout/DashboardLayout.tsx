@@ -103,34 +103,7 @@ export function DashboardLayout({ children, showHeader = true }: DashboardLayout
 
   return (
     <div className="min-h-screen flex flex-col w-full" style={{ background: isNeo ? '#F4EFE7' : undefined }}>
-      <header
-        className="h-14 flex items-center gap-3 px-4 shrink-0"
-        style={isNeo ? {
-          background: '#F4EFE7',
-          borderBottom: '2px solid #111',
-        } : {
-          borderBottom: '1px solid var(--border)',
-          background: 'rgba(255,255,255,0.8)',
-          backdropFilter: 'blur(8px)',
-        }}
-      >
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => navigate("/admin")}
-          style={isNeo ? { border: '2px solid #111', background: '#FFFDF5', borderRadius: '8px' } : {}}
-          className={isNeo ? '' : 'text-muted-foreground hover:text-foreground'}
-        >
-          <ArrowLeft className="w-4 h-4" />
-        </Button>
-        <h1
-          className="text-lg font-bold flex-1"
-          style={isNeo ? { fontFamily: "'Space Grotesk', sans-serif", color: '#111' } : {}}
-        >
-          {pageTitle}
-        </h1>
-      </header>
-      <main className="flex-1 overflow-auto p-4 md:p-6 pb-20">{children}</main>
+      <main className="flex-1 overflow-auto p-4 md:p-6 pb-20 pt-16">{children}</main>
       <MobileBottomNav />
     </div>
   );

@@ -200,9 +200,6 @@ const Profile = () => {
     <div className="max-w-3xl mx-auto grid gap-6 overflow-hidden box-border w-full">
       {isMobile && (
         <div className="flex items-center gap-4 mb-2">
-          <button onClick={() => navigate(-1)} className="p-2 rounded-full" style={isNeo ? { border: '2px solid #111', background: '#FFFDF5' } : {}}>
-            <ArrowLeft className="w-5 h-5" />
-          </button>
           <h1 className="text-2xl font-bold" style={isNeo ? { fontFamily: NEO.font, color: '#111' } : {}}>Edit Profile</h1>
         </div>
       )}
