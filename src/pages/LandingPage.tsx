@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import heroIllustration from "@/assets/hero-illustration.png";
+import heroIllustrationDesktop from "@/assets/hero-illustration-desktop.png";
 
 type PageName = "home" | "pricing" | "about";
 
@@ -137,17 +138,27 @@ const LandingPage = () => {
         {activePage === "home" && (
           <div>
             {/* Hero */}
-            <section className="max-w-screen-2xl mx-auto px-6 pt-4 pb-4 md:py-20 lg:py-32 min-h-[calc(100svh-64px)] md:min-h-auto flex flex-col justify-start md:justify-center">
+            <section className="max-w-screen-2xl mx-auto px-6 pt-4 pb-4 md:py-20 lg:py-32 min-h-[calc(100svh-64px)] md:min-h-auto flex flex-col justify-start md:justify-center relative overflow-hidden">
               {/* Hero illustration - mobile only */}
               <div className="flex justify-center md:hidden mb-2">
                 <img src={heroIllustration} alt="Student scanning QR code for attendance" className="w-44 h-auto" />
               </div>
-              <div className="space-y-1 text-center md:text-left flex-1 md:flex-none flex flex-col md:block justify-center">
+
+              {/* Desktop illustration - right aligned */}
+              <div className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none" style={{ width: '42%', maxWidth: '620px' }}>
+                <img
+                  src={heroIllustrationDesktop}
+                  alt="Student scanning QR code"
+                  className="w-full h-auto object-contain object-right"
+                />
+              </div>
+
+              <div className="space-y-1 text-center md:text-left flex-1 md:flex-none flex flex-col md:block justify-center relative z-10 md:max-w-[55%]">
                 <h1 className="text-5xl md:text-6xl lg:text-8xl font-semibold leading-[0.85] tracking-tighter uppercase text-[#111111]">
                   ATTENDANCE IN SECONDS<br /><span className="text-[#E98A3A]">NOT MINUTES</span>
                 </h1>
                 <p className="text-base md:text-xl text-[#2A2A2A] font-medium max-w-xl leading-relaxed mx-auto md:mx-0 pt-2">
-                  Manual attendance with one simple scan.
+                  Replace manual attendance with one simple scan.
                 </p>
                 <div className="pt-3">
                   <button
