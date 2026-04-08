@@ -145,7 +145,7 @@ const LandingPage = () => {
               </div>
 
               {/* Desktop illustration - right aligned */}
-              <div className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none" style={{ width: '42%', maxWidth: '620px' }}>
+              <div className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none" style={{ width: '35%', maxWidth: '500px' }}>
                 <img
                   src={heroIllustrationDesktop}
                   alt="Student scanning QR code"
