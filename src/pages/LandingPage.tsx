@@ -138,7 +138,7 @@ const LandingPage = () => {
         {activePage === "home" && (
           <div>
             {/* Hero */}
-            <section className="max-w-screen-2xl mx-auto px-6 pt-4 pb-4 md:py-20 lg:py-32 min-h-[calc(100svh-64px)] md:min-h-auto flex flex-col justify-start md:justify-center relative overflow-hidden">
+            <section className="max-w-screen-2xl mx-auto px-6 pt-4 pb-4 md:pt-8 md:pb-12 lg:pt-12 lg:pb-16 min-h-[calc(100svh-64px)] md:min-h-auto md:h-[calc(100vh-64px)] flex flex-col justify-start md:justify-center relative overflow-hidden">
               {/* Hero illustration - mobile only */}
               <div className="flex justify-center md:hidden mb-2">
                 <img src={heroIllustration} alt="Student scanning QR code for attendance" className="w-44 h-auto" />
