@@ -385,7 +385,7 @@ const Events = () => {
                         {(event as any).clubs?.name && <div className="text-xs text-muted-foreground">Club: {(event as any).clubs.name}</div>}
                       </div>
                       <div className="flex gap-2 mt-4 flex-wrap">
-                        <Button variant="outline" size="sm" className="flex-1" onClick={() => handleViewEvent(event)}><Eye className="w-3.5 h-3.5 mr-1" /> View</Button>
+                        {canViewEvent(event) && <Button variant="outline" size="sm" className="flex-1" onClick={() => handleViewEvent(event)}><Eye className="w-3.5 h-3.5 mr-1" /> View</Button>}
                         {isPast && <Button variant="outline" size="sm" onClick={() => { setFeedbackEvent({ id: event.id, name: event.name }); setFeedbackOpen(true); }}><MessageSquare className="w-3.5 h-3.5" /></Button>}
                         {canManageEvents && event.qr_token && <Button variant="outline" size="sm" onClick={() => { setSelectedEvent(event); setQrDialogOpen(true); }}><QrCode className="w-3.5 h-3.5" /></Button>}
                         {canManageEvents && <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" onClick={() => handleDelete(event.id)}><Trash2 className="w-3.5 h-3.5" /></Button>}
