@@ -122,7 +122,8 @@ const EventFeedbackModal = ({ open, onOpenChange, eventId, eventName }: EventFee
           ...NEO.card,
           fontFamily: NEO.font,
         }}
-        hideCloseButton={true as any}
+        // @ts-ignore
+        hideCloseButton
       >
         {/* Header */}
         <div
