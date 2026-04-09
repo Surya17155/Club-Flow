@@ -153,9 +153,7 @@ const Events = () => {
       .select('id, name, event_type, category, event_date, end_date, access_type, description, qr_token, club_id, attendance_given, clubs(name)')
       .order('event_date', { ascending: true });
 
-    if (viewMode === 'personal') {
-      query = query.gte('event_date', new Date().toISOString());
-    } else if (viewMode === 'club' && activeClub) {
+    if (viewMode === 'club' && activeClub) {
       query = query.eq('club_id', activeClub.club_id);
     }
 
