@@ -122,7 +122,7 @@ const EventFeedbackModal = ({ open, onOpenChange, eventId, eventName }: EventFee
           ...NEO.card,
           fontFamily: NEO.font,
         }}
-        hideCloseButton
+        hideCloseButton={true as any}
       >
         {/* Header */}
         <div
