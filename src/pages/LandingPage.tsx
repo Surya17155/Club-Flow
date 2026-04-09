@@ -71,7 +71,7 @@ const LandingPage = () => {
       {/* Header */}
       <header className="border-b-2 border-[#111111] w-full px-6 py-4 sticky top-0 z-50" style={{ background: "#F4EFE7" }}>
         <div className="max-w-screen-2xl mx-auto flex justify-between items-center">
-          <div className="text-2xl font-black text-[#111111] tracking-tighter uppercase" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>ATTENDLY</div>
+          <div className="text-2xl font-black text-[#111111] tracking-tighter uppercase" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Club Flow</div>
           <nav className="hidden md:flex gap-8 items-center">
             {navLink("home", "HOME")}
             {navLink("pricing", "PRICING")}
@@ -248,8 +248,8 @@ const LandingPage = () => {
             <footer className="border-t-2 border-[#111111] w-full py-12 px-6" style={{ background: "#F4EFE7" }}>
               <div className="max-w-screen-2xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
                 <div className="flex flex-col items-center md:items-start gap-4">
-                  <div className="text-lg font-bold text-[#111111] uppercase tracking-tighter font-['Space_Grotesk']">ATTENDLY</div>
-                  <p className="text-sm font-medium uppercase tracking-widest text-[#2A2A2A] text-center md:text-left">© 2026 ATTENDLY. BUILT FOR THE STUDENTS.</p>
+                  <div className="text-lg font-bold text-[#111111] uppercase tracking-tighter font-['Space_Grotesk']">Club Flow</div>
+                  <p className="text-sm font-medium uppercase tracking-widest text-[#2A2A2A] text-center md:text-left">© 2026 Club Flow. BUILT FOR THE STUDENTS.</p>
                 </div>
                 <nav className="flex flex-wrap justify-center gap-4 md:gap-8 text-xs md:text-sm font-medium uppercase tracking-widest">
                   <a className="text-[#2A2A2A] hover:text-[#E98A3A] transition-colors" href="#">Privacy Policy</a>
