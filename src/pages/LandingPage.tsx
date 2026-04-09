@@ -509,7 +509,7 @@ const LandingPage = () => {
                               <span className="material-symbols-outlined text-white">smart_toy</span>
                             </div>
                             <div>
-                              <div className="font-black font-['Space_Grotesk'] text-sm uppercase">ATTENDLY</div>
+                              <div className="font-black font-['Space_Grotesk'] text-sm uppercase">CLUB FLOW</div>
                               <div className="text-[10px] uppercase font-bold text-[#E98A3A]">Your AI assistant</div>
                             </div>
                           </div>
@@ -529,7 +529,7 @@ const LandingPage = () => {
                           <div className="p-4 border-t-2 border-[#111111] bg-white">
                             <div className="flex items-center gap-2 border-2 border-[#111111] rounded-full px-3 py-2 min-w-0">
                               <span className="material-symbols-outlined text-2xl text-[#111111]">attach_file</span>
-                              <input type="text" placeholder="Ask Attendly" className="flex-1 min-w-0 bg-transparent outline-none border-none text-xs sm:text-sm text-center sm:text-left" readOnly />
+                              <input type="text" placeholder="Ask Assistant" className="flex-1 min-w-0 bg-transparent outline-none border-none text-xs sm:text-sm text-center sm:text-left" readOnly />
                               <button className="bg-[#E98A3A] text-[#111111] text-sm font-bold w-10 h-10 rounded-full border-2 border-[#111111] neo-brutal-shadow uppercase flex items-center justify-center">
                                 <span className="material-symbols-outlined text-base">north_east</span>
                               </button>
@@ -563,7 +563,7 @@ const LandingPage = () => {
 
             {/* About Footer */}
             <footer className="bg-[#111111] text-[#E98A3A] font-['Space_Grotesk'] text-sm uppercase tracking-widest flex flex-col md:flex-row justify-between items-center px-12 py-16 w-full mt-auto border-t-4 border-[#E98A3A]">
-              <div className="text-2xl font-black text-white mb-8 md:mb-0">Attendly</div>
+              <div className="text-2xl font-black text-white mb-8 md:mb-0">CLUB FLOW</div>
               <div className="flex flex-wrap justify-center gap-8 mb-8 md:mb-0">
                 <a className="text-white hover:text-[#E98A3A] transition-colors underline decoration-2 underline-offset-4" href="#">Mission</a>
                 <a className="text-white hover:text-[#E98A3A] transition-colors underline decoration-2 underline-offset-4" href="#">Security</a>
