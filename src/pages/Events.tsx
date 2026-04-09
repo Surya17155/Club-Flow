@@ -437,15 +437,17 @@ const Events = () => {
                   </div>
 
                   <div className="flex gap-2 mt-auto flex-wrap">
-                    <button
-                      className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs transition-all"
-                      style={NEO.btnOutline}
-                      onClick={() => handleViewEvent(event)}
-                      onMouseEnter={(e) => { e.currentTarget.style.transform = 'translate(-1px, -1px)'; e.currentTarget.style.boxShadow = '3px 3px 0px #111'; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.transform = 'translate(0,0)'; e.currentTarget.style.boxShadow = '2px 2px 0px #111'; }}
-                    >
-                      <Eye className="w-3.5 h-3.5" /> View
-                    </button>
+                    {canViewEvent(event) && (
+                      <button
+                        className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs transition-all"
+                        style={NEO.btnOutline}
+                        onClick={() => handleViewEvent(event)}
+                        onMouseEnter={(e) => { e.currentTarget.style.transform = 'translate(-1px, -1px)'; e.currentTarget.style.boxShadow = '3px 3px 0px #111'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.transform = 'translate(0,0)'; e.currentTarget.style.boxShadow = '2px 2px 0px #111'; }}
+                      >
+                        <Eye className="w-3.5 h-3.5" /> View
+                      </button>
+                    )}
                     {isPast && (
                       <button
                         className="px-3 py-2 text-xs transition-all"
