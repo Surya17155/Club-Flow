@@ -117,13 +117,11 @@ const EventFeedbackModal = ({ open, onOpenChange, eventId, eventName }: EventFee
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="sm:max-w-md p-0 overflow-hidden"
+        className="sm:max-w-md p-0 overflow-hidden [&>button:last-child]:hidden"
         style={{
           ...NEO.card,
           fontFamily: NEO.font,
         }}
-        // @ts-ignore
-        hideCloseButton
       >
         {/* Header */}
         <div
