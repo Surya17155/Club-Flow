@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useClub } from '@/contexts/ClubContext';
+import { useUserClubs } from '@/hooks/useUserClubs';
 import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
 import { useNavigate } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
@@ -118,10 +119,19 @@ const Events = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   const { activeClub } = useClub();
+  const { clubs: userClubs } = useUserClubs();
   const { hasPower } = useDelegatedPowers();
   const navigate = useNavigate();
   const { activeDesign } = useDesign();
   const isNeo = activeDesign === 'design-2';
+
+  const POST_HOLDER_ROLES = ['president', 'vice_president', 'secretary', 'social_media_head', 'social_media_coordinator', 'technical_pr_head', 'technical_pr_coordinator', 'general_secretary', 'deputy_secretary', 'treasurer', 'deputy_treasurer', 'assistant_treasurer'];
+  const canViewEvent = (event: EventRow) => {
+    if (viewMode === 'personal') return false;
+    // Club mode: only post-holders of that club can view
+    const membership = userClubs.find(c => c.club_id === event.club_id);
+    return membership ? POST_HOLDER_ROLES.includes(membership.role) : false;
+  };
 
   const [viewMode, setViewMode] = useState<'personal' | 'club'>(() => {
     return (localStorage.getItem('dashboardViewMode') as 'personal' | 'club') || 'personal';
@@ -375,7 +385,7 @@ const Events = () => {
                         {(event as any).clubs?.name && <div className="text-xs text-muted-foreground">Club: {(event as any).clubs.name}</div>}
                       </div>
                       <div className="flex gap-2 mt-4 flex-wrap">
-                        <Button variant="outline" size="sm" className="flex-1" onClick={() => handleViewEvent(event)}><Eye className="w-3.5 h-3.5 mr-1" /> View</Button>
+                        {canViewEvent(event) && <Button variant="outline" size="sm" className="flex-1" onClick={() => handleViewEvent(event)}><Eye className="w-3.5 h-3.5 mr-1" /> View</Button>}
                         {isPast && <Button variant="outline" size="sm" onClick={() => { setFeedbackEvent({ id: event.id, name: event.name }); setFeedbackOpen(true); }}><MessageSquare className="w-3.5 h-3.5" /></Button>}
                         {canManageEvents && event.qr_token && <Button variant="outline" size="sm" onClick={() => { setSelectedEvent(event); setQrDialogOpen(true); }}><QrCode className="w-3.5 h-3.5" /></Button>}
                         {canManageEvents && <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" onClick={() => handleDelete(event.id)}><Trash2 className="w-3.5 h-3.5" /></Button>}
@@ -427,15 +437,17 @@ const Events = () => {
                   </div>
 
                   <div className="flex gap-2 mt-auto flex-wrap">
-                    <button
-                      className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs transition-all"
-                      style={NEO.btnOutline}
-                      onClick={() => handleViewEvent(event)}
-                      onMouseEnter={(e) => { e.currentTarget.style.transform = 'translate(-1px, -1px)'; e.currentTarget.style.boxShadow = '3px 3px 0px #111'; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.transform = 'translate(0,0)'; e.currentTarget.style.boxShadow = '2px 2px 0px #111'; }}
-                    >
-                      <Eye className="w-3.5 h-3.5" /> View
-                    </button>
+                    {canViewEvent(event) && (
+                      <button
+                        className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs transition-all"
+                        style={NEO.btnOutline}
+                        onClick={() => handleViewEvent(event)}
+                        onMouseEnter={(e) => { e.currentTarget.style.transform = 'translate(-1px, -1px)'; e.currentTarget.style.boxShadow = '3px 3px 0px #111'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.transform = 'translate(0,0)'; e.currentTarget.style.boxShadow = '2px 2px 0px #111'; }}
+                      >
+                        <Eye className="w-3.5 h-3.5" /> View
+                      </button>
+                    )}
                     {isPast && (
                       <button
                         className="px-3 py-2 text-xs transition-all"
