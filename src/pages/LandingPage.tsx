@@ -226,7 +226,7 @@ const LandingPage = () => {
             {/* CTA */}
             <section className="max-w-screen-2xl mx-auto px-6 py-24 text-center">
               <div className="bg-[#E98A3A] border-4 border-[#111111] p-12 md:p-24 neo-brutal-shadow">
-                <h2 className="text-4xl md:text-5xl lg:text-8xl font-black uppercase tracking-tighter text-[#111111] mb-8">START WITH ATTENDLY</h2>
+                <h2 className="text-4xl md:text-5xl lg:text-8xl font-black uppercase tracking-tighter text-[#111111] mb-8">START WITH<br />CLUB FLOW</h2>
                 <p className="text-base md:text-3xl font-bold uppercase tracking-tight text-[#111111] mb-12 max-w-2xl mx-auto">
                   Generate a QR. Let the system handle the rest.
                 </p>
