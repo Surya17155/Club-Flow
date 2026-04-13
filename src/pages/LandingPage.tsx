@@ -249,7 +249,10 @@ const LandingPage = () => {
                   >
                     JOIN THE CLUB
                   </button>
-                  <button className="bg-white text-[#111111] font-['Space_Grotesk'] font-black tracking-widest uppercase text-sm md:text-base py-4 px-10 md:py-6 md:px-12 w-full md:w-auto border-2 border-[#111111] neo-brutal-shadow hover:-translate-y-1 transition-transform whitespace-nowrap">
+                  <button
+                    onClick={() => navigate("/contact")}
+                    className="bg-white text-[#111111] font-['Space_Grotesk'] font-black tracking-widest uppercase text-sm md:text-base py-4 px-10 md:py-6 md:px-12 w-full md:w-auto border-2 border-[#111111] neo-brutal-shadow hover:-translate-y-1 transition-transform whitespace-nowrap"
+                  >
                     Contact Us
                   </button>
                 </div>
