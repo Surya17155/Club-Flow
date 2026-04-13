@@ -23,6 +23,7 @@ import {
   Crown,
   Users,
   Check,
+  HelpCircle,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -443,8 +444,32 @@ export function DashboardSidebar() {
           )}
         </nav>
 
-        {/* Bottom: sign out + collapse toggle */}
+        {/* Bottom: contact us + sign out + collapse toggle */}
         <div className="px-3 pb-4 space-y-1 mt-auto">
+          {/* Contact Us */}
+          <button
+            onClick={() => navigate('/contact')}
+            className="flex items-center gap-3 px-3 py-2.5 transition-all duration-200 w-full text-left"
+            style={{
+              color: isActive('/contact') ? activeText : inactiveText,
+              background: isActive('/contact') ? activeBg : 'transparent',
+              borderRadius: isNeo ? '10px' : '999px',
+              border: isActive('/contact') && isNeo ? '2px solid #111111' : '2px solid transparent',
+              boxShadow: isActive('/contact') && isNeo ? '3px 3px 0px #111111' : 'none',
+              fontFamily: isNeo ? "'Space Grotesk', sans-serif" : undefined,
+              fontWeight: isActive('/contact') && isNeo ? 700 : 500,
+            }}
+            onMouseEnter={(e) => { if (!isActive('/contact')) e.currentTarget.style.background = hoverBg; }}
+            onMouseLeave={(e) => { if (!isActive('/contact')) e.currentTarget.style.background = 'transparent'; }}
+          >
+            <HelpCircle className="w-[18px] h-[18px] shrink-0" />
+            {!collapsed && (
+              <span className="text-sm font-medium" style={{ transition: 'opacity 0.2s ease' }}>
+                Contact Us
+              </span>
+            )}
+          </button>
+
           <button
             onClick={handleSignOut}
             className="flex items-center gap-3 px-3 py-2.5 transition-all duration-200 w-full text-left"
