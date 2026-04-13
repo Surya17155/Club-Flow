@@ -8,6 +8,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import {
   LayoutDashboard, Calendar, Compass, UserCircle, Settings, LogOut,
   Shield, Settings2, Bot, ArrowRightLeft, Building2, X, Check, ChevronDown, Crown, ClipboardList,
+  HelpCircle,
 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 
@@ -292,8 +293,23 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
               )}
             </nav>
 
-            {/* Sign Out */}
+            {/* Contact Us + Sign Out */}
             <div className="px-3 pb-5" style={{ borderTop: '2px solid #ddd', paddingTop: '12px' }}>
+              <button
+                onClick={() => { nav('/contact'); onClose(); }}
+                className="flex items-center gap-3 w-full px-4 py-3 text-left mb-2"
+                style={{
+                  fontFamily: "'Space Grotesk', sans-serif",
+                  fontWeight: 700,
+                  color: location.pathname === '/contact' ? '#E98A3A' : '#111',
+                  background: location.pathname === '/contact' ? '#FDE8D0' : 'transparent',
+                  border: '2px solid transparent',
+                  borderRadius: '6px',
+                }}
+              >
+                <HelpCircle className="w-5 h-5" />
+                <span className="text-sm">Contact Us</span>
+              </button>
               <button
                 onClick={async () => { await signOut(); navigate('/'); onClose(); }}
                 className="flex items-center gap-3 w-full px-4 py-3 text-left"
