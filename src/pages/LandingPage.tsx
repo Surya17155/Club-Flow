@@ -581,9 +581,10 @@ const LandingPage = () => {
                 <a className="text-white hover:text-[#E98A3A] transition-colors underline decoration-2 underline-offset-4" href="#">Security</a>
                 <a className="text-white hover:text-[#E98A3A] transition-colors underline decoration-2 underline-offset-4" href="#">Privacy</a>
                 <a className="text-white hover:text-[#E98A3A] transition-colors underline decoration-2 underline-offset-4" href="#">Support</a>
+                <a className="text-white hover:text-[#E98A3A] transition-colors underline decoration-2 underline-offset-4 cursor-pointer" onClick={() => navigate('/contact')}>Contact Us</a>
               </div>
               <div className="text-white/50 text-[10px] text-center md:text-right">
-                © 2026 Attendly.<br />ALL RIGHTS RESERVED.
+                © 2026 Club Flow.<br />ALL RIGHTS RESERVED.
               </div>
             </footer>
           </div>
