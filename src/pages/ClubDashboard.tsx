@@ -278,9 +278,9 @@ const ClubDashboard = () => {
                 </div>
               </div>
 
-              {/* Upcoming Events */}
+              {/* Previous Events */}
               <section>
-                <ClubUpcomingEvents clubId={clubId} clubName={clubName} />
+                <ClubPreviousEvents clubId={clubId} clubName={clubName} />
               </section>
             </>
           ) : activeTab === 'members' ? (
