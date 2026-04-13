@@ -90,10 +90,89 @@ export default function AttendanceHistory() {
         )}
       </div>
 
-      {/* Event Detail Popup */}
-      {selectedRecord && (
-        <EventDetailPopup record={selectedRecord} onClose={() => setSelectedRecord(null)} />
-      )}
+      {/* Event Detail Dialog */}
+      <Dialog open={!!selectedRecord} onOpenChange={(open) => { if (!open) setSelectedRecord(null); }}>
+        <DialogContent
+          className="max-w-md"
+          style={{
+            border: '3px solid #111111',
+            borderRadius: '16px',
+            boxShadow: '6px 6px 0px #111111',
+            background: '#FFFDF5',
+          }}
+        >
+          <DialogHeader>
+            <DialogTitle
+              className="flex items-center gap-2"
+              style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#111111' }}
+            >
+              <Calendar className="w-5 h-5" style={{ color: '#E98A3A' }} />
+              Attendance Details
+            </DialogTitle>
+            <DialogDescription>
+              Event attendance record
+            </DialogDescription>
+          </DialogHeader>
+          {selectedRecord && (
+            <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+              <div
+                className="p-4 space-y-3"
+                style={{
+                  border: '2px solid #111111',
+                  borderRadius: '12px',
+                  boxShadow: '3px 3px 0px #111111',
+                  background: '#FFFFFF',
+                }}
+              >
+                <p className="text-xs font-bold uppercase tracking-wider" style={{ color: '#E98A3A' }}>
+                  {selectedRecord.club_name}
+                </p>
+                <h4
+                  className="font-bold text-base"
+                  style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#111111' }}
+                >
+                  {selectedRecord.event_name}
+                </h4>
+
+                <div className="space-y-1.5 text-xs">
+                  <div className="flex items-center gap-1.5" style={{ color: '#555' }}>
+                    <Calendar className="w-3.5 h-3.5" style={{ color: '#E98A3A' }} />
+                    <span>{format(new Date(selectedRecord.event_date), 'EEEE, MMMM d, yyyy')}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5" style={{ color: '#555' }}>
+                    <Clock className="w-3.5 h-3.5" style={{ color: '#E98A3A' }} />
+                    <span>Scanned at {format(new Date(selectedRecord.scanned_at), 'h:mm a, MMM d, yyyy')}</span>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-1.5">
+                  {selectedRecord.event_type && (
+                    <span
+                      className="text-[10px] font-bold px-2 py-0.5 flex items-center gap-1"
+                      style={{ border: '2px solid #111', borderRadius: '6px', background: '#FFF8E1', color: '#111' }}
+                    >
+                      <Tag className="w-3 h-3" />
+                      {selectedRecord.event_type.replace(/_/g, ' ')}
+                    </span>
+                  )}
+                  <span
+                    className="text-[10px] font-bold px-2 py-0.5 flex items-center gap-1"
+                    style={{
+                      border: '2px solid #111',
+                      borderRadius: '6px',
+                      background: selectedRecord.attendance_given ? '#E8F5E9' : '#FFEBEE',
+                      color: '#111',
+                    }}
+                  >
+                    <CheckCircle className="w-3 h-3" />
+                    {selectedRecord.attendance_given ? 'Attendance Granted' : 'Attendance Pending'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Bottom Nav */}
       {isMobile && <MobileBottomNav />}
