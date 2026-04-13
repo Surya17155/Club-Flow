@@ -42,6 +42,12 @@ interface PostHolder {
   user_id: string;
   role: string;
   full_name: string;
+  avatar_url?: string | null;
+  programme?: string | null;
+  year?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  about?: string | null;
 }
 
 const roleOrder = ['president', 'vice_president', 'secretary', 'social_media_head'];
@@ -112,11 +118,24 @@ const ClubDashboard = () => {
         .in('role', roleOrder as any);
       if (!membersData || membersData.length === 0) { setPostHolders([]); return; }
       const userIds = membersData.map(m => m.user_id);
-      const { data: profilesData } = await supabase.from('profiles').select('user_id, full_name').in('user_id', userIds);
+      const { data: profilesData } = await supabase.from('profiles').select('user_id, full_name, avatar_url, programme, year, email, phone, about').in('user_id', userIds);
       const profileMap = new Map((profilesData ?? []).map(p => [p.user_id, p]));
       setPostHolders(
         membersData
-          .map(m => ({ user_id: m.user_id, role: m.role, full_name: profileMap.get(m.user_id)?.full_name ?? 'Unknown' }))
+          .map(m => {
+            const profile = profileMap.get(m.user_id);
+            return {
+              user_id: m.user_id,
+              role: m.role,
+              full_name: profile?.full_name ?? 'Unknown',
+              avatar_url: profile?.avatar_url ?? null,
+              programme: profile?.programme ?? null,
+              year: profile?.year ?? null,
+              email: profile?.email ?? null,
+              phone: profile?.phone ?? null,
+              about: profile?.about ?? null,
+            };
+          })
           .sort((a, b) => roleOrder.indexOf(a.role) - roleOrder.indexOf(b.role))
       );
     };
