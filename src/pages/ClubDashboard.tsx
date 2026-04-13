@@ -10,9 +10,12 @@ import { ChevronLeft, Users, Calendar as CalendarIcon } from 'lucide-react';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  HoverCard, HoverCardContent, HoverCardTrigger,
+} from '@/components/ui/hover-card';
 import ManageEventsModal from '@/components/dashboard/ManageEventsModal';
-import ClubProfileSidebar from '@/components/club-dashboard/ClubProfileSidebar';
-import ClubUpcomingEvents from '@/components/club-dashboard/ClubUpcomingEvents';
+import ClubPreviousEvents from '@/components/club-dashboard/ClubPreviousEvents';
+import NeoBrutalCalendar from '@/components/dashboard/NeoBrutalCalendar';
 import MemberManagement from '@/components/club-dashboard/MemberManagement';
 import JoinRequestsPanel from '@/components/club-dashboard/JoinRequestsPanel';
 import { Button } from '@/components/ui/button';
