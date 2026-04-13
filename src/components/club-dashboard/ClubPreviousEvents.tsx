@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Calendar, Clock, Users } from 'lucide-react';
+import { Calendar, Clock, Users, Tag, Shield, CheckCircle } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { format } from 'date-fns';
 
@@ -128,39 +128,105 @@ const ClubPreviousEvents = ({ clubId, clubName }: Props) => {
 
       {/* Event Detail Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-md border-[3px] border-[#111] rounded-[6px] bg-white" style={{ boxShadow: '6px 6px 0px #111' }}>
+        <DialogContent
+          className="max-w-md"
+          style={{
+            border: '3px solid #111111',
+            borderRadius: '16px',
+            boxShadow: '6px 6px 0px #111111',
+            background: '#FFFDF5',
+          }}
+        >
           <DialogHeader>
-            <DialogTitle className="font-black text-[#111]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{loadingDetail ? 'Loading...' : selectedEvent?.name}</DialogTitle>
-            <DialogDescription className="text-[#111]/50 font-medium">Past event details for {clubName}</DialogDescription>
+            <DialogTitle
+              className="flex items-center gap-2"
+              style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#111111' }}
+            >
+              <Calendar className="w-5 h-5" style={{ color: '#E98A3A' }} />
+              {loadingDetail ? 'Loading...' : 'Past Event Details'}
+            </DialogTitle>
+            <DialogDescription>
+              Event details for {clubName}
+            </DialogDescription>
           </DialogHeader>
           {loadingDetail ? (
             <div className="flex justify-center py-8">
               <div className="w-6 h-6 border-[3px] border-[#111]/30 border-t-[#111] rounded-full animate-spin" />
             </div>
           ) : selectedEvent ? (
-            <div className="space-y-4">
-              <div className="flex flex-wrap gap-2">
-                <span className="px-3 py-1 text-xs font-bold border-[2px] border-[#111] rounded-[4px] bg-[#E98A3A] text-[#111]">{eventTypeLabelMap[selectedEvent.event_type] ?? selectedEvent.event_type}</span>
-                <span className="px-3 py-1 text-xs font-bold border-[2px] border-[#111] rounded-[4px] bg-white text-[#111] capitalize">{selectedEvent.category}</span>
-                <span className="px-3 py-1 text-xs font-bold border-[2px] border-[#111] rounded-[4px] bg-white text-[#111]">{selectedEvent.access_type === 'open' ? 'Open for All' : 'Only for Club Members'}</span>
-              </div>
-              <div className="flex items-start gap-3 text-sm">
-                <Clock className="w-4 h-4 text-[#111]/60 mt-0.5 shrink-0" />
-                <div>
-                  <p className="font-bold text-[#111]">{formatDateTime(selectedEvent.event_date)}</p>
-                  {selectedEvent.end_date && (
-                    <p className="text-[#111]/50 font-medium">Ended: {formatDateTime(selectedEvent.end_date)}</p>
-                  )}
-                </div>
-              </div>
-              <div className="flex items-center gap-3 text-sm">
-                <Users className="w-4 h-4 text-[#111]/60 shrink-0" />
-                <span className="text-[#111] font-bold">{selectedEvent.participant_count} Participants</span>
-              </div>
-              <div className="pt-2 border-t-[2px] border-[#111]/20">
-                <p className="text-sm text-[#111]/70 leading-relaxed font-medium">
-                  {selectedEvent.description || 'No description provided.'}
+            <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+              <div
+                className="p-4 space-y-3"
+                style={{
+                  border: '2px solid #111111',
+                  borderRadius: '12px',
+                  boxShadow: '3px 3px 0px #111111',
+                  background: '#FFFFFF',
+                }}
+              >
+                <p className="text-xs font-bold uppercase tracking-wider" style={{ color: '#E98A3A' }}>
+                  {clubName}
                 </p>
+                <h4
+                  className="font-bold text-base"
+                  style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#111111' }}
+                >
+                  {selectedEvent.name}
+                </h4>
+
+                <div className="space-y-1.5 text-xs">
+                  <div className="flex items-center gap-1.5" style={{ color: '#555' }}>
+                    <Calendar className="w-3.5 h-3.5" style={{ color: '#E98A3A' }} />
+                    <span>{format(new Date(selectedEvent.event_date), 'EEEE, MMMM d, yyyy')}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5" style={{ color: '#555' }}>
+                    <Clock className="w-3.5 h-3.5" style={{ color: '#E98A3A' }} />
+                    <span>
+                      {format(new Date(selectedEvent.event_date), 'h:mm a')}
+                      {selectedEvent.end_date ? ` – ${format(new Date(selectedEvent.end_date), 'h:mm a')}` : ''}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-1.5">
+                  <span
+                    className="text-[10px] font-bold px-2 py-0.5 flex items-center gap-1"
+                    style={{ border: '2px solid #111', borderRadius: '6px', background: '#FFF8E1', color: '#111' }}
+                  >
+                    <Tag className="w-3 h-3" />
+                    {eventTypeLabelMap[selectedEvent.event_type] ?? selectedEvent.event_type}
+                  </span>
+                  <span
+                    className="text-[10px] font-bold px-2 py-0.5 flex items-center gap-1"
+                    style={{ border: '2px solid #111', borderRadius: '6px', background: '#FFFDF5', color: '#111' }}
+                  >
+                    <Shield className="w-3 h-3" />
+                    {selectedEvent.access_type === 'open' ? 'Open for All' : 'Club Only'}
+                  </span>
+                  <span
+                    className="text-[10px] font-bold px-2 py-0.5 flex items-center gap-1"
+                    style={{
+                      border: '2px solid #111',
+                      borderRadius: '6px',
+                      background: '#E8F5E9',
+                      color: '#111',
+                    }}
+                  >
+                    <Users className="w-3 h-3" />
+                    {selectedEvent.participant_count} Participants
+                  </span>
+                </div>
+
+                {selectedEvent.description && (
+                  <div style={{ borderTop: '2px solid #111', paddingTop: '8px' }}>
+                    <h5 className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: '#888' }}>
+                      Description
+                    </h5>
+                    <p className="text-xs leading-relaxed" style={{ color: '#555' }}>
+                      {selectedEvent.description}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           ) : null}
