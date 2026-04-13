@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import heroIllustration from "@/assets/hero-illustration.png";
 import heroIllustrationDesktop from "@/assets/hero-illustration-desktop.png";
 
-type PageName = "home" | "pricing" | "about";
+type PageName = "home" | "pricing" | "about" | "contact";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -76,6 +76,12 @@ const LandingPage = () => {
             {navLink("home", "HOME")}
             {navLink("pricing", "PRICING")}
             {navLink("about", "ABOUT")}
+            <button
+              onClick={() => navigate('/contact')}
+              className={`font-['Space_Grotesk'] font-bold tracking-tighter uppercase hover:-translate-y-0.5 transition-transform duration-100 text-[#111111] hover:text-[#E98A3A]`}
+            >
+              CONTACT US
+            </button>
           </nav>
           <div className="flex gap-4 items-center">
             <button
@@ -116,6 +122,12 @@ const LandingPage = () => {
               {mobileNavLink("home", "Home")}
               {mobileNavLink("pricing", "Pricing")}
               {mobileNavLink("about", "About")}
+              <button
+                onClick={() => { setMobileMenuOpen(false); navigate('/contact'); }}
+                className="text-lg font-['Space_Grotesk'] font-bold uppercase text-left text-[#111111] hover:text-[#E98A3A]"
+              >
+                Contact Us
+              </button>
               <button
                 onClick={() => { setMobileMenuOpen(false); navigate("/auth?mode=login"); }}
                 className="font-['Space_Grotesk'] font-bold text-sm tracking-widest uppercase py-3 px-6 border-2 border-[#111111] neo-brutal-shadow mt-2 text-left"
@@ -338,7 +350,7 @@ const LandingPage = () => {
                   <h2 className="font-black text-3xl uppercase mb-4 tracking-tighter">Enterprise Plan</h2>
                   <p className="text-xl italic" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>For Clubs with too much budget: Please just buy me a pizza instead.</p>
                 </div>
-                <button className="border-2 border-[#111111] px-8 py-4 font-bold uppercase neo-shadow neo-shadow-hover transition-all">Contact US</button>
+                <button onClick={() => navigate('/contact')} className="border-2 border-[#111111] px-8 py-4 font-bold uppercase neo-shadow neo-shadow-hover transition-all">Contact US</button>
               </div>
             </div>
 
@@ -569,9 +581,10 @@ const LandingPage = () => {
                 <a className="text-white hover:text-[#E98A3A] transition-colors underline decoration-2 underline-offset-4" href="#">Security</a>
                 <a className="text-white hover:text-[#E98A3A] transition-colors underline decoration-2 underline-offset-4" href="#">Privacy</a>
                 <a className="text-white hover:text-[#E98A3A] transition-colors underline decoration-2 underline-offset-4" href="#">Support</a>
+                <a className="text-white hover:text-[#E98A3A] transition-colors underline decoration-2 underline-offset-4 cursor-pointer" onClick={() => navigate('/contact')}>Contact Us</a>
               </div>
               <div className="text-white/50 text-[10px] text-center md:text-right">
-                © 2026 Attendly.<br />ALL RIGHTS RESERVED.
+                © 2026 Club Flow.<br />ALL RIGHTS RESERVED.
               </div>
             </footer>
           </div>

@@ -10,9 +10,12 @@ import { ChevronLeft, Users, Calendar as CalendarIcon } from 'lucide-react';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  HoverCard, HoverCardContent, HoverCardTrigger,
+} from '@/components/ui/hover-card';
 import ManageEventsModal from '@/components/dashboard/ManageEventsModal';
-import ClubProfileSidebar from '@/components/club-dashboard/ClubProfileSidebar';
-import ClubUpcomingEvents from '@/components/club-dashboard/ClubUpcomingEvents';
+import ClubPreviousEvents from '@/components/club-dashboard/ClubPreviousEvents';
+import NeoBrutalCalendar from '@/components/dashboard/NeoBrutalCalendar';
 import MemberManagement from '@/components/club-dashboard/MemberManagement';
 import JoinRequestsPanel from '@/components/club-dashboard/JoinRequestsPanel';
 import { Button } from '@/components/ui/button';
@@ -20,25 +23,18 @@ import { MobileClubProfileCard } from '@/components/mobile/MobileClubProfileCard
 import { MobileBottomNav } from '@/components/mobile/MobileBottomNav';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 
-const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-function getMiniCalendar(year: number, month: number) {
-  const firstDay = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const weeks: (number | null)[][] = [];
-  let week: (number | null)[] = Array(firstDay).fill(null);
-  for (let d = 1; d <= daysInMonth; d++) {
-    week.push(d);
-    if (week.length === 7) { weeks.push(week); week = []; }
-  }
-  if (week.length) { while (week.length < 7) week.push(null); weeks.push(week); }
-  return weeks;
-}
 
 interface PostHolder {
   user_id: string;
   role: string;
   full_name: string;
+  avatar_url?: string | null;
+  programme?: string | null;
+  year?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  about?: string | null;
 }
 
 const roleOrder = ['president', 'vice_president', 'secretary', 'social_media_head'];
@@ -109,43 +105,32 @@ const ClubDashboard = () => {
         .in('role', roleOrder as any);
       if (!membersData || membersData.length === 0) { setPostHolders([]); return; }
       const userIds = membersData.map(m => m.user_id);
-      const { data: profilesData } = await supabase.from('profiles').select('user_id, full_name').in('user_id', userIds);
+      const { data: profilesData } = await supabase.from('profiles').select('user_id, full_name, avatar_url, programme, year, email, phone, about').in('user_id', userIds);
       const profileMap = new Map((profilesData ?? []).map(p => [p.user_id, p]));
       setPostHolders(
         membersData
-          .map(m => ({ user_id: m.user_id, role: m.role, full_name: profileMap.get(m.user_id)?.full_name ?? 'Unknown' }))
+          .map(m => {
+            const profile = profileMap.get(m.user_id);
+            return {
+              user_id: m.user_id,
+              role: m.role,
+              full_name: profile?.full_name ?? 'Unknown',
+              avatar_url: profile?.avatar_url ?? null,
+              programme: profile?.programme ?? null,
+              year: profile?.year ?? null,
+              email: profile?.email ?? null,
+              phone: profile?.phone ?? null,
+              about: profile?.about ?? null,
+            };
+          })
           .sort((a, b) => roleOrder.indexOf(a.role) - roleOrder.indexOf(b.role))
       );
     };
     fetchPostHolders();
   }, [clubId]);
 
-  // Calendar
-  const now = new Date();
-  const [calMonth, setCalMonth] = useState(now.getMonth());
-  const [calYear, setCalYear] = useState(now.getFullYear());
-  const weeks = getMiniCalendar(calYear, calMonth);
-  const monthName = new Date(calYear, calMonth).toLocaleString('default', { month: 'long' });
 
-  const [calendarEvents, setCalendarEvents] = useState<Record<string, { name: string; color: string }[]>>({});
-  useEffect(() => {
-    if (!clubId) return;
-    const start = new Date(calYear, calMonth, 1);
-    const end = new Date(calYear, calMonth + 1, 0, 23, 59, 59);
-    supabase.from('events').select('id, name, event_date, category').eq('club_id', clubId)
-      .gte('event_date', start.toISOString()).lte('event_date', end.toISOString())
-      .order('event_date', { ascending: true }).then(({ data }) => {
-        const map: Record<string, { name: string; color: string }[]> = {};
-        (data ?? []).forEach(e => {
-          const d = new Date(e.event_date);
-          const key = `${calYear}-${String(calMonth + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-          const color = e.category === 'technical' ? 'bg-primary' : e.category === 'cultural' ? 'bg-destructive' : 'bg-accent';
-          if (!map[key]) map[key] = [];
-          map[key].push({ name: e.name, color });
-        });
-        setCalendarEvents(map);
-      });
-  }, [clubId, calMonth, calYear]);
+
 
   if (authLoading) {
     return (
@@ -256,9 +241,9 @@ const ClubDashboard = () => {
                 </div>
               </div>
 
-              {/* Upcoming Events */}
+              {/* Previous Events */}
               <section>
-                <ClubUpcomingEvents clubId={clubId} clubName={clubName} />
+                <ClubPreviousEvents clubId={clubId} clubName={clubName} />
               </section>
             </>
           ) : activeTab === 'members' ? (
@@ -282,17 +267,92 @@ const ClubDashboard = () => {
     <DashboardLayout showHeader={false}>
       <div className="space-y-6 animate-fade-in text-foreground">
         <header className="relative z-20 flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate(cameFromSuperAdmin ? '/super-admin' : '/admin')}
-              className="w-9 h-9 flex items-center justify-center border-[3px] border-[#111] rounded-[6px] bg-[#111] text-white hover:translate-y-[1px] transition-all"
-              style={{ boxShadow: '2px 2px 0px #E98A3A' }}
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <h1 className="text-xl md:text-2xl font-black text-[#111]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-              {clubName} <span className="text-[#E98A3A]">Official</span>
-            </h1>
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => navigate(cameFromSuperAdmin ? '/super-admin' : '/admin')}
+                className="w-9 h-9 flex items-center justify-center border-[3px] border-[#111] rounded-[6px] bg-[#111] text-white hover:translate-y-[1px] transition-all"
+                style={{ boxShadow: '2px 2px 0px #E98A3A' }}
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <h1 className="text-xl md:text-2xl font-black text-[#111]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                {clubName} <span className="text-[#E98A3A]">Official</span>
+              </h1>
+            </div>
+            {/* President info with hover card */}
+            {president && (
+              <div className="ml-12">
+                <HoverCard openDelay={200}>
+                  <HoverCardTrigger asChild>
+                    <button className="flex items-center gap-2 cursor-pointer group">
+                      <span
+                        className="px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider rounded-[4px]"
+                        style={{ background: '#E98A3A', color: '#111', border: '2px solid #111', fontFamily: "'Space Grotesk', sans-serif" }}
+                      >
+                        President
+                      </span>
+                      <span className="text-sm font-bold text-[#111] group-hover:text-[#E98A3A] transition-colors" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                        {president.full_name}
+                      </span>
+                    </button>
+                  </HoverCardTrigger>
+                  <HoverCardContent
+                    align="start"
+                    className="w-80 p-0 overflow-hidden"
+                    style={{ border: '3px solid #111', borderRadius: '10px', boxShadow: '6px 6px 0px #111', background: '#FFFDF5' }}
+                  >
+                    <div className="p-4 flex items-center gap-4" style={{ borderBottom: '2px solid #111', background: '#FDE8D0' }}>
+                      <div
+                        className="w-14 h-14 rounded-full overflow-hidden shrink-0 flex items-center justify-center"
+                        style={{ border: '3px solid #111', background: '#E98A3A' }}
+                      >
+                        {president.avatar_url ? (
+                          <img src={president.avatar_url} alt={president.full_name} className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="text-lg font-black text-[#111]">{president.full_name[0]}</span>
+                        )}
+                      </div>
+                      <div>
+                        <h4 className="text-base font-black text-[#111]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{president.full_name}</h4>
+                        <span
+                          className="inline-block px-2 py-0.5 text-[9px] font-black uppercase tracking-wider rounded-[4px] mt-1"
+                          style={{ background: '#E98A3A', color: '#111', border: '2px solid #111' }}
+                        >
+                          President
+                        </span>
+                      </div>
+                    </div>
+                    <div className="p-4 space-y-2.5 text-xs" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                      {president.programme && (
+                        <div className="flex justify-between">
+                          <span className="font-bold text-[#111]/50 uppercase tracking-wider">Programme</span>
+                          <span className="font-bold text-[#111]">{president.programme}{president.year ? ` • ${president.year}` : ''}</span>
+                        </div>
+                      )}
+                      {president.email && (
+                        <div className="flex justify-between">
+                          <span className="font-bold text-[#111]/50 uppercase tracking-wider">Email</span>
+                          <span className="font-bold text-[#111] truncate ml-2">{president.email}</span>
+                        </div>
+                      )}
+                      {president.phone && (
+                        <div className="flex justify-between">
+                          <span className="font-bold text-[#111]/50 uppercase tracking-wider">Phone</span>
+                          <span className="font-bold text-[#111]">{president.phone}</span>
+                        </div>
+                      )}
+                      {president.about && (
+                        <div className="pt-2" style={{ borderTop: '2px solid #111' }}>
+                          <span className="font-bold text-[#111]/50 uppercase tracking-wider text-[10px] block mb-1">About</span>
+                          <p className="text-[#111]/70 leading-relaxed">{president.about}</p>
+                        </div>
+                      )}
+                    </div>
+                  </HoverCardContent>
+                </HoverCard>
+              </div>
+            )}
           </div>
 
           <div className="flex items-center gap-4">
@@ -324,36 +384,15 @@ const ClubDashboard = () => {
             </section>
 
             <main className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              <div className="lg:col-span-3">
-                <ClubProfileSidebar clubId={clubId} clubName={clubName} clubAbout={clubDetails.about} clubLogo={clubDetails.logo_url} socialInstagram={clubDetails.social_instagram} socialLinkedin={clubDetails.social_linkedin} />
-              </div>
-              <div className="lg:col-span-6 space-y-6">
-                {/* Calendar */}
-                <div className="border-[3px] border-[#111] rounded-[6px] bg-white p-6" style={{ boxShadow: '4px 4px 0px #111' }}>
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-black text-[#111]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Monthly Calendar</h3>
-                    <div className="flex items-center gap-2">
-                      <button onClick={() => { if (calMonth === 0) { setCalMonth(11); setCalYear(y => y - 1); } else setCalMonth(m => m - 1); }} className="p-1.5 border-[2px] border-[#111] rounded-[4px] hover:bg-[#E98A3A]/20 transition-colors"><ChevronLeft className="w-4 h-4" /></button>
-                      <span className="text-sm font-bold min-w-[120px] text-center text-[#111]">{monthName} {calYear}</span>
-                      <button onClick={() => { if (calMonth === 11) { setCalMonth(0); setCalYear(y => y + 1); } else setCalMonth(m => m + 1); }} className="p-1.5 border-[2px] border-[#111] rounded-[4px] hover:bg-[#E98A3A]/20 transition-colors"><ChevronLeft className="w-4 h-4 rotate-180" /></button>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-7 gap-1">
-                    {DAYS.map(d => (<div key={d} className="text-center text-xs font-bold text-[#111]/50 py-2">{d}</div>))}
-                    {weeks.flat().map((day, i) => {
-                      const dateKey = day ? `${calYear}-${String(calMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}` : '';
-                      const events = day ? calendarEvents[dateKey] || [] : [];
-                      const isToday = day === now.getDate() && calMonth === now.getMonth() && calYear === now.getFullYear();
-                      return (
-                        <div key={i} className={`min-h-[60px] p-1 rounded-[4px] text-xs border-[2px] ${isToday ? 'border-[#E98A3A] bg-[#E98A3A]/10' : 'border-transparent'} ${day ? 'hover:border-[#111] hover:bg-[#FDE8D0]/30 cursor-pointer transition-all' : ''}`}>
-                          {day && (<><span className={`${isToday ? 'text-[#E98A3A] font-black' : 'text-[#111]/70 font-bold'}`}>{day}</span>{events.map((ev, j) => (<div key={j} className="mt-0.5 px-1 py-0.5 rounded-[2px] text-[10px] text-white truncate bg-[#E98A3A] border border-[#111]">{ev.name}</div>))}</>)}
-                        </div>
-                      );
-                    })}
-                  </div>
+              <div className="lg:col-span-8">
+                {/* Calendar - same as personal dashboard */}
+                <div className="border-[3px] border-[#111] rounded-[6px] bg-white overflow-hidden" style={{ boxShadow: '4px 4px 0px #111' }}>
+                  <NeoBrutalCalendar mode="club" />
                 </div>
               </div>
-              <div className="lg:col-span-3"><ClubUpcomingEvents clubId={clubId} clubName={clubName} /></div>
+              <div className="lg:col-span-4">
+                <ClubPreviousEvents clubId={clubId} clubName={clubName} />
+              </div>
             </main>
           </>
         ) : activeTab === 'members' ? (
