@@ -32,6 +32,7 @@ import ClubSettingsPage from "./pages/ClubSettingsPage";
 import AssignPowersPage from "./pages/AssignPowersPage";
 import ChatbotPage from "./pages/ChatbotPage";
 import AttendanceHistory from "./pages/AttendanceHistory";
+import ContactUs from "./pages/ContactUs";
 
 // Lazy-load rarely visited routes
 const MarkAttendance = lazy(() => import("./pages/MarkAttendance"));
@@ -93,6 +94,7 @@ const App = () => (
                 <Route path="/assign-powers" element={<AssignPowersPage />} />
                 <Route path="/chatbot" element={<ChatbotPage />} />
                 <Route path="/attendance-history" element={<AttendanceHistory />} />
+                <Route path="/contact" element={<ContactUs />} />
                 <Route path="/manage-outsiders" element={<DesktopFrame><ManageOutsiders /></DesktopFrame>} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
