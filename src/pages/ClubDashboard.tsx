@@ -129,32 +129,8 @@ const ClubDashboard = () => {
     fetchPostHolders();
   }, [clubId]);
 
-  // Calendar
-  const now = new Date();
-  const [calMonth, setCalMonth] = useState(now.getMonth());
-  const [calYear, setCalYear] = useState(now.getFullYear());
-  const weeks = getMiniCalendar(calYear, calMonth);
-  const monthName = new Date(calYear, calMonth).toLocaleString('default', { month: 'long' });
 
-  const [calendarEvents, setCalendarEvents] = useState<Record<string, { name: string; color: string }[]>>({});
-  useEffect(() => {
-    if (!clubId) return;
-    const start = new Date(calYear, calMonth, 1);
-    const end = new Date(calYear, calMonth + 1, 0, 23, 59, 59);
-    supabase.from('events').select('id, name, event_date, category').eq('club_id', clubId)
-      .gte('event_date', start.toISOString()).lte('event_date', end.toISOString())
-      .order('event_date', { ascending: true }).then(({ data }) => {
-        const map: Record<string, { name: string; color: string }[]> = {};
-        (data ?? []).forEach(e => {
-          const d = new Date(e.event_date);
-          const key = `${calYear}-${String(calMonth + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-          const color = e.category === 'technical' ? 'bg-primary' : e.category === 'cultural' ? 'bg-destructive' : 'bg-accent';
-          if (!map[key]) map[key] = [];
-          map[key].push({ name: e.name, color });
-        });
-        setCalendarEvents(map);
-      });
-  }, [clubId, calMonth, calYear]);
+
 
   if (authLoading) {
     return (
