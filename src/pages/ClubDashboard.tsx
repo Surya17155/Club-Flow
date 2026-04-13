@@ -23,20 +23,7 @@ import { MobileClubProfileCard } from '@/components/mobile/MobileClubProfileCard
 import { MobileBottomNav } from '@/components/mobile/MobileBottomNav';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 
-const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-function getMiniCalendar(year: number, month: number) {
-  const firstDay = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const weeks: (number | null)[][] = [];
-  let week: (number | null)[] = Array(firstDay).fill(null);
-  for (let d = 1; d <= daysInMonth; d++) {
-    week.push(d);
-    if (week.length === 7) { weeks.push(week); week = []; }
-  }
-  if (week.length) { while (week.length < 7) week.push(null); weeks.push(week); }
-  return weeks;
-}
 
 interface PostHolder {
   user_id: string;
