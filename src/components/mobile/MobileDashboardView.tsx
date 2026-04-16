@@ -100,7 +100,7 @@ export function MobileDashboardView({
             className="text-xl text-center"
             style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#111' }}
           >
-            Hi, <span className="font-black text-2xl">{fullName?.split(' ')[0] || 'there'}</span>
+            Hi, <span className="font-black text-2xl text-amber-600">{fullName?.split(' ')[0] || 'there'}</span>
           </p>
 
           {/* Stats Row — only 2 cards, centered */}
