@@ -448,7 +448,7 @@ const Events = () => {
                         <Eye className="w-3.5 h-3.5" /> View
                       </button>
                     )}
-                    {isPast && (
+                    {isPast && viewMode === 'personal' && (
                       <button
                         className="px-3 py-2 text-xs transition-all"
                         style={NEO.btnOutline}

@@ -3,9 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { usePersonalStats } from '@/hooks/usePersonalStats';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { MobileBottomNav } from '@/components/mobile/MobileBottomNav';
-import { Calendar, Clock, Users, Tag, Shield, CheckCircle } from 'lucide-react';
+import { Calendar, Clock, Users, Tag, Shield, CheckCircle, MessageSquare } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { format } from 'date-fns';
+import EventFeedbackModal from '@/components/dashboard/EventFeedbackModal';
 
 interface AttendanceRecord {
   id: string;
@@ -24,6 +25,10 @@ export default function AttendanceHistory() {
   const isMobile = useIsMobile();
   const { stats, loading } = usePersonalStats();
   const [selectedRecord, setSelectedRecord] = useState<AttendanceRecord | null>(null);
+  const [feedbackEvent, setFeedbackEvent] = useState<{ id: string; name: string } | null>(null);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const viewMode = (localStorage.getItem('dashboardViewMode') as 'personal' | 'club') || 'personal';
+  const isPersonalMode = viewMode === 'personal';
 
   const records = stats.attendanceRecords;
 
@@ -57,10 +62,9 @@ export default function AttendanceHistory() {
           records.map((record) => {
             const eventDate = new Date(record.event_date);
             return (
-              <button
+              <div
                 key={record.id}
-                onClick={() => setSelectedRecord(record)}
-                className="w-full text-left transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+                className="w-full text-left transition-all"
                 style={{
                   background: '#FFFDF5',
                   border: '2px solid #111',
@@ -68,23 +72,45 @@ export default function AttendanceHistory() {
                   padding: '14px 16px',
                 }}
               >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-black truncate" style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#111' }}>
-                      {record.event_name}
-                    </h3>
-                    <p className="text-xs font-bold mt-0.5" style={{ color: '#E98A3A', fontFamily: "'Space Grotesk', sans-serif" }}>
-                      {record.club_name}
-                    </p>
+                <button
+                  onClick={() => setSelectedRecord(record)}
+                  className="w-full text-left"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-sm font-black truncate" style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#111' }}>
+                        {record.event_name}
+                      </h3>
+                      <p className="text-xs font-bold mt-0.5" style={{ color: '#E98A3A', fontFamily: "'Space Grotesk', sans-serif" }}>
+                        {record.club_name}
+                      </p>
+                    </div>
+                    <span
+                      className="text-[11px] font-bold shrink-0 mt-0.5"
+                      style={{ color: '#888', fontFamily: "'Space Grotesk', sans-serif" }}
+                    >
+                      {eventDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </span>
                   </div>
-                  <span
-                    className="text-[11px] font-bold shrink-0 mt-0.5"
-                    style={{ color: '#888', fontFamily: "'Space Grotesk', sans-serif" }}
-                  >
-                    {eventDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                  </span>
-                </div>
-              </button>
+                </button>
+                {isPersonalMode && (
+                  <div className="flex items-center gap-2 mt-2">
+                    <button
+                      onClick={() => { setFeedbackEvent({ id: record.event_id, name: record.event_name }); setFeedbackOpen(true); }}
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold transition-all active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
+                      style={{
+                        background: '#FFFDF5',
+                        border: '2px solid #111',
+                        boxShadow: '2px 2px 0px #111',
+                        fontFamily: "'Space Grotesk', sans-serif",
+                        color: '#111',
+                      }}
+                    >
+                      <MessageSquare className="w-3.5 h-3.5" /> Review
+                    </button>
+                  </div>
+                )}
+              </div>
             );
           })
         )}
@@ -173,6 +199,16 @@ export default function AttendanceHistory() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Feedback Modal */}
+      {feedbackEvent && (
+        <EventFeedbackModal
+          open={feedbackOpen}
+          onOpenChange={setFeedbackOpen}
+          eventId={feedbackEvent.id}
+          eventName={feedbackEvent.name}
+        />
+      )}
 
       {/* Bottom Nav */}
       {isMobile && <MobileBottomNav />}

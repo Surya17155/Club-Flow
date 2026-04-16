@@ -8,7 +8,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import {
   LayoutDashboard, Calendar, Compass, UserCircle, Settings, LogOut,
   Shield, Settings2, Bot, ArrowRightLeft, Building2, X, Check, ChevronDown, Crown, ClipboardList,
-  HelpCircle,
+  HelpCircle, MessageSquare,
 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 
@@ -50,6 +50,7 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
   const clubItems = [
     { title: 'Dashboard', icon: LayoutDashboard, url: '/admin' },
     { title: 'Events', icon: Calendar, url: '/events' },
+    { title: 'Reviews', icon: MessageSquare, url: '/reviews' },
     { title: 'Club', icon: Building2, url: '/clubs' },
     ...(isPresident ? [{ title: 'Club Settings', icon: Settings2, url: '/club-settings' }] : []),
     { title: 'Settings', icon: Settings, url: '/settings' },
