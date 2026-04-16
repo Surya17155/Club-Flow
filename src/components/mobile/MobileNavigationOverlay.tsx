@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -58,10 +58,12 @@ export function MobileNavigationOverlay() {
     }
   }, [showDrawer]);
 
+  const navigate = useNavigate();
   const setViewMode = (mode: ViewMode) => {
     setViewModeState(mode);
     localStorage.setItem('dashboardViewMode', mode);
     window.dispatchEvent(new Event('viewModeChanged'));
+    navigate('/admin');
   };
 
   if (!showDrawer) {
