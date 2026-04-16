@@ -176,7 +176,7 @@ const AuthPage = () => {
 
         {/* Logo */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tighter text-[#111111]">ATTENDLY</h1>
+          <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tighter text-[#111111]">Club Flow</h1>
           <p className="text-sm font-medium mt-1" style={{ color: "#544338" }}>Multi-Club Attendance System</p>
         </div>
 
