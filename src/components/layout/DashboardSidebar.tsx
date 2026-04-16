@@ -166,6 +166,7 @@ export function DashboardSidebar() {
     localStorage.setItem('dashboardViewMode', mode);
     setViewModeLocal(mode);
     window.dispatchEvent(new Event('viewModeChanged'));
+    navigate('/admin');
   };
 
   // Build contextual nav items
