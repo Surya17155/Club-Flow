@@ -24,6 +24,7 @@ import {
   Users,
   Check,
   HelpCircle,
+  MessageSquare,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -46,6 +47,7 @@ const personalNavItems = [
 const clubNavItems = [
   { title: 'Dashboard', url: '/admin', icon: LayoutDashboard },
   { title: 'Events', url: '/events', icon: Calendar },
+  { title: 'Reviews', url: '/reviews', icon: MessageSquare },
   { title: 'Club', url: '/clubs', icon: Building2 },
   { title: 'Club Settings', url: '/club-settings', icon: Settings2 },
   { title: 'Settings', url: '/settings', icon: Settings },

@@ -3,9 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { usePersonalStats } from '@/hooks/usePersonalStats';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { MobileBottomNav } from '@/components/mobile/MobileBottomNav';
-import { Calendar, Clock, Users, Tag, Shield, CheckCircle } from 'lucide-react';
+import { Calendar, Clock, Users, Tag, Shield, CheckCircle, MessageSquare } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { format } from 'date-fns';
+import EventFeedbackModal from '@/components/dashboard/EventFeedbackModal';
 
 interface AttendanceRecord {
   id: string;
@@ -24,6 +25,10 @@ export default function AttendanceHistory() {
   const isMobile = useIsMobile();
   const { stats, loading } = usePersonalStats();
   const [selectedRecord, setSelectedRecord] = useState<AttendanceRecord | null>(null);
+  const [feedbackEvent, setFeedbackEvent] = useState<{ id: string; name: string } | null>(null);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const viewMode = (localStorage.getItem('dashboardViewMode') as 'personal' | 'club') || 'personal';
+  const isPersonalMode = viewMode === 'personal';
 
   const records = stats.attendanceRecords;
 
@@ -173,6 +178,16 @@ export default function AttendanceHistory() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Feedback Modal */}
+      {feedbackEvent && (
+        <EventFeedbackModal
+          open={feedbackOpen}
+          onOpenChange={setFeedbackOpen}
+          eventId={feedbackEvent.id}
+          eventName={feedbackEvent.name}
+        />
+      )}
 
       {/* Bottom Nav */}
       {isMobile && <MobileBottomNav />}

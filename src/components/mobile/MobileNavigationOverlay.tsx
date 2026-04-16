@@ -18,6 +18,7 @@ const DRAWER_ROUTES = [
   '/club-settings',
   '/assign-powers',
   '/chatbot',
+  '/reviews',
   '/super-admin',
   '/global-reports',
   '/manage-outsiders',
