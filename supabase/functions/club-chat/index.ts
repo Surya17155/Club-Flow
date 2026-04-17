@@ -590,7 +590,7 @@ serve(async (req) => {
     const memberUserIds = (members || []).map((m: any) => m.user_id);
     let profiles: any[] = [];
     if (memberUserIds.length > 0) {
-      const { data } = await adminClient.from("profiles").select("user_id, full_name, email, programme, year, roll_no, phone, social_instagram, social_linkedin, social_gmail, class_coordinator, section").in("user_id", memberUserIds);
+      const { data } = await adminClient.from("profiles").select("user_id, full_name, email, programme, year, roll_no, phone, social_instagram, social_linkedin, social_gmail, class_coordinator, section, about, avatar_url").in("user_id", memberUserIds);
       profiles = data || [];
     }
 
@@ -691,9 +691,9 @@ ${JSON.stringify(clubSummaries, null, 2)}${fileContext}
 
 **RESPONSE FORMAT RULES (STRICTLY FOLLOW)**:
 
-**MEMBER QUERIES**: When the user asks about members, respond with a JSON block wrapped in \`\`\`members-json markers. Format:
+**MEMBER QUERIES**: When the user asks about members, respond with a JSON block wrapped in \`\`\`members-json markers. Include EVERY available field for each member (name, role, programme, year, section, roll_no, email, phone, about, instagram, linkedin, gmail, member_since, avatar_url) so the profile popup is complete. Use empty string "" for missing values, do not omit keys. Format:
 \`\`\`members-json
-{"header":"Club Members","subtext":"5 members found","members":[{"name":"John Doe","role":"President","programme":"B.Tech CSE","email":"john@iilm.edu","phone":"9876543210","instagram":"https://instagram.com/john","linkedin":"https://linkedin.com/in/john","gmail":"john@gmail.com"}]}
+{"header":"Club Members","subtext":"5 members found","members":[{"name":"John Doe","role":"president","programme":"BBA","year":"2nd Year","section":"A","roll_no":"2410220051","email":"john@iilm.edu","phone":"9876543210","about":"Short bio","instagram":"john","linkedin":"john","gmail":"john@gmail.com","member_since":"2026-03-28","avatar_url":""}]}
 \`\`\`
 
 **EVENT QUERIES**: When the user asks about events, respond with a JSON block wrapped in \`\`\`events-json markers. Format:
