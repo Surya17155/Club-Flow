@@ -75,15 +75,15 @@ const ClubPreviousEvents = ({ clubId, clubName }: Props) => {
     setLoadingDetail(true);
     setDialogOpen(true);
 
-    const [eventRes, participantRes] = await Promise.all([
+    const [eventRes, attendanceRes] = await Promise.all([
       supabase.from('events').select('id, name, description, event_date, end_date, category, event_type, access_type').eq('id', eventId).single(),
-      supabase.from('event_participants').select('id', { count: 'exact', head: true }).eq('event_id', eventId),
+      supabase.from('attendance').select('id', { count: 'exact', head: true }).eq('event_id', eventId).eq('status', 'present'),
     ]);
 
     if (eventRes.data) {
       setSelectedEvent({
         ...eventRes.data,
-        participant_count: participantRes.count ?? 0,
+        participant_count: attendanceRes.count ?? 0,
       });
     }
     setLoadingDetail(false);
