@@ -13,11 +13,18 @@ interface MemberCard {
   name: string;
   role: string;
   programme?: string;
+  year?: string;
+  section?: string;
+  roll_no?: string;
   email?: string;
   phone?: string;
+  about?: string;
   instagram?: string;
   linkedin?: string;
   gmail?: string;
+  member_since?: string;
+  avatar_url?: string;
+  club_memberships?: Array<{ club_name: string; role: string }>;
 }
 
 interface EventCard {
