@@ -363,15 +363,13 @@ export function DashboardSidebar() {
             if (collapsed) {
               return (
                 <div key={item.title} className="group relative">
-                  <button
+                  <MagnifiedIcon
+                    item={{ title: item.title, icon: item.icon, url: '' }}
+                    active={false}
+                    mouseY={mouseY}
                     onClick={item.action}
-                    className="flex items-center justify-center w-10 h-10 rounded-full mx-auto transition-colors"
-                    style={{ color: isNeo ? '#E98A3A' : '#8A8F98' }}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = hoverBg; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
-                  >
-                    <item.icon className="w-[18px] h-[18px]" />
-                  </button>
+                    isNeo={isNeo}
+                  />
                 </div>
               );
             }
@@ -382,7 +380,7 @@ export function DashboardSidebar() {
                 onClick={item.action}
                 className="flex items-center gap-3 px-3 py-2.5 transition-all duration-200 w-full text-left"
                 style={{
-                  color: isNeo ? '#E98A3A' : '#8A8F98',
+                  color: inactiveText,
                   borderRadius: isNeo ? '10px' : '999px',
                   fontFamily: isNeo ? "'Space Grotesk', sans-serif" : undefined,
                 }}
