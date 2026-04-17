@@ -17,8 +17,8 @@ const SUPER_ADMIN_EMAIL = 'suryakant.gnbba2029@iilm.edu';
 const ChatbotPage = () => {
   const { user, session } = useAuth();
   const { activeClub } = useClub();
-  const isSuperAdmin = user?.email === SUPER_ADMIN_EMAIL;
-  const activeClubId = isSuperAdmin ? undefined : activeClub?.club_id;
+  // Always send the active club so the agent can execute actions (super admin still has unrestricted access in the function).
+  const activeClubId = activeClub?.club_id;
 
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState('');
