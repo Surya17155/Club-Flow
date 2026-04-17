@@ -590,7 +590,7 @@ serve(async (req) => {
     const memberUserIds = (members || []).map((m: any) => m.user_id);
     let profiles: any[] = [];
     if (memberUserIds.length > 0) {
-      const { data } = await adminClient.from("profiles").select("user_id, full_name, email, programme, year, roll_no, phone, social_instagram, social_linkedin, social_gmail, class_coordinator, section").in("user_id", memberUserIds);
+      const { data } = await adminClient.from("profiles").select("user_id, full_name, email, programme, year, roll_no, phone, social_instagram, social_linkedin, social_gmail, class_coordinator, section, about, avatar_url").in("user_id", memberUserIds);
       profiles = data || [];
     }
 
@@ -601,7 +601,7 @@ serve(async (req) => {
       const clubAttendance = attendanceData.filter((a: any) => clubEvents.some((e: any) => e.id === a.event_id));
       const memberDetails = clubMembers.map((m: any) => {
         const p = profiles.find((pr: any) => pr.user_id === m.user_id);
-        return { name: p?.full_name || "Unknown", email: p?.email, role: m.role, programme: p?.programme, year: p?.year, phone: p?.phone, section: p?.section, class_coordinator: p?.class_coordinator, instagram: p?.social_instagram, linkedin: p?.social_linkedin, gmail: p?.social_gmail };
+        return { name: p?.full_name || "Unknown", email: p?.email, role: m.role, programme: p?.programme, year: p?.year, section: p?.section, roll_no: p?.roll_no, phone: p?.phone, about: p?.about, avatar_url: p?.avatar_url, class_coordinator: p?.class_coordinator, instagram: p?.social_instagram, linkedin: p?.social_linkedin, gmail: p?.social_gmail, member_since: m.joined_at };
       });
       const eventDetails = clubEvents.slice(0, 10).map((e: any) => {
         const eventAttendees = attendanceData
@@ -691,9 +691,9 @@ ${JSON.stringify(clubSummaries, null, 2)}${fileContext}
 
 **RESPONSE FORMAT RULES (STRICTLY FOLLOW)**:
 
-**MEMBER QUERIES**: When the user asks about members, respond with a JSON block wrapped in \`\`\`members-json markers. Format:
+**MEMBER QUERIES**: When the user asks about members, respond with a JSON block wrapped in \`\`\`members-json markers. Include EVERY available field for each member (name, role, programme, year, section, roll_no, email, phone, about, instagram, linkedin, gmail, member_since, avatar_url) so the profile popup is complete. Use empty string "" for missing values, do not omit keys. Format:
 \`\`\`members-json
-{"header":"Club Members","subtext":"5 members found","members":[{"name":"John Doe","role":"President","programme":"B.Tech CSE","email":"john@iilm.edu","phone":"9876543210","instagram":"https://instagram.com/john","linkedin":"https://linkedin.com/in/john","gmail":"john@gmail.com"}]}
+{"header":"Club Members","subtext":"5 members found","members":[{"name":"John Doe","role":"president","programme":"BBA","year":"2nd Year","section":"A","roll_no":"2410220051","email":"john@iilm.edu","phone":"9876543210","about":"Short bio","instagram":"john","linkedin":"john","gmail":"john@gmail.com","member_since":"2026-03-28","avatar_url":""}]}
 \`\`\`
 
 **EVENT QUERIES**: When the user asks about events, respond with a JSON block wrapped in \`\`\`events-json markers. Format:

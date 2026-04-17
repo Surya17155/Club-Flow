@@ -13,11 +13,18 @@ interface MemberCard {
   name: string;
   role: string;
   programme?: string;
+  year?: string;
+  section?: string;
+  roll_no?: string;
   email?: string;
   phone?: string;
+  about?: string;
   instagram?: string;
   linkedin?: string;
   gmail?: string;
+  member_since?: string;
+  avatar_url?: string;
+  club_memberships?: Array<{ club_name: string; role: string }>;
 }
 
 interface EventCard {
@@ -278,7 +285,11 @@ const MemberCardComponent = memo(function MemberCardComponent({ member, index }:
                   className="w-24 h-24 rounded-full overflow-hidden border-[3px] border-[#111] bg-[#FDE8D0] flex items-center justify-center text-[#111] text-2xl font-black"
                   style={{ boxShadow: '3px 3px 0px #E98A3A' }}
                 >
-                  {initials}
+                  {member.avatar_url ? (
+                    <img src={member.avatar_url} alt={member.name} className="w-full h-full object-cover" />
+                  ) : (
+                    initials
+                  )}
                 </div>
 
                 <div>
@@ -313,13 +324,28 @@ const MemberCardComponent = memo(function MemberCardComponent({ member, index }:
                   </div>
                 )}
 
-                {member.programme && (
+                {member.about && (
+                  <div className="w-full text-left bg-[#FDE8D0] rounded-[6px] p-3 border-[2px] border-[#111]">
+                    <h4 className="text-xs font-black text-[#111]/50 uppercase tracking-wider mb-1">About</h4>
+                    <p className="text-sm text-[#111]/80 leading-relaxed font-medium">{member.about}</p>
+                  </div>
+                )}
+
+                {(member.programme || member.year || member.section || member.roll_no) && (
                   <div className="w-full text-left space-y-2 bg-white rounded-[6px] p-4 text-sm border-[2px] border-[#111]">
                     <h4 className="text-xs font-black text-[#111]/50 uppercase tracking-wider mb-2">Academic Details</h4>
-                    <div className="flex justify-between">
-                      <span className="text-[#111]/50 font-medium">Programme:</span>
-                      <span className="text-[#111] font-bold">{member.programme}</span>
-                    </div>
+                    {member.programme && (
+                      <div className="flex justify-between gap-3"><span className="text-[#111]/50 font-medium">Programme:</span><span className="text-[#111] font-bold text-right">{member.programme}</span></div>
+                    )}
+                    {member.year && (
+                      <div className="flex justify-between gap-3"><span className="text-[#111]/50 font-medium">Year:</span><span className="text-[#111] font-bold text-right">{member.year}</span></div>
+                    )}
+                    {member.section && (
+                      <div className="flex justify-between gap-3"><span className="text-[#111]/50 font-medium">Section:</span><span className="text-[#111] font-bold text-right">{member.section}</span></div>
+                    )}
+                    {member.roll_no && (
+                      <div className="flex justify-between gap-3"><span className="text-[#111]/50 font-medium">Roll No:</span><span className="text-[#111] font-bold text-right">{member.roll_no}</span></div>
+                    )}
                   </div>
                 )}
 
@@ -341,7 +367,30 @@ const MemberCardComponent = memo(function MemberCardComponent({ member, index }:
                   </div>
                 )}
 
-                {!member.programme && !member.email && !member.phone && !member.instagram && !member.linkedin && !member.gmail && (
+                {member.club_memberships && member.club_memberships.length > 0 && (
+                  <div className="w-full text-left space-y-2 bg-white rounded-[6px] p-4 text-sm border-[2px] border-[#111]">
+                    <h4 className="text-xs font-black text-[#111]/50 uppercase tracking-wider mb-2">Club Memberships</h4>
+                    <div className="space-y-2">
+                      {member.club_memberships.map((c, i) => (
+                        <div key={i} className="flex items-center justify-between p-2.5 rounded-[4px] border-[1.5px] border-[#111] bg-[#FFFDF5]">
+                          <span className="font-bold text-[#111] text-sm">{c.club_name}</span>
+                          <span className="text-[10px] px-2 py-0.5 font-black border-[1.5px] border-[#111] rounded-[3px] bg-[#E98A3A]/20 text-[#111]">
+                            {normalizeRoleLabel(c.role)}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {member.member_since && (
+                  <div className="w-full flex justify-between text-sm">
+                    <span className="text-[#111]/50 font-medium">Member Since</span>
+                    <span className="text-[#111] font-bold">{(() => { try { return new Date(member.member_since).toLocaleDateString(); } catch { return member.member_since; } })()}</span>
+                  </div>
+                )}
+
+                {!member.programme && !member.year && !member.section && !member.roll_no && !member.email && !member.phone && !member.instagram && !member.linkedin && !member.gmail && !member.about && (
                   <p className="text-sm text-[#111]/50 font-medium py-2">No additional details available</p>
                 )}
               </div>
