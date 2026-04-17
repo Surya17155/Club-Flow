@@ -51,45 +51,87 @@ const ChatbotPage = () => {
   };
 
   const send = async () => {
-    const trimmed = input.trim();
-    if ((!trimmed && !file) || loading) return;
+    const text = input.trim();
+    if ((!text && !file) || loading || !session?.access_token) return;
 
-    let userMsg = trimmed;
-    let fileUrl: string | undefined;
-    let fileName: string | undefined;
-
-    if (file) {
-      fileUrl = file.storageUrl;
-      fileName = file.name;
-      if (!userMsg) userMsg = `[Uploaded file: ${file.name}]`;
-      clearFile();
-    }
-
-    setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
+    const displayText = file ? `${text || 'Process this file'} 📎 ${file.name}` : text;
+    const userMsg: Msg = { role: 'user', content: displayText };
+    const history = [...messages, userMsg];
+    setMessages(history);
     setInput('');
     setLoading(true);
 
+    let assistantSoFar = '';
+    const upsert = (chunk: string) => {
+      assistantSoFar += chunk;
+      setMessages(prev => {
+        const last = prev[prev.length - 1];
+        if (last?.role === 'assistant') {
+          return prev.map((m, i) => i === prev.length - 1 ? { ...m, content: assistantSoFar } : m);
+        }
+        return [...prev, { role: 'assistant', content: assistantSoFar }];
+      });
+    };
+
     try {
       const body: any = {
-        message: userMsg,
-        history: messages,
-        ...(activeClubId && { clubId: activeClubId }),
-        ...(fileUrl && { fileUrl, fileName }),
+        message: text || 'Process this file',
+        conversation_history: messages.map(m => ({ role: m.role, content: m.content })),
+        active_club_id: activeClubId || undefined,
       };
+      if (file?.parsedData) {
+        body.file_data = file.parsedData;
+        body.file_name = file.name;
+      } else if (file?.storageUrl) {
+        body.file_urls = [file.storageUrl];
+        body.file_name = file.name;
+      }
+      clearFile();
 
-      const res = await fetch(CHAT_URL, {
+      const resp = await fetch(CHAT_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${session?.access_token}`,
+          Authorization: `Bearer ${session.access_token}`,
         },
         body: JSON.stringify(body),
       });
 
-      const data = await res.json();
-      setMessages(prev => [...prev, { role: 'assistant', content: data.reply || 'No response.' }]);
-    } catch {
-      toast({ title: 'Chat error', description: 'Could not reach the chatbot.', variant: 'destructive' });
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({ error: 'Request failed' }));
+        toast({ title: 'Chat Error', description: err.error || 'Something went wrong', variant: 'destructive' });
+        setLoading(false);
+        return;
+      }
+      if (!resp.body) throw new Error('No response body');
+
+      const reader = resp.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+
+        let idx: number;
+        while ((idx = buffer.indexOf('\n')) !== -1) {
+          let line = buffer.slice(0, idx);
+          buffer = buffer.slice(idx + 1);
+          if (line.endsWith('\r')) line = line.slice(0, -1);
+          if (!line.startsWith('data: ')) continue;
+          const json = line.slice(6).trim();
+          if (json === '[DONE]') break;
+          try {
+            const parsed = JSON.parse(json);
+            const content = parsed.choices?.[0]?.delta?.content;
+            if (content) upsert(content);
+          } catch { /* partial */ }
+        }
+      }
+    } catch (e) {
+      console.error('Chat stream error:', e);
+      toast({ title: 'Chat Error', description: 'Failed to connect to assistant', variant: 'destructive' });
     } finally {
       setLoading(false);
     }
