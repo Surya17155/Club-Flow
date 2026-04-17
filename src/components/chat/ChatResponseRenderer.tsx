@@ -177,76 +177,70 @@ function tryLegacyMemberParse(content: string): ParsedContent['blocks'][0] | nul
   return { type: 'members', header: 'Club Members', subtext: `${members.length} members`, members };
 }
 
-// ── Role Styling ──
+// ── Role Styling (Neo-Brutalism) ──
 
-function getRoleColor(role: string): string {
-  const r = role.toLowerCase();
-  if (r === 'president') return 'from-amber-500/20 to-orange-500/20 border-amber-400/40';
-  if (r === 'vice president') return 'from-purple-500/20 to-violet-500/20 border-purple-400/40';
-  if (r.includes('secretary')) return 'from-blue-500/20 to-cyan-500/20 border-blue-400/40';
-  if (r.includes('social media')) return 'from-pink-500/20 to-rose-500/20 border-pink-400/40';
-  if (r.includes('technical') || r.includes('pr')) return 'from-indigo-500/20 to-violet-500/20 border-indigo-400/40';
-  if (r.includes('treasurer')) return 'from-emerald-500/20 to-teal-500/20 border-emerald-400/40';
-  if (r === 'member') return 'from-gray-500/10 to-slate-500/10 border-gray-300/40';
-  return 'from-slate-500/10 to-gray-500/10 border-slate-300/40';
+const roleLabelMap: Record<string, string> = {
+  admin: 'Admin', president: 'President', vice_president: 'Vice President',
+  social_media_head: 'Social Media Head', social_media_coordinator: 'Social Media Coordinator',
+  technical_pr_head: 'Technical & PR Head', technical_pr_coordinator: 'Technical & PR Coordinator',
+  general_secretary: 'General Secretary', secretary: 'Secretary',
+  deputy_secretary: 'Deputy Secretary', treasurer: 'Treasurer',
+  deputy_treasurer: 'Deputy Treasurer', assistant_treasurer: 'Assistant Treasurer',
+  member: 'Member',
+};
+
+function normalizeRoleLabel(role: string): string {
+  if (!role) return 'Member';
+  const key = role.toLowerCase().replace(/\s+/g, '_').replace(/&/g, '').replace(/__+/g, '_');
+  return roleLabelMap[key] || role;
 }
 
-function getRoleBadgeColor(role: string): string {
-  const r = role.toLowerCase();
-  if (r === 'president') return 'bg-amber-500/20 text-amber-700 dark:text-amber-300 border-amber-400/30';
-  if (r === 'vice president') return 'bg-purple-500/20 text-purple-700 dark:text-purple-300 border-purple-400/30';
-  if (r.includes('secretary')) return 'bg-blue-500/20 text-blue-700 dark:text-blue-300 border-blue-400/30';
-  if (r.includes('social media')) return 'bg-pink-500/20 text-pink-700 dark:text-pink-300 border-pink-400/30';
-  if (r.includes('technical') || r.includes('pr')) return 'bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border-indigo-400/30';
-  if (r.includes('treasurer')) return 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-400/30';
-  if (r === 'member') return 'bg-gray-500/10 text-gray-600 dark:text-gray-300 border-gray-300/30';
-  return 'bg-slate-500/10 text-slate-600 dark:text-slate-300 border-slate-300/30';
+function getRoleBadgeBg(role: string): string {
+  const r = (role || '').toLowerCase();
+  if (r === 'president') return '#E98A3A';
+  if (r.includes('vice')) return '#C9B6FF';
+  if (r.includes('secretary')) return '#A8D8FF';
+  if (r.includes('social')) return '#FFB8D1';
+  if (r.includes('technical') || r.includes('pr')) return '#C5C0FF';
+  if (r.includes('treasurer')) return '#A8E6C2';
+  return '#FDE8D0';
 }
 
-function getRoleIcon(role: string) {
-  const r = role.toLowerCase();
-  if (r === 'president' || r === 'vice president') return <Shield className="w-3.5 h-3.5" />;
-  return <User className="w-3.5 h-3.5" />;
-}
-
-function getAvatarGradient(role: string): string {
-  const r = role.toLowerCase();
-  if (r === 'president') return 'from-amber-400 to-orange-500';
-  if (r === 'vice president') return 'from-purple-400 to-violet-500';
-  if (r.includes('secretary')) return 'from-blue-400 to-cyan-500';
-  if (r.includes('social media')) return 'from-pink-400 to-rose-500';
-  if (r.includes('technical') || r.includes('pr')) return 'from-indigo-400 to-violet-500';
-  if (r.includes('treasurer')) return 'from-emerald-400 to-teal-500';
-  return 'from-slate-400 to-gray-500';
-}
-
-// ── Member Card Component ──
+// ── Member Card Component (Neo-Brutalism, matches MemberManagement) ──
 
 const MemberCardComponent = memo(function MemberCardComponent({ member, index }: { member: MemberCard; index: number }) {
   const [expanded, setExpanded] = useState(false);
+  const roleLabel = normalizeRoleLabel(member.role);
+  const initials = (member.name || '?').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
 
   return (
     <>
       <motion.div
-        initial={{ opacity: 0, y: 8 }}
+        initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: index * 0.06, type: 'spring', stiffness: 400, damping: 28 }}
+        transition={{ delay: index * 0.04, type: 'spring', stiffness: 400, damping: 28 }}
         onClick={() => setExpanded(true)}
-        className={`relative cursor-pointer rounded-2xl p-3 border bg-gradient-to-br ${getRoleColor(member.role)} backdrop-blur-xl shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all duration-200`}
+        className="cursor-pointer flex items-center gap-3 p-3 bg-white border-[2px] border-[#111] rounded-[6px] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all"
+        style={{ boxShadow: '3px 3px 0px #111', fontFamily: "'Space Grotesk', sans-serif" }}
       >
-        <div className="flex items-center gap-3">
-          <div className={`w-9 h-9 rounded-full bg-gradient-to-br ${getAvatarGradient(member.role)} flex items-center justify-center text-white font-bold text-sm shadow-md shrink-0`}>
-            {member.name?.[0]?.toUpperCase() || '?'}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="font-semibold text-sm text-foreground truncate">{member.name || 'Unknown'}</p>
-            <span className={`inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-full border ${getRoleBadgeColor(member.role)}`}>
-              {getRoleIcon(member.role)}
-              {member.role}
+        <div
+          className="w-10 h-10 rounded-[4px] border-[2px] border-[#111] flex items-center justify-center font-black text-[#111] text-sm shrink-0"
+          style={{ background: '#FDE8D0' }}
+        >
+          {initials}
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="font-black text-sm text-[#111] truncate">{member.name || 'Unknown'}</p>
+          <div className="mt-0.5">
+            <span
+              className="inline-block px-2 py-0.5 text-[10px] font-black border-[1.5px] border-[#111] rounded-[3px] text-[#111]"
+              style={{ background: getRoleBadgeBg(member.role) }}
+            >
+              {roleLabel}
             </span>
           </div>
-          <div className="text-muted-foreground/40 text-xs">→</div>
         </div>
+        <ChevronDown className="w-4 h-4 text-[#111]/40 shrink-0" />
       </motion.div>
 
       <AnimatePresence>
@@ -255,50 +249,100 @@ const MemberCardComponent = memo(function MemberCardComponent({ member, index }:
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm"
+            transition={{ duration: 0.18 }}
+            className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/40"
             onClick={() => setExpanded(false)}
           >
             <motion.div
-              initial={{ scale: 0.85, opacity: 0, y: 20 }}
+              initial={{ scale: 0.92, opacity: 0, y: 12 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.85, opacity: 0, y: 20 }}
-              transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+              exit={{ scale: 0.92, opacity: 0, y: 12 }}
+              transition={{ type: 'spring', stiffness: 350, damping: 28 }}
               onClick={e => e.stopPropagation()}
-              className="w-full max-w-sm rounded-3xl border border-amber-200/40 shadow-2xl overflow-hidden"
-              style={{ background: 'rgba(255,255,255,0.88)', backdropFilter: 'blur(40px) saturate(1.5)', WebkitBackdropFilter: 'blur(40px) saturate(1.5)' }}
+              className="w-full max-w-md max-h-[85vh] overflow-y-auto bg-white border-[3px] border-[#111] rounded-[6px]"
+              style={{ boxShadow: '4px 4px 0px #111', scrollbarWidth: 'none', fontFamily: "'Space Grotesk', sans-serif" }}
             >
-              <div className={`relative h-20 bg-gradient-to-br ${getAvatarGradient(member.role)} flex items-end px-5 pb-3`}>
-                <button onClick={() => setExpanded(false)} className="absolute top-3 right-3 w-7 h-7 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/50 transition-colors">
-                  <X className="w-4 h-4" />
+              <div className="flex items-center justify-between p-4 border-b-[2px] border-[#111]">
+                <h3 className="font-black text-lg text-[#111]">View Profile</h3>
+                <button
+                  onClick={() => setExpanded(false)}
+                  className="w-8 h-8 flex items-center justify-center bg-white border-[2px] border-[#111] rounded-[4px] hover:bg-[#FDE8D0] transition-colors"
+                  style={{ boxShadow: '2px 2px 0px #111' }}
+                >
+                  <X className="w-4 h-4 text-[#111]" />
                 </button>
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-white/30 backdrop-blur-md flex items-center justify-center text-white font-bold text-lg shadow-lg border border-white/20">
-                    {member.name?.[0]?.toUpperCase() || '?'}
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-white text-base drop-shadow-sm">{member.name}</h3>
-                    <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full bg-white/25 text-white border border-white/20">
-                      {getRoleIcon(member.role)} {member.role}
+              </div>
+
+              <div className="p-5 flex flex-col items-center text-center space-y-4">
+                <div
+                  className="w-24 h-24 rounded-full overflow-hidden border-[3px] border-[#111] bg-[#FDE8D0] flex items-center justify-center text-[#111] text-2xl font-black"
+                  style={{ boxShadow: '3px 3px 0px #E98A3A' }}
+                >
+                  {initials}
+                </div>
+
+                <div>
+                  <h3 className="text-xl font-black text-[#111]">{member.name || 'Unknown'}</h3>
+                  <div className="mt-1.5">
+                    <span
+                      className="px-3 py-1 text-xs font-black border-[2px] border-[#111] rounded-[4px] text-[#111]"
+                      style={{ background: getRoleBadgeBg(member.role) }}
+                    >
+                      {roleLabel}
                     </span>
                   </div>
                 </div>
-              </div>
-              <div className="p-5 space-y-3">
-                {member.programme && <DetailRow icon={<GraduationCap className="w-4 h-4 text-amber-500" />} label="Programme" value={member.programme} />}
-                {member.email && <DetailRow icon={<Mail className="w-4 h-4 text-amber-500" />} label="Email" value={member.email} href={`mailto:${member.email}`} />}
-                {member.phone && <DetailRow icon={<Phone className="w-4 h-4 text-amber-500" />} label="Phone" value={member.phone} href={`tel:${member.phone}`} />}
-                {member.instagram && member.instagram !== 'Not Provided' && (
-                  <DetailRow icon={<Instagram className="w-4 h-4 text-amber-500" />} label="Instagram" value="View Profile" href={member.instagram.startsWith('http') ? member.instagram : `https://instagram.com/${member.instagram}`} />
+
+                {(member.linkedin || member.instagram || member.gmail) && (
+                  <div className="flex gap-3 items-center">
+                    {member.linkedin && member.linkedin !== 'Not Provided' && (
+                      <a href={member.linkedin.startsWith('http') ? member.linkedin : `https://linkedin.com/in/${member.linkedin}`} target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-[4px] border-[2px] border-[#111] bg-white flex items-center justify-center hover:bg-[#FDE8D0] transition-colors" style={{ boxShadow: '2px 2px 0px #111' }}>
+                        <Linkedin className="w-4 h-4 text-[#111]" />
+                      </a>
+                    )}
+                    {member.instagram && member.instagram !== 'Not Provided' && (
+                      <a href={member.instagram.startsWith('http') ? member.instagram : `https://instagram.com/${member.instagram}`} target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-[4px] border-[2px] border-[#111] bg-white flex items-center justify-center hover:bg-[#FDE8D0] transition-colors" style={{ boxShadow: '2px 2px 0px #111' }}>
+                        <Instagram className="w-4 h-4 text-[#111]" />
+                      </a>
+                    )}
+                    {member.gmail && member.gmail !== 'Not Provided' && (
+                      <a href={`mailto:${member.gmail}`} className="w-9 h-9 rounded-[4px] border-[2px] border-[#111] bg-white flex items-center justify-center hover:bg-[#FDE8D0] transition-colors" style={{ boxShadow: '2px 2px 0px #111' }}>
+                        <Mail className="w-4 h-4 text-[#111]" />
+                      </a>
+                    )}
+                  </div>
                 )}
-                {member.linkedin && member.linkedin !== 'Not Provided' && (
-                  <DetailRow icon={<Linkedin className="w-4 h-4 text-amber-500" />} label="LinkedIn" value="View Profile" href={member.linkedin.startsWith('http') ? member.linkedin : `https://linkedin.com/in/${member.linkedin}`} />
+
+                {member.programme && (
+                  <div className="w-full text-left space-y-2 bg-white rounded-[6px] p-4 text-sm border-[2px] border-[#111]">
+                    <h4 className="text-xs font-black text-[#111]/50 uppercase tracking-wider mb-2">Academic Details</h4>
+                    <div className="flex justify-between">
+                      <span className="text-[#111]/50 font-medium">Programme:</span>
+                      <span className="text-[#111] font-bold">{member.programme}</span>
+                    </div>
+                  </div>
                 )}
-                {member.gmail && member.gmail !== 'Not Provided' && (
-                  <DetailRow icon={<Mail className="w-4 h-4 text-amber-500" />} label="Gmail" value={member.gmail} href={`mailto:${member.gmail}`} />
+
+                {(member.email || member.phone) && (
+                  <div className="w-full text-left space-y-2 bg-white rounded-[6px] p-4 text-sm border-[2px] border-[#111]">
+                    <h4 className="text-xs font-black text-[#111]/50 uppercase tracking-wider mb-2">Contact</h4>
+                    {member.email && (
+                      <div className="flex items-center gap-2">
+                        <Mail className="w-3.5 h-3.5 text-[#111]/40 shrink-0" />
+                        <a href={`mailto:${member.email}`} className="text-[#111] font-medium break-all hover:underline">{member.email}</a>
+                      </div>
+                    )}
+                    {member.phone && (
+                      <div className="flex items-center gap-2">
+                        <Phone className="w-3.5 h-3.5 text-[#111]/40 shrink-0" />
+                        <a href={`tel:${member.phone}`} className="text-[#111] font-medium hover:underline">{member.phone}</a>
+                      </div>
+                    )}
+                  </div>
                 )}
+
                 {!member.programme && !member.email && !member.phone && !member.instagram && !member.linkedin && !member.gmail && (
-                  <p className="text-sm text-muted-foreground text-center py-2">No additional details available</p>
+                  <p className="text-sm text-[#111]/50 font-medium py-2">No additional details available</p>
                 )}
               </div>
             </motion.div>
