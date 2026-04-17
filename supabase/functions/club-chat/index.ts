@@ -601,7 +601,7 @@ serve(async (req) => {
       const clubAttendance = attendanceData.filter((a: any) => clubEvents.some((e: any) => e.id === a.event_id));
       const memberDetails = clubMembers.map((m: any) => {
         const p = profiles.find((pr: any) => pr.user_id === m.user_id);
-        return { name: p?.full_name || "Unknown", email: p?.email, role: m.role, programme: p?.programme, year: p?.year, phone: p?.phone, section: p?.section, class_coordinator: p?.class_coordinator, instagram: p?.social_instagram, linkedin: p?.social_linkedin, gmail: p?.social_gmail };
+        return { name: p?.full_name || "Unknown", email: p?.email, role: m.role, programme: p?.programme, year: p?.year, section: p?.section, roll_no: p?.roll_no, phone: p?.phone, about: p?.about, avatar_url: p?.avatar_url, class_coordinator: p?.class_coordinator, instagram: p?.social_instagram, linkedin: p?.social_linkedin, gmail: p?.social_gmail, member_since: m.joined_at };
       });
       const eventDetails = clubEvents.slice(0, 10).map((e: any) => {
         const eventAttendees = attendanceData
