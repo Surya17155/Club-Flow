@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useNavigate } from 'react-router-dom';
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar';
-import { Send, Bot, User, Paperclip, FileText, ChevronLeft } from 'lucide-react';
+import { Send, Bot, User, Paperclip, FileText, ChevronLeft, RotateCcw } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useClub } from '@/contexts/ClubContext';
 import { toast } from '@/hooks/use-toast';
@@ -146,21 +146,40 @@ const ChatbotPage = () => {
       <div className="flex-1 overflow-y-auto" style={{ padding: isMobile ? '48px 16px 24px' : '24px 28px' }}>
         <div className="flex flex-col h-full max-w-3xl mx-auto" style={{ minHeight: 'calc(100vh - 120px)' }}>
       {/* Header */}
-      <div className="flex items-center justify-center md:justify-start gap-3 mb-4">
+      <div className="flex items-center gap-3 mb-4">
         <div
-          className="w-10 h-10 rounded-full flex items-center justify-center"
+          className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
           style={{ background: '#E98A3A', border: '2px solid #111' }}
         >
           <Bot className="w-5 h-5" style={{ color: '#111' }} />
         </div>
-        <div className="text-center md:text-left">
-          <h1 className="text-xl font-black" style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#111' }}>
+        <div className="flex-1 min-w-0 text-left">
+          <h1 className="text-xl font-black truncate" style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#111' }}>
             AI Chatbot
           </h1>
-          <p className="text-xs" style={{ color: '#6B7280', fontFamily: "'Space Grotesk', sans-serif" }}>
+          <p className="text-xs truncate" style={{ color: '#6B7280', fontFamily: "'Space Grotesk', sans-serif" }}>
             {activeClub ? `Managing ${activeClub.club_name}` : 'Super Admin Mode'}
           </p>
         </div>
+        <button
+          onClick={() => {
+            if (loading) return;
+            setMessages([]);
+            setInput('');
+            clearFile();
+            toast({ title: 'Chat refreshed', description: 'Started a fresh conversation.' });
+          }}
+          disabled={loading}
+          title="Refresh chat"
+          aria-label="Refresh chat"
+          className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg transition-all disabled:opacity-40"
+          style={{ background: '#FFFDF7', border: '2px solid #111', boxShadow: '2px 2px 0px #111', fontFamily: "'Space Grotesk', sans-serif" }}
+          onMouseEnter={e => { if (loading) return; e.currentTarget.style.transform = 'translate(2px,2px)'; e.currentTarget.style.boxShadow = 'none'; }}
+          onMouseLeave={e => { e.currentTarget.style.transform = 'translate(0,0)'; e.currentTarget.style.boxShadow = '2px 2px 0px #111'; }}
+        >
+          <RotateCcw className="w-4 h-4" style={{ color: '#111' }} />
+          <span className="hidden sm:inline text-xs font-black" style={{ color: '#111' }}>Refresh</span>
+        </button>
       </div>
 
       {/* Messages */}
