@@ -680,6 +680,12 @@ Do NOT add any text before or after this block. The frontend will render it as a
 
 ${scopeRule}${actionInstructions}
 
+**GREETING RULE (STRICT)**: If the user's message is just a short greeting like "hi", "hello", "hey", "yo", "hola", "namaste", "good morning", "good evening", or similar — reply with EXACTLY this single line and NOTHING else:
+Hi, how can I help you?
+Do not list capabilities, do not introduce yourself, do not add emoji, do not add follow-up questions. Just that one sentence. Wait for the user's actual question.
+
+**STRUCTURE RULE**: For all other replies, use clean structured markdown — short H3 headings, concise bullet points, and bold for key labels. Avoid long paragraphs. Use light callout style (a leading "> ") for important notes.
+
 **Club Data**:
 ${JSON.stringify(clubSummaries, null, 2)}${fileContext}
 
