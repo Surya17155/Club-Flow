@@ -181,48 +181,60 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
                 <>
                   <div className="my-2 mx-2" style={{ borderTop: '2px solid #ddd' }} />
 
-                  {isPresident && (
-                    <button
-                      onClick={() => nav('/assign-powers')}
-                      className="flex items-center gap-3 w-full px-4 py-3 text-left"
-                      style={{
-                        color: '#E98A3A',
-                        fontFamily: "'Space Grotesk', sans-serif",
-                        fontWeight: 700,
-                        border: '2px solid transparent',
-                      }}
-                    >
-                      <Shield className="w-5 h-5" />
-                      <span className="text-sm">Assign Powers</span>
-                    </button>
-                  )}
+                  {isPresident && (() => {
+                    const active = location.pathname === '/assign-powers';
+                    return (
+                      <button
+                        onClick={() => nav('/assign-powers')}
+                        className="flex items-center gap-3 w-full px-4 py-3 text-left transition-all"
+                        style={{
+                          background: active ? '#E98A3A' : 'transparent',
+                          color: active ? '#111' : '#E98A3A',
+                          fontFamily: "'Space Grotesk', sans-serif",
+                          fontWeight: active ? 800 : 700,
+                          border: active ? '2px solid #111' : '2px solid transparent',
+                          boxShadow: active ? '3px 3px 0px #111' : 'none',
+                        }}
+                      >
+                        <Shield className="w-5 h-5" />
+                        <span className="text-sm">Assign Powers</span>
+                      </button>
+                    );
+                  })()}
 
-                  {hasPower('use_chatbot') && (
-                    <button
-                      onClick={() => nav('/chatbot')}
-                      className="flex items-center gap-3 w-full px-4 py-3 text-left"
-                      style={{
-                        color: '#E98A3A',
-                        fontFamily: "'Space Grotesk', sans-serif",
-                        fontWeight: 700,
-                        border: '2px solid transparent',
-                      }}
-                    >
-                      <Bot className="w-5 h-5" />
-                      <span className="text-sm">AI Chatbot</span>
-                    </button>
-                  )}
+                  {hasPower('use_chatbot') && (() => {
+                    const active = location.pathname === '/chatbot';
+                    return (
+                      <button
+                        onClick={() => nav('/chatbot')}
+                        className="flex items-center gap-3 w-full px-4 py-3 text-left transition-all"
+                        style={{
+                          background: active ? '#E98A3A' : 'transparent',
+                          color: active ? '#111' : '#E98A3A',
+                          fontFamily: "'Space Grotesk', sans-serif",
+                          fontWeight: active ? 800 : 700,
+                          border: active ? '2px solid #111' : '2px solid transparent',
+                          boxShadow: active ? '3px 3px 0px #111' : 'none',
+                        }}
+                      >
+                        <Bot className="w-5 h-5" />
+                        <span className="text-sm">AI Chatbot</span>
+                      </button>
+                    );
+                  })()}
 
                   {clubs.length > 1 && (
                     <>
                       <button
                         onClick={() => setShowClubSwitcher(!showClubSwitcher)}
-                        className="flex items-center gap-3 w-full px-4 py-3 text-left"
+                        className="flex items-center gap-3 w-full px-4 py-3 text-left transition-all"
                         style={{
-                          color: '#E98A3A',
+                          background: showClubSwitcher ? '#E98A3A' : 'transparent',
+                          color: showClubSwitcher ? '#111' : '#E98A3A',
                           fontFamily: "'Space Grotesk', sans-serif",
-                          fontWeight: 700,
-                          border: '2px solid transparent',
+                          fontWeight: showClubSwitcher ? 800 : 700,
+                          border: showClubSwitcher ? '2px solid #111' : '2px solid transparent',
+                          boxShadow: showClubSwitcher ? '3px 3px 0px #111' : 'none',
                         }}
                       >
                         <ArrowRightLeft className="w-5 h-5" />
