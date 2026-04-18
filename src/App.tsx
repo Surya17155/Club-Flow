@@ -97,6 +97,7 @@ const App = () => (
                 <Route path="/chatbot" element={<ChatbotPage />} />
                 <Route path="/attendance-history" element={<AttendanceHistory />} />
                 <Route path="/contact" element={<ContactUs />} />
+                <Route path="/contact2" element={<Contact2 />} />
                 <Route path="/reviews" element={<Reviews />} />
                 <Route path="/manage-outsiders" element={<DesktopFrame><ManageOutsiders /></DesktopFrame>} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
