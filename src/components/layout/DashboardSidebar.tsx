@@ -360,12 +360,14 @@ export function DashboardSidebar() {
 
           {/* Contextual nav items */}
           {contextItems.map((item) => {
+            const active = item.isActive ?? (item.activeUrl ? isActive(item.activeUrl) : false);
+
             if (collapsed) {
               return (
                 <div key={item.title} className="group relative">
                   <MagnifiedIcon
                     item={{ title: item.title, icon: item.icon, url: '' }}
-                    active={false}
+                    active={active}
                     mouseY={mouseY}
                     onClick={item.action}
                     isNeo={isNeo}
@@ -380,12 +382,16 @@ export function DashboardSidebar() {
                 onClick={item.action}
                 className="flex items-center gap-3 px-3 py-2.5 transition-all duration-200 w-full text-left"
                 style={{
-                  color: inactiveText,
+                  background: active ? activeBg : 'transparent',
+                  color: active ? activeText : inactiveText,
                   borderRadius: isNeo ? '10px' : '999px',
+                  border: active && isNeo ? '2px solid #111111' : '2px solid transparent',
+                  boxShadow: active && isNeo ? '3px 3px 0px #111111' : 'none',
                   fontFamily: isNeo ? "'Space Grotesk', sans-serif" : undefined,
+                  fontWeight: active && isNeo ? 700 : 500,
                 }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = hoverBg; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+                onMouseEnter={(e) => { if (!active) e.currentTarget.style.background = hoverBg; }}
+                onMouseLeave={(e) => { if (!active) e.currentTarget.style.background = 'transparent'; }}
               >
                 <item.icon className="w-[18px] h-[18px] shrink-0" />
                 <span className="text-sm font-medium truncate">{item.title}</span>
