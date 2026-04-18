@@ -25,6 +25,7 @@ import {
   Check,
   HelpCircle,
   MessageSquare,
+  FileText,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -41,7 +42,7 @@ const personalNavItems = [
   { title: 'Events', url: '/events', icon: Calendar },
   { title: 'Discover', url: '/discover', icon: Compass },
   { title: 'Profile', url: '/profile', icon: UserCircle },
-  { title: 'Settings', url: '/settings', icon: Settings },
+  { title: 'Forms', url: '/forms', icon: FileText },
 ];
 
 const clubNavItems = [
@@ -50,7 +51,7 @@ const clubNavItems = [
   { title: 'Reviews', url: '/reviews', icon: MessageSquare },
   { title: 'Club', url: '/clubs', icon: Building2 },
   { title: 'Club Settings', url: '/club-settings', icon: Settings2 },
-  { title: 'Settings', url: '/settings', icon: Settings },
+  { title: 'Forms', url: '/forms', icon: FileText },
 ];
 
 const STORAGE_KEY = 'dashboard-sidebar-collapsed';
@@ -453,6 +454,30 @@ export function DashboardSidebar() {
 
         {/* Bottom: contact us + sign out + collapse toggle */}
         <div className="px-3 pb-4 space-y-1 mt-auto">
+          {/* Settings */}
+          <button
+            onClick={() => navigate('/settings')}
+            className="flex items-center gap-3 px-3 py-2.5 transition-all duration-200 w-full text-left"
+            style={{
+              color: isActive('/settings') ? activeText : inactiveText,
+              background: isActive('/settings') ? activeBg : 'transparent',
+              borderRadius: isNeo ? '10px' : '999px',
+              border: isActive('/settings') && isNeo ? '2px solid #111111' : '2px solid transparent',
+              boxShadow: isActive('/settings') && isNeo ? '3px 3px 0px #111111' : 'none',
+              fontFamily: isNeo ? "'Space Grotesk', sans-serif" : undefined,
+              fontWeight: isActive('/settings') && isNeo ? 700 : 500,
+            }}
+            onMouseEnter={(e) => { if (!isActive('/settings')) e.currentTarget.style.background = hoverBg; }}
+            onMouseLeave={(e) => { if (!isActive('/settings')) e.currentTarget.style.background = 'transparent'; }}
+          >
+            <Settings className="w-[18px] h-[18px] shrink-0" />
+            {!collapsed && (
+              <span className="text-sm font-medium" style={{ transition: 'opacity 0.2s ease' }}>
+                Settings
+              </span>
+            )}
+          </button>
+
           {/* Contact Us */}
           <button
             onClick={() => navigate('/contact2')}
