@@ -455,19 +455,19 @@ export function DashboardSidebar() {
         <div className="px-3 pb-4 space-y-1 mt-auto">
           {/* Contact Us */}
           <button
-            onClick={() => navigate('/contact')}
+            onClick={() => navigate('/contact2')}
             className="flex items-center gap-3 px-3 py-2.5 transition-all duration-200 w-full text-left"
             style={{
-              color: isActive('/contact') ? activeText : inactiveText,
-              background: isActive('/contact') ? activeBg : 'transparent',
+              color: isActive('/contact2') ? activeText : inactiveText,
+              background: isActive('/contact2') ? activeBg : 'transparent',
               borderRadius: isNeo ? '10px' : '999px',
-              border: isActive('/contact') && isNeo ? '2px solid #111111' : '2px solid transparent',
-              boxShadow: isActive('/contact') && isNeo ? '3px 3px 0px #111111' : 'none',
+              border: isActive('/contact2') && isNeo ? '2px solid #111111' : '2px solid transparent',
+              boxShadow: isActive('/contact2') && isNeo ? '3px 3px 0px #111111' : 'none',
               fontFamily: isNeo ? "'Space Grotesk', sans-serif" : undefined,
-              fontWeight: isActive('/contact') && isNeo ? 700 : 500,
+              fontWeight: isActive('/contact2') && isNeo ? 700 : 500,
             }}
-            onMouseEnter={(e) => { if (!isActive('/contact')) e.currentTarget.style.background = hoverBg; }}
-            onMouseLeave={(e) => { if (!isActive('/contact')) e.currentTarget.style.background = 'transparent'; }}
+            onMouseEnter={(e) => { if (!isActive('/contact2')) e.currentTarget.style.background = hoverBg; }}
+            onMouseLeave={(e) => { if (!isActive('/contact2')) e.currentTarget.style.background = 'transparent'; }}
           >
             <HelpCircle className="w-[18px] h-[18px] shrink-0" />
             {!collapsed && (

@@ -297,13 +297,13 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
             {/* Contact Us + Sign Out */}
             <div className="px-3 pb-5" style={{ borderTop: '2px solid #ddd', paddingTop: '12px' }}>
               <button
-                onClick={() => { nav('/contact'); onClose(); }}
+                onClick={() => { nav('/contact2'); onClose(); }}
                 className="flex items-center gap-3 w-full px-4 py-3 text-left mb-2"
                 style={{
                   fontFamily: "'Space Grotesk', sans-serif",
                   fontWeight: 700,
-                  color: location.pathname === '/contact' ? '#E98A3A' : '#111',
-                  background: location.pathname === '/contact' ? '#FDE8D0' : 'transparent',
+                  color: location.pathname === '/contact2' ? '#E98A3A' : '#111',
+                  background: location.pathname === '/contact2' ? '#FDE8D0' : 'transparent',
                   border: '2px solid transparent',
                   borderRadius: '6px',
                 }}
