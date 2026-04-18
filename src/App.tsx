@@ -33,6 +33,7 @@ import AssignPowersPage from "./pages/AssignPowersPage";
 import ChatbotPage from "./pages/ChatbotPage";
 import AttendanceHistory from "./pages/AttendanceHistory";
 import ContactUs from "./pages/ContactUs";
+import Contact2 from "./pages/Contact2";
 import Reviews from "./pages/Reviews";
 
 // Lazy-load rarely visited routes
