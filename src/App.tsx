@@ -35,6 +35,7 @@ import AttendanceHistory from "./pages/AttendanceHistory";
 import ContactUs from "./pages/ContactUs";
 import Contact2 from "./pages/Contact2";
 import Reviews from "./pages/Reviews";
+import Forms from "./pages/Forms";
 
 // Lazy-load rarely visited routes
 const MarkAttendance = lazy(() => import("./pages/MarkAttendance"));
@@ -99,6 +100,7 @@ const App = () => (
                 <Route path="/contact" element={<ContactUs />} />
                 <Route path="/contact2" element={<Contact2 />} />
                 <Route path="/reviews" element={<Reviews />} />
+                <Route path="/forms" element={<Forms />} />
                 <Route path="/manage-outsiders" element={<DesktopFrame><ManageOutsiders /></DesktopFrame>} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
