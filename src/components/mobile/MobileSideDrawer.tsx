@@ -8,7 +8,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import {
   LayoutDashboard, Calendar, Compass, UserCircle, Settings, LogOut,
   Shield, Settings2, Bot, ArrowRightLeft, Building2, X, Check, ChevronDown, Crown, ClipboardList,
-  HelpCircle, MessageSquare,
+  HelpCircle, MessageSquare, FileText,
 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 
@@ -44,7 +44,7 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
     { title: 'Attendance History', icon: ClipboardList, url: '/attendance-history' },
     { title: 'Discover', icon: Compass, url: '/discover' },
     { title: 'Profile', icon: UserCircle, url: '/profile' },
-    { title: 'Settings', icon: Settings, url: '/settings' },
+    { title: 'Forms', icon: FileText, url: '/forms' },
   ];
 
   const clubItems = [
@@ -53,7 +53,7 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
     { title: 'Reviews', icon: MessageSquare, url: '/reviews' },
     { title: 'Club', icon: Building2, url: '/clubs' },
     ...(isPresident ? [{ title: 'Club Settings', icon: Settings2, url: '/club-settings' }] : []),
-    { title: 'Settings', icon: Settings, url: '/settings' },
+    { title: 'Forms', icon: FileText, url: '/forms' },
   ];
 
   const navItems = isClubMode ? clubItems : personalItems;
@@ -306,17 +306,34 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
               )}
             </nav>
 
-            {/* Contact Us + Sign Out */}
+            {/* Settings + Contact Us + Sign Out */}
             <div className="px-3 pb-5" style={{ borderTop: '2px solid #ddd', paddingTop: '12px' }}>
+              <button
+                onClick={() => { nav('/settings'); onClose(); }}
+                className="flex items-center gap-3 w-full px-4 py-3 text-left mb-2"
+                style={{
+                  fontFamily: "'Space Grotesk', sans-serif",
+                  fontWeight: location.pathname === '/settings' ? 800 : 700,
+                  color: location.pathname === '/settings' ? '#111' : '#111',
+                  background: location.pathname === '/settings' ? '#E98A3A' : 'transparent',
+                  border: location.pathname === '/settings' ? '2px solid #111' : '2px solid transparent',
+                  boxShadow: location.pathname === '/settings' ? '3px 3px 0px #111' : 'none',
+                  borderRadius: '6px',
+                }}
+              >
+                <Settings className="w-5 h-5" />
+                <span className="text-sm">Settings</span>
+              </button>
               <button
                 onClick={() => { nav('/contact2'); onClose(); }}
                 className="flex items-center gap-3 w-full px-4 py-3 text-left mb-2"
                 style={{
                   fontFamily: "'Space Grotesk', sans-serif",
-                  fontWeight: 700,
-                  color: location.pathname === '/contact2' ? '#E98A3A' : '#111',
-                  background: location.pathname === '/contact2' ? '#FDE8D0' : 'transparent',
-                  border: '2px solid transparent',
+                  fontWeight: location.pathname === '/contact2' ? 800 : 700,
+                  color: location.pathname === '/contact2' ? '#111' : '#111',
+                  background: location.pathname === '/contact2' ? '#E98A3A' : 'transparent',
+                  border: location.pathname === '/contact2' ? '2px solid #111' : '2px solid transparent',
+                  boxShadow: location.pathname === '/contact2' ? '3px 3px 0px #111' : 'none',
                   borderRadius: '6px',
                 }}
               >
