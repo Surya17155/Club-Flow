@@ -172,23 +172,23 @@ export function DashboardSidebar() {
   };
 
   // Build contextual nav items
-  const contextItems: { title: string; icon: any; action: () => void }[] = [];
+  const contextItems: { title: string; icon: any; action: () => void; activeUrl?: string; isActive?: boolean }[] = [];
 
   if (isClubMode && activeClub) {
     if (isPresident) {
-      contextItems.push({ title: 'Assign Powers', icon: Shield, action: () => navigate('/assign-powers') });
+      contextItems.push({ title: 'Assign Powers', icon: Shield, action: () => navigate('/assign-powers'), activeUrl: '/assign-powers' });
     }
     if (hasPower('use_chatbot')) {
-      contextItems.push({ title: 'AI Chatbot', icon: Bot, action: () => navigate('/chatbot') });
+      contextItems.push({ title: 'AI Chatbot', icon: Bot, action: () => navigate('/chatbot'), activeUrl: '/chatbot' });
     }
     if (clubs.length > 1) {
-      contextItems.push({ title: 'Switch Club', icon: ArrowRightLeft, action: () => setShowClubSwitcher(!showClubSwitcher) });
+      contextItems.push({ title: 'Switch Club', icon: ArrowRightLeft, action: () => setShowClubSwitcher(!showClubSwitcher), isActive: showClubSwitcher });
     }
   }
 
   if (isSuperAdminEmail && isSuperAdminMode) {
-    contextItems.push({ title: 'AI Chatbot', icon: Bot, action: () => navigate('/chatbot') });
-    contextItems.push({ title: 'Manage Outsiders', icon: Users, action: () => navigate('/manage-outsiders') });
+    contextItems.push({ title: 'AI Chatbot', icon: Bot, action: () => navigate('/chatbot'), activeUrl: '/chatbot' });
+    contextItems.push({ title: 'Manage Outsiders', icon: Users, action: () => navigate('/manage-outsiders'), activeUrl: '/manage-outsiders' });
   }
 
   const initials = (profile?.full_name || user?.user_metadata?.full_name || 'U')
