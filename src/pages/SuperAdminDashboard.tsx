@@ -375,6 +375,13 @@ const SuperAdminDashboard = () => {
     setExporting(false);
   };
 
+  // Listen for export trigger dispatched from the sidebar
+  useEffect(() => {
+    const handler = () => { handleExportData(); };
+    window.addEventListener('superAdminExportData', handler);
+    return () => window.removeEventListener('superAdminExportData', handler);
+  });
+
   const filteredClubs = clubs.filter((c) => c.name.toLowerCase().includes(searchQuery.toLowerCase()));
   const filteredMembers = members.filter((m) =>
   m.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
