@@ -255,7 +255,8 @@ export function DashboardSidebar() {
           )}
         </div>
 
-        {/* View mode toggle */}
+        {/* View mode toggle (hidden in Super Admin mode) */}
+        {!(isSuperAdminEmail && isSuperAdminMode) && (
         <div className="px-3 mb-2">
           {collapsed ? (
             <button
