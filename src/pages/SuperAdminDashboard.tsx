@@ -375,6 +375,13 @@ const SuperAdminDashboard = () => {
     setExporting(false);
   };
 
+  // Listen for export trigger dispatched from the sidebar
+  useEffect(() => {
+    const handler = () => { handleExportData(); };
+    window.addEventListener('superAdminExportData', handler);
+    return () => window.removeEventListener('superAdminExportData', handler);
+  });
+
   const filteredClubs = clubs.filter((c) => c.name.toLowerCase().includes(searchQuery.toLowerCase()));
   const filteredMembers = members.filter((m) =>
   m.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -806,23 +813,10 @@ const SuperAdminDashboard = () => {
           {/* Quick actions row */}
           <div className="flex gap-2">
             <button
-              onClick={() => navigate('/global-reports')}
-              className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-bold"
-              style={{ background: NB.orange, color: NB.border, border: `2px solid ${NB.border}`, borderRadius: '8px', boxShadow: `3px 3px 0px ${NB.border}`, fontFamily: NB.font }}>
-              <FileText className="w-3.5 h-3.5" /> Reports
-            </button>
-            <button
               onClick={() => setCreateClubOpen(true)}
               className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-bold"
-              style={{ background: NB.card, color: NB.border, border: `2px solid ${NB.border}`, borderRadius: '8px', boxShadow: `3px 3px 0px ${NB.border}`, fontFamily: NB.font }}>
+              style={{ background: NB.orange, color: NB.border, border: `2px solid ${NB.border}`, borderRadius: '8px', boxShadow: `3px 3px 0px ${NB.border}`, fontFamily: NB.font }}>
               <Plus className="w-3.5 h-3.5" /> Add Club
-            </button>
-            <button
-              onClick={handleExportData}
-              disabled={exporting}
-              className="flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-bold"
-              style={{ background: NB.card, color: NB.border, border: `2px solid ${NB.border}`, borderRadius: '8px', boxShadow: `3px 3px 0px ${NB.border}`, fontFamily: NB.font }}>
-              <Download className="w-3.5 h-3.5" /> {exporting ? '...' : 'Export'}
             </button>
           </div>
 
@@ -908,8 +902,8 @@ const SuperAdminDashboard = () => {
             </div>
           </section>
 
-          {/* Platform Calendar */}
-          <SuperAdminCalendar />
+          {/* Platform Calendar removed */}
+
 
           {/* Global Event Feed */}
           <section>
@@ -976,19 +970,8 @@ const SuperAdminDashboard = () => {
               className="py-2 pl-10 pr-4 w-64 text-sm outline-none"
               style={{ border: `2px solid ${NB.border}`, borderRadius: '10px', background: NB.card, fontFamily: NB.font }} />
           </div>
-          <button
-            onClick={() => navigate('/global-reports')}
-            className="px-4 py-2 font-bold flex items-center gap-2 text-sm transition-all"
-            style={{ background: NB.orange, color: NB.border, border: `2px solid ${NB.border}`, borderRadius: '10px', boxShadow: `3px 3px 0px ${NB.border}`, fontFamily: NB.font }}>
-            <FileText className="w-4 h-4" /> Global Reports
-          </button>
-          <button
-            onClick={handleExportData}
-            disabled={exporting}
-            className="px-4 py-2 font-bold flex items-center gap-2 text-sm transition-all"
-            style={{ background: NB.card, color: NB.border, border: `2px solid ${NB.border}`, borderRadius: '10px', boxShadow: `3px 3px 0px ${NB.border}`, fontFamily: NB.font }}>
-            <Download className="w-4 h-4" /> {exporting ? 'Exporting...' : 'Export Data'}
-          </button>
+          {/* Global Reports & Export Data moved to sidebar */}
+
           <ProfileDropdown viewMode="personal" />
         </div>
       </header>
@@ -1072,10 +1055,8 @@ const SuperAdminDashboard = () => {
         </div>
       </div>
 
-      {/* Platform-wide Event Calendar */}
-      <div className="mb-6">
-        <SuperAdminCalendar />
-      </div>
+      {/* Platform Calendar removed */}
+
 
       {/* Global Event Feed */}
       <div className="p-5" style={{ background: NB.card, border: `2px solid ${NB.border}`, borderRadius: '12px', boxShadow: `4px 4px 0px ${NB.border}` }}>

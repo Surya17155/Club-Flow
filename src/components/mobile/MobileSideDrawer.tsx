@@ -8,7 +8,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import {
   LayoutDashboard, Calendar, Compass, UserCircle, Settings, LogOut,
   Shield, Settings2, Bot, ArrowRightLeft, Building2, X, Check, ChevronDown, Crown, ClipboardList,
-  HelpCircle, MessageSquare, FileText,
+  HelpCircle, MessageSquare, FileText, Download,
 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 
@@ -32,6 +32,7 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
 
   const isClubMode = viewMode === 'club';
   const isSuperAdmin = user?.email === SUPER_ADMIN_EMAIL;
+  const isSuperAdminMode = isSuperAdmin && (location.pathname === '/super-admin' || location.pathname === '/global-reports' || location.pathname.startsWith('/club/'));
 
   const initials = (profile?.full_name || 'U')
     .split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
@@ -116,7 +117,8 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
               </button>
             </div>
 
-            {/* Mode Toggle */}
+            {/* Mode Toggle (hidden in Super Admin mode) */}
+            {!isSuperAdminMode && (
             <div className="px-5 py-3" style={{ borderBottom: '2px solid #ddd' }}>
               <div
                 className="flex p-1"
@@ -151,6 +153,7 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
                 </button>
               </div>
             </div>
+            )}
 
             {/* Nav Items */}
             <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-1" style={{ scrollbarWidth: 'none' }}>
@@ -175,6 +178,47 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
                   </button>
                 );
               })}
+
+              {/* Super Admin contextual items */}
+              {isSuperAdminMode && (
+                <>
+                  <div className="my-2 mx-2" style={{ borderTop: '2px solid #ddd' }} />
+                  {(() => {
+                    const active = location.pathname === '/global-reports';
+                    return (
+                      <button
+                        onClick={() => nav('/global-reports')}
+                        className="flex items-center gap-3 w-full px-4 py-3 text-left transition-all"
+                        style={{
+                          background: active ? '#E98A3A' : 'transparent',
+                          color: '#111',
+                          fontFamily: "'Space Grotesk', sans-serif",
+                          fontWeight: active ? 800 : 700,
+                          border: active ? '2px solid #111' : '2px solid transparent',
+                          boxShadow: active ? '3px 3px 0px #111' : 'none',
+                        }}
+                      >
+                        <FileText className="w-5 h-5" />
+                        <span className="text-sm">Global Reports</span>
+                      </button>
+                    );
+                  })()}
+                  <button
+                    onClick={() => { window.dispatchEvent(new Event('superAdminExportData')); onClose(); }}
+                    className="flex items-center gap-3 w-full px-4 py-3 text-left transition-all"
+                    style={{
+                      background: 'transparent',
+                      color: '#111',
+                      fontFamily: "'Space Grotesk', sans-serif",
+                      fontWeight: 700,
+                      border: '2px solid transparent',
+                    }}
+                  >
+                    <Download className="w-5 h-5" />
+                    <span className="text-sm">Export Data</span>
+                  </button>
+                </>
+              )}
 
               {/* Club-mode contextual items */}
               {isClubMode && activeClub && (

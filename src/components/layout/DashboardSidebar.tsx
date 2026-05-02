@@ -26,6 +26,7 @@ import {
   HelpCircle,
   MessageSquare,
   FileText,
+  Download,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -188,6 +189,8 @@ export function DashboardSidebar() {
   }
 
   if (isSuperAdminEmail && isSuperAdminMode) {
+    contextItems.push({ title: 'Global Reports', icon: FileText, action: () => navigate('/global-reports'), activeUrl: '/global-reports' });
+    contextItems.push({ title: 'Export Data', icon: Download, action: () => window.dispatchEvent(new Event('superAdminExportData')) });
     contextItems.push({ title: 'AI Chatbot', icon: Bot, action: () => navigate('/chatbot'), activeUrl: '/chatbot' });
     contextItems.push({ title: 'Manage Outsiders', icon: Users, action: () => navigate('/manage-outsiders'), activeUrl: '/manage-outsiders' });
   }
@@ -255,7 +258,8 @@ export function DashboardSidebar() {
           )}
         </div>
 
-        {/* View mode toggle */}
+        {/* View mode toggle (hidden in Super Admin mode) */}
+        {!(isSuperAdminEmail && isSuperAdminMode) && (
         <div className="px-3 mb-2">
           {collapsed ? (
             <button
@@ -308,6 +312,7 @@ export function DashboardSidebar() {
             </div>
           )}
         </div>
+        )}
 
         {/* Nav items */}
         <nav className="flex-1 flex flex-col gap-1 px-3 mt-2 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
