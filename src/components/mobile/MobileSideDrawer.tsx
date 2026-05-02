@@ -153,6 +153,7 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
                 </button>
               </div>
             </div>
+            )}
 
             {/* Nav Items */}
             <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-1" style={{ scrollbarWidth: 'none' }}>
