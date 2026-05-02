@@ -806,23 +806,10 @@ const SuperAdminDashboard = () => {
           {/* Quick actions row */}
           <div className="flex gap-2">
             <button
-              onClick={() => navigate('/global-reports')}
-              className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-bold"
-              style={{ background: NB.orange, color: NB.border, border: `2px solid ${NB.border}`, borderRadius: '8px', boxShadow: `3px 3px 0px ${NB.border}`, fontFamily: NB.font }}>
-              <FileText className="w-3.5 h-3.5" /> Reports
-            </button>
-            <button
               onClick={() => setCreateClubOpen(true)}
               className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-bold"
-              style={{ background: NB.card, color: NB.border, border: `2px solid ${NB.border}`, borderRadius: '8px', boxShadow: `3px 3px 0px ${NB.border}`, fontFamily: NB.font }}>
+              style={{ background: NB.orange, color: NB.border, border: `2px solid ${NB.border}`, borderRadius: '8px', boxShadow: `3px 3px 0px ${NB.border}`, fontFamily: NB.font }}>
               <Plus className="w-3.5 h-3.5" /> Add Club
-            </button>
-            <button
-              onClick={handleExportData}
-              disabled={exporting}
-              className="flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-bold"
-              style={{ background: NB.card, color: NB.border, border: `2px solid ${NB.border}`, borderRadius: '8px', boxShadow: `3px 3px 0px ${NB.border}`, fontFamily: NB.font }}>
-              <Download className="w-3.5 h-3.5" /> {exporting ? '...' : 'Export'}
             </button>
           </div>
 
