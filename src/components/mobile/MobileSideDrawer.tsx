@@ -117,7 +117,8 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
               </button>
             </div>
 
-            {/* Mode Toggle */}
+            {/* Mode Toggle (hidden in Super Admin mode) */}
+            {!isSuperAdminMode && (
             <div className="px-5 py-3" style={{ borderBottom: '2px solid #ddd' }}>
               <div
                 className="flex p-1"
