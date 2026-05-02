@@ -309,6 +309,7 @@ export function DashboardSidebar() {
             </div>
           )}
         </div>
+        )}
 
         {/* Nav items */}
         <nav className="flex-1 flex flex-col gap-1 px-3 mt-2 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
