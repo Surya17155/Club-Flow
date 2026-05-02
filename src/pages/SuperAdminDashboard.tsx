@@ -895,8 +895,8 @@ const SuperAdminDashboard = () => {
             </div>
           </section>
 
-          {/* Platform Calendar */}
-          <SuperAdminCalendar />
+          {/* Platform Calendar removed */}
+
 
           {/* Global Event Feed */}
           <section>
