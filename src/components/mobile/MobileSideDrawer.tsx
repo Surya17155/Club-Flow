@@ -179,6 +179,47 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
                 );
               })}
 
+              {/* Super Admin contextual items */}
+              {isSuperAdminMode && (
+                <>
+                  <div className="my-2 mx-2" style={{ borderTop: '2px solid #ddd' }} />
+                  {(() => {
+                    const active = location.pathname === '/global-reports';
+                    return (
+                      <button
+                        onClick={() => nav('/global-reports')}
+                        className="flex items-center gap-3 w-full px-4 py-3 text-left transition-all"
+                        style={{
+                          background: active ? '#E98A3A' : 'transparent',
+                          color: '#111',
+                          fontFamily: "'Space Grotesk', sans-serif",
+                          fontWeight: active ? 800 : 700,
+                          border: active ? '2px solid #111' : '2px solid transparent',
+                          boxShadow: active ? '3px 3px 0px #111' : 'none',
+                        }}
+                      >
+                        <FileText className="w-5 h-5" />
+                        <span className="text-sm">Global Reports</span>
+                      </button>
+                    );
+                  })()}
+                  <button
+                    onClick={() => { window.dispatchEvent(new Event('superAdminExportData')); onClose(); }}
+                    className="flex items-center gap-3 w-full px-4 py-3 text-left transition-all"
+                    style={{
+                      background: 'transparent',
+                      color: '#111',
+                      fontFamily: "'Space Grotesk', sans-serif",
+                      fontWeight: 700,
+                      border: '2px solid transparent',
+                    }}
+                  >
+                    <Download className="w-5 h-5" />
+                    <span className="text-sm">Export Data</span>
+                  </button>
+                </>
+              )}
+
               {/* Club-mode contextual items */}
               {isClubMode && activeClub && (
                 <>
