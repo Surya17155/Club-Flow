@@ -963,19 +963,8 @@ const SuperAdminDashboard = () => {
               className="py-2 pl-10 pr-4 w-64 text-sm outline-none"
               style={{ border: `2px solid ${NB.border}`, borderRadius: '10px', background: NB.card, fontFamily: NB.font }} />
           </div>
-          <button
-            onClick={() => navigate('/global-reports')}
-            className="px-4 py-2 font-bold flex items-center gap-2 text-sm transition-all"
-            style={{ background: NB.orange, color: NB.border, border: `2px solid ${NB.border}`, borderRadius: '10px', boxShadow: `3px 3px 0px ${NB.border}`, fontFamily: NB.font }}>
-            <FileText className="w-4 h-4" /> Global Reports
-          </button>
-          <button
-            onClick={handleExportData}
-            disabled={exporting}
-            className="px-4 py-2 font-bold flex items-center gap-2 text-sm transition-all"
-            style={{ background: NB.card, color: NB.border, border: `2px solid ${NB.border}`, borderRadius: '10px', boxShadow: `3px 3px 0px ${NB.border}`, fontFamily: NB.font }}>
-            <Download className="w-4 h-4" /> {exporting ? 'Exporting...' : 'Export Data'}
-          </button>
+          {/* Global Reports & Export Data moved to sidebar */}
+
           <ProfileDropdown viewMode="personal" />
         </div>
       </header>
