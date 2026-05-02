@@ -32,6 +32,7 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
 
   const isClubMode = viewMode === 'club';
   const isSuperAdmin = user?.email === SUPER_ADMIN_EMAIL;
+  const isSuperAdminMode = isSuperAdmin && (location.pathname === '/super-admin' || location.pathname === '/global-reports' || location.pathname.startsWith('/club/'));
 
   const initials = (profile?.full_name || 'U')
     .split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
