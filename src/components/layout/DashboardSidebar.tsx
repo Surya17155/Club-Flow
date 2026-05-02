@@ -189,6 +189,8 @@ export function DashboardSidebar() {
   }
 
   if (isSuperAdminEmail && isSuperAdminMode) {
+    contextItems.push({ title: 'Global Reports', icon: FileText, action: () => navigate('/global-reports'), activeUrl: '/global-reports' });
+    contextItems.push({ title: 'Export Data', icon: Download, action: () => window.dispatchEvent(new Event('superAdminExportData')) });
     contextItems.push({ title: 'AI Chatbot', icon: Bot, action: () => navigate('/chatbot'), activeUrl: '/chatbot' });
     contextItems.push({ title: 'Manage Outsiders', icon: Users, action: () => navigate('/manage-outsiders'), activeUrl: '/manage-outsiders' });
   }
