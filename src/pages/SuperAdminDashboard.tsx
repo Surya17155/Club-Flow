@@ -1048,10 +1048,8 @@ const SuperAdminDashboard = () => {
         </div>
       </div>
 
-      {/* Platform-wide Event Calendar */}
-      <div className="mb-6">
-        <SuperAdminCalendar />
-      </div>
+      {/* Platform Calendar removed */}
+
 
       {/* Global Event Feed */}
       <div className="p-5" style={{ background: NB.card, border: `2px solid ${NB.border}`, borderRadius: '12px', boxShadow: `4px 4px 0px ${NB.border}` }}>
