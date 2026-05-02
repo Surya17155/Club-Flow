@@ -8,7 +8,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import {
   LayoutDashboard, Calendar, Compass, UserCircle, Settings, LogOut,
   Shield, Settings2, Bot, ArrowRightLeft, Building2, X, Check, ChevronDown, Crown, ClipboardList,
-  HelpCircle, MessageSquare, FileText,
+  HelpCircle, MessageSquare, FileText, Download,
 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 
