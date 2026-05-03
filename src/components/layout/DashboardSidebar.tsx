@@ -139,8 +139,25 @@ export function DashboardSidebar() {
   const mouseY = useMotionValue(Infinity);
 
   const [showClubSwitcher, setShowClubSwitcher] = useState(false);
+  const navRef = useRef<HTMLElement>(null);
 
   const isNeo = activeDesign === 'design-2';
+
+  // Persist nav scroll position across route remounts so clicking items
+  // below the fold (e.g. Assign Powers, AI Chatbot) doesn't appear to
+  // jump the sidebar to the top.
+  useEffect(() => {
+    const saved = sessionStorage.getItem('dashboard-sidebar-scroll');
+    if (saved && navRef.current) {
+      navRef.current.scrollTop = parseInt(saved, 10) || 0;
+    }
+  }, []);
+
+  const handleNavScroll = () => {
+    if (navRef.current) {
+      sessionStorage.setItem('dashboard-sidebar-scroll', String(navRef.current.scrollTop));
+    }
+  };
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, String(collapsed));
@@ -315,7 +332,7 @@ export function DashboardSidebar() {
         )}
 
         {/* Nav items */}
-        <nav className="flex-1 flex flex-col gap-1 px-3 mt-2 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
+        <nav ref={navRef} onScroll={handleNavScroll} className="flex-1 flex flex-col gap-1 px-3 mt-2 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
           {(isClubMode ? clubNavItems : personalNavItems).map((item, index) => {
             const active = isActive(item.url);
 
