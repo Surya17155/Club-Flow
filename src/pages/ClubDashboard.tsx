@@ -141,10 +141,19 @@ const ClubDashboard = () => {
   }
   if (!user) return <Navigate to="/" replace />;
   if (!isRoleCheckComplete) {
+    if (isMobile) {
+      return (
+        <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F4EFE7' }}>
+          <div className="w-8 h-8 border-[3px] border-[#111]/30 border-t-[#111] rounded-full animate-spin" />
+        </div>
+      );
+    }
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F4EFE7' }}>
-        <div className="w-8 h-8 border-[3px] border-[#111]/30 border-t-[#111] rounded-full animate-spin" />
-      </div>
+      <DashboardLayout showHeader={false}>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="w-8 h-8 border-[3px] border-[#111]/30 border-t-[#111] rounded-full animate-spin" />
+        </div>
+      </DashboardLayout>
     );
   }
 
