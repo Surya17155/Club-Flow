@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -84,6 +84,13 @@ const SuperAdminDashboard = () => {
   const [presidentSearchLoading, setPresidentSearchLoading] = useState(false);
 
   const { totalClubs, globalMembers, totalEvents, clubs, members, upcomingEvents, growthData, loading } = useSuperAdminStats();
+
+  const exportHandlerRef = useRef<(() => void) | null>(null);
+  useEffect(() => {
+    const handler = () => { exportHandlerRef.current?.(); };
+    window.addEventListener('superAdminExportData', handler);
+    return () => window.removeEventListener('superAdminExportData', handler);
+  }, []);
 
   // Check admin role
   useEffect(() => {
@@ -375,12 +382,8 @@ const SuperAdminDashboard = () => {
     setExporting(false);
   };
 
-  // Listen for export trigger dispatched from the sidebar
-  useEffect(() => {
-    const handler = () => { handleExportData(); };
-    window.addEventListener('superAdminExportData', handler);
-    return () => window.removeEventListener('superAdminExportData', handler);
-  });
+  // Keep ref pointing to latest handler for the top-level event listener
+  exportHandlerRef.current = handleExportData;
 
   const filteredClubs = clubs.filter((c) => c.name.toLowerCase().includes(searchQuery.toLowerCase()));
   const filteredMembers = members.filter((m) =>
