@@ -57,7 +57,9 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
     { title: 'Forms', icon: FileText, url: '/forms' },
   ];
 
-  const navItems = isClubMode ? clubItems : personalItems;
+  const navItems = isSuperAdminMode
+    ? [{ title: 'Dashboard', icon: LayoutDashboard, url: '/super-admin' }]
+    : (isClubMode ? clubItems : personalItems);
 
   return (
     <AnimatePresence>
