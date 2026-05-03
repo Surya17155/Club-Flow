@@ -223,7 +223,7 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
               )}
 
               {/* Club-mode contextual items */}
-              {isClubMode && activeClub && (
+              {isClubMode && activeClub && !isSuperAdminMode && (
                 <>
                   <div className="my-2 mx-2" style={{ borderTop: '2px solid #ddd' }} />
 
