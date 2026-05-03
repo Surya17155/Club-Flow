@@ -85,6 +85,13 @@ const SuperAdminDashboard = () => {
 
   const { totalClubs, globalMembers, totalEvents, clubs, members, upcomingEvents, growthData, loading } = useSuperAdminStats();
 
+  const exportHandlerRef = useRef<(() => void) | null>(null);
+  useEffect(() => {
+    const handler = () => { exportHandlerRef.current?.(); };
+    window.addEventListener('superAdminExportData', handler);
+    return () => window.removeEventListener('superAdminExportData', handler);
+  }, []);
+
   // Check admin role
   useEffect(() => {
     if (!user) return;
