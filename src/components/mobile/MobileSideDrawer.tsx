@@ -258,7 +258,8 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
                       </button>
                     );
                   })()}
-                  </button>
+                </>
+              )}
 
               {/* Club-mode contextual items */}
               {isClubMode && activeClub && !isSuperAdminMode && (
