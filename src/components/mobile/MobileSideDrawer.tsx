@@ -218,6 +218,7 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
                   >
                     <Download className="w-5 h-5" />
                     <span className="text-sm">Export Data</span>
+                  </button>
                   {(() => {
                     const active = location.pathname === '/chatbot';
                     return (
