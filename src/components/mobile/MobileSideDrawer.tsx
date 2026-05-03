@@ -8,7 +8,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import {
   LayoutDashboard, Calendar, Compass, UserCircle, Settings, LogOut,
   Shield, Settings2, Bot, ArrowRightLeft, Building2, X, Check, ChevronDown, Crown, ClipboardList,
-  HelpCircle, MessageSquare, FileText, Download,
+  HelpCircle, MessageSquare, FileText, Download, Users,
 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 
@@ -57,7 +57,9 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
     { title: 'Forms', icon: FileText, url: '/forms' },
   ];
 
-  const navItems = isClubMode ? clubItems : personalItems;
+  const navItems = isSuperAdminMode
+    ? [{ title: 'Dashboard', icon: LayoutDashboard, url: '/super-admin' }]
+    : (isClubMode ? clubItems : personalItems);
 
   return (
     <AnimatePresence>
@@ -217,11 +219,51 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
                     <Download className="w-5 h-5" />
                     <span className="text-sm">Export Data</span>
                   </button>
+                  {(() => {
+                    const active = location.pathname === '/chatbot';
+                    return (
+                      <button
+                        onClick={() => nav('/chatbot')}
+                        className="flex items-center gap-3 w-full px-4 py-3 text-left transition-all"
+                        style={{
+                          background: active ? '#E98A3A' : 'transparent',
+                          color: '#111',
+                          fontFamily: "'Space Grotesk', sans-serif",
+                          fontWeight: active ? 800 : 700,
+                          border: active ? '2px solid #111' : '2px solid transparent',
+                          boxShadow: active ? '3px 3px 0px #111' : 'none',
+                        }}
+                      >
+                        <Bot className="w-5 h-5" />
+                        <span className="text-sm">AI Chatbot</span>
+                      </button>
+                    );
+                  })()}
+                  {(() => {
+                    const active = location.pathname === '/manage-outsiders';
+                    return (
+                      <button
+                        onClick={() => nav('/manage-outsiders')}
+                        className="flex items-center gap-3 w-full px-4 py-3 text-left transition-all"
+                        style={{
+                          background: active ? '#E98A3A' : 'transparent',
+                          color: '#111',
+                          fontFamily: "'Space Grotesk', sans-serif",
+                          fontWeight: active ? 800 : 700,
+                          border: active ? '2px solid #111' : '2px solid transparent',
+                          boxShadow: active ? '3px 3px 0px #111' : 'none',
+                        }}
+                      >
+                        <Users className="w-5 h-5" />
+                        <span className="text-sm">Manage Outsiders</span>
+                      </button>
+                    );
+                  })()}
                 </>
               )}
 
               {/* Club-mode contextual items */}
-              {isClubMode && activeClub && (
+              {isClubMode && activeClub && !isSuperAdminMode && (
                 <>
                   <div className="my-2 mx-2" style={{ borderTop: '2px solid #ddd' }} />
 

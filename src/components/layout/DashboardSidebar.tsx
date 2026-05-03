@@ -193,7 +193,7 @@ export function DashboardSidebar() {
   // Build contextual nav items
   const contextItems: { title: string; icon: any; action: () => void; activeUrl?: string; isActive?: boolean }[] = [];
 
-  if (isClubMode && activeClub) {
+  if (isClubMode && activeClub && !(isSuperAdminEmail && isSuperAdminMode)) {
     if (isPresident) {
       contextItems.push({ title: 'Assign Powers', icon: Shield, action: () => navigate('/assign-powers'), activeUrl: '/assign-powers' });
     }
@@ -333,7 +333,10 @@ export function DashboardSidebar() {
 
         {/* Nav items */}
         <nav ref={navRef} onScroll={handleNavScroll} className="flex-1 flex flex-col gap-1 px-3 mt-2 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
-          {(isClubMode ? clubNavItems : personalNavItems).map((item, index) => {
+          {(isSuperAdminEmail && isSuperAdminMode
+            ? [{ title: 'Dashboard', url: '/super-admin', icon: LayoutDashboard }]
+            : (isClubMode ? clubNavItems : personalNavItems)
+          ).map((item, index) => {
             const active = isActive(item.url);
 
             if (collapsed) {
