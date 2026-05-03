@@ -382,12 +382,8 @@ const SuperAdminDashboard = () => {
     setExporting(false);
   };
 
-  // Listen for export trigger dispatched from the sidebar
-  useEffect(() => {
-    const handler = () => { handleExportData(); };
-    window.addEventListener('superAdminExportData', handler);
-    return () => window.removeEventListener('superAdminExportData', handler);
-  });
+  // Keep ref pointing to latest handler for the top-level event listener
+  exportHandlerRef.current = handleExportData;
 
   const filteredClubs = clubs.filter((c) => c.name.toLowerCase().includes(searchQuery.toLowerCase()));
   const filteredMembers = members.filter((m) =>
