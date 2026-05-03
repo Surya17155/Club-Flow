@@ -218,9 +218,47 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
                   >
                     <Download className="w-5 h-5" />
                     <span className="text-sm">Export Data</span>
+                  {(() => {
+                    const active = location.pathname === '/chatbot';
+                    return (
+                      <button
+                        onClick={() => nav('/chatbot')}
+                        className="flex items-center gap-3 w-full px-4 py-3 text-left transition-all"
+                        style={{
+                          background: active ? '#E98A3A' : 'transparent',
+                          color: '#111',
+                          fontFamily: "'Space Grotesk', sans-serif",
+                          fontWeight: active ? 800 : 700,
+                          border: active ? '2px solid #111' : '2px solid transparent',
+                          boxShadow: active ? '3px 3px 0px #111' : 'none',
+                        }}
+                      >
+                        <Bot className="w-5 h-5" />
+                        <span className="text-sm">AI Chatbot</span>
+                      </button>
+                    );
+                  })()}
+                  {(() => {
+                    const active = location.pathname === '/manage-outsiders';
+                    return (
+                      <button
+                        onClick={() => nav('/manage-outsiders')}
+                        className="flex items-center gap-3 w-full px-4 py-3 text-left transition-all"
+                        style={{
+                          background: active ? '#E98A3A' : 'transparent',
+                          color: '#111',
+                          fontFamily: "'Space Grotesk', sans-serif",
+                          fontWeight: active ? 800 : 700,
+                          border: active ? '2px solid #111' : '2px solid transparent',
+                          boxShadow: active ? '3px 3px 0px #111' : 'none',
+                        }}
+                      >
+                        <Users className="w-5 h-5" />
+                        <span className="text-sm">Manage Outsiders</span>
+                      </button>
+                    );
+                  })()}
                   </button>
-                </>
-              )}
 
               {/* Club-mode contextual items */}
               {isClubMode && activeClub && !isSuperAdminMode && (
