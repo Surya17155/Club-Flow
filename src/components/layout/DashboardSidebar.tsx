@@ -193,7 +193,7 @@ export function DashboardSidebar() {
   // Build contextual nav items
   const contextItems: { title: string; icon: any; action: () => void; activeUrl?: string; isActive?: boolean }[] = [];
 
-  if (isClubMode && activeClub) {
+  if (isClubMode && activeClub && !(isSuperAdminEmail && isSuperAdminMode)) {
     if (isPresident) {
       contextItems.push({ title: 'Assign Powers', icon: Shield, action: () => navigate('/assign-powers'), activeUrl: '/assign-powers' });
     }
