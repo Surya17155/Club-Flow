@@ -225,11 +225,22 @@ export function DashboardSidebar() {
 
   const handleSuperAdminToggle = () => {
     if (isSuperAdminMode) {
+      // Releasing the lock when explicitly toggling Super Admin off.
+      sessionStorage.removeItem('superAdminLockActive');
       navigate('/admin');
     } else {
+      sessionStorage.setItem('superAdminLockActive', 'true');
       navigate('/super-admin');
     }
   };
+
+  // Sub-items shown under the Super Admin toggle when active.
+  const superAdminSubItems = [
+    { title: 'Global Reports', icon: FileText, action: () => navigate('/global-reports'), activeUrl: '/global-reports' as string | undefined },
+    { title: 'Export Data', icon: Download, action: () => window.dispatchEvent(new Event('superAdminExportData')), activeUrl: undefined as string | undefined },
+    { title: 'AI Chatbot', icon: Bot, action: () => navigate('/chatbot'), activeUrl: '/chatbot' as string | undefined },
+    { title: 'Manage Outsiders', icon: Users, action: () => navigate('/manage-outsiders'), activeUrl: '/manage-outsiders' as string | undefined },
+  ];
 
   const sidebarBg = isNeo ? '#111111' : '#000000';
   const activeBg = isNeo ? '#E98A3A' : '#FFFFFF';
