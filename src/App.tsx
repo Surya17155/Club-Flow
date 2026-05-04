@@ -71,6 +71,7 @@ const App = () => (
             <DesignProvider>
             <Suspense fallback={<PageFallback />}>
               <MobileNavigationOverlay />
+              <SuperAdminGuard />
               <Routes>
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/login" element={<AuthPage />} />
