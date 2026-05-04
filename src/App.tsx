@@ -9,6 +9,7 @@ import { ClubProvider } from "@/contexts/ClubContext";
 import { DesignProvider } from "@/contexts/DesignContext";
 import { DesktopFrame } from "@/components/layout/DesktopFrame";
 import { MobileNavigationOverlay } from "@/components/mobile/MobileNavigationOverlay";
+import { SuperAdminGuard } from "@/components/layout/SuperAdminGuard";
 
 // Eager-load critical routes
 import LandingPage from "./pages/LandingPage";
