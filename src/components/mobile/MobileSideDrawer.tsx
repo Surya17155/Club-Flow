@@ -181,86 +181,7 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
                 );
               })}
 
-              {/* Super Admin contextual items */}
-              {isSuperAdminMode && (
-                <>
-                  <div className="my-2 mx-2" style={{ borderTop: '2px solid #ddd' }} />
-                  {(() => {
-                    const active = location.pathname === '/global-reports';
-                    return (
-                      <button
-                        onClick={() => nav('/global-reports')}
-                        className="flex items-center gap-3 w-full px-4 py-3 text-left transition-all"
-                        style={{
-                          background: active ? '#E98A3A' : 'transparent',
-                          color: '#111',
-                          fontFamily: "'Space Grotesk', sans-serif",
-                          fontWeight: active ? 800 : 700,
-                          border: active ? '2px solid #111' : '2px solid transparent',
-                          boxShadow: active ? '3px 3px 0px #111' : 'none',
-                        }}
-                      >
-                        <FileText className="w-5 h-5" />
-                        <span className="text-sm">Global Reports</span>
-                      </button>
-                    );
-                  })()}
-                  <button
-                    onClick={() => { window.dispatchEvent(new Event('superAdminExportData')); onClose(); }}
-                    className="flex items-center gap-3 w-full px-4 py-3 text-left transition-all"
-                    style={{
-                      background: 'transparent',
-                      color: '#111',
-                      fontFamily: "'Space Grotesk', sans-serif",
-                      fontWeight: 700,
-                      border: '2px solid transparent',
-                    }}
-                  >
-                    <Download className="w-5 h-5" />
-                    <span className="text-sm">Export Data</span>
-                  </button>
-                  {(() => {
-                    const active = location.pathname === '/chatbot';
-                    return (
-                      <button
-                        onClick={() => nav('/chatbot')}
-                        className="flex items-center gap-3 w-full px-4 py-3 text-left transition-all"
-                        style={{
-                          background: active ? '#E98A3A' : 'transparent',
-                          color: '#111',
-                          fontFamily: "'Space Grotesk', sans-serif",
-                          fontWeight: active ? 800 : 700,
-                          border: active ? '2px solid #111' : '2px solid transparent',
-                          boxShadow: active ? '3px 3px 0px #111' : 'none',
-                        }}
-                      >
-                        <Bot className="w-5 h-5" />
-                        <span className="text-sm">AI Chatbot</span>
-                      </button>
-                    );
-                  })()}
-                  {(() => {
-                    const active = location.pathname === '/manage-outsiders';
-                    return (
-                      <button
-                        onClick={() => nav('/manage-outsiders')}
-                        className="flex items-center gap-3 w-full px-4 py-3 text-left transition-all"
-                        style={{
-                          background: active ? '#E98A3A' : 'transparent',
-                          color: '#111',
-                          fontFamily: "'Space Grotesk', sans-serif",
-                          fontWeight: active ? 800 : 700,
-                          border: active ? '2px solid #111' : '2px solid transparent',
-                          boxShadow: active ? '3px 3px 0px #111' : 'none',
-                        }}
-                      >
-                        <Users className="w-5 h-5" />
-                        <span className="text-sm">Manage Outsiders</span>
-                      </button>
-                    );
-                  })()}
-                </>
-              )}
+              {/* Super Admin sub-items are rendered inline under the Super Admin toggle below. */}
 
               {/* Club-mode contextual items */}
               {isClubMode && activeClub && !isSuperAdminMode && (
@@ -360,7 +281,7 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
                 </>
               )}
 
-              {/* Super Admin Toggle */}
+              {/* Super Admin Toggle + inline drawer */}
               {isSuperAdmin && (
                 <>
                   <div className="my-2 mx-2" style={{ borderTop: '2px solid #ddd' }} />
@@ -377,17 +298,62 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
                       <span className="text-sm">Super Admin</span>
                     </div>
                     <Switch
-                      checked={location.pathname === '/super-admin' || location.pathname === '/global-reports'}
+                      checked={isSuperAdminMode}
                       onCheckedChange={(checked) => {
                         if (checked) {
+                          sessionStorage.setItem('superAdminLockActive', 'true');
                           nav('/super-admin');
                         } else {
+                          sessionStorage.removeItem('superAdminLockActive');
                           nav('/admin');
                         }
                       }}
                       className="scale-90"
                     />
                   </div>
+
+                  <AnimatePresence initial={false}>
+                    {isSuperAdminMode && (
+                      <motion.div
+                        key="super-admin-mobile-drawer"
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ type: 'spring', stiffness: 280, damping: 30, mass: 0.7 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="ml-5 pl-3 space-y-1" style={{ borderLeft: '2px solid #ddd' }}>
+                          {[
+                            { title: 'Global Reports', icon: FileText, url: '/global-reports', action: () => nav('/global-reports') },
+                            { title: 'Export Data', icon: Download, url: undefined, action: () => { window.dispatchEvent(new Event('superAdminExportData')); onClose(); } },
+                            { title: 'AI Chatbot', icon: Bot, url: '/chatbot', action: () => nav('/chatbot') },
+                            { title: 'Manage Outsiders', icon: Users, url: '/manage-outsiders', action: () => nav('/manage-outsiders') },
+                          ].map((sub) => {
+                            const active = sub.url ? location.pathname === sub.url : false;
+                            return (
+                              <button
+                                key={sub.title}
+                                onClick={sub.action}
+                                className="flex items-center gap-3 w-full px-3 py-2.5 text-left transition-all"
+                                style={{
+                                  background: active ? '#E98A3A' : 'transparent',
+                                  color: '#111',
+                                  fontFamily: "'Space Grotesk', sans-serif",
+                                  fontWeight: active ? 800 : 600,
+                                  border: active ? '2px solid #111' : '2px solid transparent',
+                                  boxShadow: active ? '3px 3px 0px #111' : 'none',
+                                  borderRadius: '6px',
+                                }}
+                              >
+                                <sub.icon className="w-4 h-4 shrink-0" />
+                                <span className="text-[13px]">{sub.title}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </>
               )}
             </nav>
