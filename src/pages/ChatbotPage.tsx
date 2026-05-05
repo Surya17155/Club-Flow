@@ -14,7 +14,7 @@ type Msg = { role: 'user' | 'assistant'; content: string };
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/club-chat`;
 const SUPER_ADMIN_EMAIL = 'suryakant.gnbba2029@iilm.edu';
 
-const ChatbotPage = () => {
+const ChatbotPage = ({ hideSidebar = false }: { hideSidebar?: boolean } = {}) => {
   const { user, session } = useAuth();
   const { activeClub } = useClub();
   // Always send the active club so the agent can execute actions (super admin still has unrestricted access in the function).
