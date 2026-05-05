@@ -359,6 +359,87 @@ export function DashboardSidebar() {
 
         {/* Nav items */}
         <nav ref={navRef} onScroll={handleNavScroll} className="flex-1 flex flex-col gap-1 px-3 mt-2 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
+          {/* Super Admin toggle + drawer (positioned at the top, above Dashboard) */}
+          {isSuperAdminEmail && !collapsed && (
+            <>
+              <button
+                onClick={handleSuperAdminToggle}
+                className="flex items-center gap-3 px-3 py-2.5 transition-all duration-200 w-full text-left"
+                style={{
+                  color: isSuperAdminMode ? '#F59E0B' : inactiveText,
+                  borderRadius: isNeo ? '10px' : '999px',
+                  background: isSuperAdminMode ? (isNeo ? '#2A2A2A' : 'rgba(245,158,11,0.1)') : 'transparent',
+                  fontFamily: isNeo ? "'Space Grotesk', sans-serif" : undefined,
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = hoverBg; }}
+                onMouseLeave={(e) => { if (!isSuperAdminMode) e.currentTarget.style.background = 'transparent'; }}
+              >
+                <Crown className="w-[18px] h-[18px] shrink-0" />
+                <span className="text-sm font-medium truncate flex-1">Super Admin</span>
+                <motion.div
+                  animate={{ rotate: isSuperAdminMode ? 180 : 0 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 26 }}
+                >
+                  <ChevronRight className="w-3.5 h-3.5 rotate-90" style={{ opacity: 0.7 }} />
+                </motion.div>
+              </button>
+
+              <AnimatePresence initial={false}>
+                {isSuperAdminMode && (
+                  <motion.div
+                    key="super-admin-drawer-top"
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ type: 'spring', stiffness: 280, damping: 30, mass: 0.7 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="ml-3 pl-2 mt-1 mb-1 space-y-1" style={{ borderLeft: `2px solid ${isNeo ? '#333' : 'rgba(255,255,255,0.12)'}` }}>
+                      {superAdminSubItems.map((sub) => {
+                        const subActive = sub.activeUrl ? isActive(sub.activeUrl) : false;
+                        return (
+                          <button
+                            key={sub.title}
+                            onClick={sub.action}
+                            className="flex items-center gap-3 px-3 py-2 transition-all duration-200 w-full text-left"
+                            style={{
+                              background: subActive ? activeBg : 'transparent',
+                              color: subActive ? activeText : inactiveText,
+                              borderRadius: isNeo ? '8px' : '999px',
+                              border: subActive && isNeo ? '2px solid #111111' : '2px solid transparent',
+                              boxShadow: subActive && isNeo ? '2px 2px 0px #111111' : 'none',
+                              fontFamily: isNeo ? "'Space Grotesk', sans-serif" : undefined,
+                              fontWeight: subActive && isNeo ? 700 : 500,
+                            }}
+                            onMouseEnter={(e) => { if (!subActive) e.currentTarget.style.background = hoverBg; }}
+                            onMouseLeave={(e) => { if (!subActive) e.currentTarget.style.background = 'transparent'; }}
+                          >
+                            <sub.icon className="w-[16px] h-[16px] shrink-0" />
+                            <span className="text-[13px] truncate">{sub.title}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <div className="my-1 mx-2 border-t" style={{ borderColor: isNeo ? '#333' : 'rgba(255,255,255,0.1)' }} />
+            </>
+          )}
+
+          {isSuperAdminEmail && collapsed && (
+            <div className="group relative">
+              <button
+                onClick={handleSuperAdminToggle}
+                className="flex items-center justify-center w-10 h-10 rounded-full mx-auto transition-colors"
+                style={{ color: isSuperAdminMode ? '#F59E0B' : inactiveText }}
+              >
+                <Crown className="w-[18px] h-[18px]" />
+              </button>
+            </div>
+          )}
+
           {(isSuperAdminEmail && isSuperAdminMode
             ? [{ title: 'Dashboard', url: '/super-admin', icon: LayoutDashboard }]
             : (isClubMode ? clubNavItems : personalNavItems)
