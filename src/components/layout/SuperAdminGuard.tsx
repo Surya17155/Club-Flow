@@ -10,7 +10,6 @@ const ALLOWED_PREFIXES = [
   '/super-admin',
   '/global-reports',
   '/manage-outsiders',
-  '/chatbot',
   '/settings',
   '/contact2',
   '/club/', // super admin can drill into any club from the command center
@@ -23,9 +22,6 @@ const isAllowed = (path: string) =>
  * Locks the Super Admin (only the designated email) inside the Super Admin
  * Command Center while the lock flag is on. If they navigate away to a
  * personal/club route, redirect them back to /super-admin.
- *
- * The lock is enabled when the user enters /super-admin and disabled only
- * when they explicitly toggle Super Admin off from the sidebar.
  */
 export function SuperAdminGuard() {
   const { user } = useAuth();
@@ -35,7 +31,7 @@ export function SuperAdminGuard() {
   // Auto-arm the lock whenever the super admin lands on a super admin route.
   useEffect(() => {
     if (user?.email !== SUPER_ADMIN_EMAIL) return;
-    if (location.pathname === '/super-admin') {
+    if (location.pathname.startsWith('/super-admin')) {
       sessionStorage.setItem(STORAGE_KEY, 'true');
     }
   }, [user?.email, location.pathname]);

@@ -32,7 +32,16 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
 
   const isClubMode = viewMode === 'club';
   const isSuperAdmin = user?.email === SUPER_ADMIN_EMAIL;
-  const isSuperAdminMode = isSuperAdmin && (location.pathname === '/super-admin' || location.pathname === '/global-reports' || location.pathname.startsWith('/club/'));
+  const [isSuperAdminMode, setIsSuperAdminMode] = useState<boolean>(
+    () => isSuperAdmin && sessionStorage.getItem('superAdminLockActive') === 'true'
+  );
+  useEffect(() => {
+    if (!isSuperAdmin) return;
+    const sync = () => setIsSuperAdminMode(sessionStorage.getItem('superAdminLockActive') === 'true');
+    window.addEventListener('superAdminModeChanged', sync);
+    sync();
+    return () => window.removeEventListener('superAdminModeChanged', sync);
+  }, [isSuperAdmin, location.pathname]);
 
   const initials = (profile?.full_name || 'U')
     .split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
@@ -302,9 +311,13 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
                       onCheckedChange={(checked) => {
                         if (checked) {
                           sessionStorage.setItem('superAdminLockActive', 'true');
+                          setIsSuperAdminMode(true);
+                          window.dispatchEvent(new Event('superAdminModeChanged'));
                           nav('/super-admin');
                         } else {
                           sessionStorage.removeItem('superAdminLockActive');
+                          setIsSuperAdminMode(false);
+                          window.dispatchEvent(new Event('superAdminModeChanged'));
                           nav('/admin');
                         }
                       }}
@@ -326,7 +339,7 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
                           {[
                             { title: 'Global Reports', icon: FileText, url: '/global-reports', action: () => nav('/global-reports') },
                             { title: 'Export Data', icon: Download, url: undefined, action: () => { window.dispatchEvent(new Event('superAdminExportData')); onClose(); } },
-                            { title: 'AI Chatbot', icon: Bot, url: '/chatbot', action: () => nav('/chatbot') },
+                            { title: 'AI Chatbot', icon: Bot, url: '/super-admin/chatbot', action: () => nav('/super-admin/chatbot') },
                             { title: 'Manage Outsiders', icon: Users, url: '/manage-outsiders', action: () => nav('/manage-outsiders') },
                           ].map((sub) => {
                             const active = sub.url ? location.pathname === sub.url : false;
