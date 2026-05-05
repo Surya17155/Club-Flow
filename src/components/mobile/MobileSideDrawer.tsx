@@ -311,9 +311,13 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
                       onCheckedChange={(checked) => {
                         if (checked) {
                           sessionStorage.setItem('superAdminLockActive', 'true');
+                          setIsSuperAdminMode(true);
+                          window.dispatchEvent(new Event('superAdminModeChanged'));
                           nav('/super-admin');
                         } else {
                           sessionStorage.removeItem('superAdminLockActive');
+                          setIsSuperAdminMode(false);
+                          window.dispatchEvent(new Event('superAdminModeChanged'));
                           nav('/admin');
                         }
                       }}
