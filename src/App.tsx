@@ -32,6 +32,7 @@ import MobileChat from "./pages/MobileChat";
 import ClubSettingsPage from "./pages/ClubSettingsPage";
 import AssignPowersPage from "./pages/AssignPowersPage";
 import ChatbotPage from "./pages/ChatbotPage";
+import SuperAdminChatbotPage from "./pages/SuperAdminChatbotPage";
 import AttendanceHistory from "./pages/AttendanceHistory";
 import ContactUs from "./pages/ContactUs";
 import Contact2 from "./pages/Contact2";
