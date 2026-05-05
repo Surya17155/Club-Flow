@@ -32,7 +32,16 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
 
   const isClubMode = viewMode === 'club';
   const isSuperAdmin = user?.email === SUPER_ADMIN_EMAIL;
-  const isSuperAdminMode = isSuperAdmin && (location.pathname === '/super-admin' || location.pathname === '/global-reports' || location.pathname.startsWith('/club/'));
+  const [isSuperAdminMode, setIsSuperAdminMode] = useState<boolean>(
+    () => isSuperAdmin && sessionStorage.getItem('superAdminLockActive') === 'true'
+  );
+  useEffect(() => {
+    if (!isSuperAdmin) return;
+    const sync = () => setIsSuperAdminMode(sessionStorage.getItem('superAdminLockActive') === 'true');
+    window.addEventListener('superAdminModeChanged', sync);
+    sync();
+    return () => window.removeEventListener('superAdminModeChanged', sync);
+  }, [isSuperAdmin, location.pathname]);
 
   const initials = (profile?.full_name || 'U')
     .split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
