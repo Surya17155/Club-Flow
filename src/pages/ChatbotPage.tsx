@@ -142,7 +142,7 @@ const ChatbotPage = ({ hideSidebar = false }: { hideSidebar?: boolean } = {}) =>
 
   return (
     <div className="min-h-screen flex antialiased" style={{ backgroundColor: '#F4EFE7' }}>
-      {!isMobile && <DashboardSidebar />}
+      {!isMobile && !hideSidebar && <DashboardSidebar />}
       <div className="flex-1 overflow-y-auto" style={{ padding: isMobile ? '48px 16px 24px' : '24px 28px' }}>
         <div className="flex flex-col h-full max-w-3xl mx-auto" style={{ minHeight: 'calc(100vh - 120px)' }}>
       {/* Header */}
