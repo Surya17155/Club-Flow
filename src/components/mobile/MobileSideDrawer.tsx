@@ -335,7 +335,7 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
                           {[
                             { title: 'Global Reports', icon: FileText, url: '/global-reports', action: () => nav('/global-reports') },
                             { title: 'Export Data', icon: Download, url: undefined, action: () => { window.dispatchEvent(new Event('superAdminExportData')); onClose(); } },
-                            { title: 'AI Chatbot', icon: Bot, url: '/chatbot', action: () => nav('/chatbot') },
+                            { title: 'AI Chatbot', icon: Bot, url: '/super-admin/chatbot', action: () => nav('/super-admin/chatbot') },
                             { title: 'Manage Outsiders', icon: Users, url: '/manage-outsiders', action: () => nav('/manage-outsiders') },
                           ].map((sub) => {
                             const active = sub.url ? location.pathname === sub.url : false;
