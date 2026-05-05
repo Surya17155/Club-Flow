@@ -99,6 +99,7 @@ const App = () => (
                 <Route path="/club-settings" element={<ClubSettingsPage />} />
                 <Route path="/assign-powers" element={<AssignPowersPage />} />
                 <Route path="/chatbot" element={<ChatbotPage />} />
+                <Route path="/super-admin/chatbot" element={<DesktopFrame><SuperAdminChatbotPage /></DesktopFrame>} />
                 <Route path="/attendance-history" element={<AttendanceHistory />} />
                 <Route path="/contact" element={<ContactUs />} />
                 <Route path="/contact2" element={<Contact2 />} />
