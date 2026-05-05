@@ -167,7 +167,26 @@ export function DashboardSidebar() {
     location.pathname === url || (url !== '/admin' && location.pathname.startsWith(url + '/'));
 
   const isSuperAdminEmail = user?.email === SUPER_ADMIN_EMAIL;
-  const isSuperAdminMode = location.pathname === '/super-admin' || location.pathname === '/global-reports' || location.pathname.startsWith('/club/');
+
+  // Super Admin mode is driven by the lock flag (NOT the URL), so navigating
+  // to /chatbot, /manage-outsiders, /global-reports, /settings, etc. while
+  // in Super Admin mode does NOT flip the sidebar back to Personal/Club.
+  const [isSuperAdminMode, setIsSuperAdminMode] = useState<boolean>(
+    () => sessionStorage.getItem('superAdminLockActive') === 'true'
+  );
+  useEffect(() => {
+    const sync = () => setIsSuperAdminMode(sessionStorage.getItem('superAdminLockActive') === 'true');
+    window.addEventListener('superAdminModeChanged', sync);
+    window.addEventListener('storage', sync);
+    return () => {
+      window.removeEventListener('superAdminModeChanged', sync);
+      window.removeEventListener('storage', sync);
+    };
+  }, []);
+  // Re-sync when route changes (in case the guard armed/disarmed the lock).
+  useEffect(() => {
+    setIsSuperAdminMode(sessionStorage.getItem('superAdminLockActive') === 'true');
+  }, [location.pathname]);
 
   // Determine view mode from localStorage, listen for changes
   const [viewMode, setViewModeLocal] = useState<'personal' | 'club'>(
@@ -205,12 +224,6 @@ export function DashboardSidebar() {
     }
   }
 
-  if (isSuperAdminEmail && isSuperAdminMode) {
-    // Super Admin sub-items are rendered as an inline drawer under the
-    // Super Admin toggle (not in the flat context list) so they visually
-    // group together and can collapse/expand smoothly.
-  }
-
   const initials = (profile?.full_name || user?.user_metadata?.full_name || 'U')
     .split(' ')
     .map((n: string) => n[0])
@@ -225,11 +238,14 @@ export function DashboardSidebar() {
 
   const handleSuperAdminToggle = () => {
     if (isSuperAdminMode) {
-      // Releasing the lock when explicitly toggling Super Admin off.
       sessionStorage.removeItem('superAdminLockActive');
+      setIsSuperAdminMode(false);
+      window.dispatchEvent(new Event('superAdminModeChanged'));
       navigate('/admin');
     } else {
       sessionStorage.setItem('superAdminLockActive', 'true');
+      setIsSuperAdminMode(true);
+      window.dispatchEvent(new Event('superAdminModeChanged'));
       navigate('/super-admin');
     }
   };
@@ -238,7 +254,7 @@ export function DashboardSidebar() {
   const superAdminSubItems = [
     { title: 'Global Reports', icon: FileText, action: () => navigate('/global-reports'), activeUrl: '/global-reports' as string | undefined },
     { title: 'Export Data', icon: Download, action: () => window.dispatchEvent(new Event('superAdminExportData')), activeUrl: undefined as string | undefined },
-    { title: 'AI Chatbot', icon: Bot, action: () => navigate('/chatbot'), activeUrl: '/chatbot' as string | undefined },
+    { title: 'AI Chatbot', icon: Bot, action: () => navigate('/super-admin/chatbot'), activeUrl: '/super-admin/chatbot' as string | undefined },
     { title: 'Manage Outsiders', icon: Users, action: () => navigate('/manage-outsiders'), activeUrl: '/manage-outsiders' as string | undefined },
   ];
 
