@@ -14,7 +14,7 @@ type Msg = { role: 'user' | 'assistant'; content: string };
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/club-chat`;
 const SUPER_ADMIN_EMAIL = 'suryakant.gnbba2029@iilm.edu';
 
-const ChatbotPage = () => {
+const ChatbotPage = ({ hideSidebar = false }: { hideSidebar?: boolean } = {}) => {
   const { user, session } = useAuth();
   const { activeClub } = useClub();
   // Always send the active club so the agent can execute actions (super admin still has unrestricted access in the function).
@@ -142,7 +142,7 @@ const ChatbotPage = () => {
 
   return (
     <div className="min-h-screen flex antialiased" style={{ backgroundColor: '#F4EFE7' }}>
-      {!isMobile && <DashboardSidebar />}
+      {!isMobile && !hideSidebar && <DashboardSidebar />}
       <div className="flex-1 overflow-y-auto" style={{ padding: isMobile ? '48px 16px 24px' : '24px 28px' }}>
         <div className="flex flex-col h-full max-w-3xl mx-auto" style={{ minHeight: 'calc(100vh - 120px)' }}>
       {/* Header */}
