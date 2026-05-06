@@ -29,6 +29,7 @@ import {
   Download,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Switch } from '@/components/ui/switch';
 import {
   motion,
   useMotionValue,
