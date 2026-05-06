@@ -140,6 +140,7 @@ export function DashboardSidebar() {
   const mouseY = useMotionValue(Infinity);
 
   const [showClubSwitcher, setShowClubSwitcher] = useState(false);
+  const [superAdminDrawerOpen, setSuperAdminDrawerOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
 
   const isNeo = activeDesign === 'design-2';
