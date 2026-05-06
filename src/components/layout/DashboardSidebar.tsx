@@ -238,17 +238,17 @@ export function DashboardSidebar() {
     navigate('/');
   };
 
-  const handleSuperAdminToggle = () => {
-    if (isSuperAdminMode) {
-      sessionStorage.removeItem('superAdminLockActive');
-      setIsSuperAdminMode(false);
-      window.dispatchEvent(new Event('superAdminModeChanged'));
-      navigate('/admin');
-    } else {
+  const setSuperAdminMode = (on: boolean) => {
+    if (on) {
       sessionStorage.setItem('superAdminLockActive', 'true');
       setIsSuperAdminMode(true);
       window.dispatchEvent(new Event('superAdminModeChanged'));
       navigate('/super-admin');
+    } else {
+      sessionStorage.removeItem('superAdminLockActive');
+      setIsSuperAdminMode(false);
+      window.dispatchEvent(new Event('superAdminModeChanged'));
+      navigate('/admin');
     }
   };
 
