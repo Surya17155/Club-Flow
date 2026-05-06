@@ -29,6 +29,7 @@ import {
   Download,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Switch } from '@/components/ui/switch';
 import {
   motion,
   useMotionValue,
@@ -139,6 +140,7 @@ export function DashboardSidebar() {
   const mouseY = useMotionValue(Infinity);
 
   const [showClubSwitcher, setShowClubSwitcher] = useState(false);
+  const [superAdminDrawerOpen, setSuperAdminDrawerOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
 
   const isNeo = activeDesign === 'design-2';
@@ -236,17 +238,17 @@ export function DashboardSidebar() {
     navigate('/');
   };
 
-  const handleSuperAdminToggle = () => {
-    if (isSuperAdminMode) {
-      sessionStorage.removeItem('superAdminLockActive');
-      setIsSuperAdminMode(false);
-      window.dispatchEvent(new Event('superAdminModeChanged'));
-      navigate('/admin');
-    } else {
+  const setSuperAdminMode = (on: boolean) => {
+    if (on) {
       sessionStorage.setItem('superAdminLockActive', 'true');
       setIsSuperAdminMode(true);
       window.dispatchEvent(new Event('superAdminModeChanged'));
       navigate('/super-admin');
+    } else {
+      sessionStorage.removeItem('superAdminLockActive');
+      setIsSuperAdminMode(false);
+      window.dispatchEvent(new Event('superAdminModeChanged'));
+      navigate('/admin');
     }
   };
 
@@ -359,11 +361,11 @@ export function DashboardSidebar() {
 
         {/* Nav items */}
         <nav ref={navRef} onScroll={handleNavScroll} className="flex-1 flex flex-col gap-1 px-3 mt-2 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
-          {/* Super Admin toggle + drawer (positioned at the top, above Dashboard) */}
+          {/* Super Admin toggle button + drawer (positioned at the top, above Dashboard) */}
           {isSuperAdminEmail && !collapsed && (
             <>
               <button
-                onClick={handleSuperAdminToggle}
+                onClick={() => setSuperAdminDrawerOpen((o) => !o)}
                 className="flex items-center gap-3 px-3 py-2.5 transition-all duration-200 w-full text-left"
                 style={{
                   color: isSuperAdminMode ? '#F59E0B' : inactiveText,
@@ -371,13 +373,13 @@ export function DashboardSidebar() {
                   background: isSuperAdminMode ? (isNeo ? '#2A2A2A' : 'rgba(245,158,11,0.1)') : 'transparent',
                   fontFamily: isNeo ? "'Space Grotesk', sans-serif" : undefined,
                 }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = hoverBg; }}
+                onMouseEnter={(e) => { if (!isSuperAdminMode) e.currentTarget.style.background = hoverBg; }}
                 onMouseLeave={(e) => { if (!isSuperAdminMode) e.currentTarget.style.background = 'transparent'; }}
               >
                 <Crown className="w-[18px] h-[18px] shrink-0" />
                 <span className="text-sm font-medium truncate flex-1">Super Admin</span>
                 <motion.div
-                  animate={{ rotate: isSuperAdminMode ? 180 : 0 }}
+                  animate={{ rotate: superAdminDrawerOpen ? 180 : 0 }}
                   transition={{ type: 'spring', stiffness: 300, damping: 26 }}
                 >
                   <ChevronRight className="w-3.5 h-3.5 rotate-90" style={{ opacity: 0.7 }} />
@@ -385,40 +387,37 @@ export function DashboardSidebar() {
               </button>
 
               <AnimatePresence initial={false}>
-                {isSuperAdminMode && (
+                {superAdminDrawerOpen && (
                   <motion.div
-                    key="super-admin-drawer-top"
+                    key="super-admin-switch-drawer"
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
                     transition={{ type: 'spring', stiffness: 280, damping: 30, mass: 0.7 }}
                     className="overflow-hidden"
                   >
-                    <div className="ml-3 pl-2 mt-1 mb-1 space-y-1" style={{ borderLeft: `2px solid ${isNeo ? '#333' : 'rgba(255,255,255,0.12)'}` }}>
-                      {superAdminSubItems.map((sub) => {
-                        const subActive = sub.activeUrl ? isActive(sub.activeUrl) : false;
-                        return (
-                          <button
-                            key={sub.title}
-                            onClick={sub.action}
-                            className="flex items-center gap-3 px-3 py-2 transition-all duration-200 w-full text-left"
-                            style={{
-                              background: subActive ? activeBg : 'transparent',
-                              color: subActive ? activeText : inactiveText,
-                              borderRadius: isNeo ? '8px' : '999px',
-                              border: subActive && isNeo ? '2px solid #111111' : '2px solid transparent',
-                              boxShadow: subActive && isNeo ? '2px 2px 0px #111111' : 'none',
-                              fontFamily: isNeo ? "'Space Grotesk', sans-serif" : undefined,
-                              fontWeight: subActive && isNeo ? 700 : 500,
-                            }}
-                            onMouseEnter={(e) => { if (!subActive) e.currentTarget.style.background = hoverBg; }}
-                            onMouseLeave={(e) => { if (!subActive) e.currentTarget.style.background = 'transparent'; }}
-                          >
-                            <sub.icon className="w-[16px] h-[16px] shrink-0" />
-                            <span className="text-[13px] truncate">{sub.title}</span>
-                          </button>
-                        );
-                      })}
+                    <div
+                      className="mx-1 my-1 px-3 py-3 flex items-center justify-between"
+                      style={{
+                        background: isNeo ? '#1C1C1C' : 'rgba(255,255,255,0.04)',
+                        border: `1px solid ${isNeo ? '#333' : 'rgba(255,255,255,0.08)'}`,
+                        borderRadius: isNeo ? '10px' : '12px',
+                      }}
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        <Crown className="w-4 h-4 shrink-0" style={{ color: '#F59E0B' }} />
+                        <span
+                          className="text-[12px] font-medium truncate"
+                          style={{ color: '#fff', fontFamily: isNeo ? "'Space Grotesk', sans-serif" : undefined }}
+                        >
+                          {isSuperAdminMode ? 'Turn Off' : 'Turn On'}
+                        </span>
+                      </div>
+                      <Switch
+                        checked={isSuperAdminMode}
+                        onCheckedChange={(c) => setSuperAdminMode(c)}
+                        className="scale-90"
+                      />
                     </div>
                   </motion.div>
                 )}
@@ -431,7 +430,7 @@ export function DashboardSidebar() {
           {isSuperAdminEmail && collapsed && (
             <div className="group relative">
               <button
-                onClick={handleSuperAdminToggle}
+                onClick={() => setSuperAdminMode(!isSuperAdminMode)}
                 className="flex items-center justify-center w-10 h-10 rounded-full mx-auto transition-colors"
                 style={{ color: isSuperAdminMode ? '#F59E0B' : inactiveText }}
               >
@@ -485,6 +484,36 @@ export function DashboardSidebar() {
               </button>
             );
           })}
+
+          {/* Super Admin sub-items (after Dashboard) */}
+          {isSuperAdminEmail && isSuperAdminMode && !collapsed && (
+            <div className="space-y-1 mt-1">
+              {superAdminSubItems.map((sub) => {
+                const subActive = sub.activeUrl ? isActive(sub.activeUrl) : false;
+                return (
+                  <button
+                    key={sub.title}
+                    onClick={sub.action}
+                    className="flex items-center gap-3 px-3 py-2.5 transition-all duration-200 w-full text-left"
+                    style={{
+                      background: subActive ? activeBg : 'transparent',
+                      color: subActive ? activeText : inactiveText,
+                      borderRadius: isNeo ? '10px' : '999px',
+                      border: subActive && isNeo ? '2px solid #111111' : '2px solid transparent',
+                      boxShadow: subActive && isNeo ? '3px 3px 0px #111111' : 'none',
+                      fontFamily: isNeo ? "'Space Grotesk', sans-serif" : undefined,
+                      fontWeight: subActive && isNeo ? 700 : 500,
+                    }}
+                    onMouseEnter={(e) => { if (!subActive) e.currentTarget.style.background = hoverBg; }}
+                    onMouseLeave={(e) => { if (!subActive) e.currentTarget.style.background = 'transparent'; }}
+                  >
+                    <sub.icon className="w-[18px] h-[18px] shrink-0" />
+                    <span className="text-sm truncate">{sub.title}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
 
           {/* Contextual items separator */}
           {contextItems.length > 0 && !collapsed && (
@@ -555,74 +584,101 @@ export function DashboardSidebar() {
           {/* Super Admin block moved to top of nav */}
         </nav>
 
-        {/* Bottom: contact us + sign out + collapse toggle */}
-        <div className="px-3 pb-4 space-y-1 mt-auto">
-          {/* Settings */}
-          <button
-            onClick={() => navigate('/settings')}
-            className="flex items-center gap-3 px-3 py-2.5 transition-all duration-200 w-full text-left"
-            style={{
-              color: isActive('/settings') ? activeText : inactiveText,
-              background: isActive('/settings') ? activeBg : 'transparent',
-              borderRadius: isNeo ? '10px' : '999px',
-              border: isActive('/settings') && isNeo ? '2px solid #111111' : '2px solid transparent',
-              boxShadow: isActive('/settings') && isNeo ? '3px 3px 0px #111111' : 'none',
-              fontFamily: isNeo ? "'Space Grotesk', sans-serif" : undefined,
-              fontWeight: isActive('/settings') && isNeo ? 700 : 500,
-            }}
-            onMouseEnter={(e) => { if (!isActive('/settings')) e.currentTarget.style.background = hoverBg; }}
-            onMouseLeave={(e) => { if (!isActive('/settings')) e.currentTarget.style.background = 'transparent'; }}
-          >
-            <Settings className="w-[18px] h-[18px] shrink-0" />
-            {!collapsed && (
-              <span className="text-sm font-medium" style={{ transition: 'opacity 0.2s ease' }}>
-                Settings
-              </span>
-            )}
-          </button>
+        {/* Bottom: settings + contact us + sign out + collapse toggle */}
+        <div
+          className="px-3 pb-4 space-y-1 mt-auto"
+          onMouseMove={(e) => { if (collapsed) mouseY.set(e.clientY); }}
+          onMouseLeave={() => mouseY.set(Infinity)}
+        >
+          {collapsed ? (
+            <>
+              <div className="group relative">
+                <MagnifiedIcon
+                  item={{ title: 'Settings', icon: Settings, url: '/settings' }}
+                  active={isActive('/settings')}
+                  mouseY={mouseY}
+                  onClick={() => navigate('/settings')}
+                  isNeo={isNeo}
+                />
+              </div>
+              <div className="group relative">
+                <MagnifiedIcon
+                  item={{ title: 'Contact Us', icon: HelpCircle, url: '/contact2' }}
+                  active={isActive('/contact2')}
+                  mouseY={mouseY}
+                  onClick={() => navigate('/contact2')}
+                  isNeo={isNeo}
+                />
+              </div>
+              <div className="group relative">
+                <MagnifiedIcon
+                  item={{ title: 'Sign Out', icon: LogOut, url: '' }}
+                  active={false}
+                  mouseY={mouseY}
+                  onClick={handleSignOut}
+                  isNeo={isNeo}
+                />
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Settings */}
+              <button
+                onClick={() => navigate('/settings')}
+                className="flex items-center gap-3 px-3 py-2.5 transition-all duration-200 w-full text-left"
+                style={{
+                  color: isActive('/settings') ? activeText : inactiveText,
+                  background: isActive('/settings') ? activeBg : 'transparent',
+                  borderRadius: isNeo ? '10px' : '999px',
+                  border: isActive('/settings') && isNeo ? '2px solid #111111' : '2px solid transparent',
+                  boxShadow: isActive('/settings') && isNeo ? '3px 3px 0px #111111' : 'none',
+                  fontFamily: isNeo ? "'Space Grotesk', sans-serif" : undefined,
+                  fontWeight: isActive('/settings') && isNeo ? 700 : 500,
+                }}
+                onMouseEnter={(e) => { if (!isActive('/settings')) e.currentTarget.style.background = hoverBg; }}
+                onMouseLeave={(e) => { if (!isActive('/settings')) e.currentTarget.style.background = 'transparent'; }}
+              >
+                <Settings className="w-[18px] h-[18px] shrink-0" />
+                <span className="text-sm font-medium">Settings</span>
+              </button>
 
-          {/* Contact Us */}
-          <button
-            onClick={() => navigate('/contact2')}
-            className="flex items-center gap-3 px-3 py-2.5 transition-all duration-200 w-full text-left"
-            style={{
-              color: isActive('/contact2') ? activeText : inactiveText,
-              background: isActive('/contact2') ? activeBg : 'transparent',
-              borderRadius: isNeo ? '10px' : '999px',
-              border: isActive('/contact2') && isNeo ? '2px solid #111111' : '2px solid transparent',
-              boxShadow: isActive('/contact2') && isNeo ? '3px 3px 0px #111111' : 'none',
-              fontFamily: isNeo ? "'Space Grotesk', sans-serif" : undefined,
-              fontWeight: isActive('/contact2') && isNeo ? 700 : 500,
-            }}
-            onMouseEnter={(e) => { if (!isActive('/contact2')) e.currentTarget.style.background = hoverBg; }}
-            onMouseLeave={(e) => { if (!isActive('/contact2')) e.currentTarget.style.background = 'transparent'; }}
-          >
-            <HelpCircle className="w-[18px] h-[18px] shrink-0" />
-            {!collapsed && (
-              <span className="text-sm font-medium" style={{ transition: 'opacity 0.2s ease' }}>
-                Contact Us
-              </span>
-            )}
-          </button>
+              {/* Contact Us */}
+              <button
+                onClick={() => navigate('/contact2')}
+                className="flex items-center gap-3 px-3 py-2.5 transition-all duration-200 w-full text-left"
+                style={{
+                  color: isActive('/contact2') ? activeText : inactiveText,
+                  background: isActive('/contact2') ? activeBg : 'transparent',
+                  borderRadius: isNeo ? '10px' : '999px',
+                  border: isActive('/contact2') && isNeo ? '2px solid #111111' : '2px solid transparent',
+                  boxShadow: isActive('/contact2') && isNeo ? '3px 3px 0px #111111' : 'none',
+                  fontFamily: isNeo ? "'Space Grotesk', sans-serif" : undefined,
+                  fontWeight: isActive('/contact2') && isNeo ? 700 : 500,
+                }}
+                onMouseEnter={(e) => { if (!isActive('/contact2')) e.currentTarget.style.background = hoverBg; }}
+                onMouseLeave={(e) => { if (!isActive('/contact2')) e.currentTarget.style.background = 'transparent'; }}
+              >
+                <HelpCircle className="w-[18px] h-[18px] shrink-0" />
+                <span className="text-sm font-medium">Contact Us</span>
+              </button>
 
-          <button
-            onClick={handleSignOut}
-            className="flex items-center gap-3 px-3 py-2.5 transition-all duration-200 w-full text-left"
-            style={{
-              color: inactiveText,
-              borderRadius: isNeo ? '10px' : '999px',
-              fontFamily: isNeo ? "'Space Grotesk', sans-serif" : undefined,
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = hoverBg; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
-          >
-            <LogOut className="w-[18px] h-[18px] shrink-0" />
-            {!collapsed && (
-              <span className="text-sm font-medium" style={{ transition: 'opacity 0.2s ease' }}>
-                Sign Out
-              </span>
-            )}
-          </button>
+              {/* Sign Out */}
+              <button
+                onClick={handleSignOut}
+                className="flex items-center gap-3 px-3 py-2.5 transition-all duration-200 w-full text-left"
+                style={{
+                  color: inactiveText,
+                  borderRadius: isNeo ? '10px' : '999px',
+                  fontFamily: isNeo ? "'Space Grotesk', sans-serif" : undefined,
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = hoverBg; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+              >
+                <LogOut className="w-[18px] h-[18px] shrink-0" />
+                <span className="text-sm font-medium">Sign Out</span>
+              </button>
+            </>
+          )}
 
           <button
             onClick={() => setCollapsed((c) => !c)}
