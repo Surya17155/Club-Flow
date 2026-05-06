@@ -394,7 +394,7 @@ export function DashboardSidebar() {
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
                     transition={{ type: 'spring', stiffness: 280, damping: 30, mass: 0.7 }}
-                    className="overflow-hidden"
+                    className="overflow-hidden shrink-0"
                   >
                     <div
                       className="mx-1 my-1 px-3 py-3 flex items-center justify-between"
