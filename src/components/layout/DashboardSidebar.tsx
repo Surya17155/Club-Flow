@@ -485,6 +485,36 @@ export function DashboardSidebar() {
             );
           })}
 
+          {/* Super Admin sub-items (after Dashboard) */}
+          {isSuperAdminEmail && isSuperAdminMode && !collapsed && (
+            <div className="space-y-1 mt-1">
+              {superAdminSubItems.map((sub) => {
+                const subActive = sub.activeUrl ? isActive(sub.activeUrl) : false;
+                return (
+                  <button
+                    key={sub.title}
+                    onClick={sub.action}
+                    className="flex items-center gap-3 px-3 py-2.5 transition-all duration-200 w-full text-left"
+                    style={{
+                      background: subActive ? activeBg : 'transparent',
+                      color: subActive ? activeText : inactiveText,
+                      borderRadius: isNeo ? '10px' : '999px',
+                      border: subActive && isNeo ? '2px solid #111111' : '2px solid transparent',
+                      boxShadow: subActive && isNeo ? '3px 3px 0px #111111' : 'none',
+                      fontFamily: isNeo ? "'Space Grotesk', sans-serif" : undefined,
+                      fontWeight: subActive && isNeo ? 700 : 500,
+                    }}
+                    onMouseEnter={(e) => { if (!subActive) e.currentTarget.style.background = hoverBg; }}
+                    onMouseLeave={(e) => { if (!subActive) e.currentTarget.style.background = 'transparent'; }}
+                  >
+                    <sub.icon className="w-[18px] h-[18px] shrink-0" />
+                    <span className="text-sm truncate">{sub.title}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
           {/* Contextual items separator */}
           {contextItems.length > 0 && !collapsed && (
             <div className="my-2 mx-2 border-t" style={{ borderColor: isNeo ? '#333' : 'rgba(255,255,255,0.1)' }} />
