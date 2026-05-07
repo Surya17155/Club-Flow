@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import ProfileDropdown from '@/components/dashboard/ProfileDropdown';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { MobileBottomNav } from '@/components/mobile/MobileBottomNav';
 
 const roleLabelMap: Record<string, string> = {
   admin: 'Admin', president: 'President', vice_president: 'Vice President',
@@ -182,7 +183,7 @@ const GlobalReports = () => {
   }
 
   return (
-    <div className={isMobile ? 'min-h-screen relative antialiased p-6 md:p-8 dashboard-corner-gradient text-foreground' : 'h-full overflow-auto p-1 text-foreground'}>
+    <div className={isMobile ? 'min-h-screen relative antialiased p-6 pb-24 md:p-8 dashboard-corner-gradient text-foreground' : 'h-full overflow-auto p-1 text-foreground'}>
       {isMobile && (
         <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
           <div className="absolute top-[-8%] left-[-8%] w-[550px] h-[550px] rounded-full mix-blend-multiply filter blur-[100px] opacity-80 animate-blob" style={{ backgroundColor: 'hsl(45 90% 85% / 0.9)' }} />
@@ -312,6 +313,7 @@ const GlobalReports = () => {
           </div>
         </aside>
       </main>
+      {isMobile && <MobileBottomNav />}
     </div>
   );
 };
