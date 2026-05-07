@@ -5,6 +5,7 @@ import { useProfile } from '@/hooks/useProfile';
 import { useClub } from '@/contexts/ClubContext';
 import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
 import { useDesign } from '@/contexts/DesignContext';
+import { isSuperAdminLockActive, setSuperAdminLockActive, SUPER_ADMIN_EMAIL, SUPER_ADMIN_MODE_EVENT } from '@/lib/superAdminMode';
 import {
   LayoutDashboard,
   Calendar,
@@ -57,7 +58,6 @@ const clubNavItems = [
 ];
 
 const STORAGE_KEY = 'dashboard-sidebar-collapsed';
-const SUPER_ADMIN_EMAIL = 'suryakant.gnbba2029@iilm.edu';
 
 function MagnifiedIcon({
   item,
@@ -174,20 +174,20 @@ export function DashboardSidebar() {
   // to /chatbot, /manage-outsiders, /global-reports, /settings, etc. while
   // in Super Admin mode does NOT flip the sidebar back to Personal/Club.
   const [isSuperAdminMode, setIsSuperAdminMode] = useState<boolean>(
-    () => sessionStorage.getItem('superAdminLockActive') === 'true'
+    () => isSuperAdminLockActive()
   );
   useEffect(() => {
-    const sync = () => setIsSuperAdminMode(sessionStorage.getItem('superAdminLockActive') === 'true');
-    window.addEventListener('superAdminModeChanged', sync);
+    const sync = () => setIsSuperAdminMode(isSuperAdminLockActive());
+    window.addEventListener(SUPER_ADMIN_MODE_EVENT, sync);
     window.addEventListener('storage', sync);
     return () => {
-      window.removeEventListener('superAdminModeChanged', sync);
+      window.removeEventListener(SUPER_ADMIN_MODE_EVENT, sync);
       window.removeEventListener('storage', sync);
     };
   }, []);
   // Re-sync when route changes (in case the guard armed/disarmed the lock).
   useEffect(() => {
-    setIsSuperAdminMode(sessionStorage.getItem('superAdminLockActive') === 'true');
+    setIsSuperAdminMode(isSuperAdminLockActive());
   }, [location.pathname]);
 
   // Determine view mode from localStorage, listen for changes
@@ -239,15 +239,11 @@ export function DashboardSidebar() {
   };
 
   const setSuperAdminMode = (on: boolean) => {
+    setSuperAdminLockActive(on);
+    setIsSuperAdminMode(on);
     if (on) {
-      sessionStorage.setItem('superAdminLockActive', 'true');
-      setIsSuperAdminMode(true);
-      window.dispatchEvent(new Event('superAdminModeChanged'));
       navigate('/super-admin');
     } else {
-      sessionStorage.removeItem('superAdminLockActive');
-      setIsSuperAdminMode(false);
-      window.dispatchEvent(new Event('superAdminModeChanged'));
       navigate('/admin');
     }
   };
