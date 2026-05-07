@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useClub } from '@/contexts/ClubContext';
 import { useProfile } from '@/hooks/useProfile';
 import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { isSuperAdminLockActive, setSuperAdminLockActive, SUPER_ADMIN_EMAIL, SUPER_ADMIN_MODE_EVENT } from '@/lib/superAdminMode';
 import { ChevronDown, User, Settings, LogOut, ArrowRightLeft, Check, ChevronRight, Shield, Crown, Settings2, Bot, Users } from 'lucide-react';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator,
@@ -14,8 +15,6 @@ import { Switch } from '@/components/ui/switch';
 import AssignPowersModal from './AssignPowersModal';
 import ClubSettingsModal from './ClubSettingsModal';
 import { ChatPanel } from '@/components/chat/ChatPanel';
-
-const SUPER_ADMIN_EMAIL = 'suryakant.gnbba2029@iilm.edu';
 
 const roleLabelMap: Record<string, string> = {
   admin: 'Admin',
@@ -38,14 +37,27 @@ const ProfileDropdown = ({ viewMode = 'personal' }: { viewMode?: 'personal' | 'c
   const [showPowersModal, setShowPowersModal] = useState(false);
   const [showClubSettings, setShowClubSettings] = useState(false);
   const [showChat, setShowChat] = useState(false);
+  const [isSuperAdminMode, setIsSuperAdminMode] = useState(() => isSuperAdminLockActive());
 
   const isSuperAdminEmail = user?.email === SUPER_ADMIN_EMAIL;
-  const isSuperAdminMode = location.pathname === '/super-admin' || location.pathname === '/global-reports' || location.pathname.startsWith('/club/');
+
+  useEffect(() => {
+    const sync = () => setIsSuperAdminMode(isSuperAdminLockActive());
+    sync();
+    window.addEventListener(SUPER_ADMIN_MODE_EVENT, sync);
+    window.addEventListener('storage', sync);
+    return () => {
+      window.removeEventListener(SUPER_ADMIN_MODE_EVENT, sync);
+      window.removeEventListener('storage', sync);
+    };
+  }, [location.pathname]);
 
   // Show chatbot in Super Admin mode OR in Club mode if president/admin/has power
   const showChatOption = isSuperAdminMode || (viewMode === 'club' && hasPower('use_chatbot'));
 
   const handleSuperAdminToggle = (checked: boolean) => {
+    setSuperAdminLockActive(checked);
+    setIsSuperAdminMode(checked);
     if (checked) {
       navigate('/super-admin');
     } else {

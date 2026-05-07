@@ -10,12 +10,11 @@ import { toast } from '@/hooks/use-toast';
 import { ChatResponseRenderer } from '@/components/chat/ChatResponseRenderer';
 import { useChatFileUpload } from '@/hooks/useChatFileUpload';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { isSuperAdminLockActive, SUPER_ADMIN_EMAIL } from '@/lib/superAdminMode';
 
 type Msg = { role: 'user' | 'assistant'; content: string };
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/club-chat`;
-
-const SUPER_ADMIN_EMAIL = 'suryakant.gnbba2029@iilm.edu';
 
 const MobileChat = () => {
   const navigate = useNavigate();
@@ -23,7 +22,7 @@ const MobileChat = () => {
   const { session, user } = useAuth();
   const { activeClub } = useClub();
   const isMobile = useIsMobile();
-  const isSuperAdminMode = location.state?.superAdmin === true;
+  const isSuperAdminMode = location.state?.superAdmin === true || isSuperAdminLockActive();
   const isSuperAdmin = user?.email === SUPER_ADMIN_EMAIL && isSuperAdminMode;
   const effectiveClubId = isSuperAdmin ? undefined : activeClub?.club_id;
   const [messages, setMessages] = useState<Msg[]>([]);
@@ -140,8 +139,8 @@ const MobileChat = () => {
         </Button>
         <Bot className="w-5 h-5 text-primary" />
         <div>
-          <p className="text-sm font-semibold text-foreground">ClubBot</p>
-          <p className="text-xs text-muted-foreground">AI Assistant</p>
+          <p className="text-sm font-semibold text-foreground">{isSuperAdmin ? 'Super Admin AI' : 'ClubBot'}</p>
+          <p className="text-xs text-muted-foreground">{isSuperAdmin ? 'Command Center Assistant' : 'AI Assistant'}</p>
         </div>
       </div>
 
@@ -149,8 +148,8 @@ const MobileChat = () => {
         {messages.length === 0 && (
           <div className="text-center text-muted-foreground text-sm mt-16">
             <Bot className="w-12 h-12 mx-auto mb-3 opacity-30" />
-            <p className="text-base font-medium mb-1">Hi! I'm ClubBot</p>
-            <p>Ask me anything about your club — members, events, attendance, and more.</p>
+            <p className="text-base font-medium mb-1">Hi! I'm {isSuperAdmin ? 'Super Admin AI' : 'ClubBot'}</p>
+            <p>{isSuperAdmin ? 'Ask me anything about clubs, members, events, attendance, and platform management.' : 'Ask me anything about your club — members, events, attendance, and more.'}</p>
             <p className="text-xs mt-2 opacity-70">📎 You can also upload Excel, PDF, or image files</p>
           </div>
         )}
@@ -207,7 +206,7 @@ const MobileChat = () => {
                 send();
               }
             }}
-            placeholder="Ask about your club..."
+            placeholder={isSuperAdmin ? 'Ask across all club data...' : 'Ask about your club...'}
             disabled={loading}
             className="text-sm min-h-[40px] max-h-[120px] resize-none rounded-xl"
             rows={1}
