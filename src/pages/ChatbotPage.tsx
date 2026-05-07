@@ -9,6 +9,7 @@ import { toast } from '@/hooks/use-toast';
 import { ChatResponseRenderer } from '@/components/chat/ChatResponseRenderer';
 import { useChatFileUpload } from '@/hooks/useChatFileUpload';
 import { MobileBottomNav } from '@/components/mobile/MobileBottomNav';
+import { isSuperAdminLockActive } from '@/lib/superAdminMode';
 
 type Msg = { role: 'user' | 'assistant'; content: string };
 
@@ -18,8 +19,8 @@ const SUPER_ADMIN_EMAIL = 'suryakant.gnbba2029@iilm.edu';
 const ChatbotPage = ({ hideSidebar = false }: { hideSidebar?: boolean } = {}) => {
   const { user, session } = useAuth();
   const { activeClub } = useClub();
-  // Always send the active club so the agent can execute actions (super admin still has unrestricted access in the function).
-  const activeClubId = activeClub?.club_id;
+  const isSuperAdminChat = user?.email === SUPER_ADMIN_EMAIL && isSuperAdminLockActive();
+  const activeClubId = isSuperAdminChat ? undefined : activeClub?.club_id;
 
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState('');
@@ -159,7 +160,7 @@ const ChatbotPage = ({ hideSidebar = false }: { hideSidebar?: boolean } = {}) =>
             AI Chatbot
           </h1>
           <p className="text-xs truncate" style={{ color: '#6B7280', fontFamily: "'Space Grotesk', sans-serif" }}>
-            {activeClub ? `Managing ${activeClub.club_name}` : 'Super Admin Mode'}
+            {isSuperAdminChat ? 'Super Admin Mode' : activeClub ? `Managing ${activeClub.club_name}` : 'Club Mode'}
           </p>
         </div>
         <button
