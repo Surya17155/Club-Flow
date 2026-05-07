@@ -1,7 +1,9 @@
 import { memo, useCallback, useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Home, Users, Calendar, User, Plus } from "lucide-react";
+import { Home, Users, Calendar, User, Plus, Bot, FileText } from "lucide-react";
 import { useDelegatedPowers } from "@/hooks/useDelegatedPowers";
+import { useAuth } from "@/contexts/AuthContext";
+import { isSuperAdminLockActive, SUPER_ADMIN_EMAIL, SUPER_ADMIN_MODE_EVENT } from "@/lib/superAdminMode";
 
 const personalTabs = [
   { label: "Home", icon: Home, path: "/admin" },
@@ -20,9 +22,20 @@ const clubRightTabs = [
   { label: "Profile", icon: User, path: "/profile" },
 ] as const;
 
+const superAdminLeftTabs = [
+  { label: "Home", icon: Home, path: "/super-admin" },
+  { label: "Reports", icon: FileText, path: "/global-reports" },
+] as const;
+
+const superAdminRightTabs = [
+  { label: "Outsiders", icon: Users, path: "/manage-outsiders" },
+  { label: "Profile", icon: User, path: "/profile" },
+] as const;
+
 function MobileBottomNavInner() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const [viewMode, setViewMode] = useState<'personal' | 'club'>(() => {
     return (localStorage.getItem('dashboardViewMode') as 'personal' | 'club') || 'personal';
@@ -37,6 +50,19 @@ function MobileBottomNavInner() {
     return () => { window.removeEventListener('storage', handler); window.removeEventListener('viewModeChanged', handler); };
   }, []);
 
+  const [isSuperAdminMode, setIsSuperAdminMode] = useState(() => isSuperAdminLockActive());
+
+  useEffect(() => {
+    const syncSuperAdminMode = () => setIsSuperAdminMode(isSuperAdminLockActive());
+    syncSuperAdminMode();
+    window.addEventListener(SUPER_ADMIN_MODE_EVENT, syncSuperAdminMode);
+    window.addEventListener('storage', syncSuperAdminMode);
+    return () => {
+      window.removeEventListener(SUPER_ADMIN_MODE_EVENT, syncSuperAdminMode);
+      window.removeEventListener('storage', syncSuperAdminMode);
+    };
+  }, [location.pathname]);
+
   let canCreateEvent = false;
   try {
     const { hasPower } = useDelegatedPowers();
@@ -46,6 +72,7 @@ function MobileBottomNavInner() {
   }
 
   const isClubMode = viewMode === 'club';
+  const isSuperAdmin = user?.email === SUPER_ADMIN_EMAIL && isSuperAdminMode;
   const handleNav = useCallback((path: string) => navigate(path), [navigate]);
 
   const renderTab = useCallback(({ label, icon: Icon, path }: { label: string; icon: any; path: string }) => {
@@ -96,7 +123,33 @@ function MobileBottomNavInner() {
           minHeight: '56px',
         }}
       >
-        {isClubMode ? (
+        {isSuperAdmin ? (
+          <>
+            {superAdminLeftTabs.map(renderTab)}
+
+            <button
+              onClick={() => navigate("/super-admin/chatbot")}
+              className="relative -mt-5 flex flex-col items-center justify-center transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+              style={{
+                width: '58px',
+                height: '54px',
+                background: '#E98A3A',
+                border: '2px solid #111',
+                boxShadow: '3px 3px 0px #111',
+              }}
+            >
+              <Bot className="w-6 h-6" style={{ color: '#111' }} strokeWidth={3} />
+              <span
+                className="text-[9px] uppercase leading-none mt-0.5"
+                style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800, color: '#111' }}
+              >
+                AI
+              </span>
+            </button>
+
+            {superAdminRightTabs.map(renderTab)}
+          </>
+        ) : isClubMode ? (
           <>
             {clubLeftTabs.map(renderTab)}
 
