@@ -1,9 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-
-const SUPER_ADMIN_EMAIL = 'suryakant.gnbba2029@iilm.edu';
-const STORAGE_KEY = 'superAdminLockActive';
+import { SUPER_ADMIN_EMAIL, SUPER_ADMIN_LOCK_KEY } from '@/lib/superAdminMode';
 
 // Routes allowed while locked into Super Admin Mode.
 const ALLOWED_PREFIXES = [
@@ -28,17 +26,9 @@ export function SuperAdminGuard() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Auto-arm the lock whenever the super admin lands on a super admin route.
   useEffect(() => {
     if (user?.email !== SUPER_ADMIN_EMAIL) return;
-    if (location.pathname.startsWith('/super-admin')) {
-      sessionStorage.setItem(STORAGE_KEY, 'true');
-    }
-  }, [user?.email, location.pathname]);
-
-  useEffect(() => {
-    if (user?.email !== SUPER_ADMIN_EMAIL) return;
-    const locked = sessionStorage.getItem(STORAGE_KEY) === 'true';
+    const locked = sessionStorage.getItem(SUPER_ADMIN_LOCK_KEY) === 'true';
     if (!locked) return;
     if (!isAllowed(location.pathname)) {
       navigate('/super-admin', { replace: true });
