@@ -81,7 +81,7 @@ export function MobileNavigationOverlay() {
       />
 
       <div
-        className="fixed top-0 left-0 z-40 md:hidden"
+        className="fixed top-0 left-0 z-[55] md:hidden"
         style={{
           paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)',
         }}
