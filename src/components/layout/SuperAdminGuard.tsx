@@ -37,6 +37,3 @@ export function SuperAdminGuard() {
 
   return null;
 }
-
-export const SUPER_ADMIN_LOCK_KEY = STORAGE_KEY;
-export { SUPER_ADMIN_EMAIL };
