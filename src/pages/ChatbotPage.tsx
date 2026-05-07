@@ -8,6 +8,7 @@ import { useClub } from '@/contexts/ClubContext';
 import { toast } from '@/hooks/use-toast';
 import { ChatResponseRenderer } from '@/components/chat/ChatResponseRenderer';
 import { useChatFileUpload } from '@/hooks/useChatFileUpload';
+import { MobileBottomNav } from '@/components/mobile/MobileBottomNav';
 
 type Msg = { role: 'user' | 'assistant'; content: string };
 
@@ -143,8 +144,8 @@ const ChatbotPage = ({ hideSidebar = false }: { hideSidebar?: boolean } = {}) =>
   return (
     <div className="min-h-screen flex antialiased" style={{ backgroundColor: '#F4EFE7' }}>
       {!isMobile && !hideSidebar && <DashboardSidebar />}
-      <div className="flex-1 overflow-y-auto" style={{ padding: isMobile ? '48px 16px 24px' : '24px 28px' }}>
-        <div className="flex flex-col h-full max-w-3xl mx-auto" style={{ minHeight: 'calc(100vh - 120px)' }}>
+      <div className="flex-1 overflow-y-auto" style={{ padding: isMobile ? '48px 16px 92px' : '24px 28px' }}>
+        <div className="flex flex-col h-full max-w-3xl mx-auto" style={{ minHeight: isMobile ? 'calc(100vh - 140px)' : 'calc(100vh - 120px)' }}>
       {/* Header */}
       <div className="flex items-center gap-3 mb-4">
         <div
@@ -338,6 +339,7 @@ const ChatbotPage = ({ hideSidebar = false }: { hideSidebar?: boolean } = {}) =>
       </div>
         </div>
       </div>
+      {isMobile && <MobileBottomNav />}
     </div>
   );
 };
