@@ -8,6 +8,7 @@ const ALLOWED_PREFIXES = [
   '/super-admin',
   '/global-reports',
   '/manage-outsiders',
+  '/profile',
   '/settings',
   '/contact2',
   '/club/', // super admin can drill into any club from the command center
