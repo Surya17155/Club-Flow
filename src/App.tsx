@@ -1,4 +1,3 @@
-import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -38,13 +37,11 @@ import ContactUs from "./pages/ContactUs";
 import Contact2 from "./pages/Contact2";
 import Reviews from "./pages/Reviews";
 import Forms from "./pages/Forms";
-
-// Lazy-load rarely visited routes
-const MarkAttendance = lazy(() => import("./pages/MarkAttendance"));
-const SuperAdminDashboard = lazy(() => import("./pages/SuperAdminDashboard"));
-const GlobalReports = lazy(() => import("./pages/GlobalReports"));
-const ManageOutsiders = lazy(() => import("./pages/ManageOutsiders"));
-const NotFound = lazy(() => import("./pages/NotFound"));
+import MarkAttendance from "./pages/MarkAttendance";
+import SuperAdminDashboard from "./pages/SuperAdminDashboard";
+import GlobalReports from "./pages/GlobalReports";
+import ManageOutsiders from "./pages/ManageOutsiders";
+import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -55,12 +52,6 @@ const queryClient = new QueryClient({
   },
 });
 
-const PageFallback = () => (
-  <div className="min-h-screen flex items-center justify-center bg-background">
-    <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin" />
-  </div>
-);
-
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -70,7 +61,6 @@ const App = () => (
         <AuthProvider>
           <ClubProvider>
             <DesignProvider>
-            <Suspense fallback={<PageFallback />}>
               <MobileNavigationOverlay />
               <SuperAdminGuard />
               <Routes>
@@ -109,7 +99,6 @@ const App = () => (
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
-            </Suspense>
             </DesignProvider>
           </ClubProvider>
         </AuthProvider>
