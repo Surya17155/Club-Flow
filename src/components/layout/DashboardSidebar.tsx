@@ -577,105 +577,108 @@ export function DashboardSidebar() {
             </div>
           )}
 
-          {/* Super Admin block moved to top of nav */}
+          {/* Divider before footer items */}
+          <div className="my-2 mx-2 border-t" style={{ borderColor: isNeo ? '#333' : 'rgba(255,255,255,0.1)' }} />
+
+          {/* Settings */}
+          {collapsed ? (
+            <div className="group relative">
+              <MagnifiedIcon
+                item={{ title: 'Settings', icon: Settings, url: '/settings' }}
+                active={isActive('/settings')}
+                mouseY={mouseY}
+                onClick={() => navigate('/settings')}
+                isNeo={isNeo}
+              />
+            </div>
+          ) : (
+            <button
+              onClick={() => navigate('/settings')}
+              className="flex items-center gap-3 px-3 py-2.5 transition-all duration-200 w-full text-left"
+              style={{
+                color: isActive('/settings') ? activeText : inactiveText,
+                background: isActive('/settings') ? activeBg : 'transparent',
+                borderRadius: isNeo ? '10px' : '999px',
+                border: isActive('/settings') && isNeo ? '2px solid #111111' : '2px solid transparent',
+                boxShadow: isActive('/settings') && isNeo ? '3px 3px 0px #111111' : 'none',
+                fontFamily: isNeo ? "'Space Grotesk', sans-serif" : undefined,
+                fontWeight: isActive('/settings') && isNeo ? 700 : 500,
+              }}
+              onMouseEnter={(e) => { if (!isActive('/settings')) e.currentTarget.style.background = hoverBg; }}
+              onMouseLeave={(e) => { if (!isActive('/settings')) e.currentTarget.style.background = 'transparent'; }}
+            >
+              <Settings className="w-[18px] h-[18px] shrink-0" />
+              <span className="text-sm font-medium">Settings</span>
+            </button>
+          )}
+
+          {/* Contact Us */}
+          {collapsed ? (
+            <div className="group relative">
+              <MagnifiedIcon
+                item={{ title: 'Contact Us', icon: HelpCircle, url: '/contact2' }}
+                active={isActive('/contact2')}
+                mouseY={mouseY}
+                onClick={() => navigate('/contact2')}
+                isNeo={isNeo}
+              />
+            </div>
+          ) : (
+            <button
+              onClick={() => navigate('/contact2')}
+              className="flex items-center gap-3 px-3 py-2.5 transition-all duration-200 w-full text-left"
+              style={{
+                color: isActive('/contact2') ? activeText : inactiveText,
+                background: isActive('/contact2') ? activeBg : 'transparent',
+                borderRadius: isNeo ? '10px' : '999px',
+                border: isActive('/contact2') && isNeo ? '2px solid #111111' : '2px solid transparent',
+                boxShadow: isActive('/contact2') && isNeo ? '3px 3px 0px #111111' : 'none',
+                fontFamily: isNeo ? "'Space Grotesk', sans-serif" : undefined,
+                fontWeight: isActive('/contact2') && isNeo ? 700 : 500,
+              }}
+              onMouseEnter={(e) => { if (!isActive('/contact2')) e.currentTarget.style.background = hoverBg; }}
+              onMouseLeave={(e) => { if (!isActive('/contact2')) e.currentTarget.style.background = 'transparent'; }}
+            >
+              <HelpCircle className="w-[18px] h-[18px] shrink-0" />
+              <span className="text-sm font-medium">Contact Us</span>
+            </button>
+          )}
+
+          {/* Sign Out */}
+          {collapsed ? (
+            <div className="group relative">
+              <MagnifiedIcon
+                item={{ title: 'Sign Out', icon: LogOut, url: '' }}
+                active={false}
+                mouseY={mouseY}
+                onClick={handleSignOut}
+                isNeo={isNeo}
+              />
+            </div>
+          ) : (
+            <button
+              onClick={handleSignOut}
+              className="flex items-center gap-3 px-3 py-2.5 transition-all duration-200 w-full text-left"
+              style={{
+                color: inactiveText,
+                borderRadius: isNeo ? '10px' : '999px',
+                fontFamily: isNeo ? "'Space Grotesk', sans-serif" : undefined,
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = hoverBg; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+            >
+              <LogOut className="w-[18px] h-[18px] shrink-0" />
+              <span className="text-sm font-medium">Sign Out</span>
+            </button>
+          )}
         </nav>
 
-        {/* Bottom: settings + contact us + sign out + collapse toggle */}
+        {/* Bottom: collapse toggle only */}
         <div
-          className="px-3 pb-4 space-y-1 mt-auto"
+          className="px-3 pb-4 mt-auto"
           onMouseMove={(e) => { if (collapsed) mouseY.set(e.clientY); }}
           onMouseLeave={() => mouseY.set(Infinity)}
         >
-          {collapsed ? (
-            <>
-              <div className="group relative">
-                <MagnifiedIcon
-                  item={{ title: 'Settings', icon: Settings, url: '/settings' }}
-                  active={isActive('/settings')}
-                  mouseY={mouseY}
-                  onClick={() => navigate('/settings')}
-                  isNeo={isNeo}
-                />
-              </div>
-              <div className="group relative">
-                <MagnifiedIcon
-                  item={{ title: 'Contact Us', icon: HelpCircle, url: '/contact2' }}
-                  active={isActive('/contact2')}
-                  mouseY={mouseY}
-                  onClick={() => navigate('/contact2')}
-                  isNeo={isNeo}
-                />
-              </div>
-              <div className="group relative">
-                <MagnifiedIcon
-                  item={{ title: 'Sign Out', icon: LogOut, url: '' }}
-                  active={false}
-                  mouseY={mouseY}
-                  onClick={handleSignOut}
-                  isNeo={isNeo}
-                />
-              </div>
-            </>
-          ) : (
-            <>
-              {/* Settings */}
-              <button
-                onClick={() => navigate('/settings')}
-                className="flex items-center gap-3 px-3 py-2.5 transition-all duration-200 w-full text-left"
-                style={{
-                  color: isActive('/settings') ? activeText : inactiveText,
-                  background: isActive('/settings') ? activeBg : 'transparent',
-                  borderRadius: isNeo ? '10px' : '999px',
-                  border: isActive('/settings') && isNeo ? '2px solid #111111' : '2px solid transparent',
-                  boxShadow: isActive('/settings') && isNeo ? '3px 3px 0px #111111' : 'none',
-                  fontFamily: isNeo ? "'Space Grotesk', sans-serif" : undefined,
-                  fontWeight: isActive('/settings') && isNeo ? 700 : 500,
-                }}
-                onMouseEnter={(e) => { if (!isActive('/settings')) e.currentTarget.style.background = hoverBg; }}
-                onMouseLeave={(e) => { if (!isActive('/settings')) e.currentTarget.style.background = 'transparent'; }}
-              >
-                <Settings className="w-[18px] h-[18px] shrink-0" />
-                <span className="text-sm font-medium">Settings</span>
-              </button>
-
-              {/* Contact Us */}
-              <button
-                onClick={() => navigate('/contact2')}
-                className="flex items-center gap-3 px-3 py-2.5 transition-all duration-200 w-full text-left"
-                style={{
-                  color: isActive('/contact2') ? activeText : inactiveText,
-                  background: isActive('/contact2') ? activeBg : 'transparent',
-                  borderRadius: isNeo ? '10px' : '999px',
-                  border: isActive('/contact2') && isNeo ? '2px solid #111111' : '2px solid transparent',
-                  boxShadow: isActive('/contact2') && isNeo ? '3px 3px 0px #111111' : 'none',
-                  fontFamily: isNeo ? "'Space Grotesk', sans-serif" : undefined,
-                  fontWeight: isActive('/contact2') && isNeo ? 700 : 500,
-                }}
-                onMouseEnter={(e) => { if (!isActive('/contact2')) e.currentTarget.style.background = hoverBg; }}
-                onMouseLeave={(e) => { if (!isActive('/contact2')) e.currentTarget.style.background = 'transparent'; }}
-              >
-                <HelpCircle className="w-[18px] h-[18px] shrink-0" />
-                <span className="text-sm font-medium">Contact Us</span>
-              </button>
-
-              {/* Sign Out */}
-              <button
-                onClick={handleSignOut}
-                className="flex items-center gap-3 px-3 py-2.5 transition-all duration-200 w-full text-left"
-                style={{
-                  color: inactiveText,
-                  borderRadius: isNeo ? '10px' : '999px',
-                  fontFamily: isNeo ? "'Space Grotesk', sans-serif" : undefined,
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = hoverBg; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
-              >
-                <LogOut className="w-[18px] h-[18px] shrink-0" />
-                <span className="text-sm font-medium">Sign Out</span>
-              </button>
-            </>
-          )}
-
           <button
             onClick={() => setCollapsed((c) => !c)}
             className="flex items-center justify-center w-full py-2 transition-all duration-200"
