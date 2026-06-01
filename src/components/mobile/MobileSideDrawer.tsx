@@ -366,58 +366,69 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
                   </AnimatePresence>
                 </>
               )}
-            </nav>
+              {/* Divider before footer items */}
+              <div className="my-2 mx-2" style={{ borderTop: '2px solid #ddd' }} />
 
-            {/* Settings + Contact Us + Sign Out */}
-            <div className="px-3 pb-5" style={{ borderTop: '2px solid #ddd', paddingTop: '12px' }}>
-              <button
-                onClick={() => { nav('/settings'); onClose(); }}
-                className="flex items-center gap-3 w-full px-4 py-3 text-left mb-2"
-                style={{
-                  fontFamily: "'Space Grotesk', sans-serif",
-                  fontWeight: location.pathname === '/settings' ? 800 : 700,
-                  color: location.pathname === '/settings' ? '#111' : '#111',
-                  background: location.pathname === '/settings' ? '#E98A3A' : 'transparent',
-                  border: location.pathname === '/settings' ? '2px solid #111' : '2px solid transparent',
-                  boxShadow: location.pathname === '/settings' ? '3px 3px 0px #111' : 'none',
-                  borderRadius: '6px',
-                }}
-              >
-                <Settings className="w-5 h-5" />
-                <span className="text-sm">Settings</span>
-              </button>
-              <button
-                onClick={() => { nav('/contact2'); onClose(); }}
-                className="flex items-center gap-3 w-full px-4 py-3 text-left mb-2"
-                style={{
-                  fontFamily: "'Space Grotesk', sans-serif",
-                  fontWeight: location.pathname === '/contact2' ? 800 : 700,
-                  color: location.pathname === '/contact2' ? '#111' : '#111',
-                  background: location.pathname === '/contact2' ? '#E98A3A' : 'transparent',
-                  border: location.pathname === '/contact2' ? '2px solid #111' : '2px solid transparent',
-                  boxShadow: location.pathname === '/contact2' ? '3px 3px 0px #111' : 'none',
-                  borderRadius: '6px',
-                }}
-              >
-                <HelpCircle className="w-5 h-5" />
-                <span className="text-sm">Contact Us</span>
-              </button>
+              {/* Settings */}
+              {(() => {
+                const active = location.pathname === '/settings';
+                return (
+                  <button
+                    onClick={() => { nav('/settings'); onClose(); }}
+                    className="flex items-center gap-3 w-full px-4 py-3 text-left transition-all"
+                    style={{
+                      background: active ? '#E98A3A' : 'transparent',
+                      color: active ? '#111' : '#333',
+                      border: active ? '2px solid #111' : '2px solid transparent',
+                      boxShadow: active ? '3px 3px 0px #111' : 'none',
+                      fontFamily: "'Space Grotesk', sans-serif",
+                      fontWeight: active ? 800 : 600,
+                    }}
+                  >
+                    <Settings className="w-5 h-5 shrink-0" />
+                    <span className="text-sm">Settings</span>
+                  </button>
+                );
+              })()}
+
+              {/* Contact Us */}
+              {(() => {
+                const active = location.pathname === '/contact2';
+                return (
+                  <button
+                    onClick={() => { nav('/contact2'); onClose(); }}
+                    className="flex items-center gap-3 w-full px-4 py-3 text-left transition-all"
+                    style={{
+                      background: active ? '#E98A3A' : 'transparent',
+                      color: active ? '#111' : '#333',
+                      border: active ? '2px solid #111' : '2px solid transparent',
+                      boxShadow: active ? '3px 3px 0px #111' : 'none',
+                      fontFamily: "'Space Grotesk', sans-serif",
+                      fontWeight: active ? 800 : 600,
+                    }}
+                  >
+                    <HelpCircle className="w-5 h-5 shrink-0" />
+                    <span className="text-sm">Contact Us</span>
+                  </button>
+                );
+              })()}
+
+              {/* Sign Out */}
               <button
                 onClick={async () => { await signOut(); navigate('/'); onClose(); }}
-                className="flex items-center gap-3 w-full px-4 py-3 text-left"
+                className="flex items-center gap-3 w-full px-4 py-3 text-left transition-all"
                 style={{
                   fontFamily: "'Space Grotesk', sans-serif",
-                  fontWeight: 700,
-                  color: '#111',
-                  background: '#F4EFE7',
-                  border: '2px solid #111',
-                  boxShadow: '3px 3px 0px #111',
+                  fontWeight: 600,
+                  color: '#333',
+                  background: 'transparent',
+                  border: '2px solid transparent',
                 }}
               >
-                <LogOut className="w-5 h-5" />
+                <LogOut className="w-5 h-5 shrink-0" />
                 <span className="text-sm">Sign Out</span>
               </button>
-            </div>
+            </nav>
           </motion.div>
         </>
       )}
