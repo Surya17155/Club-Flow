@@ -2,23 +2,22 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import type { Tables } from '@/integrations/supabase/types';
+import { getCachedProfile, preloadProfile, setCachedProfile } from '@/lib/preloadCache';
 
 type Profile = Tables<'profiles'>;
 
 export const useProfile = () => {
   const { user } = useAuth();
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<Profile | null>(() => user ? getCachedProfile(user.id) ?? null : null);
+  const [loading, setLoading] = useState(() => user ? !getCachedProfile(user.id) : false);
 
-  const fetchProfile = async () => {
+  const fetchProfile = async (force = false) => {
     if (!user) return;
-    setLoading(true);
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('user_id', user.id)
-      .single();
-    if (!error && data) setProfile(data);
+    const cached = getCachedProfile(user.id);
+    if (cached && !force) setProfile(cached);
+    else setLoading(true);
+    const data = await preloadProfile(user.id, force);
+    if (data) setProfile(data);
     setLoading(false);
   };
 
@@ -35,6 +34,7 @@ export const useProfile = () => {
       .select()
       .single();
     if (error) throw error;
+    setCachedProfile(user.id, data);
     setProfile(data);
     return data;
   };
