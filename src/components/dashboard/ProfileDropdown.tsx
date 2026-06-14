@@ -58,11 +58,6 @@ const ProfileDropdown = ({ viewMode = 'personal' }: { viewMode?: 'personal' | 'c
   const handleSuperAdminToggle = (checked: boolean) => {
     setSuperAdminLockActive(checked);
     setIsSuperAdminMode(checked);
-    if (checked) {
-      navigate('/super-admin');
-    } else {
-      navigate('/admin');
-    }
   };
 
   const fullName = profile?.full_name || 'User';

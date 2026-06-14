@@ -208,7 +208,6 @@ export function DashboardSidebar() {
     localStorage.setItem('dashboardViewMode', mode);
     setViewModeLocal(mode);
     window.dispatchEvent(new Event('viewModeChanged'));
-    navigate('/admin');
   };
 
   // Build contextual nav items
@@ -241,11 +240,6 @@ export function DashboardSidebar() {
   const setSuperAdminMode = (on: boolean) => {
     setSuperAdminLockActive(on);
     setIsSuperAdminMode(on);
-    if (on) {
-      navigate('/super-admin');
-    } else {
-      navigate('/admin');
-    }
   };
 
   // Sub-items shown under the Super Admin toggle when active.

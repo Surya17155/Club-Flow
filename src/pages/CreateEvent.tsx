@@ -202,8 +202,8 @@ function to24(hour: string, minute: string, period: 'AM' | 'PM'): string {
 
 const CreateEvent = () => {
   const { user, loading } = useAuth();
-  const { activeClub } = useClub();
-  const { hasPower } = useDelegatedPowers();
+  const { activeClub, loading: clubsLoading } = useClub();
+  const { hasPower, loading: powersLoading } = useDelegatedPowers();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
 
@@ -228,7 +228,7 @@ const CreateEvent = () => {
   const [qrToken, setQrToken] = useState<string | null>(null);
   const [publishing, setPublishing] = useState(false);
 
-  if (loading) {
+  if (loading || clubsLoading || powersLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: '#F4EFE7' }}>
         <div className="w-8 h-8 border-3 border-[#E98A3A] border-t-[#111] rounded-full animate-spin" />
@@ -237,8 +237,26 @@ const CreateEvent = () => {
   }
 
   if (!user) return <Navigate to="/" replace />;
-  if (!activeClub) return <Navigate to="/admin" replace />;
-  if (!hasPower('create_event')) return <Navigate to="/admin" replace />;
+
+  if (!activeClub || !hasPower('create_event')) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6" style={{ background: '#F4EFE7' }}>
+        <div className="max-w-md bg-[#FFFDF9] border-[3px] border-[#111] rounded-[8px] p-6 text-center" style={{ boxShadow: '6px 6px 0px #111' }}>
+          <h1 className="text-xl font-black mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#111' }}>Create Event Unavailable</h1>
+          <p className="text-sm font-medium mb-5" style={{ color: '#555' }}>
+            Select a club or ask the club president for event creation access.
+          </p>
+          <button
+            onClick={() => navigate(-1)}
+            className="px-5 py-2.5 font-bold text-sm border-[3px] border-[#111] rounded-[6px] transition-all hover:translate-y-[2px]"
+            style={{ background: '#E98A3A', color: '#111', boxShadow: '3px 3px 0px #111', fontFamily: "'Space Grotesk', sans-serif" }}
+          >
+            Go Back
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const startTime = to24(startHour, startMinute, startPeriod);
   const endTime = to24(endHour, endMinute, endPeriod);

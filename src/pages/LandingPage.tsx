@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import heroIllustration from "@/assets/hero-illustration.png";
 import heroIllustrationDesktop from "@/assets/hero-illustration-desktop.png";
@@ -8,7 +8,7 @@ type PageName = "home" | "pricing" | "about" | "contact";
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  const { user, loading } = useAuth();
+  const { loading } = useAuth();
   const [activePage, setActivePage] = useState<PageName>("home");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const mainRef = useRef<HTMLDivElement>(null);
@@ -24,10 +24,6 @@ const LandingPage = () => {
         <div className="w-8 h-8 border-3 border-[#E98A3A] border-t-transparent rounded-full animate-spin" />
       </div>
     );
-  }
-
-  if (user) {
-    return <Navigate to="/dashboard" replace />;
   }
 
   const navLink = (page: PageName, label: string) => (
