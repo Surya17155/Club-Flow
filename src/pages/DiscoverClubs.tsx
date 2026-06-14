@@ -13,6 +13,7 @@ import ProfileDropdown from '@/components/dashboard/ProfileDropdown';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useDesign } from '@/contexts/DesignContext';
+import { getCachedDiscoverClubs, preloadDiscoverClubs } from '@/lib/preloadCache';
 
 interface ClubCard {
   id: string;
@@ -75,11 +76,12 @@ const DiscoverClubs = () => {
   const isMobile = useIsMobile();
   const { activeDesign } = useDesign();
   const isNeo = activeDesign === 'design-2';
-  const [clubs, setClubs] = useState<ClubCard[]>([]);
-  const [loading, setLoading] = useState(true);
+  const cachedDiscover = user ? getCachedDiscoverClubs(user.id) : undefined;
+  const [clubs, setClubs] = useState<ClubCard[]>(cachedDiscover?.clubs ?? []);
+  const [loading, setLoading] = useState(!cachedDiscover);
   const [search, setSearch] = useState('');
-  const [myClubIds, setMyClubIds] = useState<Set<string>>(new Set());
-  const [myRequests, setMyRequests] = useState<Map<string, string>>(new Map());
+  const [myClubIds, setMyClubIds] = useState<Set<string>>(() => new Set(cachedDiscover?.myClubIds ?? []));
+  const [myRequests, setMyRequests] = useState<Map<string, string>>(() => new Map(cachedDiscover?.myRequests ?? []));
   const [joinDialogOpen, setJoinDialogOpen] = useState(false);
   const [selectedClub, setSelectedClub] = useState<ClubCard | null>(null);
   const [joinMessage, setJoinMessage] = useState('');
@@ -91,21 +93,18 @@ const DiscoverClubs = () => {
   }, [user?.id]);
 
   const fetchData = async () => {
-    setLoading(true);
-    const [{ data: clubsData }, { data: membersData }, { data: myMemberships }, { data: requests }] = await Promise.all([
-      supabase.from('clubs').select('id, name, tagline, description, logo_url, category, club_type'),
-      supabase.from('club_members').select('club_id'),
-      supabase.from('club_members').select('club_id').eq('user_id', user!.id),
-      supabase.from('club_join_requests').select('club_id, status').eq('user_id', user!.id),
-    ]);
-
-    const counts: Record<string, number> = {};
-    (membersData ?? []).forEach((m: any) => { counts[m.club_id] = (counts[m.club_id] || 0) + 1; });
-    setClubs((clubsData ?? []).map((c: any) => ({ ...c, memberCount: counts[c.id] || 0 })));
-    setMyClubIds(new Set((myMemberships ?? []).map((m: any) => m.club_id)));
-    const reqMap = new Map<string, string>();
-    (requests ?? []).forEach((r: any) => reqMap.set(r.club_id, r.status));
-    setMyRequests(reqMap);
+    const cached = getCachedDiscoverClubs(user!.id);
+    if (cached) {
+      setClubs(cached.clubs);
+      setMyClubIds(new Set(cached.myClubIds));
+      setMyRequests(new Map(cached.myRequests));
+    } else {
+      setLoading(true);
+    }
+    const data = await preloadDiscoverClubs(user!.id);
+    setClubs(data.clubs);
+    setMyClubIds(new Set(data.myClubIds));
+    setMyRequests(new Map(data.myRequests));
     setLoading(false);
   };
 

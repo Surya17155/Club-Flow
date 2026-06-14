@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useClub } from '@/contexts/ClubContext';
+import { getCachedDelegatedPowers, preloadDelegatedPowers } from '@/lib/preloadCache';
 
 export interface DelegatedPower {
   id: string;
@@ -24,17 +25,15 @@ export const useDelegatedPowers = (overrideClubId?: string) => {
   const { user } = useAuth();
   const { activeClub } = useClub();
   const effectiveClubId = overrideClubId || activeClub?.club_id;
-  const [powers, setPowers] = useState<DelegatedPower[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [powers, setPowers] = useState<DelegatedPower[]>(() => getCachedDelegatedPowers(user?.id, effectiveClubId) ?? []);
+  const [loading, setLoading] = useState(() => user && effectiveClubId ? !getCachedDelegatedPowers(user.id, effectiveClubId) : false);
 
-  const fetchPowers = useCallback(async () => {
+  const fetchPowers = useCallback(async (force = false) => {
     if (!user || !effectiveClubId) { setPowers([]); setLoading(false); return; }
-    setLoading(true);
-    const { data, error } = await supabase
-      .from('delegated_powers')
-      .select('*')
-      .eq('club_id', effectiveClubId);
-    if (!error && data) setPowers(data as DelegatedPower[]);
+    const cached = getCachedDelegatedPowers(user.id, effectiveClubId);
+    if (cached && !force) setPowers(cached as DelegatedPower[]);
+    else setLoading(true);
+    setPowers(await preloadDelegatedPowers(user.id, effectiveClubId, force) as DelegatedPower[]);
     setLoading(false);
   }, [user?.id, effectiveClubId]);
 
@@ -48,7 +47,7 @@ export const useDelegatedPowers = (overrideClubId?: string) => {
       power,
       granted_by: user.id,
     });
-    if (!error) await fetchPowers();
+    if (!error) await fetchPowers(true);
     return error;
   };
 
@@ -60,7 +59,7 @@ export const useDelegatedPowers = (overrideClubId?: string) => {
       .eq('club_id', effectiveClubId)
       .eq('user_id', userId)
       .eq('power', power);
-    if (!error) await fetchPowers();
+    if (!error) await fetchPowers(true);
     return error;
   };
 

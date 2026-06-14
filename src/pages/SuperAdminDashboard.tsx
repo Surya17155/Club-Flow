@@ -18,6 +18,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import ProfileDropdown from '@/components/dashboard/ProfileDropdown';
 import SuperAdminCalendar from '@/components/dashboard/SuperAdminCalendar';
 import { useToast } from '@/hooks/use-toast';
+import { getCachedAdminStatus, preloadAdminStatus } from '@/lib/preloadCache';
 
 import { useIsMobile } from '@/hooks/use-mobile';
 import { MobileBottomNav } from '@/components/mobile/MobileBottomNav';
@@ -36,7 +37,7 @@ const SuperAdminDashboard = () => {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(() => user ? getCachedAdminStatus(user.id, user.email) ?? null : null);
   const [searchQuery, setSearchQuery] = useState('');
   const [profileDialogOpen, setProfileDialogOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState<any>(null);
@@ -96,17 +97,14 @@ const SuperAdminDashboard = () => {
   useEffect(() => {
     if (!user) return;
     const checkAdmin = async () => {
-      const { data } = await supabase.
-      from('user_roles').
-      select('role').
-      eq('user_id', user.id).
-      eq('role', 'admin');
-      setIsAdmin(data && data.length > 0);
+      const cached = getCachedAdminStatus(user.id, user.email);
+      if (cached !== undefined) setIsAdmin(cached);
+      setIsAdmin(await preloadAdminStatus(user.id, user.email));
     };
     checkAdmin();
-  }, [user?.id]);
+  }, [user?.id, user?.email]);
 
-  if (authLoading || isAdmin === null) {
+  if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center dashboard-corner-gradient">
         <div className="w-8 h-8 border-[3px] border-primary/30 border-t-primary rounded-full animate-spin" />
@@ -115,7 +113,7 @@ const SuperAdminDashboard = () => {
 
   if (!user) return <Navigate to="/" replace />;
 
-  if (!isAdmin) {
+  if (isAdmin === false) {
     return (
       <div className="min-h-screen flex items-center justify-center dashboard-corner-gradient">
         <div className="glass-card p-8 text-center max-w-md">

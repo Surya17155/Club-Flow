@@ -9,6 +9,7 @@ import { DesignProvider } from "@/contexts/DesignContext";
 import { DesktopFrame } from "@/components/layout/DesktopFrame";
 import { MobileNavigationOverlay } from "@/components/mobile/MobileNavigationOverlay";
 import { SuperAdminGuard } from "@/components/layout/SuperAdminGuard";
+import { PagePreloader } from "@/components/navigation/PagePreloader";
 
 // Eager-load critical routes
 import LandingPage from "./pages/LandingPage";
@@ -61,6 +62,7 @@ const App = () => (
         <AuthProvider>
           <ClubProvider>
             <DesignProvider>
+              <PagePreloader />
               <MobileNavigationOverlay />
               <SuperAdminGuard />
               <Routes>
