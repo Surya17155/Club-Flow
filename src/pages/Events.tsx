@@ -162,9 +162,15 @@ const Events = () => {
     if (cached) {
       setEvents(cached.events as any);
       setAttendanceCounts(cached.attendanceCounts);
-    } else {
-      setLoading(true);
+      setLoading(false);
+      // Revalidate in background — don't block UI
+      preloadEvents(viewMode, activeClub?.club_id, true).then((data) => {
+        setEvents(data.events as any);
+        setAttendanceCounts(data.attendanceCounts);
+      }).catch(() => undefined);
+      return;
     }
+    setLoading(true);
     const data = await preloadEvents(viewMode, activeClub?.club_id);
     setEvents(data.events as any);
     setAttendanceCounts(data.attendanceCounts);
