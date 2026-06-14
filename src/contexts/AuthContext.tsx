@@ -14,11 +14,32 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Synchronously hydrate auth from the persisted Supabase token in localStorage
+// so guarded pages don't flash a loading spinner on every navigation/refresh.
+const readPersistedSession = (): Session | null => {
+  try {
+    const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
+    if (!url || typeof window === 'undefined') return null;
+    const ref = url.match(/https?:\/\/([^.]+)\./)?.[1];
+    if (!ref) return null;
+    const raw = window.localStorage.getItem(`sb-${ref}-auth-token`);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    const session = parsed?.currentSession ?? parsed;
+    if (!session?.access_token || !session?.user) return null;
+    if (session.expires_at && session.expires_at * 1000 < Date.now()) return null;
+    return session as Session;
+  } catch {
+    return null;
+  }
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
-  const initialSessionLoaded = useRef(false);
+  const initialSession = readPersistedSession();
+  const [user, setUser] = useState<User | null>(initialSession?.user ?? null);
+  const [session, setSession] = useState<Session | null>(initialSession);
+  const [loading, setLoading] = useState(!initialSession);
+  const initialSessionLoaded = useRef(!!initialSession);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
