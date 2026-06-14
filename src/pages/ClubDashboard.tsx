@@ -22,6 +22,7 @@ import { Button } from '@/components/ui/button';
 import { MobileClubProfileCard } from '@/components/mobile/MobileClubProfileCard';
 import { MobileBottomNav } from '@/components/mobile/MobileBottomNav';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { getCachedAdminStatus, preloadAdminStatus } from '@/lib/preloadCache';
 
 
 
@@ -70,19 +71,24 @@ const ClubDashboard = () => {
   );
 
   const cameFromSuperAdmin = location.state?.from === 'super-admin';
-  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
-  const [isRoleCheckComplete, setIsRoleCheckComplete] = useState(false);
+  const cachedAdminStatus = user ? getCachedAdminStatus(user.id, user.email) : undefined;
+  const [isSuperAdmin, setIsSuperAdmin] = useState(cachedAdminStatus ?? false);
+  const [isRoleCheckComplete, setIsRoleCheckComplete] = useState(cachedAdminStatus !== undefined);
 
   useEffect(() => {
     if (!user) return;
     const checkSuperAdmin = async () => {
-      setIsRoleCheckComplete(false);
-      const { data } = await supabase.from('user_roles').select('role').eq('user_id', user.id).eq('role', 'admin');
-      setIsSuperAdmin(!!(data && data.length > 0));
+      const cached = getCachedAdminStatus(user.id, user.email);
+      if (cached !== undefined) {
+        setIsSuperAdmin(cached);
+        setIsRoleCheckComplete(true);
+      }
+      const status = await preloadAdminStatus(user.id, user.email);
+      setIsSuperAdmin(status);
       setIsRoleCheckComplete(true);
     };
     checkSuperAdmin();
-  }, [user?.id]);
+  }, [user?.id, user?.email]);
 
   // Club details
   const [clubDetails, setClubDetails] = useState<{ about: string | null; logo_url: string | null; social_instagram: string | null; social_linkedin: string | null; tagline: string | null }>({ about: null, logo_url: null, social_instagram: null, social_linkedin: null, tagline: null });
