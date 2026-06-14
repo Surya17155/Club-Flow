@@ -308,15 +308,8 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
                     <Switch
                       checked={isSuperAdminMode}
                       onCheckedChange={(checked) => {
-                        if (checked) {
-                          setSuperAdminLockActive(true);
-                          setIsSuperAdminMode(true);
-                          nav('/super-admin');
-                        } else {
-                          setSuperAdminLockActive(false);
-                          setIsSuperAdminMode(false);
-                          nav('/admin');
-                        }
+                        setSuperAdminLockActive(checked);
+                        setIsSuperAdminMode(checked);
                       }}
                       className="scale-90"
                     />
