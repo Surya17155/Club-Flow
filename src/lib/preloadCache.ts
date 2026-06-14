@@ -234,7 +234,7 @@ export const preloadSuperAdminStats = (force = false) => cached(superAdminStatsC
   };
 }, force);
 
-const eventsKey = (viewMode: 'personal' | 'club', clubId?: string | null) => `${viewMode}:${clubId || 'all'}`;
+const eventsKey = (viewMode: 'personal' | 'club', clubId?: string | null) => `${viewMode}:${viewMode === 'club' ? clubId || 'all' : 'all'}`;
 export const getCachedEvents = (viewMode: 'personal' | 'club', clubId?: string | null) => read(eventsCache, eventsKey(viewMode, clubId));
 export const preloadEvents = (viewMode: 'personal' | 'club', clubId?: string | null, force = false) => cached(eventsCache, eventsKey(viewMode, clubId), async () => {
   let query = db.from('events').select('id, name, event_type, category, event_date, end_date, access_type, description, qr_token, club_id, attendance_given, clubs(name)').order('event_date', { ascending: true });
