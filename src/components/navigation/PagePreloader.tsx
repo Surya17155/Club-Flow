@@ -23,30 +23,30 @@ export function PagePreloader() {
   useEffect(() => {
     if (!user) return;
 
+    // Critical preloads run immediately so navigation is instant
+    preloadAdminStatus(user.id, user.email);
+    preloadProfile(user.id);
+    preloadPersonalStats(user.id);
+    preloadEvents('personal');
+    preloadUserClubs(user.id).then((clubs) => {
+      clubs.forEach((club) => {
+        preloadEvents('club', club.club_id);
+        preloadClubStats(club.club_id);
+        preloadDelegatedPowers(user.id, club.club_id);
+        preloadClubSettings(club.club_id);
+      });
+    });
+
+    // Defer non-critical to idle
     const idle = window.requestIdleCallback ?? ((cb: IdleRequestCallback) => window.setTimeout(() => cb({ didTimeout: false, timeRemaining: () => 0 } as IdleDeadline), 1));
     const cancelIdle = window.cancelIdleCallback ?? window.clearTimeout;
-
     const handle = idle(() => {
-      preloadAdminStatus(user.id, user.email);
-      preloadProfile(user.id);
-      preloadUserClubs(user.id).then((clubs) => {
-        clubs.forEach((club) => {
-          preloadClubStats(club.club_id);
-          preloadDelegatedPowers(user.id, club.club_id);
-          preloadEvents('club', club.club_id);
-          preloadClubSettings(club.club_id);
-        });
-      });
-      preloadPersonalStats(user.id);
-      preloadEvents('personal');
       preloadDiscoverClubs(user.id);
-
       if (user.email === SUPER_ADMIN_EMAIL) {
         preloadSuperAdminStats();
         preloadOutsiders().catch(() => undefined);
       }
     });
-
     return () => cancelIdle(handle as any);
   }, [user?.id, user?.email]);
 
