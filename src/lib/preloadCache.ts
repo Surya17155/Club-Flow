@@ -11,7 +11,7 @@ type CacheEntry<T> = {
 };
 
 const isFresh = <T,>(entry?: CacheEntry<T>) =>
-  !!entry?.data && !!entry.fetchedAt && Date.now() - entry.fetchedAt < CACHE_TTL;
+  !!entry && 'data' in entry && !!entry.fetchedAt && Date.now() - entry.fetchedAt < CACHE_TTL;
 
 const read = <T,>(cache: Map<string, CacheEntry<T>>, key: string) => {
   const entry = cache.get(key);
