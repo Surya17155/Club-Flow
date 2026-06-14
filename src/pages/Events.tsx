@@ -16,6 +16,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import EventFeedbackModal from '@/components/dashboard/EventFeedbackModal';
 import { useDesign } from '@/contexts/DesignContext';
 import { exportAttendanceXLSX } from '@/utils/exportAttendance';
+import { getCachedEvents, preloadEvents } from '@/lib/preloadCache';
 
 interface AttendeeDetail {
   full_name: string;
@@ -145,39 +146,28 @@ const Events = () => {
     return () => window.removeEventListener('storage', handler);
   }, []);
 
-  const [events, setEvents] = useState<EventRow[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [events, setEvents] = useState<EventRow[]>(() => getCachedEvents((localStorage.getItem('dashboardViewMode') as 'personal' | 'club') || 'personal', activeClub?.club_id)?.events ?? []);
+  const [loading, setLoading] = useState(() => !getCachedEvents((localStorage.getItem('dashboardViewMode') as 'personal' | 'club') || 'personal', activeClub?.club_id));
   const [selectedEvent, setSelectedEvent] = useState<EventRow | null>(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [qrDialogOpen, setQrDialogOpen] = useState(false);
-  const [attendanceCounts, setAttendanceCounts] = useState<Record<string, number>>({});
+  const [attendanceCounts, setAttendanceCounts] = useState<Record<string, number>>(() => getCachedEvents((localStorage.getItem('dashboardViewMode') as 'personal' | 'club') || 'personal', activeClub?.club_id)?.attendanceCounts ?? {});
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [feedbackEvent, setFeedbackEvent] = useState<{ id: string; name: string } | null>(null);
   const [attendees, setAttendees] = useState<AttendeeDetail[]>([]);
   const [loadingAttendees, setLoadingAttendees] = useState(false);
 
   const fetchEvents = async () => {
-    setLoading(true);
-    let query = supabase
-      .from('events')
-      .select('id, name, event_type, category, event_date, end_date, access_type, description, qr_token, club_id, attendance_given, clubs(name)')
-      .order('event_date', { ascending: true });
-
-    if (viewMode === 'club' && activeClub) {
-      query = query.eq('club_id', activeClub.club_id);
+    const cached = getCachedEvents(viewMode, activeClub?.club_id);
+    if (cached) {
+      setEvents(cached.events as any);
+      setAttendanceCounts(cached.attendanceCounts);
+    } else {
+      setLoading(true);
     }
-
-    const { data, error } = await query;
-    if (!error && data) {
-      setEvents(data as any);
-      const ids = data.map((e: any) => e.id);
-      if (ids.length > 0) {
-        const { data: attData } = await supabase.from('attendance').select('event_id').in('event_id', ids);
-        const counts: Record<string, number> = {};
-        (attData ?? []).forEach((a: any) => { counts[a.event_id] = (counts[a.event_id] || 0) + 1; });
-        setAttendanceCounts(counts);
-      }
-    }
+    const data = await preloadEvents(viewMode, activeClub?.club_id);
+    setEvents(data.events as any);
+    setAttendanceCounts(data.attendanceCounts);
     setLoading(false);
   };
 
