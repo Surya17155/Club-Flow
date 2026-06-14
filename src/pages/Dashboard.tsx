@@ -1,23 +1,11 @@
-import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { getCachedAdminStatus, preloadAdminStatus } from '@/lib/preloadCache';
+import AdminDashboard from './AdminDashboard';
 
 const Dashboard = () => {
   const { user, loading } = useAuth();
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(() => user ? getCachedAdminStatus(user.id, user.email) ?? null : null);
 
-  useEffect(() => {
-    if (!user) return;
-    const check = async () => {
-      const cached = getCachedAdminStatus(user.id, user.email);
-      if (cached !== undefined) setIsAdmin(cached);
-      setIsAdmin(await preloadAdminStatus(user.id, user.email));
-    };
-    check();
-  }, [user?.id]);
-
-  if (loading || (user && isAdmin === null)) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center gradient-warm">
         <div className="w-8 h-8 border-[3px] border-primary/30 border-t-primary rounded-full animate-spin" />
@@ -34,9 +22,7 @@ const Dashboard = () => {
     return <Navigate to={pendingRedirect} replace />;
   }
 
-  // Admins go to Super Admin dashboard, everyone else to regular dashboard
-  if (isAdmin) return <Navigate to="/super-admin" replace />;
-  return <Navigate to="/admin" replace />;
+  return <AdminDashboard />;
 };
 
 export default Dashboard;
