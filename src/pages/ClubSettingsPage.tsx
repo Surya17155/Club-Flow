@@ -11,33 +11,33 @@ import { supabase } from '@/integrations/supabase/client';
 import { useClub } from '@/contexts/ClubContext';
 import { toast } from 'sonner';
 import { Settings, Upload, Loader2, Instagram, Linkedin, ChevronLeft } from 'lucide-react';
+import { getCachedClubSettings, preloadClubSettings, setCachedClubSettings } from '@/lib/preloadCache';
 
 const CLUB_CATEGORIES = ['Arts & Culture', 'Technology', 'Business', 'Sports', 'Social Service', 'Media', 'Academic', 'Other'];
 
 const ClubSettingsPage = () => {
   const { activeClub } = useClub();
-  const [loading, setLoading] = useState(true);
+  const cachedClub = getCachedClubSettings(activeClub?.club_id);
+  const [loading, setLoading] = useState(() => activeClub ? !cachedClub : false);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [form, setForm] = useState({
-    name: '',
-    tagline: '',
-    about: '',
-    category: '',
-    logo_url: '' as string | null,
-    social_instagram: '',
-    social_linkedin: '',
-  });
+  const [form, setForm] = useState(() => ({
+    name: cachedClub?.name || '',
+    tagline: cachedClub?.tagline || '',
+    about: cachedClub?.about || '',
+    category: cachedClub?.category || '',
+    logo_url: cachedClub?.logo_url || null as string | null,
+    social_instagram: cachedClub?.social_instagram || '',
+    social_linkedin: cachedClub?.social_linkedin || '',
+  }));
 
   useEffect(() => {
     if (!activeClub) return;
     const fetchClub = async () => {
-      setLoading(true);
-      const { data } = await supabase
-        .from('clubs')
-        .select('name, tagline, about, category, logo_url, social_instagram, social_linkedin')
-        .eq('id', activeClub.club_id)
-        .maybeSingle();
+      const cached = getCachedClubSettings(activeClub.club_id);
+      if (cached) setForm({ name: cached.name || '', tagline: cached.tagline || '', about: cached.about || '', category: cached.category || '', logo_url: cached.logo_url || null, social_instagram: cached.social_instagram || '', social_linkedin: cached.social_linkedin || '' });
+      else setLoading(true);
+      const data = await preloadClubSettings(activeClub.club_id);
       if (data) {
         setForm({
           name: data.name || '',
@@ -92,6 +92,7 @@ const ClubSettingsPage = () => {
     if (error) {
       toast.error('Failed to save settings');
     } else {
+      setCachedClubSettings(activeClub.club_id, { ...form });
       toast.success('Club settings updated');
     }
   };
