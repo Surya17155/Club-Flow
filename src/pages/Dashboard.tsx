@@ -1,21 +1,18 @@
 import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
+import { getCachedAdminStatus, preloadAdminStatus } from '@/lib/preloadCache';
 
 const Dashboard = () => {
   const { user, loading } = useAuth();
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(() => user ? getCachedAdminStatus(user.id, user.email) ?? null : null);
 
   useEffect(() => {
     if (!user) return;
     const check = async () => {
-      const { data } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
-        .eq('role', 'admin');
-      setIsAdmin(data && data.length > 0);
+      const cached = getCachedAdminStatus(user.id, user.email);
+      if (cached !== undefined) setIsAdmin(cached);
+      setIsAdmin(await preloadAdminStatus(user.id, user.email));
     };
     check();
   }, [user?.id]);
