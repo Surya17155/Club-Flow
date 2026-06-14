@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Plus, Trash2, User, Phone, GraduationCap, Building2, ChevronRight, UserPlus, Pencil } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { getCachedOutsiders, preloadOutsiders } from '@/lib/preloadCache';
 
 const PROGRAMMES = ['B.Tech (CS)', 'B.Tech (IT)', 'BBA', 'MBA', 'B.Com', 'BA (Hons)', 'BCA', 'MCA'];
 const YEARS = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
@@ -68,8 +69,8 @@ const ManageOutsiders = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const isMobile = useIsMobile();
-  const [outsiders, setOutsiders] = useState<Outsider[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [outsiders, setOutsiders] = useState<Outsider[]>(() => getCachedOutsiders() ?? []);
+  const [loading, setLoading] = useState(() => !getCachedOutsiders());
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [selectedOutsider, setSelectedOutsider] = useState<Outsider | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -84,11 +85,11 @@ const ManageOutsiders = () => {
   });
 
   const fetchOutsiders = async () => {
-    setLoading(true);
+    const cached = getCachedOutsiders();
+    if (cached) setOutsiders(cached);
+    else setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('manage-outsider', { method: 'GET' });
-      if (error) throw error;
-      setOutsiders(data?.outsiders || []);
+      setOutsiders(await preloadOutsiders(true));
     } catch (err: any) {
       toast({ title: 'Error', description: err.message || 'Failed to fetch outsiders', variant: 'destructive' });
     } finally {
