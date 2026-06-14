@@ -11,6 +11,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pi
 import ProfileDropdown from '@/components/dashboard/ProfileDropdown';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { MobileBottomNav } from '@/components/mobile/MobileBottomNav';
+import { getCachedAdminStatus, preloadAdminStatus } from '@/lib/preloadCache';
 
 const roleLabelMap: Record<string, string> = {
   admin: 'Admin', president: 'President', vice_president: 'Vice President',
@@ -34,7 +35,7 @@ const GlobalReports = () => {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(() => user ? getCachedAdminStatus(user.id, user.email) ?? null : null);
   const [searchQuery, setSearchQuery] = useState('');
   const [clubFilter, setClubFilter] = useState('all');
   const [rows, setRows] = useState<ReportRow[]>([]);
@@ -49,15 +50,12 @@ const GlobalReports = () => {
   useEffect(() => {
     if (!user) return;
     const checkAdmin = async () => {
-      const { data } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
-        .eq('role', 'admin');
-      setIsAdmin(data && data.length > 0);
+      const cached = getCachedAdminStatus(user.id, user.email);
+      if (cached !== undefined) setIsAdmin(cached);
+      setIsAdmin(await preloadAdminStatus(user.id, user.email));
     };
     checkAdmin();
-  }, [user?.id]);
+  }, [user?.id, user?.email]);
 
   // Fetch report data
   useEffect(() => {
@@ -160,7 +158,7 @@ const GlobalReports = () => {
     URL.revokeObjectURL(url);
   };
 
-  if (authLoading || isAdmin === null) {
+  if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center dashboard-corner-gradient">
         <div className="w-8 h-8 border-[3px] border-primary/30 border-t-primary rounded-full animate-spin" />
@@ -169,7 +167,7 @@ const GlobalReports = () => {
   }
 
   if (!user) return <Navigate to="/" replace />;
-  if (!isAdmin) {
+  if (isAdmin === false) {
     return (
       <div className="min-h-screen flex items-center justify-center dashboard-corner-gradient">
         <div className="glass-card p-8 text-center max-w-md">
