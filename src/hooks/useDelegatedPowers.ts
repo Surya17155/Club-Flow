@@ -28,12 +28,12 @@ export const useDelegatedPowers = (overrideClubId?: string) => {
   const [powers, setPowers] = useState<DelegatedPower[]>(() => getCachedDelegatedPowers(user?.id, effectiveClubId) ?? []);
   const [loading, setLoading] = useState(() => user && effectiveClubId ? !getCachedDelegatedPowers(user.id, effectiveClubId) : false);
 
-  const fetchPowers = useCallback(async () => {
+  const fetchPowers = useCallback(async (force = false) => {
     if (!user || !effectiveClubId) { setPowers([]); setLoading(false); return; }
     const cached = getCachedDelegatedPowers(user.id, effectiveClubId);
-    if (cached) setPowers(cached as DelegatedPower[]);
+    if (cached && !force) setPowers(cached as DelegatedPower[]);
     else setLoading(true);
-    setPowers(await preloadDelegatedPowers(user.id, effectiveClubId) as DelegatedPower[]);
+    setPowers(await preloadDelegatedPowers(user.id, effectiveClubId, force) as DelegatedPower[]);
     setLoading(false);
   }, [user?.id, effectiveClubId]);
 
@@ -47,7 +47,7 @@ export const useDelegatedPowers = (overrideClubId?: string) => {
       power,
       granted_by: user.id,
     });
-    if (!error) await fetchPowers();
+    if (!error) await fetchPowers(true);
     return error;
   };
 
@@ -59,7 +59,7 @@ export const useDelegatedPowers = (overrideClubId?: string) => {
       .eq('club_id', effectiveClubId)
       .eq('user_id', userId)
       .eq('power', power);
-    if (!error) await fetchPowers();
+    if (!error) await fetchPowers(true);
     return error;
   };
 
