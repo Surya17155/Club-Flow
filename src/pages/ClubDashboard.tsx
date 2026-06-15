@@ -56,12 +56,16 @@ const ClubDashboard = () => {
 
   useEffect(() => {
     if (!routeClubId) { setClubNameOverride(null); return; }
-    if (routeClubId === activeClub?.club_id) { setClubNameOverride(activeClub.club_name); return; }
     let cancelled = false;
     setClubNameOverride(null);
-    supabase.from('clubs').select('name').eq('id', routeClubId).maybeSingle().then(({ data }) => {
+    const fetch = async () => {
+      const cached = getCachedClubSettings(routeClubId);
+      if (cached) setClubNameOverride(cached.name);
+      const data = await preloadClubSettings(routeClubId);
       if (!cancelled && data) setClubNameOverride(data.name);
-    });
+    };
+    fetch();
+    return () => { cancelled = true; };
     return () => { cancelled = true; };
   }, [routeClubId, activeClub?.club_id, activeClub?.club_name]);
 
