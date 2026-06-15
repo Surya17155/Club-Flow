@@ -79,6 +79,7 @@ const superAdminStatsCache = new Map<string, CacheEntry<any>>();
 const eventsCache = new Map<string, CacheEntry<CachedEventsData>>();
 const discoverCache = new Map<string, CacheEntry<CachedDiscoverData>>();
 const outsidersCache = new Map<string, CacheEntry<any[]>>();
+const clubMembersCache = new Map<string, CacheEntry<any[]>>();
 const clubSettingsCache = new Map<string, CacheEntry<any>>();
 
 export const getCachedAdminStatus = (userId: string, email?: string | null) => {
@@ -229,6 +230,7 @@ export const preloadSuperAdminStats = (force = false) => cached(superAdminStatsC
       const profile = profileMap.get(m.user_id) as any;
       return { membership_id: m.id, user_id: m.user_id, club_id: m.club_id, club_name: clubMap.get(m.club_id) || '', role: m.role, full_name: profile?.full_name || 'Unknown', email: profile?.email || null, avatar_url: profile?.avatar_url || null, programme: profile?.programme || null, roll_no: profile?.roll_no || null, section: profile?.section || null, year: profile?.year || null, semester: profile?.semester || null, phone: profile?.phone || null };
     }),
+    allEvents: eventsList.map((e: any) => ({ id: e.id, name: e.name, event_date: e.event_date, club_id: e.club_id, participant_count: participantCountMap.get(e.id) || 0 })),
     upcomingEvents: eventsList.filter((e: any) => e.event_date >= now).sort((a: any, b: any) => new Date(a.event_date).getTime() - new Date(b.event_date).getTime()).slice(0, 20).map((e: any) => ({ id: e.id, name: e.name, event_date: e.event_date, end_date: e.end_date, club_name: clubMap.get(e.club_id) || '', club_id: e.club_id, participant_count: participantCountMap.get(e.id) || 0, category: e.category, event_type: e.event_type, description: e.description })),
     growthData: monthNames.map((month, i) => ({ month, events: eventsList.filter((e: any) => { const d = new Date(e.event_date); return d.getFullYear() === currentYear && d.getMonth() === i; }).length, members: Math.round(membersList.length / 12) })),
   };
@@ -279,4 +281,15 @@ export const setCachedClubSettings = (clubId: string, data: any) => clubSettings
 export const preloadClubSettings = (clubId: string, force = false) => cached(clubSettingsCache, clubId, async () => {
   const { data } = await db.from('clubs').select('name, tagline, about, category, logo_url, social_instagram, social_linkedin').eq('id', clubId).maybeSingle();
   return data ?? null;
+export const getCachedClubMembers = (clubId: string) => read(clubMembersCache, clubId);
+export const preloadClubMembers = (clubId: string, force = false) => cached(clubMembersCache, clubId, async () => {
+  const { data: membersData } = await db.from("club_members").select("user_id, role").eq("club_id", clubId);
+  if (!membersData || membersData.length === 0) return [];
+  const userIds = membersData.map((m: any) => m.user_id);
+  const { data: profilesData } = await db.from("profiles").select("user_id, full_name, avatar_url, programme, year, email, phone, about").in("user_id", userIds);
+  const profileMap = new Map((profilesData ?? []).map((p: any) => [p.user_id, p]));
+  return membersData.map((m: any) => ({
+    user_id: m.user_id, role: m.role, ...profileMap.get(m.user_id)
+  }));
+}, force);
 }, force);

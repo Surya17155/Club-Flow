@@ -4,6 +4,7 @@ import { useClub } from '@/contexts/ClubContext';
 import {
   preloadAdminStatus,
   preloadClubSettings,
+preloadClubMembers,
   preloadClubStats,
   preloadDelegatedPowers,
   preloadDiscoverClubs,
@@ -33,6 +34,7 @@ export function PagePreloader() {
         preloadEvents('club', club.club_id);
         preloadClubStats(club.club_id);
         preloadDelegatedPowers(user.id, club.club_id);
+        preloadClubMembers(club.club_id);
         preloadClubSettings(club.club_id);
       });
     });
@@ -53,6 +55,7 @@ export function PagePreloader() {
   useEffect(() => {
     if (!user || !activeClub?.club_id) return;
     preloadClubStats(activeClub.club_id);
+    preloadClubMembers(activeClub.club_id);
     preloadDelegatedPowers(user.id, activeClub.club_id);
     preloadEvents('club', activeClub.club_id);
     preloadClubSettings(activeClub.club_id);
