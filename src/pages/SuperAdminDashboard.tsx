@@ -106,7 +106,7 @@ const SuperAdminDashboard = () => {
     checkAdmin();
   }, [user?.id, user?.email]);
 
-  if (!user) return <div className="min-h-screen" style={{ backgroundColor: '#F4EFE7' }} />;
+  if (!user) return null;
 
   if (!isSuperAdminEmail && isAdmin === false) {
     return (

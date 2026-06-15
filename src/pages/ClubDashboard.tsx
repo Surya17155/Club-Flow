@@ -125,7 +125,7 @@ const ClubDashboard = () => {
     fetchPostHolders();
   }, [clubId]);
 
-  if (!user) return <div className="min-h-screen" style={{ backgroundColor: '#F4EFE7' }} />;
+  if (!user) return null;
 
   const hasAccess = isPresident || hasPower('manage_club') || isSuperAdmin;
   if ((isRoleCheckComplete && !hasAccess && !isSuperAdmin) || !clubId) {
