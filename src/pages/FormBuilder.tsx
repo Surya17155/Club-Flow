@@ -24,10 +24,12 @@ export default function FormBuilder() {
   const { user } = useAuth();
   const { activeClub, clubs } = useClub();
 
-  const presidentClubs = clubs.filter((c) => c.role === 'president');
-  const defaultClub = presidentClubs.find((c) => c.club_id === activeClub?.club_id) ?? presidentClubs[0];
+  // Forms are always scoped to the currently selected club — no chooser.
+  const activeMembership = clubs.find((c) => c.club_id === activeClub?.club_id);
+  const canCreateHere = activeMembership?.role === 'president';
+  const clubId = activeClub?.club_id ?? '';
+  const clubName = activeClub?.club_name ?? '';
 
-  const [clubId, setClubId] = useState<string>(defaultClub?.club_id ?? '');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [deadline, setDeadline] = useState('');
@@ -44,7 +46,6 @@ export default function FormBuilder() {
     (async () => {
       const { data: form, error } = await supabase.from('forms').select('*').eq('id', id!).maybeSingle();
       if (error || !form) { toast.error('Form not found'); navigate('/forms'); return; }
-      setClubId(form.club_id);
       setTitle(form.title);
       setDescription(form.description ?? '');
       setDeadline(form.deadline ? new Date(form.deadline).toISOString().slice(0, 16) : '');
@@ -71,9 +72,6 @@ export default function FormBuilder() {
     })();
   }, [id]);
 
-  useEffect(() => {
-    if (!isEdit && !clubId && defaultClub) setClubId(defaultClub.club_id);
-  }, [defaultClub?.club_id]);
 
   const addQuestion = (type: QuestionType) => {
     setQuestions((qs) => [
