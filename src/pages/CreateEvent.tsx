@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Calendar as CalendarIcon, Clock, MapPin, Download, ArrowLeft, ChevronDown, QrCode } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, MapPin, Download, ArrowLeft, ChevronDown, QrCode, ScanFace } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -226,7 +226,9 @@ const CreateEvent = () => {
   const [capacity, setCapacity] = useState('');
   const [isCustomLocation, setIsCustomLocation] = useState(false);
   const [qrToken, setQrToken] = useState<string | null>(null);
+  const [attendanceMode, setAttendanceMode] = useState<'qr' | 'face'>('qr');
   const [publishing, setPublishing] = useState(false);
+  const [createdEventId, setCreatedEventId] = useState<string | null>(null);
 
   if (!user || (!activeClub && clubsLoading)) return null;
 
@@ -283,7 +285,7 @@ const CreateEvent = () => {
       const endDateTime = `${eventDate}T${endTime}:00${tzStr}`;
       const accessType = clubMembersOnly ? 'club_only' : openToAll ? 'open' : 'restricted';
 
-      const { error } = await supabase.from('events').insert({
+      const { data: inserted, error } = await supabase.from('events').insert({
         name: eventName.trim(),
         event_type: eventType.toLowerCase().replace(/\s+/g, '_'),
         event_date: dateTime,
@@ -292,13 +294,18 @@ const CreateEvent = () => {
         created_by: user.id,
         description: description.trim() || null,
         access_type: accessType,
-        qr_token: qrToken,
+        qr_token: attendanceMode === 'qr' ? qrToken : null,
         attendance_given: attendanceGiven,
-      });
+        attendance_mode: attendanceMode,
+      } as any).select('id').single();
 
       if (error) throw error;
       toast.success('Event published successfully!');
-      navigate('/admin');
+      if (attendanceMode === 'face' && inserted?.id) {
+        setCreatedEventId(inserted.id);
+      } else {
+        navigate('/admin');
+      }
     } catch (err: any) {
       toast.error(err.message || 'Failed to publish event');
     } finally {
