@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { SUPER_ADMIN_EMAIL } from '@/lib/superAdminMode';
+import { isSuperAdminUser } from '@/lib/superAdminMode';
 
 const db = supabase as any;
 const CACHE_TTL = 1000 * 60 * 5;
@@ -82,12 +82,12 @@ const outsidersCache = new Map<string, CacheEntry<any[]>>();
 const clubSettingsCache = new Map<string, CacheEntry<any>>();
 
 export const getCachedAdminStatus = (userId: string, email?: string | null) => {
-  if (email === SUPER_ADMIN_EMAIL) return true;
+  if (isSuperAdminUser(email)) return true;
   return read(adminRoleCache, userId);
 };
 
 export const preloadAdminStatus = (userId: string, email?: string | null, force = false) => {
-  if (email === SUPER_ADMIN_EMAIL) {
+  if (isSuperAdminUser(email)) {
     adminRoleCache.set(userId, { data: true, fetchedAt: Date.now() });
     return Promise.resolve(true);
   }
