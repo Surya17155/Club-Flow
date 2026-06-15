@@ -18,10 +18,13 @@ interface FormRow {
   description: string | null;
   club_id: string;
   is_published: boolean;
+  is_public?: boolean;
   accepting_responses: boolean;
   deadline: string | null;
   created_at: string;
 }
+
+type AvailableStatus = 'active' | 'pending' | 'completed';
 
 export default function Forms() {
   const navigate = useNavigate();
