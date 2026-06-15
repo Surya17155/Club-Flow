@@ -1,4 +1,4 @@
-import { useState, useEffect, memo } from 'react';
+import { useState, useEffect, memo, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
@@ -12,6 +12,7 @@ import {
   HelpCircle, MessageSquare, FileText, Download, Users,
 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
+import { preloadRoute } from '@/lib/routePreload';
 
 interface MobileSideDrawerProps {
   open: boolean;
@@ -45,7 +46,10 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
   const initials = (profile?.full_name || 'U')
     .split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
 
-  const nav = (path: string) => { navigate(path); };
+  const nav = useCallback((path: string, options?: { replace?: boolean }) => {
+    preloadRoute(path);
+    navigate(path, options);
+  }, [navigate]);
 
   const personalItems = [
     { title: 'Dashboard', icon: LayoutDashboard, url: '/admin' },

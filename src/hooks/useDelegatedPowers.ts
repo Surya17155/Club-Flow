@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useClub } from '@/contexts/ClubContext';
@@ -21,19 +21,22 @@ export const AVAILABLE_POWERS = [
 
 export type PowerKey = typeof AVAILABLE_POWERS[number]['key'];
 
-export const useDelegatedPowers = (overrideClubId?: string) => {
+export const useDelegatedPowers = (overrideClubId?: string, disabled = false) => {
   const { user } = useAuth();
   const { activeClub } = useClub();
   const effectiveClubId = overrideClubId || activeClub?.club_id;
   const [powers, setPowers] = useState<DelegatedPower[]>(() => getCachedDelegatedPowers(user?.id, effectiveClubId) ?? []);
   const [loading, setLoading] = useState(false);
+  const roleHasAllPowers = !overrideClubId && (activeClub?.role === 'admin' || activeClub?.role === 'president');
 
   const fetchPowers = useCallback(async (force = false) => {
+    if (disabled) { setPowers([]); return; }
     if (!user || !effectiveClubId) { setPowers([]); return; }
+    if (roleHasAllPowers) { setPowers([]); return; }
     const cached = getCachedDelegatedPowers(user.id, effectiveClubId);
     if (cached && !force) { setPowers(cached as DelegatedPower[]); return; }
     setPowers(await preloadDelegatedPowers(user.id, effectiveClubId, force) as DelegatedPower[]);
-  }, [user?.id, effectiveClubId]);
+  }, [disabled, user?.id, effectiveClubId, roleHasAllPowers]);
 
   useEffect(() => { fetchPowers(); }, [fetchPowers]);
 
@@ -61,13 +64,14 @@ export const useDelegatedPowers = (overrideClubId?: string) => {
     return error;
   };
 
-  const hasPower = (power: string): boolean => {
+  const hasPower = useCallback((power: string): boolean => {
     if (!user || !effectiveClubId) return false;
+    if (disabled) return false;
     if (activeClub?.role === 'admin' || activeClub?.role === 'president') return true;
     return powers.some(p => p.user_id === user.id && p.power === power);
-  };
+  }, [activeClub?.role, disabled, effectiveClubId, powers, user?.id]);
 
-  const isPresident = activeClub?.role === 'president' || activeClub?.role === 'admin';
+  const isPresident = !disabled && (activeClub?.role === 'president' || activeClub?.role === 'admin');
 
-  return { powers, loading, grantPower, revokePower, hasPower, isPresident, fetchPowers };
+  return useMemo(() => ({ powers, loading, grantPower, revokePower, hasPower, isPresident, fetchPowers }), [powers, loading, hasPower, isPresident, fetchPowers]);
 };

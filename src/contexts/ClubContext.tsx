@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useUserClubs, UserClub } from '@/hooks/useUserClubs';
 
 interface ClubContextType {
@@ -21,16 +21,18 @@ export const ClubProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setActiveClub(found ?? clubs[0]);
   }, [clubs]);
 
-  const switchClub = (clubId: string) => {
+  const switchClub = useCallback((clubId: string) => {
     const club = clubs.find(c => c.club_id === clubId);
     if (club) {
       setActiveClub(club);
       localStorage.setItem('activeClubId', clubId);
     }
-  };
+  }, [clubs]);
+
+  const value = useMemo(() => ({ activeClub, clubs, loading, switchClub }), [activeClub, clubs, loading, switchClub]);
 
   return (
-    <ClubContext.Provider value={{ activeClub, clubs, loading, switchClub }}>
+    <ClubContext.Provider value={value}>
       {children}
     </ClubContext.Provider>
   );

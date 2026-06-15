@@ -144,14 +144,20 @@ export const preloadAdminStatus = (userId: string, email?: string | null, force 
 
 export const getCachedUserClubs = (userId: string) => read(userClubsCache, userId);
 export const preloadUserClubs = (userId: string, force = false) => cached(userClubsCache, userId, async () => {
-  const { data, error } = await db.from('club_members').select('club_id, role, clubs(id, name, logo_url)').eq('user_id', userId);
-  if (error || !data) return [];
-  return data.map((m: any) => ({
+  const { data, error } = await db.from('club_members').select('club_id, role').eq('user_id', userId).limit(40);
+  if (error || !data?.length) return [];
+  const clubIds = data.map((m: any) => m.club_id);
+  const { data: clubsData } = await db.from('clubs').select('id, name, logo_url').in('id', clubIds);
+  const clubsById = new Map((clubsData ?? []).map((club: any) => [club.id, club]));
+  return data.map((m: any) => {
+    const club = clubsById.get(m.club_id) as any;
+    return {
     club_id: m.club_id,
-    club_name: m.clubs?.name ?? '',
+    club_name: club?.name ?? '',
     role: m.role,
-    logo_url: m.clubs?.logo_url ?? null,
-  }));
+    logo_url: club?.logo_url ?? null,
+  };
+  });
 }, force, []);
 
 export const getCachedProfile = (userId: string) => read(profileCache, userId);
@@ -164,15 +170,15 @@ export const preloadProfile = (userId: string, force = false) => cached(profileC
 export const getCachedPersonalStats = (userId: string) => read(personalStatsCache, userId);
 export const preloadPersonalStats = (userId: string, force = false) => cached(personalStatsCache, userId, async () => {
   const [clubsRes, attendanceRes] = await Promise.all([
-    db.from('club_members').select('club_id, clubs(name)').eq('user_id', userId),
-    db.from('attendance').select('id, event_id, status, scanned_at, events(name, event_date, event_type, attendance_given, clubs(name))').eq('student_id', userId).order('scanned_at', { ascending: false }),
+    db.from('club_members').select('club_id', { count: 'exact', head: true }).eq('user_id', userId),
+    db.from('attendance').select('id, event_id, status, scanned_at, events(name, event_date, event_type, attendance_given, clubs(name))').eq('student_id', userId).order('scanned_at', { ascending: false }).limit(80),
   ]);
   const rawRecords = attendanceRes.data ?? [];
   const eventsAttended = rawRecords.filter((a: any) => a.status === 'present').length;
   const totalEventsAttendance = rawRecords.filter((a: any) => a.status === 'present' && a.events?.attendance_given === true).length;
   const attendanceRate = rawRecords.length > 0 ? Math.round((eventsAttended / rawRecords.length) * 100) : 0;
   return {
-    clubCount: clubsRes.data?.length ?? 0,
+    clubCount: clubsRes.count ?? 0,
     eventsAttended,
     totalEventsAttendance,
     attendanceRate,
@@ -197,10 +203,10 @@ export const getCachedClubStats = (clubId?: string) => clubId ? read(clubStatsCa
 export const preloadClubStats = (clubId: string, force = false) => cached(clubStatsCache, clubId, async () => {
   const [membersRes, eventsRes] = await Promise.all([
     db.from('club_members').select('id', { count: 'exact', head: true }).eq('club_id', clubId),
-    db.from('events').select('id, name, event_date').eq('club_id', clubId).order('event_date', { ascending: true }),
+    db.from('events').select('id, name, event_date', { count: 'exact' }).eq('club_id', clubId).order('event_date', { ascending: false }).limit(20),
   ]);
   const totalMembers = membersRes.count ?? 0;
-  const events = eventsRes.data ?? [];
+  const events = [...(eventsRes.data ?? [])].reverse();
   let chartData: CachedClubStats['chartData'] = [];
   let avgAttendanceRate = 0;
   if (events.length > 0) {
@@ -221,7 +227,7 @@ export const preloadClubStats = (clubId: string, force = false) => cached(clubSt
       avgAttendanceRate = Math.round(eventsWithAttendance.reduce((sum: number, e: any) => sum + ((attendanceByEvent[e.id]?.present || 0) / totalMembers) * 100, 0) / eventsWithAttendance.length);
     }
   }
-  return { totalMembers, totalEvents: events.length, avgAttendanceRate, chartData };
+  return { totalMembers, totalEvents: eventsRes.count ?? events.length, avgAttendanceRate, chartData };
 }, force, emptyClubStats);
 
 const powersKey = (userId: string, clubId: string) => `${userId}:${clubId}`;
@@ -283,7 +289,7 @@ export const preloadSuperAdminStats = (force = false) => cached(superAdminStatsC
 const eventsKey = (viewMode: 'personal' | 'club', clubId?: string | null) => `${viewMode}:${viewMode === 'club' ? clubId || 'all' : 'all'}`;
 export const getCachedEvents = (viewMode: 'personal' | 'club', clubId?: string | null) => read(eventsCache, eventsKey(viewMode, clubId));
 export const preloadEvents = (viewMode: 'personal' | 'club', clubId?: string | null, force = false) => cached(eventsCache, eventsKey(viewMode, clubId), async () => {
-  let query = db.from('events').select('id, name, event_type, category, event_date, end_date, access_type, description, qr_token, club_id, attendance_given, clubs(name)').order('event_date', { ascending: true });
+  let query = db.from('events').select('id, name, event_type, category, event_date, end_date, access_type, description, qr_token, club_id, attendance_given, clubs(name)').order('event_date', { ascending: true }).limit(80);
   if (viewMode === 'club' && clubId) query = query.eq('club_id', clubId);
   const { data, error } = await query;
   const events = !error && data ? data : [];

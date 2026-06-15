@@ -1,6 +1,7 @@
-import type { ReactNode } from "react";
-import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
+import { lazy, Suspense, type ReactNode } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
+
+const DashboardSidebar = lazy(() => import("@/components/layout/DashboardSidebar").then((m) => ({ default: m.DashboardSidebar })));
 
 interface DesktopFrameProps {
   children: ReactNode;
@@ -18,7 +19,9 @@ export function DesktopFrame({ children }: DesktopFrameProps) {
       className="min-h-screen flex antialiased"
       style={{ backgroundColor: "#F4EFE7" }}
     >
-      <DashboardSidebar />
+      <Suspense fallback={<div style={{ width: 244, margin: 12 }} />}>
+        <DashboardSidebar />
+      </Suspense>
       <div className="flex-1 flex flex-col min-w-0">
         <div
           className="flex-1 flex flex-col"

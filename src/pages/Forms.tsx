@@ -1,16 +1,17 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { Plus, FileText, Edit3, BarChart3, Trash2, ExternalLink, Clock, User as UserIcon, Building2, CalendarClock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useClub } from '@/contexts/ClubContext';
 import { toast } from 'sonner';
+import { preloadRoute } from '@/lib/routePreload';
 
 const BG = '#F4EFE7';
 const CARD = '#FFFDF5';
 const BORDER = '2px solid #111';
 const SHADOW = '4px 4px 0px #111';
+const PAGE_SIZE = 24;
 
 interface FormRow {
   id: string;
@@ -55,19 +56,25 @@ export default function Forms() {
   const [creatorNames, setCreatorNames] = useState<Record<string, string>>({});
   const [questionCounts, setQuestionCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(0);
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const requestSeq = useRef(0);
   const clubIdsKey = clubs.map((club) => club.club_id).join(',');
+  const openRoute = useCallback((path: string) => { preloadRoute(path); navigate(path); }, [navigate]);
 
   const isPresidentOfActive = useMemo(
     () => !!clubs.find((c) => c.club_id === activeClub?.club_id && c.role === 'president'),
     [clubs, activeClub?.club_id]
   );
 
-  const load = async () => {
+  const load = useCallback(async () => {
+    const seq = ++requestSeq.current;
     setLoading(true);
     let query = supabase
       .from('forms')
       .select('id, title, description, club_id, created_by, is_published, is_public, accepting_responses, deadline, created_at')
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .range(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE - 1);
     if (tab === 'manage') {
       if (!activeClub?.club_id) { setForms([]); setLoading(false); return; }
       query = query.eq('club_id', activeClub.club_id);
@@ -77,8 +84,10 @@ export default function Forms() {
       query = query.eq('is_published', true).in('club_id', clubIds);
     }
     const { data, error } = await query;
+    if (seq !== requestSeq.current) return;
     if (error) { toast.error(error.message); setLoading(false); return; }
     const rows = (data as FormRow[]) || [];
+    setHasNextPage(rows.length === PAGE_SIZE);
     setForms(rows);
 
     if (rows.length) {
@@ -94,6 +103,7 @@ export default function Forms() {
           ? supabase.from('form_responses').select('form_id, submitted_at').eq('user_id', user.id).in('form_id', formIds)
           : Promise.resolve({ data: [] as any[] }),
       ]);
+      if (seq !== requestSeq.current) return;
 
       const cn: Record<string, string> = {};
       (clubsRes.data ?? []).forEach((c: any) => { cn[c.id] = c.name; });
@@ -114,9 +124,10 @@ export default function Forms() {
       setClubNames({}); setCreatorNames({}); setQuestionCounts({}); setSubmittedMap({});
     }
     setLoading(false);
-  };
+  }, [activeClub?.club_id, clubIdsKey, page, tab, user?.id]);
 
-  useEffect(() => { load(); /* eslint-disable-next-line */ }, [tab, activeClub?.club_id, user?.id, clubIdsKey]);
+  useEffect(() => { setPage(0); }, [tab, activeClub?.club_id, clubIdsKey]);
+  useEffect(() => { load(); }, [load]);
 
   // Refresh on focus + on app-wide form mutations (avoids realtime overhead)
   useEffect(() => {
@@ -128,10 +139,10 @@ export default function Forms() {
       window.removeEventListener('formsChanged', onRefresh);
     };
     // eslint-disable-next-line
-  }, [user?.id, tab, activeClub?.club_id, clubIdsKey]);
+  }, [load]);
 
 
-  const now = Date.now();
+  const now = useMemo(() => Date.now(), [forms]);
 
   const classify = (f: FormRow): AvailableStatus => {
     const submitted = !!submittedMap[f.id];
@@ -158,7 +169,7 @@ export default function Forms() {
   const handleCreate = () => {
     if (!isClubMode) { toast.error('Switch to Club mode to create forms'); return; }
     if (!isPresidentOfActive) { toast.error('Only the club president can create forms'); return; }
-    navigate('/forms/new');
+    openRoute('/forms/new');
   };
 
   const subtitle = isClubMode
@@ -193,14 +204,13 @@ export default function Forms() {
             <p className="text-sm mt-1" style={{ color: '#555' }}>{subtitle}</p>
           </div>
           {isClubMode && isPresidentOfActive && (
-            <motion.button
-              whileTap={{ scale: 0.96 }}
+            <button
               onClick={handleCreate}
-              className="flex items-center gap-2 px-4 py-2.5 text-sm font-bold"
+              className="flex items-center gap-2 px-4 py-2.5 text-sm font-bold transition-transform active:scale-[0.98]"
               style={{ background: '#E98A3A', color: '#111', border: BORDER, borderRadius: '6px', boxShadow: SHADOW }}
             >
               <Plus className="w-4 h-4" /> Create Form
-            </motion.button>
+            </button>
           )}
         </div>
 
@@ -236,7 +246,11 @@ export default function Forms() {
         )}
 
         {loading ? (
-          <div className="text-center py-12 text-sm font-semibold" style={{ color: '#555' }}>Loading forms…</div>
+          <div className="grid gap-3 md:grid-cols-2">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="h-36 animate-pulse" style={{ background: CARD, border: BORDER, borderRadius: '8px', boxShadow: SHADOW }} />
+            ))}
+          </div>
         ) : visibleForms.length === 0 ? (
           <div className="text-center py-16 px-6" style={{ background: CARD, border: BORDER, borderRadius: '10px', boxShadow: SHADOW }}>
             <FileText className="w-12 h-12 mx-auto mb-3" style={{ color: '#E98A3A' }} />
@@ -262,10 +276,8 @@ export default function Forms() {
               const clubName = clubNames[f.club_id] ?? 'Club';
               const creatorName = f.created_by ? creatorNames[f.created_by] ?? 'Unknown' : '—';
               return (
-                <motion.div
+                <div
                   key={f.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
                   className="p-4 flex flex-col"
                   style={{ background: CARD, border: BORDER, borderRadius: '8px', boxShadow: SHADOW }}
                 >
@@ -310,7 +322,7 @@ export default function Forms() {
                   <div className="flex flex-wrap gap-2 mt-auto pt-2">
                     {tab === 'available' && status === 'pending' && (
                       <button
-                        onClick={() => navigate(`/forms/${f.id}`)}
+                        onClick={() => openRoute(`/forms/${f.id}`)}
                         className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold"
                         style={{ background: '#E98A3A', color: '#111', border: '1.5px solid #111', borderRadius: '6px' }}
                       >
@@ -319,7 +331,7 @@ export default function Forms() {
                     )}
                     {tab === 'available' && status === 'completed' && (
                       <button
-                        onClick={() => navigate(`/forms/${f.id}`)}
+                        onClick={() => openRoute(`/forms/${f.id}`)}
                         className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold"
                         style={{ background: CARD, border: '1.5px solid #111', borderRadius: '6px' }}
                       >
@@ -338,21 +350,21 @@ export default function Forms() {
                     {tab === 'manage' && (
                       <>
                         <button
-                          onClick={() => navigate(`/forms/${f.id}`)}
+                          onClick={() => openRoute(`/forms/${f.id}`)}
                           className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold"
                           style={{ background: CARD, border: '1.5px solid #111', borderRadius: '6px' }}
                         >
                           <ExternalLink className="w-3 h-3" /> View
                         </button>
                         <button
-                          onClick={() => navigate(`/forms/${f.id}/edit`)}
+                          onClick={() => openRoute(`/forms/${f.id}/edit`)}
                           className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold"
                           style={{ background: CARD, border: '1.5px solid #111', borderRadius: '6px' }}
                         >
                           <Edit3 className="w-3 h-3" /> Edit
                         </button>
                         <button
-                          onClick={() => navigate(`/forms/${f.id}/responses`)}
+                          onClick={() => openRoute(`/forms/${f.id}/responses`)}
                           className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold"
                           style={{ background: '#111', color: '#FFFDF5', border: '1.5px solid #111', borderRadius: '6px' }}
                         >
@@ -368,9 +380,30 @@ export default function Forms() {
                       </>
                     )}
                   </div>
-                </motion.div>
+                </div>
               );
             })}
+          </div>
+        )}
+        {!loading && forms.length > 0 && (
+          <div className="mt-5 flex items-center justify-end gap-2">
+            <button
+              disabled={page === 0}
+              onClick={() => setPage((p) => Math.max(0, p - 1))}
+              className="px-3 py-1.5 text-xs font-bold disabled:opacity-40 disabled:cursor-not-allowed"
+              style={{ background: CARD, border: '1.5px solid #111', borderRadius: '6px' }}
+            >
+              Previous
+            </button>
+            <span className="text-xs font-bold" style={{ color: '#555' }}>Page {page + 1}</span>
+            <button
+              disabled={!hasNextPage}
+              onClick={() => setPage((p) => p + 1)}
+              className="px-3 py-1.5 text-xs font-bold disabled:opacity-40 disabled:cursor-not-allowed"
+              style={{ background: '#E98A3A', color: '#111', border: '1.5px solid #111', borderRadius: '6px' }}
+            >
+              Next
+            </button>
           </div>
         )}
       </div>

@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { MobileSideDrawer } from './MobileSideDrawer';
+
+const MobileSideDrawer = lazy(() => import('./MobileSideDrawer').then((m) => ({ default: m.MobileSideDrawer })));
 
 type ViewMode = 'personal' | 'club';
 
@@ -72,12 +73,16 @@ export function MobileNavigationOverlay() {
 
   return (
     <>
-      <MobileSideDrawer
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        viewMode={viewMode}
-        setViewMode={setViewMode}
-      />
+      {drawerOpen && (
+        <Suspense fallback={null}>
+          <MobileSideDrawer
+            open={drawerOpen}
+            onClose={() => setDrawerOpen(false)}
+            viewMode={viewMode}
+            setViewMode={setViewMode}
+          />
+        </Suspense>
+      )}
 
       <div
         className="fixed top-0 left-0 z-[55] md:hidden"

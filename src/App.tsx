@@ -7,44 +7,45 @@ import { Suspense, lazy } from "react";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ClubProvider } from "@/contexts/ClubContext";
 import { DesignProvider } from "@/contexts/DesignContext";
-import { DesktopFrame } from "@/components/layout/DesktopFrame";
-import { MobileNavigationOverlay } from "@/components/mobile/MobileNavigationOverlay";
 import { SuperAdminGuard } from "@/components/layout/SuperAdminGuard";
 import { PagePreloader } from "@/components/navigation/PagePreloader";
 import { ProtectedRoute } from "@/components/navigation/ProtectedRoute";
+import { lazyRoute } from "@/lib/routePreload";
 
-import LandingPage from "./pages/LandingPage";
-import AuthPage from "./pages/AuthPage";
+const DesktopFrame = lazy(() => import("@/components/layout/DesktopFrame").then((m) => ({ default: m.DesktopFrame })));
+const MobileNavigationOverlay = lazy(() => import("@/components/mobile/MobileNavigationOverlay").then((m) => ({ default: m.MobileNavigationOverlay })));
 
-const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
-const ResetPassword = lazy(() => import("./pages/ResetPassword"));
-const Dashboard = lazy(() => import("./pages/Dashboard"));
-const ClubDashboard = lazy(() => import("./pages/ClubDashboard"));
-const MemberDashboard = lazy(() => import("./pages/MemberDashboard"));
-const Events = lazy(() => import("./pages/Events"));
-const Profile = lazy(() => import("./pages/Profile"));
-const Settings = lazy(() => import("./pages/Settings"));
-const CreateEvent = lazy(() => import("./pages/CreateEvent"));
-const DiscoverClubs = lazy(() => import("./pages/DiscoverClubs"));
-const MobileCalendar = lazy(() => import("./pages/MobileCalendar"));
-const MobileChat = lazy(() => import("./pages/MobileChat"));
-const ClubSettingsPage = lazy(() => import("./pages/ClubSettingsPage"));
-const AssignPowersPage = lazy(() => import("./pages/AssignPowersPage"));
-const ChatbotPage = lazy(() => import("./pages/ChatbotPage"));
-const SuperAdminChatbotPage = lazy(() => import("./pages/SuperAdminChatbotPage"));
-const AttendanceHistory = lazy(() => import("./pages/AttendanceHistory"));
-const ContactUs = lazy(() => import("./pages/ContactUs"));
-const Contact2 = lazy(() => import("./pages/Contact2"));
-const Reviews = lazy(() => import("./pages/Reviews"));
-const Forms = lazy(() => import("./pages/Forms"));
-const FormBuilder = lazy(() => import("./pages/FormBuilder"));
-const FormFill = lazy(() => import("./pages/FormFill"));
-const FormResponses = lazy(() => import("./pages/FormResponses"));
-const MarkAttendance = lazy(() => import("./pages/MarkAttendance"));
-const SuperAdminDashboard = lazy(() => import("./pages/SuperAdminDashboard"));
-const GlobalReports = lazy(() => import("./pages/GlobalReports"));
-const ManageOutsiders = lazy(() => import("./pages/ManageOutsiders"));
-const NotFound = lazy(() => import("./pages/NotFound"));
+const LandingPage = lazyRoute("landing");
+const AuthPage = lazyRoute("auth");
+const AdminDashboard = lazyRoute("admin");
+const ResetPassword = lazyRoute("resetPassword");
+const Dashboard = lazyRoute("dashboard");
+const ClubDashboard = lazyRoute("clubDashboard");
+const MemberDashboard = lazyRoute("memberDashboard");
+const Events = lazyRoute("events");
+const Profile = lazyRoute("profile");
+const Settings = lazyRoute("settings");
+const CreateEvent = lazyRoute("createEvent");
+const DiscoverClubs = lazyRoute("discover");
+const MobileCalendar = lazyRoute("mobileCalendar");
+const MobileChat = lazyRoute("mobileChat");
+const ClubSettingsPage = lazyRoute("clubSettings");
+const AssignPowersPage = lazyRoute("assignPowers");
+const ChatbotPage = lazyRoute("chatbot");
+const SuperAdminChatbotPage = lazyRoute("superAdminChatbot");
+const AttendanceHistory = lazyRoute("attendanceHistory");
+const ContactUs = lazyRoute("contact");
+const Contact2 = lazyRoute("contact2");
+const Reviews = lazyRoute("reviews");
+const Forms = lazyRoute("forms");
+const FormBuilder = lazyRoute("formBuilder");
+const FormFill = lazyRoute("formFill");
+const FormResponses = lazyRoute("formResponses");
+const MarkAttendance = lazyRoute("markAttendance");
+const SuperAdminDashboard = lazyRoute("superAdmin");
+const GlobalReports = lazyRoute("globalReports");
+const ManageOutsiders = lazyRoute("manageOutsiders");
+const NotFound = lazyRoute("notFound");
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -56,8 +57,16 @@ const queryClient = new QueryClient({
 });
 
 const RouteFallback = () => (
-  <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
-    <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+  <div className="min-h-screen bg-background text-foreground p-6">
+    <div className="mx-auto flex h-full max-w-5xl flex-col gap-5 pt-8">
+      <div className="h-10 w-52 rounded-[6px] bg-muted animate-pulse" />
+      <div className="grid gap-4 md:grid-cols-3">
+        <div className="h-28 rounded-[6px] bg-muted animate-pulse" />
+        <div className="h-28 rounded-[6px] bg-muted animate-pulse" />
+        <div className="h-28 rounded-[6px] bg-muted animate-pulse" />
+      </div>
+      <div className="h-64 rounded-[6px] bg-muted animate-pulse" />
+    </div>
   </div>
 );
 
@@ -71,7 +80,9 @@ const App = () => (
           <ClubProvider>
             <DesignProvider>
               <PagePreloader />
-              <MobileNavigationOverlay />
+              <Suspense fallback={null}>
+                <MobileNavigationOverlay />
+              </Suspense>
               <SuperAdminGuard />
               <Suspense fallback={<RouteFallback />}>
                 <Routes>

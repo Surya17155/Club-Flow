@@ -4,6 +4,7 @@ import { Home, Users, Calendar, User, Plus, Bot, FileText } from "lucide-react";
 import { useDelegatedPowers } from "@/hooks/useDelegatedPowers";
 import { useAuth } from "@/contexts/AuthContext";
 import { getSuperAdminModeForUser, isSuperAdminUser, SUPER_ADMIN_MODE_EVENT } from "@/lib/superAdminMode";
+import { preloadRoute } from "@/lib/routePreload";
 
 const personalTabs = [
   { label: "Home", icon: Home, path: "/admin" },
@@ -63,17 +64,11 @@ function MobileBottomNavInner() {
     };
   }, [location.pathname, user?.email]);
 
-  let canCreateEvent = false;
-  try {
-    const { hasPower } = useDelegatedPowers();
-    canCreateEvent = hasPower("create_event");
-  } catch {
-    canCreateEvent = false;
-  }
-
   const isClubMode = viewMode === 'club';
   const isSuperAdmin = isSuperAdminUser(user?.email) && isSuperAdminMode;
-  const handleNav = useCallback((path: string) => navigate(path), [navigate]);
+  const { hasPower } = useDelegatedPowers(undefined, !isClubMode || isSuperAdmin);
+  const canCreateEvent = isClubMode && !isSuperAdmin && hasPower("create_event");
+  const handleNav = useCallback((path: string) => { preloadRoute(path); navigate(path); }, [navigate]);
 
   const renderTab = useCallback(({ label, icon: Icon, path }: { label: string; icon: any; path: string }) => {
     const active = location.pathname === path;
@@ -128,7 +123,7 @@ function MobileBottomNavInner() {
             {superAdminLeftTabs.map(renderTab)}
 
             <button
-              onClick={() => navigate("/super-admin/chatbot")}
+              onClick={() => handleNav("/super-admin/chatbot")}
               className="relative -mt-5 flex flex-col items-center justify-center transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
               style={{
                 width: '58px',
@@ -155,7 +150,7 @@ function MobileBottomNavInner() {
 
             {canCreateEvent ? (
               <button
-                onClick={() => navigate("/create-event")}
+                onClick={() => handleNav("/create-event")}
                 className="relative -mt-5 flex items-center justify-center transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
                 style={{
                   width: '52px',

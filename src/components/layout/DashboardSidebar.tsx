@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
@@ -32,6 +32,7 @@ import {
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Switch } from '@/components/ui/switch';
+import { preloadRoute } from '@/lib/routePreload';
 import {
   motion,
   useMotionValue,
@@ -126,7 +127,7 @@ function MagnifiedIcon({
   );
 }
 
-export function DashboardSidebar() {
+export const DashboardSidebar = memo(function DashboardSidebar() {
   const [collapsed, setCollapsed] = useState(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
     return stored === 'true';
@@ -194,6 +195,11 @@ export function DashboardSidebar() {
   const isClubMode = viewMode === 'club';
   const pendingFormsCount = usePendingFormsCount();
 
+  const go = useCallback((url: string, options?: { replace?: boolean }) => {
+    preloadRoute(url);
+    navigate(url, options);
+  }, [navigate]);
+
 
   useEffect(() => {
     const handler = () => {
@@ -214,10 +220,10 @@ export function DashboardSidebar() {
 
   if (isClubMode && activeClub && !(isSuperAdminEmail && isSuperAdminMode)) {
     if (isPresident) {
-      contextItems.push({ title: 'Assign Powers', icon: Shield, action: () => navigate('/assign-powers'), activeUrl: '/assign-powers' });
+      contextItems.push({ title: 'Assign Powers', icon: Shield, action: () => go('/assign-powers'), activeUrl: '/assign-powers' });
     }
     if (hasPower('use_chatbot')) {
-      contextItems.push({ title: 'AI Chatbot', icon: Bot, action: () => navigate('/chatbot'), activeUrl: '/chatbot' });
+      contextItems.push({ title: 'AI Chatbot', icon: Bot, action: () => go('/chatbot'), activeUrl: '/chatbot' });
     }
     if (clubs.length > 1) {
       contextItems.push({ title: 'Switch Club', icon: ArrowRightLeft, action: () => setShowClubSwitcher(!showClubSwitcher), isActive: showClubSwitcher });
@@ -233,29 +239,29 @@ export function DashboardSidebar() {
 
   const handleSignOut = async () => {
     await signOut();
-    navigate('/');
+    go('/');
   };
 
   const setSuperAdminMode = (on: boolean) => {
     setSuperAdminLockActive(on);
     setIsSuperAdminMode(on);
     if (on) {
-      navigate('/super-admin', { replace: true });
+      go('/super-admin', { replace: true });
       return;
     }
 
     localStorage.setItem('dashboardViewMode', 'personal');
     setViewModeLocal('personal');
     window.dispatchEvent(new Event('viewModeChanged'));
-    navigate('/admin', { replace: true });
+    go('/admin', { replace: true });
   };
 
   // Sub-items shown under the Super Admin toggle when active.
   const superAdminSubItems = [
-    { title: 'Global Reports', icon: FileText, action: () => navigate('/global-reports'), activeUrl: '/global-reports' as string | undefined },
+    { title: 'Global Reports', icon: FileText, action: () => go('/global-reports'), activeUrl: '/global-reports' as string | undefined },
     { title: 'Export Data', icon: Download, action: () => window.dispatchEvent(new Event('superAdminExportData')), activeUrl: undefined as string | undefined },
-    { title: 'AI Chatbot', icon: Bot, action: () => navigate('/super-admin/chatbot'), activeUrl: '/super-admin/chatbot' as string | undefined },
-    { title: 'Manage Outsiders', icon: Users, action: () => navigate('/manage-outsiders'), activeUrl: '/manage-outsiders' as string | undefined },
+    { title: 'AI Chatbot', icon: Bot, action: () => go('/super-admin/chatbot'), activeUrl: '/super-admin/chatbot' as string | undefined },
+    { title: 'Manage Outsiders', icon: Users, action: () => go('/manage-outsiders'), activeUrl: '/manage-outsiders' as string | undefined },
   ];
 
   const sidebarBg = isNeo ? '#111111' : '#000000';
@@ -268,12 +274,13 @@ export function DashboardSidebar() {
     <>
       <div
         className="flex flex-col shrink-0"
-        onMouseMove={(e) => { if (collapsed) mouseY.set(e.clientY); }}
+        onMouseMove={(e) => { if (collapsed && window.innerWidth >= 1024) mouseY.set(e.clientY); }}
         onMouseLeave={() => mouseY.set(Infinity)}
         style={{
           width: collapsed ? 64 : 220,
           background: sidebarBg,
-          transition: 'width 0.25s ease',
+          transition: 'width 0.2s ease',
+          contain: 'layout paint',
           borderRadius: isNeo ? '16px' : '16px',
           border: isNeo ? '3px solid #111111' : 'none',
           margin: '12px',
@@ -452,7 +459,7 @@ export function DashboardSidebar() {
                     active={active}
                     mouseY={mouseY}
                     index={index}
-                    onClick={() => navigate(item.url)}
+                    onClick={() => go(item.url)}
                     isNeo={isNeo}
                   />
                   {badge > 0 && (
@@ -474,7 +481,8 @@ export function DashboardSidebar() {
             return (
               <button
                 key={item.title}
-                onClick={() => navigate(item.url)}
+                onClick={() => go(item.url)}
+                onMouseEnter={(e) => { preloadRoute(item.url); if (!active) e.currentTarget.style.background = hoverBg; }}
                 className="flex items-center gap-3 px-3 py-2.5 transition-all duration-200 w-full text-left"
                 style={{
                   background: active ? activeBg : 'transparent',
@@ -485,7 +493,6 @@ export function DashboardSidebar() {
                   fontFamily: isNeo ? "'Space Grotesk', sans-serif" : undefined,
                   fontWeight: active && isNeo ? 700 : 500,
                 }}
-                onMouseEnter={(e) => { if (!active) e.currentTarget.style.background = hoverBg; }}
                 onMouseLeave={(e) => { if (!active) e.currentTarget.style.background = 'transparent'; }}
               >
                 <item.icon className="w-[18px] h-[18px] shrink-0" />
@@ -615,13 +622,13 @@ export function DashboardSidebar() {
                 item={{ title: 'Settings', icon: Settings, url: '/settings' }}
                 active={isActive('/settings')}
                 mouseY={mouseY}
-                onClick={() => navigate('/settings')}
+                onClick={() => go('/settings')}
                 isNeo={isNeo}
               />
             </div>
           ) : (
             <button
-              onClick={() => navigate('/settings')}
+              onClick={() => go('/settings')}
               className="flex items-center gap-3 px-3 py-2.5 transition-all duration-200 w-full text-left"
               style={{
                 color: isActive('/settings') ? activeText : inactiveText,
@@ -647,13 +654,13 @@ export function DashboardSidebar() {
                 item={{ title: 'Contact Us', icon: HelpCircle, url: '/contact2' }}
                 active={isActive('/contact2')}
                 mouseY={mouseY}
-                onClick={() => navigate('/contact2')}
+                onClick={() => go('/contact2')}
                 isNeo={isNeo}
               />
             </div>
           ) : (
             <button
-              onClick={() => navigate('/contact2')}
+              onClick={() => go('/contact2')}
               className="flex items-center gap-3 px-3 py-2.5 transition-all duration-200 w-full text-left"
               style={{
                 color: isActive('/contact2') ? activeText : inactiveText,
@@ -704,7 +711,7 @@ export function DashboardSidebar() {
         {/* Bottom: collapse toggle only */}
         <div
           className="px-3 pb-4 mt-auto"
-          onMouseMove={(e) => { if (collapsed) mouseY.set(e.clientY); }}
+          onMouseMove={(e) => { if (collapsed && window.innerWidth >= 1024) mouseY.set(e.clientY); }}
           onMouseLeave={() => mouseY.set(Infinity)}
         >
           <button
@@ -723,4 +730,4 @@ export function DashboardSidebar() {
       </div>
     </>
   );
-}
+});
