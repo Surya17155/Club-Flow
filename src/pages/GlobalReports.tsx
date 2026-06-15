@@ -11,7 +11,6 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pi
 import ProfileDropdown from '@/components/dashboard/ProfileDropdown';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { MobileBottomNav } from '@/components/mobile/MobileBottomNav';
-getCachedSuperAdminStats, preloadSuperAdminStats,
 import { getCachedAdminStatus, preloadAdminStatus } from '@/lib/preloadCache';
 import { isSuperAdminUser } from '@/lib/superAdminMode';
 

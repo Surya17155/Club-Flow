@@ -22,7 +22,6 @@ import { Button } from '@/components/ui/button';
 import { MobileClubProfileCard } from '@/components/mobile/MobileClubProfileCard';
 import { MobileBottomNav } from '@/components/mobile/MobileBottomNav';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-getCachedClubMembers, preloadClubMembers, getCachedClubSettings, preloadClubSettings,
 import { getCachedAdminStatus, preloadAdminStatus, getCachedClubMembers, preloadClubMembers, getCachedClubSettings, preloadClubSettings } from '@/lib/preloadCache';
 
 
@@ -66,7 +65,6 @@ const ClubDashboard = () => {
     };
     fetch();
     return () => { cancelled = true; };
-    return () => { cancelled = true; };
   }, [routeClubId, activeClub?.club_id, activeClub?.club_name]);
 
   const { stats: clubStats } = useClubStats(clubId);
@@ -105,6 +103,8 @@ const ClubDashboard = () => {
       if (data) setClubDetails(data);
     };
     fetch();
+  }, [clubId]);
+
   const [postHolders, setPostHolders] = useState<PostHolder[]>(() => {
     if (!clubId) return [];
     const cached = getCachedClubMembers(clubId);
@@ -121,11 +121,6 @@ const ClubDashboard = () => {
       if (data) {
         setPostHolders(data.filter((m: any) => roleOrder.includes(m.role)).sort((a: any, b: any) => roleOrder.indexOf(a.role) - roleOrder.indexOf(b.role)));
       }
-    };
-    fetchPostHolders();
-  }, [clubId]);
-          .sort((a, b) => roleOrder.indexOf(a.role) - roleOrder.indexOf(b.role))
-      );
     };
     fetchPostHolders();
   }, [clubId]);
