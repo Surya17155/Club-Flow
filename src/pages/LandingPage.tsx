@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
 import heroIllustration from "@/assets/hero-illustration.png";
 import heroIllustrationDesktop from "@/assets/hero-illustration-desktop.png";
 
@@ -8,7 +7,6 @@ type PageName = "home" | "pricing" | "about" | "contact";
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  const { loading } = useAuth();
   const [activePage, setActivePage] = useState<PageName>("home");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const mainRef = useRef<HTMLDivElement>(null);
@@ -17,14 +15,6 @@ const LandingPage = () => {
     mainRef.current?.scrollTo({ top: 0, behavior: "smooth" });
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [activePage]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: "#F4EFE7" }}>
-        <div className="w-8 h-8 border-3 border-[#E98A3A] border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
 
   const navLink = (page: PageName, label: string) => (
     <button
@@ -355,7 +345,7 @@ const LandingPage = () => {
 
             {/* Pricing Footer */}
             <footer className="flex flex-col md:flex-row justify-between items-center px-8 py-12 w-full gap-4 bg-[#111111] border-t-2 border-[#111111]">
-              <div className="text-lg font-black text-[#E98A3A]">​CLUB FLOW</div>
+              <div className="text-lg font-black text-[#E98A3A]">CLUB FLOW</div>
               <div className="flex gap-8 font-['Space_Grotesk'] uppercase text-xs tracking-widest text-[#F4EFE7]">
                 <a className="hover:text-[#E98A3A] transition-colors" href="#">Privacy Policy</a>
                 <a className="hover:text-[#E98A3A] transition-colors" href="#">Terms of Service</a>

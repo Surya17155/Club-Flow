@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useSuperAdminStats } from '@/hooks/useSuperAdminStats';
 import { Search, Plus, Settings, TrendingUp, Users, Calendar, Building2, Clock, ChevronDown, Eye, UserCog, Shield, FileText, MoreVertical, Trash2, ChevronRight, Pencil, Download, Crown } from 'lucide-react';
@@ -34,7 +34,7 @@ const roleLabelMap: Record<string, string> = {
 
 const SuperAdminDashboard = () => {
   const NB = { font: "'Space Grotesk', sans-serif", bg: '#F4EFE7', card: '#FFFDF5', border: '#111', orange: '#E98A3A' };
-  const { user, loading: authLoading } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [isAdmin, setIsAdmin] = useState<boolean | null>(() => user ? getCachedAdminStatus(user.id, user.email) ?? null : null);
@@ -84,7 +84,7 @@ const SuperAdminDashboard = () => {
   const [presidentSearchResults, setPresidentSearchResults] = useState<any[]>([]);
   const [presidentSearchLoading, setPresidentSearchLoading] = useState(false);
 
-  const { totalClubs, globalMembers, totalEvents, clubs, members, upcomingEvents, growthData, loading } = useSuperAdminStats();
+  const { totalClubs, globalMembers, totalEvents, clubs, members, upcomingEvents, growthData } = useSuperAdminStats();
 
   const exportHandlerRef = useRef<(() => void) | null>(null);
   useEffect(() => {
@@ -104,14 +104,7 @@ const SuperAdminDashboard = () => {
     checkAdmin();
   }, [user?.id, user?.email]);
 
-  if (authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center dashboard-corner-gradient">
-        <div className="w-8 h-8 border-[3px] border-primary/30 border-t-primary rounded-full animate-spin" />
-      </div>);
-  }
-
-  if (!user) return <Navigate to="/" replace />;
+  if (!user) return null;
 
   if (isAdmin === false) {
     return (
@@ -830,7 +823,7 @@ const SuperAdminDashboard = () => {
                   <div className="w-9 h-9 mx-auto mb-1.5 flex items-center justify-center" style={{ background: `${NB.orange}30`, border: `2px solid ${NB.border}`, borderRadius: '8px' }}>
                     <Icon className="w-4 h-4" style={{ color: NB.orange }} />
                   </div>
-                  <h3 className="text-2xl font-black" style={{ fontFamily: NB.font, color: NB.border }}>{loading ? '...' : stat.value}</h3>
+                  <h3 className="text-2xl font-black" style={{ fontFamily: NB.font, color: NB.border }}>{stat.value}</h3>
                   <p className="text-[11px] font-semibold uppercase tracking-wider mt-0.5" style={{ color: '#888' }}>
                     {stat.label}
                   </p>
@@ -850,11 +843,7 @@ const SuperAdminDashboard = () => {
               </button>
             </div>
             <div className="space-y-3">
-              {loading ?
-              <div className="p-6 text-center" style={{ background: NB.card, border: `2px solid ${NB.border}`, borderRadius: '10px' }}>
-                  <p className="text-sm" style={{ color: '#888' }}>Loading clubs...</p>
-                </div> :
-              filteredClubs.length === 0 ?
+              {filteredClubs.length === 0 ?
               <div className="p-6 text-center" style={{ background: NB.card, border: `2px solid ${NB.border}`, borderRadius: '10px' }}>
                   <Building2 className="w-8 h-8 mx-auto mb-2" style={{ color: '#888' }} />
                   <p className="text-sm" style={{ color: '#888' }}>No clubs found</p>
@@ -910,11 +899,7 @@ const SuperAdminDashboard = () => {
           <section>
             <h3 className="text-base font-black mb-3" style={{ fontFamily: NB.font }}>Global Event Feed</h3>
             <div className="space-y-3">
-              {loading ?
-              <div className="p-6 text-center" style={{ background: NB.card, border: `2px solid ${NB.border}`, borderRadius: '10px' }}>
-                  <p className="text-sm" style={{ color: '#888' }}>Loading events...</p>
-                </div> :
-              upcomingEvents.length === 0 ?
+              {upcomingEvents.length === 0 ?
               <div className="p-6 text-center" style={{ background: NB.card, border: `2px solid ${NB.border}`, borderRadius: '10px' }}>
                   <Calendar className="w-8 h-8 mx-auto mb-2" style={{ color: '#888' }} />
                   <p className="text-sm" style={{ color: '#888' }}>No upcoming events</p>
@@ -987,7 +972,7 @@ const SuperAdminDashboard = () => {
                 <Icon className="w-6 h-6" style={{ color: NB.border }} />
               </div>
               <div>
-                <h3 className="text-3xl font-black" style={{ fontFamily: NB.font }}>{loading ? '...' : stat.value}</h3>
+                <h3 className="text-3xl font-black" style={{ fontFamily: NB.font }}>{stat.value}</h3>
                 <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#888' }}>{stat.label}</p>
               </div>
             </div>
@@ -1008,9 +993,7 @@ const SuperAdminDashboard = () => {
             </button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 overflow-y-auto pr-2 flex-1" style={{ scrollbarWidth: 'none' }}>
-            {loading ?
-            <p className="col-span-3 text-center py-8" style={{ color: '#888' }}>Loading clubs...</p> :
-            filteredClubs.length === 0 ?
+            {filteredClubs.length === 0 ?
             <p className="col-span-3 text-center py-8" style={{ color: '#888' }}>No clubs found</p> :
             filteredClubs.map((club) =>
             <div key={club.id} className="p-4 relative" style={{ background: NB.bg, border: `2px solid ${NB.border}`, borderRadius: '10px', boxShadow: `3px 3px 0px ${NB.border}` }}>
@@ -1063,9 +1046,7 @@ const SuperAdminDashboard = () => {
       <div className="p-5" style={{ background: NB.card, border: `2px solid ${NB.border}`, borderRadius: '12px', boxShadow: `4px 4px 0px ${NB.border}` }}>
         <h2 className="text-lg font-black mb-4" style={{ fontFamily: NB.font }}>Global Event Feed</h2>
         <div className="flex gap-6 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
-          {loading ?
-          <p style={{ color: '#888' }} className="py-4">Loading events...</p> :
-          upcomingEvents.length === 0 ?
+          {upcomingEvents.length === 0 ?
           <p style={{ color: '#888' }} className="py-4">No upcoming events</p> :
           upcomingEvents.map((event) => {
             const d = new Date(event.event_date);

@@ -2,8 +2,7 @@ import { useState, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
 import { useUserClubs, UserClub } from '@/hooks/useUserClubs';
-import { Navigate, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Camera, Linkedin, Instagram, Mail, Save, Loader2, LogOut, Download, X } from 'lucide-react';
+import { Camera, Linkedin, Instagram, Mail, Save, Loader2, LogOut, Download, X } from 'lucide-react';
 import { MobileBottomNav } from '@/components/mobile/MobileBottomNav';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -79,10 +78,9 @@ const buildFullUrl = (username: string, type: 'linkedin' | 'instagram'): string 
 };
 
 const Profile = () => {
-  const { user, loading: authLoading } = useAuth();
-  const { profile, loading: profileLoading, updateProfile, uploadAvatar } = useProfile();
-  const { clubs, loading: clubsLoading } = useUserClubs();
-  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { profile, updateProfile, uploadAvatar } = useProfile();
+  const { clubs } = useUserClubs();
   const isMobile = useIsMobile();
   const { toast } = useToast();
   const { activeDesign } = useDesign();
@@ -97,9 +95,6 @@ const Profile = () => {
   const [leavingClub, setLeavingClub] = useState(false);
 
   const val = (key: string) => form[key] ?? (profile as any)?.[key] ?? '';
-
-  if (!user && !authLoading) return <Navigate to="/" replace />;
-  const isLoading = authLoading || profileLoading;
 
   const linkedinUsername = form.social_linkedin !== undefined
     ? form.social_linkedin
@@ -480,11 +475,7 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen pb-24 overflow-x-hidden" style={{ background: isNeo ? '#F4EFE7' : undefined }}>
-      <div className="px-4 py-6 md:px-8 md:py-8 lg:px-10 lg:py-10 w-full overflow-hidden" style={{ paddingRight: isMobile && isNeo ? 'calc(1rem + 6px)' : undefined }}>{isLoading ? (
-        <div className="flex justify-center py-12">
-          <div className="w-8 h-8 border-[3px] border-[#E98A3A]/30 border-t-[#E98A3A] rounded-full animate-spin" />
-        </div>
-      ) : content}</div>
+      <div className="px-4 py-6 md:px-8 md:py-8 lg:px-10 lg:py-10 w-full overflow-hidden" style={{ paddingRight: isMobile && isNeo ? 'calc(1rem + 6px)' : undefined }}>{content}</div>
       <MobileBottomNav />
     </div>
   );

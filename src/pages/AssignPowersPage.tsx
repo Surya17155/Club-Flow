@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useNavigate } from 'react-router-dom';
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar';
 import { Switch } from '@/components/ui/switch';
 import { supabase } from '@/integrations/supabase/client';
 import { useClub } from '@/contexts/ClubContext';
 import { useDelegatedPowers, AVAILABLE_POWERS } from '@/hooks/useDelegatedPowers';
 import { toast } from 'sonner';
-import { Shield, Loader2, ChevronDown, ChevronLeft } from 'lucide-react';
+import { Shield, ChevronDown } from 'lucide-react';
 import VerifiedBadge, { getRoleBadgeVariant } from '@/components/ui/VerifiedBadge';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -29,16 +28,14 @@ const roleLabelMap: Record<string, string> = {
 
 const AssignPowersPage = () => {
   const { activeClub } = useClub();
-  const { powers, grantPower, revokePower, loading: powersLoading } = useDelegatedPowers(activeClub?.club_id);
+  const { powers, grantPower, revokePower } = useDelegatedPowers(activeClub?.club_id);
   const [members, setMembers] = useState<ClubMember[]>([]);
-  const [loading, setLoading] = useState(true);
   const [toggling, setToggling] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!activeClub) return;
     const fetchMembers = async () => {
-      setLoading(true);
       const { data: memberRows, error } = await supabase
         .from('club_members')
         .select('user_id, role')
@@ -65,7 +62,6 @@ const AssignPowersPage = () => {
       } else {
         setMembers([]);
       }
-      setLoading(false);
     };
     fetchMembers();
   }, [activeClub?.club_id]);
@@ -88,18 +84,6 @@ const AssignPowersPage = () => {
   };
 
   const isMobile = useIsMobile();
-  const navigate = useNavigate();
-
-  if (loading || powersLoading) {
-    return (
-      <div className="min-h-screen flex antialiased" style={{ backgroundColor: '#F4EFE7' }}>
-        {!isMobile && <DashboardSidebar />}
-        <div className="flex-1 flex items-center justify-center" style={{ padding: '24px 28px' }}>
-          <Loader2 className="w-8 h-8 animate-spin" style={{ color: '#E98A3A' }} />
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen flex antialiased" style={{ backgroundColor: '#F4EFE7' }}>

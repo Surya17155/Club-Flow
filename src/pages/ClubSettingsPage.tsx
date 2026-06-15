@@ -1,16 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useNavigate } from 'react-router-dom';
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { useClub } from '@/contexts/ClubContext';
 import { toast } from 'sonner';
-import { Settings, Upload, Loader2, Instagram, Linkedin, ChevronLeft } from 'lucide-react';
+import { Settings, Upload, Loader2, Instagram, Linkedin } from 'lucide-react';
 import { getCachedClubSettings, preloadClubSettings, setCachedClubSettings } from '@/lib/preloadCache';
 
 const CLUB_CATEGORIES = ['Arts & Culture', 'Technology', 'Business', 'Sports', 'Social Service', 'Media', 'Academic', 'Other'];
@@ -18,7 +16,6 @@ const CLUB_CATEGORIES = ['Arts & Culture', 'Technology', 'Business', 'Sports', '
 const ClubSettingsPage = () => {
   const { activeClub } = useClub();
   const cachedClub = getCachedClubSettings(activeClub?.club_id);
-  const [loading, setLoading] = useState(() => activeClub ? !cachedClub : false);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [form, setForm] = useState(() => ({
@@ -36,7 +33,6 @@ const ClubSettingsPage = () => {
     const fetchClub = async () => {
       const cached = getCachedClubSettings(activeClub.club_id);
       if (cached) setForm({ name: cached.name || '', tagline: cached.tagline || '', about: cached.about || '', category: cached.category || '', logo_url: cached.logo_url || null, social_instagram: cached.social_instagram || '', social_linkedin: cached.social_linkedin || '' });
-      else setLoading(true);
       const data = await preloadClubSettings(activeClub.club_id);
       if (data) {
         setForm({
@@ -49,7 +45,6 @@ const ClubSettingsPage = () => {
           social_linkedin: (data as any).social_linkedin || '',
         });
       }
-      setLoading(false);
     };
     fetchClub();
   }, [activeClub?.club_id]);
@@ -98,18 +93,6 @@ const ClubSettingsPage = () => {
   };
 
   const isMobile = useIsMobile();
-  const navigate = useNavigate();
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex antialiased" style={{ backgroundColor: '#F4EFE7' }}>
-        {!isMobile && <DashboardSidebar />}
-        <div className="flex-1 flex items-center justify-center" style={{ padding: '24px 28px' }}>
-          <Loader2 className="w-8 h-8 animate-spin" style={{ color: '#E98A3A' }} />
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen flex antialiased" style={{ backgroundColor: '#F4EFE7' }}>

@@ -147,7 +147,6 @@ const Events = () => {
   }, []);
 
   const [events, setEvents] = useState<EventRow[]>(() => getCachedEvents((localStorage.getItem('dashboardViewMode') as 'personal' | 'club') || 'personal', activeClub?.club_id)?.events ?? []);
-  const [loading, setLoading] = useState(() => !getCachedEvents((localStorage.getItem('dashboardViewMode') as 'personal' | 'club') || 'personal', activeClub?.club_id));
   const [selectedEvent, setSelectedEvent] = useState<EventRow | null>(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [qrDialogOpen, setQrDialogOpen] = useState(false);
@@ -162,7 +161,6 @@ const Events = () => {
     if (cached) {
       setEvents(cached.events as any);
       setAttendanceCounts(cached.attendanceCounts);
-      setLoading(false);
       // Revalidate in background — don't block UI
       preloadEvents(viewMode, activeClub?.club_id, true).then((data) => {
         setEvents(data.events as any);
@@ -170,11 +168,9 @@ const Events = () => {
       }).catch(() => undefined);
       return;
     }
-    setLoading(true);
     const data = await preloadEvents(viewMode, activeClub?.club_id);
     setEvents(data.events as any);
     setAttendanceCounts(data.attendanceCounts);
-    setLoading(false);
   };
 
   useEffect(() => { fetchEvents(); }, [viewMode, activeClub?.club_id]);
@@ -344,11 +340,7 @@ const Events = () => {
           ))}
         </div>
 
-        {loading ? (
-          <div className="flex justify-center py-12">
-            <div className="w-8 h-8 border-[3px] border-[#E98A3A]/30 border-t-[#E98A3A] rounded-full animate-spin" />
-          </div>
-        ) : filteredEvents.length === 0 ? (
+        {filteredEvents.length === 0 ? (
           <p className="text-center py-12" style={{ color: '#888', fontFamily: isNeo ? NEO.font : undefined }}>No events found.</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">

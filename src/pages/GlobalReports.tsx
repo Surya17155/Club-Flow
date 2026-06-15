@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Search, Download, Shield, ArrowLeft, Eye } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -32,7 +32,7 @@ interface ReportRow {
 }
 
 const GlobalReports = () => {
-  const { user, loading: authLoading } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [isAdmin, setIsAdmin] = useState<boolean | null>(() => user ? getCachedAdminStatus(user.id, user.email) ?? null : null);
@@ -42,7 +42,6 @@ const GlobalReports = () => {
   const [clubs, setClubs] = useState<{ id: string; name: string }[]>([]);
   const [eventsPerClub, setEventsPerClub] = useState<{ name: string; events: number }[]>([]);
   const [programmeData, setProgrammeData] = useState<{ name: string; value: number }[]>([]);
-  const [loading, setLoading] = useState(true);
   const [profileDialogOpen, setProfileDialogOpen] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState<any>(null);
 
@@ -61,7 +60,6 @@ const GlobalReports = () => {
   useEffect(() => {
     if (isAdmin !== true) return;
     const fetch = async () => {
-      setLoading(true);
       const [{ data: eventsData }, { data: clubsData }, { data: membersData }, { data: profilesData }, { data: participantsData }] = await Promise.all([
         supabase.from('events').select('id, name, event_date, club_id'),
         supabase.from('clubs').select('id, name'),
@@ -124,8 +122,6 @@ const GlobalReports = () => {
         progMap.set(prog, (progMap.get(prog) || 0) + 1);
       });
       setProgrammeData(Array.from(progMap.entries()).map(([name, value]) => ({ name, value })).filter(p => p.name));
-
-      setLoading(false);
     };
     fetch();
   }, [isAdmin]);
@@ -158,15 +154,7 @@ const GlobalReports = () => {
     URL.revokeObjectURL(url);
   };
 
-  if (authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center dashboard-corner-gradient">
-        <div className="w-8 h-8 border-[3px] border-primary/30 border-t-primary rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  if (!user) return <Navigate to="/" replace />;
+  if (!user) return null;
   if (isAdmin === false) {
     return (
       <div className="min-h-screen flex items-center justify-center dashboard-corner-gradient">
@@ -253,9 +241,7 @@ const GlobalReports = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/20">
-                {loading ? (
-                  <tr><td colSpan={5} className="text-center py-8 text-muted-foreground">Loading...</td></tr>
-                ) : filteredRows.length === 0 ? (
+                {filteredRows.length === 0 ? (
                   <tr><td colSpan={5} className="text-center py-8 text-muted-foreground">No events found</td></tr>
                 ) : (
                   filteredRows.map((row, i) => (

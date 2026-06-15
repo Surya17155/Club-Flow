@@ -8,7 +8,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { usePersonalStats } from "@/hooks/usePersonalStats";
 import { useClubStats } from "@/hooks/useClubStats";
 import { useDelegatedPowers } from "@/hooks/useDelegatedPowers";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   ChevronDown,
   Edit3,
@@ -68,7 +68,7 @@ const roleLabelMap: Record<string, string> = {
 type ViewMode = "personal" | "club";
 
 const AdminDashboard = () => {
-  const { user, loading } = useAuth();
+  const { user } = useAuth();
   const { profile } = useProfile();
   const { activeClub, clubs } = useClub();
   const { stats: personalStats } = usePersonalStats();
@@ -137,16 +137,6 @@ const AdminDashboard = () => {
     };
     fetchUpcoming();
   }, []);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "#fdfbf7" }}>
-        <div className="w-8 h-8 border-[3px] border-primary/30 border-t-primary rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  if (!user) return <Navigate to="/" replace />;
 
   const fullName = profile?.full_name || user?.user_metadata?.full_name || "Student";
   const programme = profile?.programme || user?.user_metadata?.programme || "";

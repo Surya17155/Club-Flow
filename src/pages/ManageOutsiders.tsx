@@ -70,7 +70,6 @@ const ManageOutsiders = () => {
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const [outsiders, setOutsiders] = useState<Outsider[]>(() => getCachedOutsiders() ?? []);
-  const [loading, setLoading] = useState(() => !getCachedOutsiders());
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [selectedOutsider, setSelectedOutsider] = useState<Outsider | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -87,13 +86,10 @@ const ManageOutsiders = () => {
   const fetchOutsiders = async () => {
     const cached = getCachedOutsiders();
     if (cached) setOutsiders(cached);
-    else setLoading(true);
     try {
       setOutsiders(await preloadOutsiders(true));
     } catch (err: any) {
       toast({ title: 'Error', description: err.message || 'Failed to fetch outsiders', variant: 'destructive' });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -234,11 +230,7 @@ const ManageOutsiders = () => {
 
       {/* Content */}
       <div className={`px-5 pt-5 pb-8 ${isMobile ? 'pb-28' : ''}`}>
-        {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="w-10 h-10 border-[3px] rounded-full animate-spin" style={{ borderColor: `${NB.border}40`, borderTopColor: NB.orange }} />
-          </div>
-        ) : outsiders.length === 0 ? (
+        {outsiders.length === 0 ? (
           <div
             className="flex flex-col items-center justify-center py-16 text-center border-2 mt-2"
             style={{ background: NB.card, borderColor: NB.border, borderRadius: 14, boxShadow: `6px 6px 0 0 ${NB.border}` }}
