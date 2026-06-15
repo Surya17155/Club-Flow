@@ -91,6 +91,7 @@ const cached = <T,>(cache: Map<string, CacheEntry<T>>, key: string, loader: () =
       cache.set(key, { data: fallback, fetchedAt: Date.now() });
       return fallback;
     }
+    cache.delete(key);
     throw error;
   }).finally(() => {
     finishFreshFetch(key);
