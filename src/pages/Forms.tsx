@@ -63,12 +63,17 @@ export default function Forms() {
 
   const load = async () => {
     setLoading(true);
-    let query = supabase.from('forms').select('*').order('created_at', { ascending: false });
+    let query = supabase
+      .from('forms')
+      .select('id, title, description, club_id, created_by, is_published, is_public, accepting_responses, deadline, created_at')
+      .order('created_at', { ascending: false });
     if (tab === 'manage') {
       if (!activeClub?.club_id) { setForms([]); setLoading(false); return; }
       query = query.eq('club_id', activeClub.club_id);
     } else {
-      query = query.eq('is_published', true);
+      const clubIds = clubs.map((club) => club.club_id);
+      if (clubIds.length === 0) { setForms([]); setLoading(false); return; }
+      query = query.eq('is_published', true).in('club_id', clubIds);
     }
     const { data, error } = await query;
     if (error) { toast.error(error.message); setLoading(false); return; }
@@ -110,7 +115,7 @@ export default function Forms() {
     setLoading(false);
   };
 
-  useEffect(() => { load(); /* eslint-disable-next-line */ }, [tab, activeClub?.club_id, user?.id]);
+  useEffect(() => { load(); /* eslint-disable-next-line */ }, [tab, activeClub?.club_id, user?.id, clubs.length]);
 
   // Refresh on focus + on app-wide form mutations (avoids realtime overhead)
   useEffect(() => {
@@ -122,7 +127,7 @@ export default function Forms() {
       window.removeEventListener('formsChanged', onRefresh);
     };
     // eslint-disable-next-line
-  }, [user?.id, tab, activeClub?.club_id]);
+  }, [user?.id, tab, activeClub?.club_id, clubs.length]);
 
 
   const now = Date.now();
