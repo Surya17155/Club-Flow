@@ -325,7 +325,7 @@ export const setCachedClubSettings = (clubId: string, data: any) => clubSettings
 export const preloadClubSettings = (clubId: string, force = false) => cached(clubSettingsCache, clubId, async () => {
   const { data } = await db.from('clubs').select('name, tagline, about, category, logo_url, social_instagram, social_linkedin').eq('id', clubId).maybeSingle();
   return data ?? null;
-}, force, []);
+}, force, null);
 
 export const getCachedUpcomingEvents = () => read(upcomingEventsCache, 'upcoming');
 export const preloadUpcomingEvents = (force = false) => cached(upcomingEventsCache, 'upcoming', async () => {
@@ -365,7 +365,7 @@ export const preloadJoinRequests = (clubId: string, force = false) => cached(joi
   const { data: profiles } = await db.from('profiles').select('user_id, full_name, email, programme, roll_no').in('user_id', userIds);
   const profileMap = new Map((profiles ?? []).map((p: any) => [p.user_id, p]));
   return data.map((r: any) => ({ ...r, full_name: (profileMap.get(r.user_id) as any)?.full_name || 'Unknown', email: (profileMap.get(r.user_id) as any)?.email || null, programme: (profileMap.get(r.user_id) as any)?.programme || null, roll_no: (profileMap.get(r.user_id) as any)?.roll_no || null }));
-}, force);
+}, force, []);
 
 export const getCachedAssignableMembers = (clubId: string) => read(assignableMembersCache, clubId);
 export const preloadAssignableMembers = (clubId: string, force = false) => cached(assignableMembersCache, clubId, async () => {
@@ -375,4 +375,4 @@ export const preloadAssignableMembers = (clubId: string, force = false) => cache
   const { data: profileRows } = await db.from('profiles').select('user_id, full_name').in('user_id', userIds);
   const profileMap = new Map((profileRows ?? []).map((p: any) => [p.user_id, p]));
   return memberRows.map((m: any) => ({ user_id: m.user_id, role: m.role, full_name: (profileMap.get(m.user_id) as any)?.full_name ?? 'Unknown' }));
-}, force);
+}, force, []);
