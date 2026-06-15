@@ -11,7 +11,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pi
 import ProfileDropdown from '@/components/dashboard/ProfileDropdown';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { MobileBottomNav } from '@/components/mobile/MobileBottomNav';
-import { getCachedAdminStatus, preloadAdminStatus } from '@/lib/preloadCache';
+import { getCachedAdminStatus, getCachedSuperAdminStats, preloadAdminStatus, preloadSuperAdminStats } from '@/lib/preloadCache';
 import { isSuperAdminUser } from '@/lib/superAdminMode';
 
 const roleLabelMap: Record<string, string> = {
@@ -60,67 +60,53 @@ const GlobalReports = () => {
 
   // Fetch report data
   useEffect(() => {
-    if (!isSuperAdminEmail && isAdmin !== true) return;
     const fetch = async () => {
-      const [{ data: eventsData }, { data: clubsData }, { data: membersData }, { data: profilesData }, { data: participantsData }] = await Promise.all([
-        supabase.from('events').select('id, name, event_date, club_id'),
-        supabase.from('clubs').select('id, name'),
-        supabase.from('club_members').select('id, user_id, club_id, role'),
-        supabase.from('profiles').select('user_id, full_name, programme'),
-        supabase.from('event_participants').select('event_id'),
-      ]);
-
-      const cList = clubsData || [];
-      const mList = membersData || [];
-      const eList = eventsData || [];
-      const pList = profilesData || [];
-      const partList = participantsData || [];
-
-      setClubs(cList);
-
-      const clubMap = new Map(cList.map(c => [c.id, c.name]));
-
-      // Participant counts
-      const partCounts = new Map<string, number>();
-      partList.forEach(p => partCounts.set(p.event_id, (partCounts.get(p.event_id) || 0) + 1));
-
+      let stats = getCachedSuperAdminStats();
+      if (!stats) stats = await preloadSuperAdminStats();
+      
+      const { clubs: cList, members: mList, allEvents: eList } = stats as any;
+      
+      setClubs(cList.map((c: any) => ({ id: c.id, name: c.name })));
+      
+      const clubMap = new Map(cList.map((c: any) => [c.id, c.name]));
+      
       // Club membership stats
       const clubStats = new Map<string, { total: number; postHolders: number }>();
-      mList.forEach(m => {
+      mList.forEach((m: any) => {
         const curr = clubStats.get(m.club_id) || { total: 0, postHolders: 0 };
         curr.total++;
-        if (m.role !== 'member') curr.postHolders++;
+        if (m.role !== "member") curr.postHolders++;
         clubStats.set(m.club_id, curr);
       });
 
       const reportRows: ReportRow[] = eList
-        .sort((a, b) => new Date(a.event_date).getTime() - new Date(b.event_date).getTime())
-        .map(e => {
+        .sort((a: any, b: any) => new Date(a.event_date).getTime() - new Date(b.event_date).getTime())
+        .map((e: any) => {
           const stats = clubStats.get(e.club_id) || { total: 0, postHolders: 0 };
           return {
             eventName: e.name,
             eventDate: e.event_date,
-            clubName: clubMap.get(e.club_id) || '',
+            clubName: clubMap.get(e.club_id) || "",
             clubId: e.club_id,
             totalMembers: stats.total,
             postHolders: stats.postHolders,
             regularMembers: stats.total - stats.postHolders,
-            participantCount: partCounts.get(e.id) || 0,
+            participantCount: e.participant_count,
           };
         });
       setRows(reportRows);
 
       // Events per club chart
-      const epc = cList.map(c => ({
-        name: c.name.length > 10 ? c.name.slice(0, 10) + '…' : c.name,
-        events: eList.filter(e => e.club_id === c.id).length,
-      })).filter(c => c.events > 0);
+      const epc = cList.map((c: any) => ({
+        name: c.name.length > 10 ? c.name.slice(0, 10) + "…" : c.name,
+        events: eList.filter((e: any) => e.club_id === c.id).length,
+      })).filter((c: any) => c.events > 0);
       setEventsPerClub(epc);
 
       // Programme distribution
       const progMap = new Map<string, number>();
-      pList.forEach(p => {
-        const prog = p.programme || 'Other';
+      mList.forEach((m: any) => {
+        const prog = m.programme || "Other";
         progMap.set(prog, (progMap.get(prog) || 0) + 1);
       });
       setProgrammeData(Array.from(progMap.entries()).map(([name, value]) => ({ name, value })).filter(p => p.name));

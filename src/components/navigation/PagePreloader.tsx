@@ -3,15 +3,19 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useClub } from '@/contexts/ClubContext';
 import {
   preloadAdminStatus,
+  preloadAssignableMembers,
+  preloadClubMembers,
   preloadClubSettings,
   preloadClubStats,
   preloadDelegatedPowers,
   preloadDiscoverClubs,
   preloadEvents,
+  preloadJoinRequests,
   preloadOutsiders,
   preloadPersonalStats,
   preloadProfile,
   preloadSuperAdminStats,
+  preloadUpcomingEvents,
   preloadUserClubs,
 } from '@/lib/preloadCache';
 import { isSuperAdminUser } from '@/lib/superAdminMode';
@@ -28,12 +32,16 @@ export function PagePreloader() {
     preloadProfile(user.id);
     preloadPersonalStats(user.id);
     preloadEvents('personal');
+    preloadUpcomingEvents();
     preloadUserClubs(user.id).then((clubs) => {
       clubs.forEach((club) => {
         preloadEvents('club', club.club_id);
         preloadClubStats(club.club_id);
         preloadDelegatedPowers(user.id, club.club_id);
+        preloadClubMembers(club.club_id);
         preloadClubSettings(club.club_id);
+        preloadJoinRequests(club.club_id);
+        preloadAssignableMembers(club.club_id);
       });
     });
 
@@ -53,9 +61,12 @@ export function PagePreloader() {
   useEffect(() => {
     if (!user || !activeClub?.club_id) return;
     preloadClubStats(activeClub.club_id);
+    preloadClubMembers(activeClub.club_id);
     preloadDelegatedPowers(user.id, activeClub.club_id);
     preloadEvents('club', activeClub.club_id);
     preloadClubSettings(activeClub.club_id);
+    preloadJoinRequests(activeClub.club_id);
+    preloadAssignableMembers(activeClub.club_id);
   }, [user?.id, activeClub?.club_id]);
 
   return null;

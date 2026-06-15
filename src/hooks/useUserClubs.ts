@@ -12,18 +12,16 @@ export interface UserClub {
 export const useUserClubs = () => {
   const { user } = useAuth();
   const [clubs, setClubs] = useState<UserClub[]>(() => user ? getCachedUserClubs(user.id) ?? [] : []);
-  const [loading, setLoading] = useState(() => user ? !getCachedUserClubs(user.id) : false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!user) { setClubs([]); setLoading(false); return; }
+    if (!user) { setClubs([]); return; }
 
     const fetch = async () => {
       const cached = getCachedUserClubs(user.id);
       if (cached) setClubs(cached);
-      else setLoading(true);
       const data = await preloadUserClubs(user.id);
       setClubs(data);
-      setLoading(false);
     };
     fetch();
   }, [user?.id]);

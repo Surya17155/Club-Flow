@@ -9,16 +9,14 @@ type Profile = Tables<'profiles'>;
 export const useProfile = () => {
   const { user } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(() => user ? getCachedProfile(user.id) ?? null : null);
-  const [loading, setLoading] = useState(() => user ? !getCachedProfile(user.id) : false);
+  const [loading, setLoading] = useState(false);
 
   const fetchProfile = async (force = false) => {
     if (!user) return;
     const cached = getCachedProfile(user.id);
     if (cached && !force) setProfile(cached);
-    else setLoading(true);
     const data = await preloadProfile(user.id, force);
     if (data) setProfile(data);
-    setLoading(false);
   };
 
   useEffect(() => {

@@ -2,13 +2,13 @@ import { useState, useEffect } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar';
 import { Switch } from '@/components/ui/switch';
-import { supabase } from '@/integrations/supabase/client';
 import { useClub } from '@/contexts/ClubContext';
 import { useDelegatedPowers, AVAILABLE_POWERS } from '@/hooks/useDelegatedPowers';
 import { toast } from 'sonner';
 import { Shield, ChevronDown } from 'lucide-react';
 import VerifiedBadge, { getRoleBadgeVariant } from '@/components/ui/VerifiedBadge';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getCachedAssignableMembers, preloadAssignableMembers } from '@/lib/preloadCache';
 
 interface ClubMember {
   user_id: string;
@@ -29,39 +29,16 @@ const roleLabelMap: Record<string, string> = {
 const AssignPowersPage = () => {
   const { activeClub } = useClub();
   const { powers, grantPower, revokePower } = useDelegatedPowers(activeClub?.club_id);
-  const [members, setMembers] = useState<ClubMember[]>([]);
+  const [members, setMembers] = useState<ClubMember[]>(() => activeClub ? (getCachedAssignableMembers(activeClub.club_id) ?? []) as ClubMember[] : []);
   const [toggling, setToggling] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!activeClub) return;
     const fetchMembers = async () => {
-      const { data: memberRows, error } = await supabase
-        .from('club_members')
-        .select('user_id, role')
-        .eq('club_id', activeClub.club_id)
-        .neq('role', 'president')
-        .neq('role', 'member')
-        .neq('role', 'admin');
-
-      if (!error && memberRows) {
-        const userIds = memberRows.map(m => m.user_id);
-        let profileMap = new Map<string, { full_name: string | null }>();
-        if (userIds.length > 0) {
-          const { data: profileRows } = await supabase
-            .from('profiles')
-            .select('user_id, full_name')
-            .in('user_id', userIds);
-          profileMap = new Map((profileRows ?? []).map(p => [p.user_id, p]));
-        }
-        setMembers(memberRows.map(m => ({
-          user_id: m.user_id,
-          role: m.role,
-          full_name: profileMap.get(m.user_id)?.full_name ?? 'Unknown',
-        })));
-      } else {
-        setMembers([]);
-      }
+      const cached = getCachedAssignableMembers(activeClub.club_id);
+      if (cached) setMembers(cached as ClubMember[]);
+      setMembers(await preloadAssignableMembers(activeClub.club_id, true) as ClubMember[]);
     };
     fetchMembers();
   }, [activeClub?.club_id]);

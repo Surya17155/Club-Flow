@@ -56,13 +56,20 @@ export const useSuperAdminStats = () => {
   const [members, setMembers] = useState<MemberWithProfile[]>(cachedStats?.members ?? []);
   const [upcomingEvents, setUpcomingEvents] = useState<UpcomingEvent[]>(cachedStats?.upcomingEvents ?? []);
   const [growthData, setGrowthData] = useState<GrowthData[]>(cachedStats?.growthData ?? []);
-  const [loading, setLoading] = useState(!cachedStats);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchAll = async () => {
       const cached = getCachedSuperAdminStats();
-      if (cached) setLoading(false);
-      else setLoading(true);
+      if (cached) {
+        setTotalClubs(cached.totalClubs);
+        setGlobalMembers(cached.globalMembers);
+        setTotalEvents(cached.totalEvents);
+        setClubs(cached.clubs);
+        setMembers(cached.members);
+        setUpcomingEvents(cached.upcomingEvents);
+        setGrowthData(cached.growthData);
+      }
       const data = await preloadSuperAdminStats();
       setTotalClubs(data.totalClubs);
       setGlobalMembers(data.globalMembers);
@@ -71,7 +78,6 @@ export const useSuperAdminStats = () => {
       setMembers(data.members);
       setUpcomingEvents(data.upcomingEvents);
       setGrowthData(data.growthData);
-      setLoading(false);
     };
 
     fetchAll();

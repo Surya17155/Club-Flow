@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Check, X, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
+import { getCachedJoinRequests, preloadJoinRequests } from '@/lib/preloadCache';
 
 interface JoinRequest {
   id: string;
@@ -18,41 +19,12 @@ interface JoinRequest {
 
 const JoinRequestsPanel = ({ clubId }: { clubId: string }) => {
   const { user } = useAuth();
-  const [requests, setRequests] = useState<JoinRequest[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [requests, setRequests] = useState<JoinRequest[]>(() => (getCachedJoinRequests(clubId) ?? []) as JoinRequest[]);
 
   const fetchRequests = async () => {
-    setLoading(true);
-    const { data, error } = await supabase
-      .from('club_join_requests')
-      .select('id, user_id, message, status, created_at')
-      .eq('club_id', clubId)
-      .eq('status', 'pending')
-      .order('created_at', { ascending: true });
-
-    if (error || !data) { setLoading(false); return; }
-
-    if (data.length > 0) {
-      const userIds = data.map((r: any) => r.user_id);
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select('user_id, full_name, email, programme, roll_no')
-        .in('user_id', userIds);
-
-      const profileMap: Record<string, any> = {};
-      (profiles ?? []).forEach((p: any) => { profileMap[p.user_id] = p; });
-
-      setRequests(data.map((r: any) => ({
-        ...r,
-        full_name: profileMap[r.user_id]?.full_name || 'Unknown',
-        email: profileMap[r.user_id]?.email || null,
-        programme: profileMap[r.user_id]?.programme || null,
-        roll_no: profileMap[r.user_id]?.roll_no || null,
-      })));
-    } else {
-      setRequests([]);
-    }
-    setLoading(false);
+    const cached = getCachedJoinRequests(clubId);
+    if (cached) setRequests(cached as JoinRequest[]);
+    setRequests(await preloadJoinRequests(clubId, true) as JoinRequest[]);
   };
 
   useEffect(() => { fetchRequests(); }, [clubId]);
@@ -82,14 +54,6 @@ const JoinRequestsPanel = ({ clubId }: { clubId: string }) => {
       setRequests(prev => prev.filter(r => r.id !== request.id));
     }
   };
-
-  if (loading) {
-    return (
-      <div className="flex justify-center py-6">
-        <div className="w-6 h-6 border-[3px] border-[#111]/30 border-t-[#111] rounded-full animate-spin" />
-      </div>
-    );
-  }
 
   if (requests.length === 0) {
     return (
