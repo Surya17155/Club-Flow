@@ -551,6 +551,7 @@ export type Database = {
           deadline: string | null
           description: string | null
           id: string
+          is_public: boolean
           is_published: boolean
           title: string
           updated_at: string
@@ -566,6 +567,7 @@ export type Database = {
           deadline?: string | null
           description?: string | null
           id?: string
+          is_public?: boolean
           is_published?: boolean
           title: string
           updated_at?: string
@@ -581,6 +583,7 @@ export type Database = {
           deadline?: string | null
           description?: string | null
           id?: string
+          is_public?: boolean
           is_published?: boolean
           title?: string
           updated_at?: string
@@ -686,6 +689,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      is_club_member: {
+        Args: { _club_id: string; _user_id: string }
         Returns: boolean
       }
       is_club_president: {

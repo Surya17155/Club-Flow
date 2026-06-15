@@ -33,6 +33,7 @@ export default function FormBuilder() {
   const [deadline, setDeadline] = useState('');
   const [allowMultiple, setAllowMultiple] = useState(false);
   const [anonymous, setAnonymous] = useState(false);
+  const [isPublic, setIsPublic] = useState(false);
   const [isPublished, setIsPublished] = useState(false);
   const [questions, setQuestions] = useState<DraftQuestion[]>([]);
   const [loading, setLoading] = useState(isEdit);
@@ -49,6 +50,7 @@ export default function FormBuilder() {
       setDeadline(form.deadline ? new Date(form.deadline).toISOString().slice(0, 16) : '');
       setAllowMultiple(form.allow_multiple);
       setAnonymous(form.anonymous);
+      setIsPublic((form as any).is_public ?? false);
       setIsPublished(form.is_published);
 
       const { data: qs } = await supabase.from('form_questions').select('*').eq('form_id', id!).order('position');
@@ -127,8 +129,9 @@ export default function FormBuilder() {
         deadline: deadline ? new Date(deadline).toISOString() : null,
         allow_multiple: allowMultiple,
         anonymous,
+        is_public: isPublic,
         is_published: publish ?? isPublished,
-      };
+      } as any;
 
       let formId = id;
       if (isEdit) {
@@ -212,6 +215,12 @@ export default function FormBuilder() {
             </Field>
             <Toggle label="Allow multiple responses" value={allowMultiple} onChange={setAllowMultiple} />
             <Toggle label="Anonymous mode" value={anonymous} onChange={setAnonymous} />
+            <Toggle label="Public (all members can see)" value={isPublic} onChange={setIsPublic} />
+          </div>
+          <div className="text-[11px]" style={{ color: '#666' }}>
+            {isPublic
+              ? 'This form will be visible to every signed-in member across all clubs.'
+              : 'This form will only be visible to members of the selected club.'}
           </div>
         </div>
 

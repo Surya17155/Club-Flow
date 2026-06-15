@@ -18,17 +18,22 @@ interface FormRow {
   description: string | null;
   club_id: string;
   is_published: boolean;
+  is_public?: boolean;
   accepting_responses: boolean;
   deadline: string | null;
   created_at: string;
 }
+
+type AvailableStatus = 'active' | 'pending' | 'completed';
 
 export default function Forms() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { activeClub, clubs } = useClub();
   const [tab, setTab] = useState<'available' | 'manage'>('available');
+  const [availableStatus, setAvailableStatus] = useState<AvailableStatus>('active');
   const [forms, setForms] = useState<FormRow[]>([]);
+  const [submittedIds, setSubmittedIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
 
   const isPresident = useMemo(
@@ -49,15 +54,49 @@ export default function Forms() {
       }
       query = query.in('club_id', presidentClubIds);
     } else {
+      // Available — RLS already scopes to user's clubs + public forms
       query = query.eq('is_published', true);
     }
     const { data, error } = await query;
     if (error) toast.error(error.message);
     else setForms((data as FormRow[]) || []);
+
+    // Which of these has the user already submitted?
+    if (user && data && data.length) {
+      const { data: resp } = await supabase
+        .from('form_responses')
+        .select('form_id')
+        .eq('user_id', user.id)
+        .in('form_id', (data as FormRow[]).map((f) => f.id));
+      setSubmittedIds(new Set((resp ?? []).map((r: any) => r.form_id)));
+    } else {
+      setSubmittedIds(new Set());
+    }
     setLoading(false);
   };
 
-  useEffect(() => { load(); /* eslint-disable-next-line */ }, [tab, presidentClubIds.join(',')]);
+  useEffect(() => { load(); /* eslint-disable-next-line */ }, [tab, presidentClubIds.join(','), user?.id]);
+
+  const now = Date.now();
+  const visibleForms = useMemo(() => {
+    if (tab !== 'available') return forms;
+    return forms.filter((f) => {
+      const submitted = submittedIds.has(f.id);
+      const expired = f.deadline ? new Date(f.deadline).getTime() < now : false;
+      if (availableStatus === 'active') return !submitted && !expired;
+      if (availableStatus === 'pending') return !submitted && expired; // missed deadline, never submitted
+      return submitted; // completed
+    });
+  }, [forms, submittedIds, tab, availableStatus, now]);
+
+  const countFor = (s: AvailableStatus) =>
+    forms.filter((f) => {
+      const submitted = submittedIds.has(f.id);
+      const expired = f.deadline ? new Date(f.deadline).getTime() < now : false;
+      if (s === 'active') return !submitted && !expired;
+      if (s === 'pending') return !submitted && expired;
+      return submitted;
+    }).length;
 
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this form and all its responses?')) return;
@@ -135,19 +174,54 @@ export default function Forms() {
           )}
         </div>
 
+        {tab === 'available' && (
+          <div className="flex flex-wrap gap-2 mb-4">
+            {(['active', 'pending', 'completed'] as AvailableStatus[]).map((s) => {
+              const active = availableStatus === s;
+              const label = s === 'active' ? 'Active' : s === 'pending' ? 'Pending' : 'Completed';
+              return (
+                <button
+                  key={s}
+                  onClick={() => setAvailableStatus(s)}
+                  className="px-3 py-1.5 text-xs font-bold"
+                  style={{
+                    background: active ? '#E98A3A' : CARD,
+                    color: '#111',
+                    border: '1.5px solid #111',
+                    borderRadius: '999px',
+                    boxShadow: active ? 'none' : '2px 2px 0px #111',
+                  }}
+                >
+                  {label} ({countFor(s)})
+                </button>
+              );
+            })}
+          </div>
+        )}
+
         {loading ? (
           <div className="text-center py-12 text-sm font-semibold" style={{ color: '#555' }}>Loading forms…</div>
-        ) : forms.length === 0 ? (
+        ) : visibleForms.length === 0 ? (
           <div className="text-center py-16 px-6" style={{ background: CARD, border: BORDER, borderRadius: '10px', boxShadow: SHADOW }}>
             <FileText className="w-12 h-12 mx-auto mb-3" style={{ color: '#E98A3A' }} />
-            <div className="font-bold mb-1">No forms yet</div>
+            <div className="font-bold mb-1">
+              {tab === 'manage'
+                ? 'No forms yet'
+                : availableStatus === 'active'
+                ? 'No active forms'
+                : availableStatus === 'pending'
+                ? 'Nothing pending'
+                : 'Nothing completed yet'}
+            </div>
             <div className="text-xs" style={{ color: '#666' }}>
-              {tab === 'manage' ? 'Create your first form to get started.' : 'No published forms available right now.'}
+              {tab === 'manage'
+                ? 'Create your first form to get started.'
+                : 'Forms from your clubs will appear here once published.'}
             </div>
           </div>
         ) : (
           <div className="grid gap-3 md:grid-cols-2">
-            {forms.map((f) => (
+            {visibleForms.map((f) => (
               <motion.div
                 key={f.id}
                 initial={{ opacity: 0, y: 10 }}
