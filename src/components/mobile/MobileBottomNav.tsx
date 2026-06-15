@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Home, Users, Calendar, User, Plus, Bot, FileText } from "lucide-react";
 import { useDelegatedPowers } from "@/hooks/useDelegatedPowers";
 import { useAuth } from "@/contexts/AuthContext";
-import { isSuperAdminLockActive, isSuperAdminUser, SUPER_ADMIN_MODE_EVENT } from "@/lib/superAdminMode";
+import { getSuperAdminModeForUser, isSuperAdminLockActive, isSuperAdminUser, SUPER_ADMIN_MODE_EVENT } from "@/lib/superAdminMode";
 
 const personalTabs = [
   { label: "Home", icon: Home, path: "/admin" },
@@ -50,7 +50,7 @@ function MobileBottomNavInner() {
     return () => { window.removeEventListener('storage', handler); window.removeEventListener('viewModeChanged', handler); };
   }, []);
 
-  const [isSuperAdminMode, setIsSuperAdminMode] = useState(() => isSuperAdminLockActive());
+  const [isSuperAdminMode, setIsSuperAdminMode] = useState(() => getSuperAdminModeForUser(user?.email));
 
   useEffect(() => {
     const syncSuperAdminMode = () => setIsSuperAdminMode(isSuperAdminLockActive());

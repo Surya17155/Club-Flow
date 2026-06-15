@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { isSuperAdminLockActive, isSuperAdminUser } from '@/lib/superAdminMode';
+import { getSuperAdminModeForUser, isSuperAdminUser } from '@/lib/superAdminMode';
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -21,7 +21,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   if (
     authUser &&
     isSuperAdminUser(authUser.email) &&
-    isSuperAdminLockActive() &&
+    getSuperAdminModeForUser(authUser.email) &&
     ['/dashboard', '/admin'].includes(location.pathname)
   ) {
     return <Navigate to="/super-admin" replace />;

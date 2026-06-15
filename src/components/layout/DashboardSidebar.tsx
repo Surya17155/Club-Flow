@@ -5,7 +5,7 @@ import { useProfile } from '@/hooks/useProfile';
 import { useClub } from '@/contexts/ClubContext';
 import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
 import { useDesign } from '@/contexts/DesignContext';
-import { isSuperAdminLockActive, isSuperAdminUser, setSuperAdminLockActive, SUPER_ADMIN_MODE_EVENT } from '@/lib/superAdminMode';
+import { getSuperAdminModeForUser, isSuperAdminLockActive, isSuperAdminUser, setSuperAdminLockActive, SUPER_ADMIN_MODE_EVENT } from '@/lib/superAdminMode';
 import {
   LayoutDashboard,
   Calendar,
@@ -174,7 +174,7 @@ export function DashboardSidebar() {
   // to /chatbot, /manage-outsiders, /global-reports, /settings, etc. while
   // in Super Admin mode does NOT flip the sidebar back to Personal/Club.
   const [isSuperAdminMode, setIsSuperAdminMode] = useState<boolean>(
-    () => isSuperAdminLockActive()
+    () => getSuperAdminModeForUser(user?.email)
   );
   useEffect(() => {
     const sync = () => setIsSuperAdminMode(isSuperAdminLockActive());
