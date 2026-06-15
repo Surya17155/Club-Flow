@@ -104,12 +104,8 @@ const AdminDashboard = () => {
   const [activeStatModal, setActiveStatModal] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchUpcoming = async () => {
-      const cached = getCachedUpcomingEvents();
-      if (cached) setUpcomingEvents(cached);
-      setUpcomingEvents(await preloadUpcomingEvents());
-    };
-    fetchUpcoming();
+    if (getCachedUpcomingEvents()) return;
+    preloadUpcomingEvents().then(setUpcomingEvents).catch(() => undefined);
   }, []);
 
   const fullName = profile?.full_name || user?.user_metadata?.full_name || "Student";

@@ -31,7 +31,7 @@ export const useDelegatedPowers = (overrideClubId?: string) => {
   const fetchPowers = useCallback(async (force = false) => {
     if (!user || !effectiveClubId) { setPowers([]); return; }
     const cached = getCachedDelegatedPowers(user.id, effectiveClubId);
-    if (cached && !force) setPowers(cached as DelegatedPower[]);
+    if (cached && !force) { setPowers(cached as DelegatedPower[]); return; }
     setPowers(await preloadDelegatedPowers(user.id, effectiveClubId, force) as DelegatedPower[]);
   }, [user?.id, effectiveClubId]);
 

@@ -19,7 +19,7 @@ export const useUserClubs = () => {
 
     const fetch = async () => {
       const cached = getCachedUserClubs(user.id);
-      if (cached) setClubs(cached);
+      if (cached) { setClubs(cached); return; }
       const data = await preloadUserClubs(user.id);
       setClubs(data);
     };

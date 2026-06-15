@@ -186,10 +186,6 @@ export function DashboardSidebar() {
       window.removeEventListener('storage', sync);
     };
   }, [user?.email]);
-  // Re-sync when route changes (in case the guard armed/disarmed the lock).
-  useEffect(() => {
-    setIsSuperAdminMode(getSuperAdminModeForUser(user?.email));
-  }, [location.pathname, user?.email]);
 
   // Determine view mode from localStorage, listen for changes
   const [viewMode, setViewModeLocal] = useState<'personal' | 'club'>(
