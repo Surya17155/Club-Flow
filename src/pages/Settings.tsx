@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Navigate, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Lock, Loader2 } from 'lucide-react';
+import { Lock, Loader2 } from 'lucide-react';
 import { MobileBottomNav } from '@/components/mobile/MobileBottomNav';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -48,8 +47,7 @@ const NEO = {
 };
 
 const Settings = () => {
-  const { user, loading, signOut } = useAuth();
-  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
   const isMobile = useIsMobile();
   const { toast } = useToast();
   const { activeDesign } = useDesign();
@@ -57,15 +55,6 @@ const Settings = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [saving, setSaving] = useState(false);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: isNeo ? '#F4EFE7' : undefined }}>
-        <div className="w-8 h-8 border-[3px] border-[#E98A3A]/30 border-t-[#E98A3A] rounded-full animate-spin" />
-      </div>
-    );
-  }
-  if (!user) return <Navigate to="/" replace />;
 
   const handleChangePassword = async () => {
     if (newPassword.length < 6) {
