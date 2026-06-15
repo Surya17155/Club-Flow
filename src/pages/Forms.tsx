@@ -111,7 +111,7 @@ export default function Forms() {
     if (!confirm('Delete this form and all its responses?')) return;
     const { error } = await supabase.from('forms').delete().eq('id', id);
     if (error) toast.error(error.message);
-    else { toast.success('Form deleted'); load(); }
+    else { toast.success('Form deleted'); window.dispatchEvent(new Event('formsChanged')); load(); }
   };
 
   const handleCreate = () => {
