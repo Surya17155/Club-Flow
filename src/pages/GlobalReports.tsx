@@ -142,7 +142,7 @@ const GlobalReports = () => {
     URL.revokeObjectURL(url);
   };
 
-  if (!user) return null;
+  if (!user) return <div className="min-h-screen" style={{ backgroundColor: '#F4EFE7' }} />;
   if (!isSuperAdminEmail && isAdmin === false) {
     return (
       <div className="min-h-screen flex items-center justify-center dashboard-corner-gradient">
