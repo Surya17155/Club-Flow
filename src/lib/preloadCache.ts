@@ -86,7 +86,10 @@ const cached = <T,>(cache: Map<string, CacheEntry<T>>, key: string, loader: () =
     cache.set(key, { data, fetchedAt: Date.now() });
     return data;
   }).catch((error) => {
-    if (entry && 'data' in entry) return entry.data as T;
+    if (entry && 'data' in entry) {
+      cache.set(key, { data: entry.data, fetchedAt: entry.fetchedAt });
+      return entry.data as T;
+    }
     if (fallback !== undefined) {
       cache.set(key, { data: fallback, fetchedAt: Date.now() });
       return fallback;
