@@ -159,9 +159,14 @@ export default function FormBuilder() {
         if (error) throw error;
       }
 
-      toast.success(publish ? 'Form published!' : 'Saved');
+      if (publish) {
+        toast.success('✓ Form Published Successfully', { description: 'The form is now visible to eligible club members.' });
+      } else {
+        toast.success('Saved');
+      }
       window.dispatchEvent(new Event('formsChanged'));
       navigate('/forms');
+
 
     } catch (e: any) {
       toast.error(e.message ?? 'Save failed');
