@@ -249,7 +249,7 @@ export const preloadSuperAdminStats = (force = false) => cached(superAdminStatsC
     totalClubs: clubsList.length,
     globalMembers: new Set(membersList.map((m: any) => m.user_id)).size,
     totalEvents: eventsList.length,
-    allEvents: eventsList.map((e: any) => ({ id: e.id, name: e.name, event_date: e.event_date, club_id: e.club_id, participant_count: participantCountMap.get(e.id) || 0 })),
+    allEvents: eventsList.map((e: any) => ({ ...e, club_name: clubMap.get(e.club_id) || '', participant_count: participantCountMap.get(e.id) || 0 })),
     clubs: clubsList.map((club: any) => {
       const presidentMember = membersList.find((m: any) => m.club_id === club.id && m.role === 'president');
       const presidentProfile = presidentMember ? profileMap.get(presidentMember.user_id) as any : null;
@@ -267,7 +267,6 @@ export const preloadSuperAdminStats = (force = false) => cached(superAdminStatsC
       const profile = profileMap.get(m.user_id) as any;
       return { membership_id: m.id, user_id: m.user_id, club_id: m.club_id, club_name: clubMap.get(m.club_id) || '', role: m.role, full_name: profile?.full_name || 'Unknown', email: profile?.email || null, avatar_url: profile?.avatar_url || null, programme: profile?.programme || null, roll_no: profile?.roll_no || null, section: profile?.section || null, year: profile?.year || null, semester: profile?.semester || null, phone: profile?.phone || null };
     }),
-    allEvents: eventsList.map((e: any) => ({ ...e, club_name: clubMap.get(e.club_id) || '', participant_count: participantCountMap.get(e.id) || 0 })),
     upcomingEvents: eventsList.filter((e: any) => e.event_date >= now).sort((a: any, b: any) => new Date(a.event_date).getTime() - new Date(b.event_date).getTime()).slice(0, 20).map((e: any) => ({ id: e.id, name: e.name, event_date: e.event_date, end_date: e.end_date, club_name: clubMap.get(e.club_id) || '', club_id: e.club_id, participant_count: participantCountMap.get(e.id) || 0, category: e.category, event_type: e.event_type, description: e.description })),
     growthData: monthNames.map((month, i) => ({ month, events: eventsList.filter((e: any) => { const d = new Date(e.event_date); return d.getFullYear() === currentYear && d.getMonth() === i; }).length, members: Math.round(membersList.length / 12) })),
   };
