@@ -63,13 +63,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(session?.user ?? null);
       })
       .catch(() => {
-        setSession(null);
-        setUser(null);
+        // Keep any hydrated session; don't blank state on transient errors.
       })
       .finally(() => {
         initialSessionLoaded.current = true;
+        // Only flip loading off if it was on. Never flip it back on.
         setLoading(false);
       });
+
 
     return () => subscription.unsubscribe();
   }, []);

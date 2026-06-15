@@ -20,6 +20,21 @@ const LandingPage = () => {
   }, [activePage]);
 
   if (!loading && user) return <Navigate to={getAuthenticatedHomePath(user.email)} replace />;
+  // While auth is still resolving but a persisted token exists, render a neutral
+  // background instead of the full landing markup to avoid a flash + unmount.
+  if (loading && typeof window !== 'undefined') {
+    const hasToken = (() => {
+      try {
+        for (let i = 0; i < window.localStorage.length; i += 1) {
+          const k = window.localStorage.key(i);
+          if (k?.startsWith('sb-') && k.endsWith('-auth-token')) return true;
+        }
+      } catch {}
+      return false;
+    })();
+    if (hasToken) return <div style={{ minHeight: '100vh', background: '#F4EFE7' }} />;
+  }
+
 
   const navLink = (page: PageName, label: string) => (
     <button
