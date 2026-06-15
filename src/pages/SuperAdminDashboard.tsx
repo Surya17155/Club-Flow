@@ -19,6 +19,7 @@ import ProfileDropdown from '@/components/dashboard/ProfileDropdown';
 import SuperAdminCalendar from '@/components/dashboard/SuperAdminCalendar';
 import { useToast } from '@/hooks/use-toast';
 import { getCachedAdminStatus, preloadAdminStatus } from '@/lib/preloadCache';
+import { isSuperAdminUser } from '@/lib/superAdminMode';
 
 import { useIsMobile } from '@/hooks/use-mobile';
 import { MobileBottomNav } from '@/components/mobile/MobileBottomNav';
@@ -38,6 +39,7 @@ const SuperAdminDashboard = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [isAdmin, setIsAdmin] = useState<boolean | null>(() => user ? getCachedAdminStatus(user.id, user.email) ?? null : null);
+  const isSuperAdminEmail = isSuperAdminUser(user?.email);
   const [searchQuery, setSearchQuery] = useState('');
   const [profileDialogOpen, setProfileDialogOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState<any>(null);
@@ -106,7 +108,7 @@ const SuperAdminDashboard = () => {
 
   if (!user) return null;
 
-  if (isAdmin === false) {
+  if (!isSuperAdminEmail && isAdmin === false) {
     return (
       <div className="min-h-screen flex items-center justify-center dashboard-corner-gradient">
         <div className="glass-card p-8 text-center max-w-md">
