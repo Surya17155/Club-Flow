@@ -15,6 +15,8 @@ export function CacheStatusIndicator() {
       ? 'Warmed cache'
       : 'Fresh data';
 
+  if (!running && status.lastSource === 'idle') return null;
+
   return (
     <div
       className="fixed z-[70] flex items-center gap-2 px-3 py-1.5 text-[11px] font-bold uppercase"
