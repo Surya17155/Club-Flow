@@ -437,3 +437,42 @@ export const preloadAssignableMembers = (clubId: string, force = false) => cache
   const profileMap = new Map((profileRows ?? []).map((p: any) => [p.user_id, p]));
   return memberRows.map((m: any) => ({ user_id: m.user_id, role: m.role, full_name: (profileMap.get(m.user_id) as any)?.full_name ?? 'Unknown' }));
 }, force, []);
+
+export type RoutePreloadContext = {
+  userId?: string | null;
+  email?: string | null;
+  activeClubId?: string | null;
+  clubIds?: string[];
+};
+
+export const preloadRouteData = (path: string, ctx: RoutePreloadContext, force = false) => {
+  if (!ctx.userId) return Promise.resolve([] as PromiseSettledResult<unknown>[]);
+
+  const clubIds = Array.from(new Set([ctx.activeClubId, ...(ctx.clubIds ?? [])].filter(Boolean) as string[]));
+  const activeClubId = ctx.activeClubId ?? clubIds[0];
+  const tasks: Promise<unknown>[] = [preloadProfile(ctx.userId, force), preloadUserClubs(ctx.userId, force)];
+
+  if (path === '/admin' || path === '/dashboard') {
+    tasks.push(preloadPersonalStats(ctx.userId, force), preloadUpcomingEvents(force), preloadEvents('personal', null, force));
+  }
+  if (path === '/events' || path === '/scan' || path === '/calendar') {
+    tasks.push(preloadEvents('personal', null, force));
+    if (activeClubId) tasks.push(preloadEvents('club', activeClubId, force));
+  }
+  if (path === '/discover') tasks.push(preloadDiscoverClubs(ctx.userId, force));
+  if (path === '/attendance-history') tasks.push(preloadPersonalStats(ctx.userId, force));
+  if (path === '/profile' || path === '/settings') tasks.push(preloadProfile(ctx.userId, force));
+  if (path === '/super-admin' || path === '/global-reports') {
+    tasks.push(preloadAdminStatus(ctx.userId, ctx.email, force), preloadSuperAdminStats(force));
+  }
+  if (path === '/manage-outsiders') tasks.push(preloadOutsiders(force));
+  if (activeClubId && (path === '/clubs' || path.startsWith('/club/'))) {
+    tasks.push(preloadClubStats(activeClubId, force), preloadClubMembers(activeClubId, force), preloadJoinRequests(activeClubId, force));
+  }
+  if (activeClubId && path === '/club-settings') tasks.push(preloadClubSettings(activeClubId, force));
+  if (activeClubId && path === '/assign-powers') tasks.push(preloadDelegatedPowers(ctx.userId, activeClubId, force), preloadAssignableMembers(activeClubId, force));
+  if (activeClubId && path === '/create-event') tasks.push(preloadDelegatedPowers(ctx.userId, activeClubId, force), preloadClubSettings(activeClubId, force));
+  if (activeClubId && (path === '/chatbot' || path === '/reviews')) tasks.push(preloadEvents('club', activeClubId, force));
+
+  return Promise.allSettled(tasks);
+};
