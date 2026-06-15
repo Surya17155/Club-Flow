@@ -1,9 +1,9 @@
 import { useState, useCallback } from 'react';
 import { ClubDetailOverlay } from './ClubDetailOverlay';
 import { AttendanceHistoryModal } from './AttendanceHistoryModal';
+import { useNavigate } from 'react-router-dom';
 import { MobileProfileCard } from './MobileProfileCard';
 import { MobileBottomNav } from './MobileBottomNav';
-import { usePreloadedNavigate } from '@/hooks/usePreloadedNavigate';
 import {
   Users, Calendar, ChevronRight,
   Compass, ClipboardList, Settings2,
@@ -47,7 +47,7 @@ export function MobileDashboardView({
   onEventClick, canManageClub, canManageEvents, onManageEventsOpen,
   socialLinkedin, socialInstagram, socialGmail, attendanceRecords = [], role,
 }: MobileDashboardViewProps) {
-  const navigate = usePreloadedNavigate();
+  const navigate = useNavigate();
   const { profile } = useProfile();
   const { user } = useAuth();
   const [expandedClubId, setExpandedClubId] = useState<string | null>(null);

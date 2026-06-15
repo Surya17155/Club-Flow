@@ -10,61 +10,6 @@ type CacheEntry<T> = {
   fetchedAt?: number;
 };
 
-export type CacheStatusSnapshot = {
-  active: number;
-  completed: number;
-  total: number;
-  lastLabel: string;
-  lastSource: 'idle' | 'warmed-cache' | 'fresh-fetch';
-  updatedAt: number;
-};
-
-let cacheStatus: CacheStatusSnapshot = {
-  active: 0,
-  completed: 0,
-  total: 0,
-  lastLabel: 'Idle',
-  lastSource: 'idle',
-  updatedAt: Date.now(),
-};
-
-const cacheStatusListeners = new Set<(snapshot: CacheStatusSnapshot) => void>();
-const emitCacheStatus = () => cacheStatusListeners.forEach((listener) => listener(cacheStatus));
-const setCacheStatus = (updates: Partial<CacheStatusSnapshot>) => {
-  cacheStatus = { ...cacheStatus, ...updates, updatedAt: Date.now() };
-  emitCacheStatus();
-};
-
-export const getCacheStatusSnapshot = () => cacheStatus;
-export const subscribeCacheStatus = (listener: (snapshot: CacheStatusSnapshot) => void) => {
-  cacheStatusListeners.add(listener);
-  listener(cacheStatus);
-  return () => { cacheStatusListeners.delete(listener); };
-};
-
-const noteCacheHit = (label: string) => {
-  setCacheStatus({ lastLabel: label, lastSource: 'warmed-cache' });
-};
-
-const beginFreshFetch = (label: string) => {
-  setCacheStatus({
-    active: cacheStatus.active + 1,
-    completed: cacheStatus.active === 0 ? 0 : cacheStatus.completed,
-    total: cacheStatus.active === 0 ? 1 : cacheStatus.total + 1,
-    lastLabel: label,
-    lastSource: 'fresh-fetch',
-  });
-};
-
-const finishFreshFetch = (label: string) => {
-  setCacheStatus({
-    active: Math.max(0, cacheStatus.active - 1),
-    completed: cacheStatus.completed + 1,
-    lastLabel: label,
-    lastSource: 'fresh-fetch',
-  });
-};
-
 const isFresh = <T,>(entry?: CacheEntry<T>) =>
   !!entry && 'data' in entry && !!entry.fetchedAt && Date.now() - entry.fetchedAt < CACHE_TTL;
 
@@ -75,29 +20,19 @@ const read = <T,>(cache: Map<string, CacheEntry<T>>, key: string) => {
 
 const cached = <T,>(cache: Map<string, CacheEntry<T>>, key: string, loader: () => Promise<T>, force = false, fallback?: T) => {
   const entry = cache.get(key);
-  if (!force && isFresh(entry)) {
-    noteCacheHit(key);
-    return Promise.resolve(entry!.data as T);
-  }
+  if (!force && isFresh(entry)) return Promise.resolve(entry!.data as T);
   if (entry?.promise) return entry.promise;
 
-  beginFreshFetch(key);
   const promise = loader().then((data) => {
     cache.set(key, { data, fetchedAt: Date.now() });
     return data;
   }).catch((error) => {
-    if (entry && 'data' in entry) {
-      cache.set(key, { data: entry.data, fetchedAt: entry.fetchedAt });
-      return entry.data as T;
-    }
+    if (entry && 'data' in entry) return entry.data as T;
     if (fallback !== undefined) {
       cache.set(key, { data: fallback, fetchedAt: Date.now() });
       return fallback;
     }
-    cache.delete(key);
     throw error;
-  }).finally(() => {
-    finishFreshFetch(key);
   });
 
   cache.set(key, { ...entry, promise });
@@ -441,42 +376,3 @@ export const preloadAssignableMembers = (clubId: string, force = false) => cache
   const profileMap = new Map((profileRows ?? []).map((p: any) => [p.user_id, p]));
   return memberRows.map((m: any) => ({ user_id: m.user_id, role: m.role, full_name: (profileMap.get(m.user_id) as any)?.full_name ?? 'Unknown' }));
 }, force, []);
-
-export type RoutePreloadContext = {
-  userId?: string | null;
-  email?: string | null;
-  activeClubId?: string | null;
-  clubIds?: string[];
-};
-
-export const preloadRouteData = (path: string, ctx: RoutePreloadContext, force = false) => {
-  if (!ctx.userId) return Promise.resolve([] as PromiseSettledResult<unknown>[]);
-
-  const clubIds = Array.from(new Set([ctx.activeClubId, ...(ctx.clubIds ?? [])].filter(Boolean) as string[]));
-  const activeClubId = ctx.activeClubId ?? clubIds[0];
-  const tasks: Promise<unknown>[] = [preloadProfile(ctx.userId, force), preloadUserClubs(ctx.userId, force)];
-
-  if (path === '/admin' || path === '/dashboard') {
-    tasks.push(preloadPersonalStats(ctx.userId, force), preloadUpcomingEvents(force), preloadEvents('personal', null, force));
-  }
-  if (path === '/events' || path === '/scan' || path === '/calendar') {
-    tasks.push(preloadEvents('personal', null, force));
-    if (activeClubId) tasks.push(preloadEvents('club', activeClubId, force));
-  }
-  if (path === '/discover') tasks.push(preloadDiscoverClubs(ctx.userId, force));
-  if (path === '/attendance-history') tasks.push(preloadPersonalStats(ctx.userId, force));
-  if (path === '/profile' || path === '/settings') tasks.push(preloadProfile(ctx.userId, force));
-  if (path === '/super-admin' || path === '/global-reports') {
-    tasks.push(preloadAdminStatus(ctx.userId, ctx.email, force), preloadSuperAdminStats(force));
-  }
-  if (path === '/manage-outsiders') tasks.push(preloadOutsiders(force));
-  if (activeClubId && (path === '/clubs' || path.startsWith('/club/'))) {
-    tasks.push(preloadClubStats(activeClubId, force), preloadClubMembers(activeClubId, force), preloadJoinRequests(activeClubId, force));
-  }
-  if (activeClubId && path === '/club-settings') tasks.push(preloadClubSettings(activeClubId, force));
-  if (activeClubId && path === '/assign-powers') tasks.push(preloadDelegatedPowers(ctx.userId, activeClubId, force), preloadAssignableMembers(activeClubId, force));
-  if (activeClubId && path === '/create-event') tasks.push(preloadDelegatedPowers(ctx.userId, activeClubId, force), preloadClubSettings(activeClubId, force));
-  if (activeClubId && (path === '/chatbot' || path === '/reviews')) tasks.push(preloadEvents('club', activeClubId, force));
-
-  return Promise.allSettled(tasks);
-};

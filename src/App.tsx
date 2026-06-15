@@ -11,7 +11,6 @@ import { MobileNavigationOverlay } from "@/components/mobile/MobileNavigationOve
 import { SuperAdminGuard } from "@/components/layout/SuperAdminGuard";
 import { PagePreloader } from "@/components/navigation/PagePreloader";
 import { ProtectedRoute } from "@/components/navigation/ProtectedRoute";
-import { CacheStatusIndicator } from "@/components/navigation/CacheStatusIndicator";
 
 // Eager-load critical routes
 import LandingPage from "./pages/LandingPage";
@@ -65,7 +64,6 @@ const App = () => (
           <ClubProvider>
             <DesignProvider>
               <PagePreloader />
-              <CacheStatusIndicator />
               <MobileNavigationOverlay />
               <SuperAdminGuard />
               <Routes>

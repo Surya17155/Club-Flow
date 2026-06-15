@@ -1,11 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
 import { useClub } from '@/contexts/ClubContext';
 import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
 import { useDesign } from '@/contexts/DesignContext';
-import { usePreloadedNavigate } from '@/hooks/usePreloadedNavigate';
 import { getSuperAdminModeForUser, isSuperAdminUser, setSuperAdminLockActive, SUPER_ADMIN_MODE_EVENT } from '@/lib/superAdminMode';
 import {
   LayoutDashboard,
@@ -132,7 +131,7 @@ export function DashboardSidebar() {
     return stored === 'true';
   });
   const location = useLocation();
-  const navigate = usePreloadedNavigate();
+  const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { profile } = useProfile();
   const { activeClub, clubs, switchClub } = useClub();

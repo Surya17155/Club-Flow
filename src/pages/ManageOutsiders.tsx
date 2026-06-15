@@ -83,11 +83,11 @@ const ManageOutsiders = () => {
     email: '', fullName: '', programme: '', section: '', year: '', rollNo: '', phone: '',
   });
 
-  const fetchOutsiders = async (force = false) => {
+  const fetchOutsiders = async () => {
     const cached = getCachedOutsiders();
     if (cached) setOutsiders(cached);
     try {
-      setOutsiders(await preloadOutsiders(force));
+      setOutsiders(await preloadOutsiders(true));
     } catch (err: any) {
       toast({ title: 'Error', description: err.message || 'Failed to fetch outsiders', variant: 'destructive' });
     }
@@ -124,7 +124,7 @@ const ManageOutsiders = () => {
       toast({ title: 'Outsider added!', description: `${formData.fullName} has been added with default password.` });
       resetForm();
       setShowAddDialog(false);
-      fetchOutsiders(true);
+      fetchOutsiders();
     } catch (err: any) {
       toast({ title: 'Failed to add', description: err.message, variant: 'destructive' });
     } finally {
@@ -142,7 +142,7 @@ const ManageOutsiders = () => {
       if (data?.error) throw new Error(data.error);
       toast({ title: 'Outsider removed', description: 'User has been removed from the platform.' });
       setSelectedOutsider(null);
-      fetchOutsiders(true);
+      fetchOutsiders();
     } catch (err: any) {
       toast({ title: 'Failed to remove', description: err.message, variant: 'destructive' });
     } finally {
@@ -171,7 +171,7 @@ const ManageOutsiders = () => {
       toast({ title: 'Updated!', description: 'Outsider details have been updated.' });
       setEditMode(false);
       setSelectedOutsider(null);
-      fetchOutsiders(true);
+      fetchOutsiders();
     } catch (err: any) {
       toast({ title: 'Failed to update', description: err.message, variant: 'destructive' });
     } finally {

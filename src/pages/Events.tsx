@@ -11,7 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useClub } from '@/contexts/ClubContext';
 import { useUserClubs } from '@/hooks/useUserClubs';
 import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
-import { usePreloadedNavigate } from '@/hooks/usePreloadedNavigate';
+import { useNavigate } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import EventFeedbackModal from '@/components/dashboard/EventFeedbackModal';
 import { useDesign } from '@/contexts/DesignContext';
@@ -122,7 +122,7 @@ const Events = () => {
   const { activeClub } = useClub();
   const { clubs: userClubs } = useUserClubs();
   const { hasPower } = useDelegatedPowers();
-  const navigate = usePreloadedNavigate();
+  const navigate = useNavigate();
   const { activeDesign } = useDesign();
   const isNeo = activeDesign === 'design-2';
 
@@ -162,7 +162,7 @@ const Events = () => {
       setEvents(cached.events as any);
       setAttendanceCounts(cached.attendanceCounts);
       // Revalidate in background — don't block UI
-      preloadEvents(viewMode, activeClub?.club_id).then((data) => {
+      preloadEvents(viewMode, activeClub?.club_id, true).then((data) => {
         setEvents(data.events as any);
         setAttendanceCounts(data.attendanceCounts);
       }).catch(() => undefined);

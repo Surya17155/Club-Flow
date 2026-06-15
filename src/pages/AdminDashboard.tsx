@@ -8,7 +8,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { usePersonalStats } from "@/hooks/usePersonalStats";
 import { useClubStats } from "@/hooks/useClubStats";
 import { useDelegatedPowers } from "@/hooks/useDelegatedPowers";
-import { usePreloadedNavigate } from "@/hooks/usePreloadedNavigate";
+import { useNavigate } from "react-router-dom";
 import {
   ChevronDown,
   Edit3,
@@ -91,7 +91,7 @@ const AdminDashboard = () => {
     window.addEventListener('viewModeChanged', handler);
     return () => window.removeEventListener('viewModeChanged', handler);
   }, []);
-  const navigate = usePreloadedNavigate();
+  const navigate = useNavigate();
   const greeting = useMemo(() => getRandomGreeting(), []);
   const isMobile = useIsMobile();
   const { activeDesign } = useDesign();

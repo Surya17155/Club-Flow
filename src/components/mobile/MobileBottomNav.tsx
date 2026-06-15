@@ -1,10 +1,9 @@
 import { memo, useCallback, useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Home, Users, Calendar, User, Plus, Bot, FileText } from "lucide-react";
 import { useDelegatedPowers } from "@/hooks/useDelegatedPowers";
 import { useAuth } from "@/contexts/AuthContext";
 import { getSuperAdminModeForUser, isSuperAdminUser, SUPER_ADMIN_MODE_EVENT } from "@/lib/superAdminMode";
-import { usePreloadedNavigate } from "@/hooks/usePreloadedNavigate";
 
 const personalTabs = [
   { label: "Home", icon: Home, path: "/admin" },
@@ -35,7 +34,7 @@ const superAdminRightTabs = [
 
 function MobileBottomNavInner() {
   const location = useLocation();
-  const navigate = usePreloadedNavigate();
+  const navigate = useNavigate();
   const { user } = useAuth();
 
   const [viewMode, setViewMode] = useState<'personal' | 'club'>(() => {
