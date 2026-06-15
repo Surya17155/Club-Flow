@@ -158,7 +158,9 @@ export default function FormBuilder() {
       }
 
       toast.success(publish ? 'Form published!' : 'Saved');
+      window.dispatchEvent(new Event('formsChanged'));
       navigate('/forms');
+
     } catch (e: any) {
       toast.error(e.message ?? 'Save failed');
     } finally {
