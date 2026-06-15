@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Home, Users, Calendar, User, Plus, Bot, FileText } from "lucide-react";
 import { useDelegatedPowers } from "@/hooks/useDelegatedPowers";
 import { useAuth } from "@/contexts/AuthContext";
-import { isSuperAdminLockActive, SUPER_ADMIN_EMAIL, SUPER_ADMIN_MODE_EVENT } from "@/lib/superAdminMode";
+import { isSuperAdminLockActive, isSuperAdminUser, SUPER_ADMIN_MODE_EVENT } from "@/lib/superAdminMode";
 
 const personalTabs = [
   { label: "Home", icon: Home, path: "/admin" },
@@ -72,7 +72,7 @@ function MobileBottomNavInner() {
   }
 
   const isClubMode = viewMode === 'club';
-  const isSuperAdmin = user?.email === SUPER_ADMIN_EMAIL && isSuperAdminMode;
+  const isSuperAdmin = isSuperAdminUser(user?.email) && isSuperAdminMode;
   const handleNav = useCallback((path: string) => navigate(path), [navigate]);
 
   const renderTab = useCallback(({ label, icon: Icon, path }: { label: string; icon: any; path: string }) => {

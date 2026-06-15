@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
 import { useClub } from '@/contexts/ClubContext';
 import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
-import { isSuperAdminLockActive, setSuperAdminLockActive, SUPER_ADMIN_EMAIL, SUPER_ADMIN_MODE_EVENT } from '@/lib/superAdminMode';
+import { isSuperAdminLockActive, isSuperAdminUser, setSuperAdminLockActive, SUPER_ADMIN_MODE_EVENT } from '@/lib/superAdminMode';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   LayoutDashboard, Calendar, Compass, UserCircle, Settings, LogOut,
@@ -30,7 +30,7 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
   const [showClubSwitcher, setShowClubSwitcher] = useState(false);
 
   const isClubMode = viewMode === 'club';
-  const isSuperAdmin = user?.email === SUPER_ADMIN_EMAIL;
+  const isSuperAdmin = isSuperAdminUser(user?.email);
   const [isSuperAdminMode, setIsSuperAdminMode] = useState<boolean>(
     () => isSuperAdmin && isSuperAdminLockActive()
   );
@@ -310,6 +310,13 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
                       onCheckedChange={(checked) => {
                         setSuperAdminLockActive(checked);
                         setIsSuperAdminMode(checked);
+                        if (checked) {
+                          navigate('/super-admin', { replace: true });
+                        } else {
+                          setViewMode('personal');
+                          navigate('/admin', { replace: true });
+                        }
+                        onClose();
                       }}
                       className="scale-90"
                     />

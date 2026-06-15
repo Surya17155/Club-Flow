@@ -5,7 +5,7 @@ import { useProfile } from '@/hooks/useProfile';
 import { useClub } from '@/contexts/ClubContext';
 import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
 import { useDesign } from '@/contexts/DesignContext';
-import { isSuperAdminLockActive, setSuperAdminLockActive, SUPER_ADMIN_EMAIL, SUPER_ADMIN_MODE_EVENT } from '@/lib/superAdminMode';
+import { isSuperAdminLockActive, isSuperAdminUser, setSuperAdminLockActive, SUPER_ADMIN_MODE_EVENT } from '@/lib/superAdminMode';
 import {
   LayoutDashboard,
   Calendar,
@@ -168,7 +168,7 @@ export function DashboardSidebar() {
   const isActive = (url: string) =>
     location.pathname === url || (url !== '/admin' && location.pathname.startsWith(url + '/'));
 
-  const isSuperAdminEmail = user?.email === SUPER_ADMIN_EMAIL;
+  const isSuperAdminEmail = isSuperAdminUser(user?.email);
 
   // Super Admin mode is driven by the lock flag (NOT the URL), so navigating
   // to /chatbot, /manage-outsiders, /global-reports, /settings, etc. while
@@ -240,6 +240,15 @@ export function DashboardSidebar() {
   const setSuperAdminMode = (on: boolean) => {
     setSuperAdminLockActive(on);
     setIsSuperAdminMode(on);
+    if (on) {
+      navigate('/super-admin', { replace: true });
+      return;
+    }
+
+    localStorage.setItem('dashboardViewMode', 'personal');
+    setViewModeLocal('personal');
+    window.dispatchEvent(new Event('viewModeChanged'));
+    navigate('/admin', { replace: true });
   };
 
   // Sub-items shown under the Super Admin toggle when active.

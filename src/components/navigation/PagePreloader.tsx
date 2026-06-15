@@ -14,7 +14,7 @@ import {
   preloadSuperAdminStats,
   preloadUserClubs,
 } from '@/lib/preloadCache';
-import { SUPER_ADMIN_EMAIL } from '@/lib/superAdminMode';
+import { isSuperAdminUser } from '@/lib/superAdminMode';
 
 export function PagePreloader() {
   const { user } = useAuth();
@@ -42,7 +42,7 @@ export function PagePreloader() {
     const cancelIdle = window.cancelIdleCallback ?? window.clearTimeout;
     const handle = idle(() => {
       preloadDiscoverClubs(user.id);
-      if (user.email === SUPER_ADMIN_EMAIL) {
+      if (isSuperAdminUser(user.email)) {
         preloadSuperAdminStats();
         preloadOutsiders().catch(() => undefined);
       }
