@@ -228,9 +228,9 @@ const CreateEvent = () => {
   const [qrToken, setQrToken] = useState<string | null>(null);
   const [publishing, setPublishing] = useState(false);
 
-  if (!user || (!activeClub && clubsLoading) || powersLoading) return null;
+  if (!user || (!activeClub && clubsLoading)) return null;
 
-  if (!activeClub || !hasPower('create_event')) {
+  if (!activeClub || (!powersLoading && !hasPower('create_event'))) {
     return (
       <div className="min-h-screen flex items-center justify-center p-6" style={{ background: '#F4EFE7' }}>
         <div className="max-w-md bg-[#FFFDF9] border-[3px] border-[#111] rounded-[8px] p-6 text-center" style={{ boxShadow: '6px 6px 0px #111' }}>
