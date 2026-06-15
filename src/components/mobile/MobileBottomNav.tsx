@@ -123,7 +123,7 @@ function MobileBottomNavInner() {
             {superAdminLeftTabs.map(renderTab)}
 
             <button
-              onClick={() => navigate("/super-admin/chatbot")}
+              onClick={() => handleNav("/super-admin/chatbot")}
               className="relative -mt-5 flex flex-col items-center justify-center transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
               style={{
                 width: '58px',
@@ -150,7 +150,7 @@ function MobileBottomNavInner() {
 
             {canCreateEvent ? (
               <button
-                onClick={() => navigate("/create-event")}
+                onClick={() => handleNav("/create-event")}
                 className="relative -mt-5 flex items-center justify-center transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
                 style={{
                   width: '52px',
