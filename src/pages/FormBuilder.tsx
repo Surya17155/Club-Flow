@@ -40,6 +40,8 @@ export default function FormBuilder() {
   const [questions, setQuestions] = useState<DraftQuestion[]>([]);
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
+  const [confirmPublish, setConfirmPublish] = useState(false);
+
 
   useEffect(() => {
     if (!isEdit) return;
