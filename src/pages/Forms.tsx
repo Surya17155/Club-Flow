@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Plus, FileText, Users, Edit3, BarChart3, Trash2, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Plus, FileText, Edit3, BarChart3, Trash2, ExternalLink, Clock, User as UserIcon, Building2, CalendarClock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useClub } from '@/contexts/ClubContext';
@@ -17,6 +17,7 @@ interface FormRow {
   title: string;
   description: string | null;
   club_id: string;
+  created_by: string | null;
   is_published: boolean;
   is_public?: boolean;
   accepting_responses: boolean;
@@ -24,7 +25,7 @@ interface FormRow {
   created_at: string;
 }
 
-type AvailableStatus = 'active' | 'pending' | 'completed';
+type AvailableStatus = 'pending' | 'completed' | 'closed';
 
 export default function Forms() {
   const navigate = useNavigate();
@@ -46,11 +47,13 @@ export default function Forms() {
   }, []);
   const isClubMode = viewMode === 'club';
 
-  // Club mode → manage only. Personal mode → fill only.
   const tab: 'available' | 'manage' = isClubMode ? 'manage' : 'available';
-  const [availableStatus, setAvailableStatus] = useState<AvailableStatus>('active');
+  const [availableStatus, setAvailableStatus] = useState<AvailableStatus>('pending');
   const [forms, setForms] = useState<FormRow[]>([]);
-  const [submittedIds, setSubmittedIds] = useState<Set<string>>(new Set());
+  const [submittedMap, setSubmittedMap] = useState<Record<string, string>>({}); // form_id -> submitted_at
+  const [clubNames, setClubNames] = useState<Record<string, string>>({});
+  const [creatorNames, setCreatorNames] = useState<Record<string, string>>({});
+  const [questionCounts, setQuestionCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
 
   const isPresidentOfActive = useMemo(
@@ -68,18 +71,41 @@ export default function Forms() {
       query = query.eq('is_published', true);
     }
     const { data, error } = await query;
-    if (error) toast.error(error.message);
-    else setForms((data as FormRow[]) || []);
+    if (error) { toast.error(error.message); setLoading(false); return; }
+    const rows = (data as FormRow[]) || [];
+    setForms(rows);
 
-    if (user && data && data.length) {
-      const { data: resp } = await supabase
-        .from('form_responses')
-        .select('form_id')
-        .eq('user_id', user.id)
-        .in('form_id', (data as FormRow[]).map((f) => f.id));
-      setSubmittedIds(new Set((resp ?? []).map((r: any) => r.form_id)));
+    if (rows.length) {
+      const formIds = rows.map((f) => f.id);
+      const clubIds = Array.from(new Set(rows.map((f) => f.club_id)));
+      const creatorIds = Array.from(new Set(rows.map((f) => f.created_by).filter(Boolean) as string[]));
+
+      const [clubsRes, profilesRes, qRes, respRes] = await Promise.all([
+        clubIds.length ? supabase.from('clubs').select('id, name').in('id', clubIds) : Promise.resolve({ data: [] as any[] }),
+        creatorIds.length ? supabase.from('profiles').select('user_id, full_name').in('user_id', creatorIds) : Promise.resolve({ data: [] as any[] }),
+        supabase.from('form_questions').select('form_id').in('form_id', formIds),
+        user
+          ? supabase.from('form_responses').select('form_id, submitted_at').eq('user_id', user.id).in('form_id', formIds)
+          : Promise.resolve({ data: [] as any[] }),
+      ]);
+
+      const cn: Record<string, string> = {};
+      (clubsRes.data ?? []).forEach((c: any) => { cn[c.id] = c.name; });
+      setClubNames(cn);
+
+      const pn: Record<string, string> = {};
+      (profilesRes.data ?? []).forEach((p: any) => { pn[p.user_id] = p.full_name; });
+      setCreatorNames(pn);
+
+      const qc: Record<string, number> = {};
+      (qRes.data ?? []).forEach((q: any) => { qc[q.form_id] = (qc[q.form_id] ?? 0) + 1; });
+      setQuestionCounts(qc);
+
+      const sm: Record<string, string> = {};
+      (respRes.data ?? []).forEach((r: any) => { sm[r.form_id] = r.submitted_at; });
+      setSubmittedMap(sm);
     } else {
-      setSubmittedIds(new Set());
+      setClubNames({}); setCreatorNames({}); setQuestionCounts({}); setSubmittedMap({});
     }
     setLoading(false);
   };
@@ -87,25 +113,21 @@ export default function Forms() {
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [tab, activeClub?.club_id, user?.id]);
 
   const now = Date.now();
+
+  const classify = (f: FormRow): AvailableStatus => {
+    const submitted = !!submittedMap[f.id];
+    const expired = f.deadline ? new Date(f.deadline).getTime() < now : false;
+    if (submitted) return 'completed';
+    if (expired || !f.accepting_responses) return 'closed';
+    return 'pending';
+  };
+
   const visibleForms = useMemo(() => {
     if (tab !== 'available') return forms;
-    return forms.filter((f) => {
-      const submitted = submittedIds.has(f.id);
-      const expired = f.deadline ? new Date(f.deadline).getTime() < now : false;
-      if (availableStatus === 'active') return !submitted && !expired;
-      if (availableStatus === 'pending') return !submitted && expired; // missed deadline, never submitted
-      return submitted; // completed
-    });
-  }, [forms, submittedIds, tab, availableStatus, now]);
+    return forms.filter((f) => classify(f) === availableStatus);
+  }, [forms, submittedMap, tab, availableStatus, now]);
 
-  const countFor = (s: AvailableStatus) =>
-    forms.filter((f) => {
-      const submitted = submittedIds.has(f.id);
-      const expired = f.deadline ? new Date(f.deadline).getTime() < now : false;
-      if (s === 'active') return !submitted && !expired;
-      if (s === 'pending') return !submitted && expired;
-      return submitted;
-    }).length;
+  const countFor = (s: AvailableStatus) => forms.filter((f) => classify(f) === s).length;
 
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this form and all its responses?')) return;
@@ -115,20 +137,30 @@ export default function Forms() {
   };
 
   const handleCreate = () => {
-    if (!isClubMode) {
-      toast.error('Switch to Club mode to create forms');
-      return;
-    }
-    if (!isPresidentOfActive) {
-      toast.error('Only the club president can create forms');
-      return;
-    }
+    if (!isClubMode) { toast.error('Switch to Club mode to create forms'); return; }
+    if (!isPresidentOfActive) { toast.error('Only the club president can create forms'); return; }
     navigate('/forms/new');
   };
 
   const subtitle = isClubMode
     ? `Manage forms for ${activeClub?.club_name ?? 'this club'}.`
     : 'Forms shared with you from your clubs.';
+
+  const estimateMinutes = (id: string) => Math.max(1, Math.ceil((questionCounts[id] ?? 0) * 0.5));
+
+  const statusPill = (status: AvailableStatus) => {
+    const map: Record<AvailableStatus, { bg: string; label: string }> = {
+      pending: { bg: '#FDE8D0', label: 'PENDING' },
+      completed: { bg: '#C7F0BA', label: 'COMPLETED' },
+      closed: { bg: '#E5E5E5', label: 'CLOSED' },
+    };
+    const s = map[status];
+    return (
+      <span className="text-[10px] font-bold px-2 py-0.5" style={{ background: s.bg, border: '1.5px solid #111', borderRadius: '999px' }}>
+        {s.label}
+      </span>
+    );
+  };
 
   return (
     <div style={{ background: BG, fontFamily: "'Space Grotesk', sans-serif", minHeight: '100vh' }} className="px-4 py-6 md:px-8">
@@ -166,12 +198,11 @@ export default function Forms() {
           </div>
         )}
 
-
         {tab === 'available' && (
           <div className="flex flex-wrap gap-2 mb-4">
-            {(['active', 'pending', 'completed'] as AvailableStatus[]).map((s) => {
+            {(['pending', 'completed', 'closed'] as AvailableStatus[]).map((s) => {
               const active = availableStatus === s;
-              const label = s === 'active' ? 'Active' : s === 'pending' ? 'Pending' : 'Completed';
+              const label = s.charAt(0).toUpperCase() + s.slice(1);
               return (
                 <button
                   key={s}
@@ -200,11 +231,11 @@ export default function Forms() {
             <div className="font-bold mb-1">
               {tab === 'manage'
                 ? 'No forms yet'
-                : availableStatus === 'active'
-                ? 'No active forms'
                 : availableStatus === 'pending'
-                ? 'Nothing pending'
-                : 'Nothing completed yet'}
+                ? 'No pending forms'
+                : availableStatus === 'completed'
+                ? 'Nothing completed yet'
+                : 'No closed forms'}
             </div>
             <div className="text-xs" style={{ color: '#666' }}>
               {tab === 'manage'
@@ -214,80 +245,120 @@ export default function Forms() {
           </div>
         ) : (
           <div className="grid gap-3 md:grid-cols-2">
-            {visibleForms.map((f) => (
-              <motion.div
-                key={f.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="p-4 flex flex-col"
-                style={{ background: CARD, border: BORDER, borderRadius: '8px', boxShadow: SHADOW }}
-              >
-                <div className="flex items-start justify-between gap-2 mb-2">
-                  <h3 className="font-bold text-base leading-tight" style={{ color: '#111' }}>{f.title}</h3>
-                  <span
-                    className="text-[10px] font-bold px-2 py-0.5"
-                    style={{
-                      background: f.is_published ? '#C7F0BA' : '#FDE8D0',
-                      border: '1.5px solid #111', borderRadius: '999px',
-                    }}
-                  >
-                    {f.is_published ? 'LIVE' : 'DRAFT'}
-                  </span>
-                </div>
-                {f.description && (
-                  <p className="text-xs mb-3 line-clamp-2" style={{ color: '#555' }}>{f.description}</p>
-                )}
-                {f.deadline && (
-                  <div className="text-[11px] font-semibold mb-3" style={{ color: '#888' }}>
-                    Deadline: {new Date(f.deadline).toLocaleString()}
+            {visibleForms.map((f) => {
+              const status = tab === 'available' ? classify(f) : (f.is_published ? 'pending' : 'closed');
+              const clubName = clubNames[f.club_id] ?? 'Club';
+              const creatorName = f.created_by ? creatorNames[f.created_by] ?? 'Unknown' : '—';
+              return (
+                <motion.div
+                  key={f.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="p-4 flex flex-col"
+                  style={{ background: CARD, border: BORDER, borderRadius: '8px', boxShadow: SHADOW }}
+                >
+                  <div className="flex items-start justify-between gap-2 mb-1.5">
+                    <h3 className="font-bold text-base leading-tight" style={{ color: '#111' }}>{f.title}</h3>
+                    {tab === 'available'
+                      ? statusPill(status as AvailableStatus)
+                      : (
+                        <span className="text-[10px] font-bold px-2 py-0.5" style={{ background: f.is_published ? '#C7F0BA' : '#FDE8D0', border: '1.5px solid #111', borderRadius: '999px' }}>
+                          {f.is_published ? 'LIVE' : 'DRAFT'}
+                        </span>
+                      )}
                   </div>
-                )}
 
-                <div className="flex flex-wrap gap-2 mt-auto pt-2">
-                  {tab === 'available' && (
-                    <button
-                      onClick={() => navigate(`/forms/${f.id}`)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold"
-                      style={{ background: '#E98A3A', color: '#111', border: '1.5px solid #111', borderRadius: '6px' }}
-                    >
-                      <ExternalLink className="w-3 h-3" /> Open
-                    </button>
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-semibold mb-2" style={{ color: '#666' }}>
+                    <span className="inline-flex items-center gap-1"><Building2 className="w-3 h-3" /> {clubName}</span>
+                    {tab === 'manage' ? null : (
+                      <span className="inline-flex items-center gap-1"><UserIcon className="w-3 h-3" /> {creatorName}</span>
+                    )}
+                  </div>
+
+                  {f.description && (
+                    <p className="text-xs mb-2 line-clamp-2" style={{ color: '#555' }}>{f.description}</p>
                   )}
-                  {tab === 'manage' && (
-                    <>
+
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-semibold mb-3" style={{ color: '#888' }}>
+                    {f.deadline && (
+                      <span className="inline-flex items-center gap-1">
+                        <CalendarClock className="w-3 h-3" /> Due {new Date(f.deadline).toLocaleDateString()}
+                      </span>
+                    )}
+                    {tab === 'available' && status === 'pending' && (
+                      <span className="inline-flex items-center gap-1"><Clock className="w-3 h-3" /> ~{estimateMinutes(f.id)} min</span>
+                    )}
+                    {tab === 'available' && status === 'completed' && submittedMap[f.id] && (
+                      <span className="inline-flex items-center gap-1">
+                        Submitted {new Date(submittedMap[f.id]).toLocaleDateString()}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex flex-wrap gap-2 mt-auto pt-2">
+                    {tab === 'available' && status === 'pending' && (
+                      <button
+                        onClick={() => navigate(`/forms/${f.id}`)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold"
+                        style={{ background: '#E98A3A', color: '#111', border: '1.5px solid #111', borderRadius: '6px' }}
+                      >
+                        <ExternalLink className="w-3 h-3" /> Fill Form
+                      </button>
+                    )}
+                    {tab === 'available' && status === 'completed' && (
                       <button
                         onClick={() => navigate(`/forms/${f.id}`)}
                         className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold"
                         style={{ background: CARD, border: '1.5px solid #111', borderRadius: '6px' }}
                       >
-                        <ExternalLink className="w-3 h-3" /> View
+                        <ExternalLink className="w-3 h-3" /> View Submission
                       </button>
+                    )}
+                    {tab === 'available' && status === 'closed' && (
                       <button
-                        onClick={() => navigate(`/forms/${f.id}/edit`)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold"
-                        style={{ background: CARD, border: '1.5px solid #111', borderRadius: '6px' }}
+                        disabled
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold opacity-60 cursor-not-allowed"
+                        style={{ background: '#E5E5E5', border: '1.5px solid #111', borderRadius: '6px' }}
                       >
-                        <Edit3 className="w-3 h-3" /> Edit
+                        Closed
                       </button>
-                      <button
-                        onClick={() => navigate(`/forms/${f.id}/responses`)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold"
-                        style={{ background: '#111', color: '#FFFDF5', border: '1.5px solid #111', borderRadius: '6px' }}
-                      >
-                        <BarChart3 className="w-3 h-3" /> Responses
-                      </button>
-                      <button
-                        onClick={() => handleDelete(f.id)}
-                        className="flex items-center gap-1.5 px-2 py-1.5 text-xs font-bold ml-auto"
-                        style={{ background: '#FFD2D2', border: '1.5px solid #111', borderRadius: '6px' }}
-                      >
-                        <Trash2 className="w-3 h-3" />
-                      </button>
-                    </>
-                  )}
-                </div>
-              </motion.div>
-            ))}
+                    )}
+                    {tab === 'manage' && (
+                      <>
+                        <button
+                          onClick={() => navigate(`/forms/${f.id}`)}
+                          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold"
+                          style={{ background: CARD, border: '1.5px solid #111', borderRadius: '6px' }}
+                        >
+                          <ExternalLink className="w-3 h-3" /> View
+                        </button>
+                        <button
+                          onClick={() => navigate(`/forms/${f.id}/edit`)}
+                          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold"
+                          style={{ background: CARD, border: '1.5px solid #111', borderRadius: '6px' }}
+                        >
+                          <Edit3 className="w-3 h-3" /> Edit
+                        </button>
+                        <button
+                          onClick={() => navigate(`/forms/${f.id}/responses`)}
+                          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold"
+                          style={{ background: '#111', color: '#FFFDF5', border: '1.5px solid #111', borderRadius: '6px' }}
+                        >
+                          <BarChart3 className="w-3 h-3" /> Responses
+                        </button>
+                        <button
+                          onClick={() => handleDelete(f.id)}
+                          className="flex items-center gap-1.5 px-2 py-1.5 text-xs font-bold ml-auto"
+                          style={{ background: '#FFD2D2', border: '1.5px solid #111', borderRadius: '6px' }}
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
         )}
       </div>

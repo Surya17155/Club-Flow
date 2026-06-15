@@ -107,6 +107,7 @@ export default function FormFill() {
         if (aErr) throw aErr;
       }
       setSubmitted(true);
+      window.dispatchEvent(new Event('formsChanged'));
     } catch (e: any) {
       toast.error(e.message ?? 'Submission failed');
     } finally {
