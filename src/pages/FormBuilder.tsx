@@ -234,10 +234,14 @@ export default function FormBuilder() {
                 className="w-full p-2 text-sm font-semibold" style={{ background: '#fff', border: '1.5px solid #111', borderRadius: '6px' }} />
             </Field>
             <Toggle label="Allow multiple responses" value={allowMultiple} onChange={setAllowMultiple} />
-            <Toggle label="Anonymous mode" value={anonymous} onChange={setAnonymous} />
+            <Toggle label="For everyone" value={isPublic} onChange={setIsPublic} />
           </div>
           <div className="text-[11px]" style={{ color: '#666' }}>
-            This form will only be visible to members of <span style={{ color: '#E98A3A', fontWeight: 700 }}>{clubName}</span>.
+            {isPublic ? (
+              <>This form will be visible to <span style={{ color: '#E98A3A', fontWeight: 700 }}>all students</span> on the platform.</>
+            ) : (
+              <>This form will only be visible to members of <span style={{ color: '#E98A3A', fontWeight: 700 }}>{clubName}</span>.</>
+            )}
           </div>
         </div>
 
