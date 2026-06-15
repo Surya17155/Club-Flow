@@ -7,7 +7,7 @@ import { useClub } from '@/contexts/ClubContext';
 import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
 import { toast } from 'sonner';
 import { QRCodeSVG } from 'qrcode.react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { format, parse } from 'date-fns';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -228,17 +228,9 @@ const CreateEvent = () => {
   const [qrToken, setQrToken] = useState<string | null>(null);
   const [publishing, setPublishing] = useState(false);
 
-  if (loading || clubsLoading || powersLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: '#F4EFE7' }}>
-        <div className="w-8 h-8 border-3 border-[#E98A3A] border-t-[#111] rounded-full animate-spin" />
-      </div>
-    );
-  }
+  if (!user) return null;
 
-  if (!user) return <Navigate to="/" replace />;
-
-  if (!activeClub || !hasPower('create_event')) {
+  if ((!activeClub && !clubsLoading) || (!powersLoading && activeClub && !hasPower('create_event'))) {
     return (
       <div className="min-h-screen flex items-center justify-center p-6" style={{ background: '#F4EFE7' }}>
         <div className="max-w-md bg-[#FFFDF9] border-[3px] border-[#111] rounded-[8px] p-6 text-center" style={{ boxShadow: '6px 6px 0px #111' }}>
