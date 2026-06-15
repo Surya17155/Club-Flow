@@ -205,6 +205,13 @@ export default function FormBuilder() {
   return (
     <div style={{ background: BG, fontFamily: "'Space Grotesk', sans-serif", minHeight: '100vh' }} className="px-4 pb-32 md:px-8">
       <div className="max-w-3xl mx-auto pt-16 md:pt-8">
+        <button
+          onClick={() => navigate('/forms')}
+          className="flex items-center gap-2 px-3 py-2 text-sm font-bold mb-5"
+          style={{ background: CARD, color: '#111', border: BORDER, borderRadius: '6px', boxShadow: '3px 3px 0px #111' }}
+        >
+          <ArrowLeft className="w-4 h-4" /> Back
+        </button>
         <h1 className="text-3xl font-black mb-1">{isEdit ? 'Edit Form' : 'Create Form'}</h1>
         <div className="text-xs font-bold mb-4" style={{ color: '#666' }}>
           For <span style={{ color: '#E98A3A' }}>{clubName}</span>
