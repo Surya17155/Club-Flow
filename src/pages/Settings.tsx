@@ -90,7 +90,7 @@ const Settings = () => {
         <h2 className="text-lg font-bold mb-4" style={isNeo ? { fontFamily: NEO.font, color: '#111' } : {}}>Account</h2>
         <div>
           <Label style={isNeo ? { fontFamily: NEO.font, fontWeight: 600, color: '#111' } : {}}>Email</Label>
-          <Input value={user.email ?? ''} disabled className="mt-1.5" style={isNeo ? { ...NEO.input, opacity: 0.6 } : { opacity: 0.6 }} />
+          <Input value={user?.email ?? ''} disabled className="mt-1.5" style={isNeo ? { ...NEO.input, opacity: 0.6 } : { opacity: 0.6 }} />
         </div>
       </div>
 
