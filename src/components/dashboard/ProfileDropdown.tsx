@@ -5,7 +5,7 @@ import { useClub } from '@/contexts/ClubContext';
 import { useProfile } from '@/hooks/useProfile';
 import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { isSuperAdminLockActive, setSuperAdminLockActive, SUPER_ADMIN_EMAIL, SUPER_ADMIN_MODE_EVENT } from '@/lib/superAdminMode';
+import { isSuperAdminLockActive, isSuperAdminUser, setSuperAdminLockActive, SUPER_ADMIN_MODE_EVENT } from '@/lib/superAdminMode';
 import { ChevronDown, User, Settings, LogOut, ArrowRightLeft, Check, ChevronRight, Shield, Crown, Settings2, Bot, Users } from 'lucide-react';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator,
@@ -39,7 +39,7 @@ const ProfileDropdown = ({ viewMode = 'personal' }: { viewMode?: 'personal' | 'c
   const [showChat, setShowChat] = useState(false);
   const [isSuperAdminMode, setIsSuperAdminMode] = useState(() => isSuperAdminLockActive());
 
-  const isSuperAdminEmail = user?.email === SUPER_ADMIN_EMAIL;
+  const isSuperAdminEmail = isSuperAdminUser(user?.email);
 
   useEffect(() => {
     const sync = () => setIsSuperAdminMode(isSuperAdminLockActive());
@@ -58,6 +58,8 @@ const ProfileDropdown = ({ viewMode = 'personal' }: { viewMode?: 'personal' | 'c
   const handleSuperAdminToggle = (checked: boolean) => {
     setSuperAdminLockActive(checked);
     setIsSuperAdminMode(checked);
+    if (checked) navigate('/super-admin', { replace: true });
+    else navigate('/admin', { replace: true });
   };
 
   const fullName = profile?.full_name || 'User';
