@@ -80,8 +80,12 @@ export default function Forms() {
       query = query.eq('club_id', activeClub.club_id);
     } else {
       const clubIds = clubs.map((club) => club.club_id);
-      if (clubIds.length === 0) { setForms([]); setLoading(false); return; }
-      query = query.eq('is_published', true).in('club_id', clubIds);
+      query = query.eq('is_published', true);
+      if (clubIds.length > 0) {
+        query = query.or(`is_public.eq.true,club_id.in.(${clubIds.join(',')})`);
+      } else {
+        query = query.eq('is_public', true);
+      }
     }
     const { data, error } = await query;
     if (seq !== requestSeq.current) return;
