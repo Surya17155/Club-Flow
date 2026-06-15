@@ -26,9 +26,15 @@ const DRAWER_ROUTES = [
   '/forms',
 ] as const;
 
-const shouldShowDrawer = (pathname: string) =>
-  DRAWER_ROUTES.some((route) => pathname === route || pathname.startsWith(`${route}/`)) ||
-  pathname.startsWith('/club/');
+const shouldShowDrawer = (pathname: string) => {
+  // Only show the side-panel button on top-level "list/home" screens.
+  // On any nested/detail screen (e.g. /forms/new, /forms/:id, /events/:id)
+  // the page provides its own back button instead.
+  if (DRAWER_ROUTES.includes(pathname as typeof DRAWER_ROUTES[number])) return true;
+  // /club/:id is a top-level dashboard; deeper nested routes are detail screens.
+  if (/^\/club\/[^/]+$/.test(pathname)) return true;
+  return false;
+};
 
 export function MobileNavigationOverlay() {
   const location = useLocation();
