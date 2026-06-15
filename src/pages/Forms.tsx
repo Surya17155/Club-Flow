@@ -59,6 +59,7 @@ export default function Forms() {
   const [page, setPage] = useState(0);
   const requestSeq = useRef(0);
   const clubIdsKey = clubs.map((club) => club.club_id).join(',');
+  const openRoute = useCallback((path: string) => { preloadRoute(path); navigate(path); }, [navigate]);
 
   const isPresidentOfActive = useMemo(
     () => !!clubs.find((c) => c.club_id === activeClub?.club_id && c.role === 'president'),
@@ -166,7 +167,7 @@ export default function Forms() {
   const handleCreate = () => {
     if (!isClubMode) { toast.error('Switch to Club mode to create forms'); return; }
     if (!isPresidentOfActive) { toast.error('Only the club president can create forms'); return; }
-    navigate('/forms/new');
+    openRoute('/forms/new');
   };
 
   const subtitle = isClubMode
@@ -243,7 +244,11 @@ export default function Forms() {
         )}
 
         {loading ? (
-          <div className="text-center py-12 text-sm font-semibold" style={{ color: '#555' }}>Loading forms…</div>
+          <div className="grid gap-3 md:grid-cols-2">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="h-36 animate-pulse" style={{ background: CARD, border: BORDER, borderRadius: '8px', boxShadow: SHADOW }} />
+            ))}
+          </div>
         ) : visibleForms.length === 0 ? (
           <div className="text-center py-16 px-6" style={{ background: CARD, border: BORDER, borderRadius: '10px', boxShadow: SHADOW }}>
             <FileText className="w-12 h-12 mx-auto mb-3" style={{ color: '#E98A3A' }} />
@@ -315,7 +320,7 @@ export default function Forms() {
                   <div className="flex flex-wrap gap-2 mt-auto pt-2">
                     {tab === 'available' && status === 'pending' && (
                       <button
-                        onClick={() => navigate(`/forms/${f.id}`)}
+                        onClick={() => openRoute(`/forms/${f.id}`)}
                         className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold"
                         style={{ background: '#E98A3A', color: '#111', border: '1.5px solid #111', borderRadius: '6px' }}
                       >
@@ -324,7 +329,7 @@ export default function Forms() {
                     )}
                     {tab === 'available' && status === 'completed' && (
                       <button
-                        onClick={() => navigate(`/forms/${f.id}`)}
+                        onClick={() => openRoute(`/forms/${f.id}`)}
                         className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold"
                         style={{ background: CARD, border: '1.5px solid #111', borderRadius: '6px' }}
                       >
@@ -343,21 +348,21 @@ export default function Forms() {
                     {tab === 'manage' && (
                       <>
                         <button
-                          onClick={() => navigate(`/forms/${f.id}`)}
+                          onClick={() => openRoute(`/forms/${f.id}`)}
                           className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold"
                           style={{ background: CARD, border: '1.5px solid #111', borderRadius: '6px' }}
                         >
                           <ExternalLink className="w-3 h-3" /> View
                         </button>
                         <button
-                          onClick={() => navigate(`/forms/${f.id}/edit`)}
+                          onClick={() => openRoute(`/forms/${f.id}/edit`)}
                           className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold"
                           style={{ background: CARD, border: '1.5px solid #111', borderRadius: '6px' }}
                         >
                           <Edit3 className="w-3 h-3" /> Edit
                         </button>
                         <button
-                          onClick={() => navigate(`/forms/${f.id}/responses`)}
+                          onClick={() => openRoute(`/forms/${f.id}/responses`)}
                           className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold"
                           style={{ background: '#111', color: '#FFFDF5', border: '1.5px solid #111', borderRadius: '6px' }}
                         >
