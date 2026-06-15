@@ -20,7 +20,6 @@ interface JoinRequest {
 const JoinRequestsPanel = ({ clubId }: { clubId: string }) => {
   const { user } = useAuth();
   const [requests, setRequests] = useState<JoinRequest[]>(() => (getCachedJoinRequests(clubId) ?? []) as JoinRequest[]);
-  const [loading, setLoading] = useState(false);
 
   const fetchRequests = async () => {
     const cached = getCachedJoinRequests(clubId);

@@ -83,7 +83,6 @@ const NB_BTN_BLACK = "bg-[#111] text-white font-bold border-[2px] border-[#111] 
 const MemberManagement = ({ clubId, isSuperAdmin = false }: Props) => {
   const { user } = useAuth();
   const [members, setMembers] = useState<Member[]>(() => (getCachedClubMembers(clubId) ?? []) as Member[]);
-  const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMember, setViewMember] = useState<Member | null>(null);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
@@ -427,12 +426,7 @@ const MemberManagement = ({ clubId, isSuperAdmin = false }: Props) => {
         />
       </div>
 
-      {loading ? (
-        <div className="flex justify-center py-12">
-          <div className="w-6 h-6 border-[3px] border-[#111]/30 border-t-[#111] rounded-full animate-spin" />
-        </div>
-      ) : (
-        <div className="space-y-6">
+      <div className="space-y-6">
           {postHolders.length > 0 && (
             <div>
               <h4 className="text-xs font-black text-[#111]/50 uppercase tracking-wider mb-3">Post-holders ({postHolders.length})</h4>
@@ -454,8 +448,7 @@ const MemberManagement = ({ clubId, isSuperAdmin = false }: Props) => {
               )}
             </div>
           </div>
-        </div>
-      )}
+      </div>
 
       {/* Add Member Dialog */}
       <Dialog open={addDialogOpen} onOpenChange={(open) => { setAddDialogOpen(open); if (!open) resetAddForm(); }}>
