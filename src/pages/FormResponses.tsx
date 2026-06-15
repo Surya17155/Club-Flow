@@ -30,11 +30,14 @@ export default function FormResponses() {
   const [answers, setAnswers] = useState<AnswerRow[]>([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
+  const [assigned, setAssigned] = useState(0);
+  const [viewed, setViewed] = useState(0);
+  const [started, setStarted] = useState(0);
 
   const load = async () => {
     if (!id) return;
     setLoading(true);
-    const { data: f } = await supabase.from('forms').select('title').eq('id', id).maybeSingle();
+    const { data: f } = await supabase.from('forms').select('title, club_id, is_public').eq('id', id).maybeSingle();
     setTitle(f?.title ?? 'Form');
     const { data: qs } = await supabase.from('form_questions').select('*').eq('form_id', id).order('position');
     setQuestions((qs ?? []).map((q: any) => ({
@@ -48,10 +51,24 @@ export default function FormResponses() {
       const { data: ans } = await supabase.from('form_answers').select('*').in('response_id', rs.map((r: any) => r.id));
       setAnswers((ans as AnswerRow[]) ?? []);
     } else setAnswers([]);
+
+    // Analytics
+    if (f?.club_id) {
+      const { count: memberCount } = await supabase
+        .from('club_members')
+        .select('user_id', { count: 'exact', head: true })
+        .eq('club_id', f.club_id);
+      setAssigned(memberCount ?? 0);
+    }
+    const { data: views } = await supabase.from('form_views').select('user_id, started').eq('form_id', id);
+    setViewed((views ?? []).length);
+    setStarted((views ?? []).filter((v: any) => v.started).length);
+
     setLoading(false);
   };
 
   useEffect(() => { load(); }, [id]);
+
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
