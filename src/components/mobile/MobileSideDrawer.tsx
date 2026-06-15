@@ -1,9 +1,10 @@
 import { useState, useEffect, memo } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
 import { useClub } from '@/contexts/ClubContext';
 import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
+import { usePreloadedNavigate } from '@/hooks/usePreloadedNavigate';
 import { getSuperAdminModeForUser, isSuperAdminUser, setSuperAdminLockActive, SUPER_ADMIN_MODE_EVENT } from '@/lib/superAdminMode';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
@@ -21,7 +22,7 @@ interface MobileSideDrawerProps {
 }
 
 function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileSideDrawerProps) {
-  const navigate = useNavigate();
+  const navigate = usePreloadedNavigate();
   const location = useLocation();
   const { user, signOut } = useAuth();
   const { profile } = useProfile();
@@ -45,7 +46,7 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
   const initials = (profile?.full_name || 'U')
     .split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
 
-  const nav = (path: string) => { navigate(path); };
+  const nav = (path: string) => { navigate(path); onClose(); };
 
   const personalItems = [
     { title: 'Dashboard', icon: LayoutDashboard, url: '/admin' },
