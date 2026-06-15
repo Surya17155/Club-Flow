@@ -139,7 +139,7 @@ const MemberManagement = ({ clubId, isSuperAdmin = false }: Props) => {
         setEditDialogOpen(false);
         setEditTarget(null);
         setViewMember(null);
-        await fetchMembers();
+        await fetchMembers(true);
       }
     } catch (err: any) {
       toast.error(err.message || 'Failed to update');
@@ -240,7 +240,7 @@ const MemberManagement = ({ clubId, isSuperAdmin = false }: Props) => {
         toast.success(`${selectedSearchUser.full_name} added to the club as ${roleLabelMap[searchUserRole] || searchUserRole}!`);
         resetAddForm();
         setAddDialogOpen(false);
-        await fetchMembers();
+        await fetchMembers(true);
       }
     } catch (err: any) {
       toast.error(err.message || 'Failed to add member');
@@ -292,7 +292,7 @@ const MemberManagement = ({ clubId, isSuperAdmin = false }: Props) => {
         }
         resetAddForm();
         setAddDialogOpen(false);
-        await fetchMembers();
+        await fetchMembers(true);
       }
     } catch (err: any) {
       toast.error(err.message || 'Failed to add member');
@@ -330,7 +330,7 @@ const MemberManagement = ({ clubId, isSuperAdmin = false }: Props) => {
       toast.success(`${roleTarget.full_name} is now ${roleLabelMap[newRole] ?? newRole}`);
       setRoleDialogOpen(false);
       setRoleTarget(null);
-      await fetchMembers();
+      await fetchMembers(true);
     }
     setChangingRole(false);
   };
@@ -372,7 +372,7 @@ const MemberManagement = ({ clubId, isSuperAdmin = false }: Props) => {
         const { summary, results } = response.data;
         setImportResults({ summary, results });
         toast.success(`Import complete: ${summary.added} added, ${summary.updated} updated, ${summary.skipped} skipped, ${summary.failed} failed`);
-        await fetchMembers();
+        await fetchMembers(true);
       }
     } catch (err: any) {
       toast.error(err.message || 'Failed to process Excel file');

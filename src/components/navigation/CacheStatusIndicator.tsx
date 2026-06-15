@@ -28,7 +28,7 @@ export function CacheStatusIndicator() {
         boxShadow: '3px 3px 0px #111111',
         fontFamily: "'Space Grotesk', sans-serif",
       }}
-      title={status.lastLabel}
+      title={running ? 'Background preload is running' : 'Latest data source'}
       aria-live="polite"
     >
       <Icon className={running ? 'w-3.5 h-3.5 animate-pulse' : 'w-3.5 h-3.5'} />

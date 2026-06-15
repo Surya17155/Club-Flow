@@ -124,7 +124,7 @@ const ManageOutsiders = () => {
       toast({ title: 'Outsider added!', description: `${formData.fullName} has been added with default password.` });
       resetForm();
       setShowAddDialog(false);
-      fetchOutsiders();
+      fetchOutsiders(true);
     } catch (err: any) {
       toast({ title: 'Failed to add', description: err.message, variant: 'destructive' });
     } finally {
@@ -142,7 +142,7 @@ const ManageOutsiders = () => {
       if (data?.error) throw new Error(data.error);
       toast({ title: 'Outsider removed', description: 'User has been removed from the platform.' });
       setSelectedOutsider(null);
-      fetchOutsiders();
+      fetchOutsiders(true);
     } catch (err: any) {
       toast({ title: 'Failed to remove', description: err.message, variant: 'destructive' });
     } finally {
@@ -171,7 +171,7 @@ const ManageOutsiders = () => {
       toast({ title: 'Updated!', description: 'Outsider details have been updated.' });
       setEditMode(false);
       setSelectedOutsider(null);
-      fetchOutsiders();
+      fetchOutsiders(true);
     } catch (err: any) {
       toast({ title: 'Failed to update', description: err.message, variant: 'destructive' });
     } finally {
