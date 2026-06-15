@@ -39,7 +39,7 @@ export const getCacheStatusSnapshot = () => cacheStatus;
 export const subscribeCacheStatus = (listener: (snapshot: CacheStatusSnapshot) => void) => {
   cacheStatusListeners.add(listener);
   listener(cacheStatus);
-  return () => cacheStatusListeners.delete(listener);
+  return () => { cacheStatusListeners.delete(listener); };
 };
 
 const noteCacheHit = (label: string) => {
