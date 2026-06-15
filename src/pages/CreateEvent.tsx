@@ -510,68 +510,140 @@ const CreateEvent = () => {
             </div>
           </section>
 
-          {/* Column 3: QR Code */}
+          {/* Column 3: Attendance Method */}
           <section className="p-5 flex flex-col gap-4" style={nb.card}>
-            <h2 className="text-lg mb-1" style={nb.heading}>Attendance & QR</h2>
+            <h2 className="text-lg mb-1" style={nb.heading}>Attendance Method</h2>
 
-            <div
-              className="flex-1 flex flex-col items-center justify-center p-6 rounded-xl"
-              style={{ background: '#FFF8F0', border: '2px dashed #111' }}
-            >
-              {qrToken ? (
-                <div className="qr-code-container p-4 rounded-xl" style={{ background: '#fff', border: '3px solid #111', boxShadow: '4px 4px 0px #111' }}>
-                  <QRCodeSVG value={`${window.location.origin}/mark-attendance/${qrToken}`} size={140} />
-                </div>
-              ) : (
-                <div className="text-center">
-                  <QrCode className="w-14 h-14 mx-auto mb-3" style={{ color: '#ccc' }} />
-                  <p className="text-sm" style={{ color: '#999', fontWeight: 500 }}>Click below to generate a QR code</p>
-                </div>
-              )}
-            </div>
-
-            <button
-              type="button"
-              onClick={generateQR}
-              className="w-full py-2.5 text-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all"
-              style={nb.btnOrange}
-            >
-              Generate QR Code
-            </button>
-
-            {qrToken && (
+            {/* Mode toggle */}
+            <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
-                className="w-full flex items-center justify-center gap-2 py-3 text-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all"
-                style={nb.btnBlack}
-                onClick={() => {
-                  const svg = document.querySelector('.qr-code-container svg') as SVGElement;
-                  if (!svg) { toast.error('QR code not found'); return; }
-                  const canvas = document.createElement('canvas');
-                  const size = 320;
-                  canvas.width = size;
-                  canvas.height = size;
-                  const ctx = canvas.getContext('2d')!;
-                  const svgData = new XMLSerializer().serializeToString(svg);
-                  const img = new Image();
-                  img.onload = () => {
-                    ctx.fillStyle = '#ffffff';
-                    ctx.fillRect(0, 0, size, size);
-                    ctx.drawImage(img, 0, 0, size, size);
-                    const link = document.createElement('a');
-                    link.download = `qr-code-${eventName || 'event'}.png`;
-                    link.href = canvas.toDataURL('image/png');
-                    link.click();
-                    toast.success('QR Code downloaded!');
-                  };
-                  img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+                onClick={() => { setAttendanceMode('qr'); }}
+                className="py-3 text-sm flex items-center justify-center gap-2 transition-all"
+                style={{
+                  ...nb.btnOrange,
+                  background: attendanceMode === 'qr' ? '#E98A3A' : '#FFF8F0',
+                  boxShadow: attendanceMode === 'qr' ? '4px 4px 0 #111' : '2px 2px 0 #111',
                 }}
               >
-                <Download className="w-4 h-4" />
-                <span>Download QR Code</span>
+                <QrCode className="w-4 h-4" /> QR Code
               </button>
+              <button
+                type="button"
+                onClick={() => { setAttendanceMode('face'); setQrToken(null); }}
+                className="py-3 text-sm flex items-center justify-center gap-2 transition-all"
+                style={{
+                  ...nb.btnOrange,
+                  background: attendanceMode === 'face' ? '#E98A3A' : '#FFF8F0',
+                  boxShadow: attendanceMode === 'face' ? '4px 4px 0 #111' : '2px 2px 0 #111',
+                }}
+              >
+                <ScanFace className="w-4 h-4" /> Face ID
+              </button>
+            </div>
+
+            {attendanceMode === 'qr' && (
+              <>
+                <div
+                  className="flex-1 flex flex-col items-center justify-center p-6 rounded-xl"
+                  style={{ background: '#FFF8F0', border: '2px dashed #111' }}
+                >
+                  {qrToken ? (
+                    <div className="qr-code-container p-4 rounded-xl" style={{ background: '#fff', border: '3px solid #111', boxShadow: '4px 4px 0px #111' }}>
+                      <QRCodeSVG value={`${window.location.origin}/mark-attendance/${qrToken}`} size={140} />
+                    </div>
+                  ) : (
+                    <div className="text-center">
+                      <QrCode className="w-14 h-14 mx-auto mb-3" style={{ color: '#ccc' }} />
+                      <p className="text-sm" style={{ color: '#999', fontWeight: 500 }}>Click below to generate a QR code</p>
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={generateQR}
+                  className="w-full py-2.5 text-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all"
+                  style={nb.btnOrange}
+                >
+                  Generate QR Code
+                </button>
+
+                {qrToken && (
+                  <button
+                    type="button"
+                    className="w-full flex items-center justify-center gap-2 py-3 text-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all"
+                    style={nb.btnBlack}
+                    onClick={() => {
+                      const svg = document.querySelector('.qr-code-container svg') as SVGElement;
+                      if (!svg) { toast.error('QR code not found'); return; }
+                      const canvas = document.createElement('canvas');
+                      const size = 320;
+                      canvas.width = size;
+                      canvas.height = size;
+                      const ctx = canvas.getContext('2d')!;
+                      const svgData = new XMLSerializer().serializeToString(svg);
+                      const img = new Image();
+                      img.onload = () => {
+                        ctx.fillStyle = '#ffffff';
+                        ctx.fillRect(0, 0, size, size);
+                        ctx.drawImage(img, 0, 0, size, size);
+                        const link = document.createElement('a');
+                        link.download = `qr-code-${eventName || 'event'}.png`;
+                        link.href = canvas.toDataURL('image/png');
+                        link.click();
+                        toast.success('QR Code downloaded!');
+                      };
+                      img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+                    }}
+                  >
+                    <Download className="w-4 h-4" />
+                    <span>Download QR Code</span>
+                  </button>
+                )}
+              </>
+            )}
+
+            {attendanceMode === 'face' && (
+              <div
+                className="flex-1 flex flex-col items-center justify-center p-6 rounded-xl text-center"
+                style={{ background: '#FFF8F0', border: '2px dashed #111' }}
+              >
+                <ScanFace className="w-14 h-14 mb-3" style={{ color: '#E98A3A' }} />
+                <p className="text-sm font-bold mb-1" style={{ color: '#111' }}>Face ID Attendance</p>
+                <p className="text-xs" style={{ color: '#555' }}>
+                  No QR needed. Open the live scanner from this event after publishing to mark attendance by face.
+                </p>
+              </div>
             )}
           </section>
+        </main>
+
+        {/* Post-publish Face ID success */}
+        {createdEventId && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.7)' }}>
+            <div style={{ ...nb.card, padding: '24px', maxWidth: '420px', width: '100%' }} className="text-center">
+              <ScanFace className="w-12 h-12 mx-auto mb-3" style={{ color: '#E98A3A' }} />
+              <h3 className="text-lg font-black mb-2" style={nb.heading}>Face ID enabled</h3>
+              <p className="text-sm mb-5" style={{ color: '#555' }}>
+                Open the live scanner now or later from the event.
+              </p>
+              <div className="flex gap-3">
+                <button onClick={() => navigate('/admin')} className="flex-1 py-2.5 text-sm" style={nb.btnBlack}>
+                  Done
+                </button>
+                <button
+                  onClick={() => navigate(`/events/${createdEventId}/face-scan`)}
+                  className="flex-1 py-2.5 text-sm flex items-center justify-center gap-2"
+                  style={nb.btnOrange}
+                >
+                  <ScanFace className="w-4 h-4" /> Open Scanner
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         </main>
 
         {/* Publish Button */}
