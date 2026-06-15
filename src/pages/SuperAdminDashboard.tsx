@@ -84,7 +84,7 @@ const SuperAdminDashboard = () => {
   const [presidentSearchResults, setPresidentSearchResults] = useState<any[]>([]);
   const [presidentSearchLoading, setPresidentSearchLoading] = useState(false);
 
-  const { totalClubs, globalMembers, totalEvents, clubs, members, upcomingEvents, growthData, loading } = useSuperAdminStats();
+  const { totalClubs, globalMembers, totalEvents, clubs, members, upcomingEvents, growthData } = useSuperAdminStats();
 
   const exportHandlerRef = useRef<(() => void) | null>(null);
   useEffect(() => {

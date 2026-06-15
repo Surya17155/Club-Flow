@@ -70,7 +70,6 @@ const ManageOutsiders = () => {
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const [outsiders, setOutsiders] = useState<Outsider[]>(() => getCachedOutsiders() ?? []);
-  const [loading, setLoading] = useState(() => !getCachedOutsiders());
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [selectedOutsider, setSelectedOutsider] = useState<Outsider | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -87,13 +86,10 @@ const ManageOutsiders = () => {
   const fetchOutsiders = async () => {
     const cached = getCachedOutsiders();
     if (cached) setOutsiders(cached);
-    else setLoading(true);
     try {
       setOutsiders(await preloadOutsiders(true));
     } catch (err: any) {
       toast({ title: 'Error', description: err.message || 'Failed to fetch outsiders', variant: 'destructive' });
-    } finally {
-      setLoading(false);
     }
   };
 

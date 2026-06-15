@@ -42,7 +42,6 @@ const GlobalReports = () => {
   const [clubs, setClubs] = useState<{ id: string; name: string }[]>([]);
   const [eventsPerClub, setEventsPerClub] = useState<{ name: string; events: number }[]>([]);
   const [programmeData, setProgrammeData] = useState<{ name: string; value: number }[]>([]);
-  const [loading, setLoading] = useState(true);
   const [profileDialogOpen, setProfileDialogOpen] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState<any>(null);
 
@@ -61,7 +60,6 @@ const GlobalReports = () => {
   useEffect(() => {
     if (isAdmin !== true) return;
     const fetch = async () => {
-      setLoading(true);
       const [{ data: eventsData }, { data: clubsData }, { data: membersData }, { data: profilesData }, { data: participantsData }] = await Promise.all([
         supabase.from('events').select('id, name, event_date, club_id'),
         supabase.from('clubs').select('id, name'),
@@ -124,8 +122,6 @@ const GlobalReports = () => {
         progMap.set(prog, (progMap.get(prog) || 0) + 1);
       });
       setProgrammeData(Array.from(progMap.entries()).map(([name, value]) => ({ name, value })).filter(p => p.name));
-
-      setLoading(false);
     };
     fetch();
   }, [isAdmin]);
