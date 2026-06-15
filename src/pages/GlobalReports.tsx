@@ -12,6 +12,7 @@ import ProfileDropdown from '@/components/dashboard/ProfileDropdown';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { MobileBottomNav } from '@/components/mobile/MobileBottomNav';
 import { getCachedAdminStatus, preloadAdminStatus } from '@/lib/preloadCache';
+import { isSuperAdminUser } from '@/lib/superAdminMode';
 
 const roleLabelMap: Record<string, string> = {
   admin: 'Admin', president: 'President', vice_president: 'Vice President',
@@ -36,6 +37,7 @@ const GlobalReports = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [isAdmin, setIsAdmin] = useState<boolean | null>(() => user ? getCachedAdminStatus(user.id, user.email) ?? null : null);
+  const isSuperAdminEmail = isSuperAdminUser(user?.email);
   const [searchQuery, setSearchQuery] = useState('');
   const [clubFilter, setClubFilter] = useState('all');
   const [rows, setRows] = useState<ReportRow[]>([]);
@@ -58,7 +60,7 @@ const GlobalReports = () => {
 
   // Fetch report data
   useEffect(() => {
-    if (isAdmin !== true) return;
+    if (!isSuperAdminEmail && isAdmin !== true) return;
     const fetch = async () => {
       const [{ data: eventsData }, { data: clubsData }, { data: membersData }, { data: profilesData }, { data: participantsData }] = await Promise.all([
         supabase.from('events').select('id, name, event_date, club_id'),
@@ -124,7 +126,7 @@ const GlobalReports = () => {
       setProgrammeData(Array.from(progMap.entries()).map(([name, value]) => ({ name, value })).filter(p => p.name));
     };
     fetch();
-  }, [isAdmin]);
+  }, [isAdmin, isSuperAdminEmail]);
 
   const filteredRows = useMemo(() => {
     let r = rows;
@@ -155,7 +157,7 @@ const GlobalReports = () => {
   };
 
   if (!user) return null;
-  if (isAdmin === false) {
+  if (!isSuperAdminEmail && isAdmin === false) {
     return (
       <div className="min-h-screen flex items-center justify-center dashboard-corner-gradient">
         <div className="glass-card p-8 text-center max-w-md">

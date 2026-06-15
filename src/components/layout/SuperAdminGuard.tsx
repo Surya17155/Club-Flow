@@ -1,22 +1,37 @@
 import { useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { isSuperAdminUser, SUPER_ADMIN_LOCK_KEY, SUPER_ADMIN_MODE_EVENT } from '@/lib/superAdminMode';
+import { getAuthenticatedHomePath, initializeSuperAdminModeForSession, isSuperAdminLockActive, isSuperAdminUser, resetSuperAdminModeSession } from '@/lib/superAdminMode';
 
 /**
  * Keeps stale Super Admin mode state from leaking between users without
  * forcing route changes. Navigation should only happen from explicit clicks.
  */
 export function SuperAdminGuard() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (!user || isSuperAdminUser(user.email)) return;
+    if (loading) return;
 
-    if (sessionStorage.getItem(SUPER_ADMIN_LOCK_KEY) === 'true') {
-      sessionStorage.removeItem(SUPER_ADMIN_LOCK_KEY);
-      window.dispatchEvent(new Event(SUPER_ADMIN_MODE_EVENT));
+    if (!user) {
+      resetSuperAdminModeSession();
+      return;
     }
-  }, [user?.id, user?.email]);
+
+    const modeIsActive = initializeSuperAdminModeForSession(user.email);
+    const isSuperAdmin = isSuperAdminUser(user.email);
+
+    if (isSuperAdmin && modeIsActive && ['/', '/dashboard', '/admin'].includes(location.pathname)) {
+      navigate(getAuthenticatedHomePath(user.email), { replace: true });
+      return;
+    }
+
+    if (!isSuperAdmin && isSuperAdminLockActive()) {
+      resetSuperAdminModeSession();
+    }
+  }, [loading, user?.id, user?.email, location.pathname, navigate]);
 
   return null;
 }

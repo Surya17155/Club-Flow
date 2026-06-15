@@ -9,17 +9,16 @@ import { toast } from '@/hooks/use-toast';
 import { ChatResponseRenderer } from '@/components/chat/ChatResponseRenderer';
 import { useChatFileUpload } from '@/hooks/useChatFileUpload';
 import { MobileBottomNav } from '@/components/mobile/MobileBottomNav';
-import { isSuperAdminLockActive } from '@/lib/superAdminMode';
+import { getSuperAdminModeForUser, isSuperAdminUser } from '@/lib/superAdminMode';
 
 type Msg = { role: 'user' | 'assistant'; content: string };
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/club-chat`;
-const SUPER_ADMIN_EMAIL = 'suryakant.gnbba2029@iilm.edu';
 
 const ChatbotPage = ({ hideSidebar = false }: { hideSidebar?: boolean } = {}) => {
   const { user, session } = useAuth();
   const { activeClub } = useClub();
-  const isSuperAdminChat = user?.email === SUPER_ADMIN_EMAIL && isSuperAdminLockActive();
+  const isSuperAdminChat = isSuperAdminUser(user?.email) && getSuperAdminModeForUser(user?.email);
   const activeClubId = isSuperAdminChat ? undefined : activeClub?.club_id;
 
   const [messages, setMessages] = useState<Msg[]>([]);

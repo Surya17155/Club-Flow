@@ -5,7 +5,7 @@ import { useClub } from '@/contexts/ClubContext';
 import { useProfile } from '@/hooks/useProfile';
 import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { isSuperAdminLockActive, setSuperAdminLockActive, SUPER_ADMIN_EMAIL, SUPER_ADMIN_MODE_EVENT } from '@/lib/superAdminMode';
+import { getSuperAdminModeForUser, isSuperAdminUser, setSuperAdminLockActive, SUPER_ADMIN_MODE_EVENT } from '@/lib/superAdminMode';
 import { ChevronDown, User, Settings, LogOut, ArrowRightLeft, Check, ChevronRight, Shield, Crown, Settings2, Bot, Users } from 'lucide-react';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator,
@@ -37,12 +37,12 @@ const ProfileDropdown = ({ viewMode = 'personal' }: { viewMode?: 'personal' | 'c
   const [showPowersModal, setShowPowersModal] = useState(false);
   const [showClubSettings, setShowClubSettings] = useState(false);
   const [showChat, setShowChat] = useState(false);
-  const [isSuperAdminMode, setIsSuperAdminMode] = useState(() => isSuperAdminLockActive());
+  const [isSuperAdminMode, setIsSuperAdminMode] = useState(() => getSuperAdminModeForUser(user?.email));
 
-  const isSuperAdminEmail = user?.email === SUPER_ADMIN_EMAIL;
+  const isSuperAdminEmail = isSuperAdminUser(user?.email);
 
   useEffect(() => {
-    const sync = () => setIsSuperAdminMode(isSuperAdminLockActive());
+    const sync = () => setIsSuperAdminMode(getSuperAdminModeForUser(user?.email));
     sync();
     window.addEventListener(SUPER_ADMIN_MODE_EVENT, sync);
     window.addEventListener('storage', sync);
@@ -50,7 +50,7 @@ const ProfileDropdown = ({ viewMode = 'personal' }: { viewMode?: 'personal' | 'c
       window.removeEventListener(SUPER_ADMIN_MODE_EVENT, sync);
       window.removeEventListener('storage', sync);
     };
-  }, [location.pathname]);
+  }, [location.pathname, user?.email]);
 
   // Show chatbot in Super Admin mode OR in Club mode if president/admin/has power
   const showChatOption = isSuperAdminMode || (viewMode === 'club' && hasPower('use_chatbot'));
@@ -58,6 +58,8 @@ const ProfileDropdown = ({ viewMode = 'personal' }: { viewMode?: 'personal' | 'c
   const handleSuperAdminToggle = (checked: boolean) => {
     setSuperAdminLockActive(checked);
     setIsSuperAdminMode(checked);
+    if (checked) navigate('/super-admin', { replace: true });
+    else navigate('/admin', { replace: true });
   };
 
   const fullName = profile?.full_name || 'User';

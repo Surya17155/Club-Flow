@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
 import { useClub } from '@/contexts/ClubContext';
 import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
-import { isSuperAdminLockActive, setSuperAdminLockActive, SUPER_ADMIN_EMAIL, SUPER_ADMIN_MODE_EVENT } from '@/lib/superAdminMode';
+import { getSuperAdminModeForUser, isSuperAdminUser, setSuperAdminLockActive, SUPER_ADMIN_MODE_EVENT } from '@/lib/superAdminMode';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   LayoutDashboard, Calendar, Compass, UserCircle, Settings, LogOut,
@@ -30,17 +30,17 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
   const [showClubSwitcher, setShowClubSwitcher] = useState(false);
 
   const isClubMode = viewMode === 'club';
-  const isSuperAdmin = user?.email === SUPER_ADMIN_EMAIL;
+  const isSuperAdmin = isSuperAdminUser(user?.email);
   const [isSuperAdminMode, setIsSuperAdminMode] = useState<boolean>(
-    () => isSuperAdmin && isSuperAdminLockActive()
+    () => getSuperAdminModeForUser(user?.email)
   );
   useEffect(() => {
     if (!isSuperAdmin) return;
-    const sync = () => setIsSuperAdminMode(isSuperAdminLockActive());
+    const sync = () => setIsSuperAdminMode(getSuperAdminModeForUser(user?.email));
     window.addEventListener(SUPER_ADMIN_MODE_EVENT, sync);
     sync();
     return () => window.removeEventListener(SUPER_ADMIN_MODE_EVENT, sync);
-  }, [isSuperAdmin, location.pathname]);
+  }, [isSuperAdmin, location.pathname, user?.email]);
 
   const initials = (profile?.full_name || 'U')
     .split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
@@ -310,6 +310,13 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
                       onCheckedChange={(checked) => {
                         setSuperAdminLockActive(checked);
                         setIsSuperAdminMode(checked);
+                        if (checked) {
+                          navigate('/super-admin', { replace: true });
+                        } else {
+                          setViewMode('personal');
+                          navigate('/admin', { replace: true });
+                        }
+                        onClose();
                       }}
                       className="scale-90"
                     />

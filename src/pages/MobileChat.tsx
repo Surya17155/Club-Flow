@@ -10,7 +10,7 @@ import { toast } from '@/hooks/use-toast';
 import { ChatResponseRenderer } from '@/components/chat/ChatResponseRenderer';
 import { useChatFileUpload } from '@/hooks/useChatFileUpload';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { isSuperAdminLockActive, SUPER_ADMIN_EMAIL } from '@/lib/superAdminMode';
+import { getSuperAdminModeForUser, isSuperAdminUser } from '@/lib/superAdminMode';
 
 type Msg = { role: 'user' | 'assistant'; content: string };
 
@@ -22,8 +22,8 @@ const MobileChat = () => {
   const { session, user } = useAuth();
   const { activeClub } = useClub();
   const isMobile = useIsMobile();
-  const isSuperAdminMode = location.state?.superAdmin === true || isSuperAdminLockActive();
-  const isSuperAdmin = user?.email === SUPER_ADMIN_EMAIL && isSuperAdminMode;
+  const isSuperAdminMode = location.state?.superAdmin === true || getSuperAdminModeForUser(user?.email);
+  const isSuperAdmin = isSuperAdminUser(user?.email) && isSuperAdminMode;
   const effectiveClubId = isSuperAdmin ? undefined : activeClub?.club_id;
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState('');

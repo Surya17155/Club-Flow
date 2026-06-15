@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { getAuthenticatedHomePath, resetSuperAdminModeSession } from '@/lib/superAdminMode';
 
 interface AuthContextType {
   user: User | null;
@@ -81,7 +82,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       password,
       options: {
         data: metadata,
-        emailRedirectTo: `${window.location.origin}/dashboard`,
+        emailRedirectTo: `${window.location.origin}${getAuthenticatedHomePath(normalizedEmail)}`,
       },
     });
     if (error) throw error;
@@ -123,6 +124,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = async () => {
     await supabase.auth.signOut();
+    resetSuperAdminModeSession();
+    sessionStorage.removeItem('pendingRedirect');
     setSession(null);
     setUser(null);
     setLoading(false);

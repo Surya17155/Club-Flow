@@ -5,7 +5,7 @@ import { useProfile } from '@/hooks/useProfile';
 import { useClub } from '@/contexts/ClubContext';
 import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
 import { useDesign } from '@/contexts/DesignContext';
-import { isSuperAdminLockActive, setSuperAdminLockActive, SUPER_ADMIN_EMAIL, SUPER_ADMIN_MODE_EVENT } from '@/lib/superAdminMode';
+import { getSuperAdminModeForUser, isSuperAdminUser, setSuperAdminLockActive, SUPER_ADMIN_MODE_EVENT } from '@/lib/superAdminMode';
 import {
   LayoutDashboard,
   Calendar,
@@ -168,27 +168,27 @@ export function DashboardSidebar() {
   const isActive = (url: string) =>
     location.pathname === url || (url !== '/admin' && location.pathname.startsWith(url + '/'));
 
-  const isSuperAdminEmail = user?.email === SUPER_ADMIN_EMAIL;
+  const isSuperAdminEmail = isSuperAdminUser(user?.email);
 
   // Super Admin mode is driven by the lock flag (NOT the URL), so navigating
   // to /chatbot, /manage-outsiders, /global-reports, /settings, etc. while
   // in Super Admin mode does NOT flip the sidebar back to Personal/Club.
   const [isSuperAdminMode, setIsSuperAdminMode] = useState<boolean>(
-    () => isSuperAdminLockActive()
+    () => getSuperAdminModeForUser(user?.email)
   );
   useEffect(() => {
-    const sync = () => setIsSuperAdminMode(isSuperAdminLockActive());
+    const sync = () => setIsSuperAdminMode(getSuperAdminModeForUser(user?.email));
     window.addEventListener(SUPER_ADMIN_MODE_EVENT, sync);
     window.addEventListener('storage', sync);
     return () => {
       window.removeEventListener(SUPER_ADMIN_MODE_EVENT, sync);
       window.removeEventListener('storage', sync);
     };
-  }, []);
+  }, [user?.email]);
   // Re-sync when route changes (in case the guard armed/disarmed the lock).
   useEffect(() => {
-    setIsSuperAdminMode(isSuperAdminLockActive());
-  }, [location.pathname]);
+    setIsSuperAdminMode(getSuperAdminModeForUser(user?.email));
+  }, [location.pathname, user?.email]);
 
   // Determine view mode from localStorage, listen for changes
   const [viewMode, setViewModeLocal] = useState<'personal' | 'club'>(
@@ -240,6 +240,15 @@ export function DashboardSidebar() {
   const setSuperAdminMode = (on: boolean) => {
     setSuperAdminLockActive(on);
     setIsSuperAdminMode(on);
+    if (on) {
+      navigate('/super-admin', { replace: true });
+      return;
+    }
+
+    localStorage.setItem('dashboardViewMode', 'personal');
+    setViewModeLocal('personal');
+    window.dispatchEvent(new Event('viewModeChanged'));
+    navigate('/admin', { replace: true });
   };
 
   // Sub-items shown under the Super Admin toggle when active.
