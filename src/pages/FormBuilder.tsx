@@ -24,10 +24,12 @@ export default function FormBuilder() {
   const { user } = useAuth();
   const { activeClub, clubs } = useClub();
 
-  const presidentClubs = clubs.filter((c) => c.role === 'president');
-  const defaultClub = presidentClubs.find((c) => c.club_id === activeClub?.club_id) ?? presidentClubs[0];
+  // Forms are always scoped to the currently selected club — no chooser.
+  const activeMembership = clubs.find((c) => c.club_id === activeClub?.club_id);
+  const canCreateHere = activeMembership?.role === 'president';
+  const clubId = activeClub?.club_id ?? '';
+  const clubName = activeClub?.club_name ?? '';
 
-  const [clubId, setClubId] = useState<string>(defaultClub?.club_id ?? '');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [deadline, setDeadline] = useState('');
@@ -44,7 +46,6 @@ export default function FormBuilder() {
     (async () => {
       const { data: form, error } = await supabase.from('forms').select('*').eq('id', id!).maybeSingle();
       if (error || !form) { toast.error('Form not found'); navigate('/forms'); return; }
-      setClubId(form.club_id);
       setTitle(form.title);
       setDescription(form.description ?? '');
       setDeadline(form.deadline ? new Date(form.deadline).toISOString().slice(0, 16) : '');
@@ -71,9 +72,6 @@ export default function FormBuilder() {
     })();
   }, [id]);
 
-  useEffect(() => {
-    if (!isEdit && !clubId && defaultClub) setClubId(defaultClub.club_id);
-  }, [defaultClub?.club_id]);
 
   const addQuestion = (type: QuestionType) => {
     setQuestions((qs) => [
@@ -160,7 +158,9 @@ export default function FormBuilder() {
       }
 
       toast.success(publish ? 'Form published!' : 'Saved');
+      window.dispatchEvent(new Event('formsChanged'));
       navigate('/forms');
+
     } catch (e: any) {
       toast.error(e.message ?? 'Save failed');
     } finally {
@@ -170,11 +170,22 @@ export default function FormBuilder() {
 
   if (loading) return <div style={{ background: BG, minHeight: '100vh' }} className="flex items-center justify-center font-bold">Loading…</div>;
 
-  if (presidentClubs.length === 0) {
+  if (!activeClub) {
     return (
       <div style={{ background: BG, fontFamily: "'Space Grotesk', sans-serif" }} className="min-h-screen flex items-center justify-center p-6">
         <div className="text-center p-6" style={{ background: CARD, border: BORDER, borderRadius: '8px', boxShadow: SHADOW }}>
-          <div className="font-bold mb-2">Only club presidents can create forms.</div>
+          <div className="font-bold mb-2">No active club selected.</div>
+          <button onClick={() => navigate('/forms')} className="text-sm underline">Go to Forms</button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!canCreateHere) {
+    return (
+      <div style={{ background: BG, fontFamily: "'Space Grotesk', sans-serif" }} className="min-h-screen flex items-center justify-center p-6">
+        <div className="text-center p-6 max-w-md" style={{ background: CARD, border: BORDER, borderRadius: '8px', boxShadow: SHADOW }}>
+          <div className="font-bold mb-2">Only the president of {clubName} can create forms for this club.</div>
           <button onClick={() => navigate('/forms')} className="text-sm underline">Go to Forms</button>
         </div>
       </div>
@@ -187,19 +198,14 @@ export default function FormBuilder() {
   return (
     <div style={{ background: BG, fontFamily: "'Space Grotesk', sans-serif", minHeight: '100vh' }} className="px-4 pb-32 md:px-8">
       <div className="max-w-3xl mx-auto pt-16 md:pt-8">
-        <h1 className="text-3xl font-black mb-4">{isEdit ? 'Edit Form' : 'Create Form'}</h1>
+        <h1 className="text-3xl font-black mb-1">{isEdit ? 'Edit Form' : 'Create Form'}</h1>
+        <div className="text-xs font-bold mb-4" style={{ color: '#666' }}>
+          For <span style={{ color: '#E98A3A' }}>{clubName}</span>
+        </div>
 
         {/* Settings */}
         <div className="p-5 mb-5 space-y-3" style={{ background: CARD, border: BORDER, borderRadius: '8px', boxShadow: SHADOW }}>
-          {presidentClubs.length > 1 && (
-            <Field label="Club">
-              <select value={clubId} onChange={(e) => setClubId(e.target.value)} className="w-full p-2 text-sm font-semibold" style={{ background: '#fff', border: '1.5px solid #111', borderRadius: '6px' }}>
-                {presidentClubs.map((c) => (
-                  <option key={c.club_id} value={c.club_id}>{c.club_name}</option>
-                ))}
-              </select>
-            </Field>
-          )}
+
           <Field label="Form Title *">
             <input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={200}
               className="w-full p-2 text-sm font-semibold" style={{ background: '#fff', border: '1.5px solid #111', borderRadius: '6px' }} />
