@@ -115,12 +115,20 @@ export default function Forms() {
   };
 
   const handleCreate = () => {
-    if (!isPresident) {
-      toast.error('Only club presidents can create forms');
+    if (!isClubMode) {
+      toast.error('Switch to Club mode to create forms');
+      return;
+    }
+    if (!isPresidentOfActive) {
+      toast.error('Only the club president can create forms');
       return;
     }
     navigate('/forms/new');
   };
+
+  const subtitle = isClubMode
+    ? `Manage forms for ${activeClub?.club_name ?? 'this club'}.`
+    : 'Forms shared with you from your clubs.';
 
   return (
     <div style={{ background: BG, fontFamily: "'Space Grotesk', sans-serif", minHeight: '100vh' }} className="px-4 py-6 md:px-8">
@@ -136,13 +144,11 @@ export default function Forms() {
         <div className="flex items-start justify-between flex-wrap gap-4 mb-6">
           <div>
             <h1 className="text-3xl md:text-4xl font-black" style={{ color: '#111', letterSpacing: '-0.02em' }}>
-              Smart Forms
+              {isClubMode ? 'Manage Forms' : 'My Forms'}
             </h1>
-            <p className="text-sm mt-1" style={{ color: '#555' }}>
-              Surveys, registrations, feedback — profile auto-attached.
-            </p>
+            <p className="text-sm mt-1" style={{ color: '#555' }}>{subtitle}</p>
           </div>
-          {isPresident && (
+          {isClubMode && isPresidentOfActive && (
             <motion.button
               whileTap={{ scale: 0.96 }}
               onClick={handleCreate}
@@ -154,34 +160,12 @@ export default function Forms() {
           )}
         </div>
 
-        <div className="flex gap-2 mb-5">
-          <button
-            onClick={() => setTab('available')}
-            className="px-4 py-2 text-sm font-bold"
-            style={{
-              background: tab === 'available' ? '#111' : CARD,
-              color: tab === 'available' ? '#FFFDF5' : '#111',
-              border: BORDER, borderRadius: '6px',
-              boxShadow: tab === 'available' ? 'none' : '3px 3px 0px #111',
-            }}
-          >
-            Available Forms
-          </button>
-          {isPresident && (
-            <button
-              onClick={() => setTab('manage')}
-              className="px-4 py-2 text-sm font-bold"
-              style={{
-                background: tab === 'manage' ? '#111' : CARD,
-                color: tab === 'manage' ? '#FFFDF5' : '#111',
-                border: BORDER, borderRadius: '6px',
-                boxShadow: tab === 'manage' ? 'none' : '3px 3px 0px #111',
-              }}
-            >
-              Manage My Forms
-            </button>
-          )}
-        </div>
+        {!isClubMode && (
+          <div className="text-[11px] mb-4 px-3 py-2 inline-block" style={{ background: CARD, border: '1.5px solid #111', borderRadius: '6px', color: '#666' }}>
+            To create or manage forms, switch to <b>Club mode</b> from the sidebar.
+          </div>
+        )}
+
 
         {tab === 'available' && (
           <div className="flex flex-wrap gap-2 mb-4">
