@@ -39,6 +39,9 @@ import ContactUs from "./pages/ContactUs";
 import Contact2 from "./pages/Contact2";
 import Reviews from "./pages/Reviews";
 import Forms from "./pages/Forms";
+import FormBuilder from "./pages/FormBuilder";
+import FormFill from "./pages/FormFill";
+import FormResponses from "./pages/FormResponses";
 import MarkAttendance from "./pages/MarkAttendance";
 import SuperAdminDashboard from "./pages/SuperAdminDashboard";
 import GlobalReports from "./pages/GlobalReports";
@@ -97,7 +100,11 @@ const App = () => (
                 <Route path="/contact" element={<ContactUs />} />
                 <Route path="/contact2" element={<Contact2 />} />
                 <Route path="/reviews" element={<Reviews />} />
-                <Route path="/forms" element={<Forms />} />
+                <Route path="/forms" element={<ProtectedRoute><Forms /></ProtectedRoute>} />
+                <Route path="/forms/new" element={<ProtectedRoute><FormBuilder /></ProtectedRoute>} />
+                <Route path="/forms/:id/edit" element={<ProtectedRoute><FormBuilder /></ProtectedRoute>} />
+                <Route path="/forms/:id/responses" element={<ProtectedRoute><FormResponses /></ProtectedRoute>} />
+                <Route path="/forms/:id" element={<ProtectedRoute><FormFill /></ProtectedRoute>} />
                 <Route path="/manage-outsiders" element={<ProtectedRoute><DesktopFrame><ManageOutsiders /></DesktopFrame></ProtectedRoute>} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />

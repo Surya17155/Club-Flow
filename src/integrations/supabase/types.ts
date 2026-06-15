@@ -412,6 +412,189 @@ export type Database = {
           },
         ]
       }
+      form_answers: {
+        Row: {
+          created_at: string
+          file_url: string | null
+          id: string
+          question_id: string
+          response_id: string
+          value: Json | null
+        }
+        Insert: {
+          created_at?: string
+          file_url?: string | null
+          id?: string
+          question_id: string
+          response_id: string
+          value?: Json | null
+        }
+        Update: {
+          created_at?: string
+          file_url?: string | null
+          id?: string
+          question_id?: string
+          response_id?: string
+          value?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "form_answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "form_questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "form_answers_response_id_fkey"
+            columns: ["response_id"]
+            isOneToOne: false
+            referencedRelation: "form_responses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      form_questions: {
+        Row: {
+          config: Json
+          created_at: string
+          description: string | null
+          form_id: string
+          id: string
+          label: string
+          options: Json
+          position: number
+          required: boolean
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          config?: Json
+          created_at?: string
+          description?: string | null
+          form_id: string
+          id?: string
+          label: string
+          options?: Json
+          position?: number
+          required?: boolean
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          config?: Json
+          created_at?: string
+          description?: string | null
+          form_id?: string
+          id?: string
+          label?: string
+          options?: Json
+          position?: number
+          required?: boolean
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "form_questions_form_id_fkey"
+            columns: ["form_id"]
+            isOneToOne: false
+            referencedRelation: "forms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      form_responses: {
+        Row: {
+          created_at: string
+          form_id: string
+          id: string
+          profile_snapshot: Json
+          submitted_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          form_id: string
+          id?: string
+          profile_snapshot?: Json
+          submitted_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          form_id?: string
+          id?: string
+          profile_snapshot?: Json
+          submitted_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "form_responses_form_id_fkey"
+            columns: ["form_id"]
+            isOneToOne: false
+            referencedRelation: "forms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      forms: {
+        Row: {
+          accepting_responses: boolean
+          allow_multiple: boolean
+          anonymous: boolean
+          banner_url: string | null
+          club_id: string
+          created_at: string
+          created_by: string
+          deadline: string | null
+          description: string | null
+          id: string
+          is_published: boolean
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          accepting_responses?: boolean
+          allow_multiple?: boolean
+          anonymous?: boolean
+          banner_url?: string | null
+          club_id: string
+          created_at?: string
+          created_by: string
+          deadline?: string | null
+          description?: string | null
+          id?: string
+          is_published?: boolean
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          accepting_responses?: boolean
+          allow_multiple?: boolean
+          anonymous?: boolean
+          banner_url?: string | null
+          club_id?: string
+          created_at?: string
+          created_by?: string
+          deadline?: string | null
+          description?: string | null
+          id?: string
+          is_published?: boolean
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "forms_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           about: string | null
