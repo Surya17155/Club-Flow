@@ -129,8 +129,9 @@ export default function FormBuilder() {
         deadline: deadline ? new Date(deadline).toISOString() : null,
         allow_multiple: allowMultiple,
         anonymous,
+        is_public: isPublic,
         is_published: publish ?? isPublished,
-      };
+      } as any;
 
       let formId = id;
       if (isEdit) {
