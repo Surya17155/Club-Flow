@@ -69,6 +69,25 @@ export interface CachedDiscoverData {
   myRequests: [string, string][];
 }
 
+export interface CachedUpcomingEvent {
+  id: string;
+  name: string;
+  event_date: string;
+  end_date: string | null;
+  description: string | null;
+  event_type: string;
+  category: string;
+  access_type: string;
+  attendance_given: boolean | null;
+  clubs?: { name: string } | null;
+  month: string;
+  day: string;
+  club_name: string;
+  full_date: string;
+  time: string;
+  end_time: string | null;
+}
+
 const adminRoleCache = new Map<string, CacheEntry<boolean>>();
 const userClubsCache = new Map<string, CacheEntry<CachedUserClub[]>>();
 const profileCache = new Map<string, CacheEntry<any>>();
@@ -81,6 +100,9 @@ const discoverCache = new Map<string, CacheEntry<CachedDiscoverData>>();
 const outsidersCache = new Map<string, CacheEntry<any[]>>();
 const clubMembersCache = new Map<string, CacheEntry<any[]>>();
 const clubSettingsCache = new Map<string, CacheEntry<any>>();
+const upcomingEventsCache = new Map<string, CacheEntry<CachedUpcomingEvent[]>>();
+const joinRequestsCache = new Map<string, CacheEntry<any[]>>();
+const assignableMembersCache = new Map<string, CacheEntry<any[]>>();
 
 export const getCachedAdminStatus = (userId: string, email?: string | null) => {
   if (isSuperAdminUser(email)) return true;
