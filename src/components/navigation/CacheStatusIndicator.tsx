@@ -17,10 +17,10 @@ export function CacheStatusIndicator() {
 
   return (
     <div
-      className="fixed z-[70] hidden md:flex items-center gap-2 px-3 py-1.5 text-[11px] font-bold uppercase"
+      className="fixed z-[70] flex items-center gap-2 px-3 py-1.5 text-[11px] font-bold uppercase"
       style={{
-        right: 18,
-        bottom: 18,
+        right: 10,
+        top: 'calc(env(safe-area-inset-top, 0px) + 10px)',
         background: running ? '#FFE9A8' : '#FFFDF5',
         color: '#111111',
         border: '2px solid #111111',
