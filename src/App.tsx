@@ -7,12 +7,21 @@ import { Suspense } from "react";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ClubProvider } from "@/contexts/ClubContext";
 import { DesignProvider } from "@/contexts/DesignContext";
-import { DesktopFrame } from "@/components/layout/DesktopFrame";
-import { MobileNavigationOverlay } from "@/components/mobile/MobileNavigationOverlay";
 import { SuperAdminGuard } from "@/components/layout/SuperAdminGuard";
 import { PagePreloader } from "@/components/navigation/PagePreloader";
 import { ProtectedRoute } from "@/components/navigation/ProtectedRoute";
 import { lazyRoute } from "@/lib/routePreload";
+
+const DesktopFrame = lazyRouteFrame();
+const MobileNavigationOverlay = lazyRouteMobileOverlay();
+
+function lazyRouteFrame() {
+  return import("react").then ? undefined as never : undefined as never;
+}
+
+function lazyRouteMobileOverlay() {
+  return import("react").then ? undefined as never : undefined as never;
+}
 
 const LandingPage = lazyRoute("landing");
 const AuthPage = lazyRoute("auth");
