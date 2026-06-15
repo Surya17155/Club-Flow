@@ -80,7 +80,9 @@ const App = () => (
           <ClubProvider>
             <DesignProvider>
               <PagePreloader />
-              <MobileNavigationOverlay />
+              <Suspense fallback={null}>
+                <MobileNavigationOverlay />
+              </Suspense>
               <SuperAdminGuard />
               <Suspense fallback={<RouteFallback />}>
                 <Routes>
