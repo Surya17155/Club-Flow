@@ -21,10 +21,10 @@ const JoinRequestsPanel = ({ clubId }: { clubId: string }) => {
   const { user } = useAuth();
   const [requests, setRequests] = useState<JoinRequest[]>(() => (getCachedJoinRequests(clubId) ?? []) as JoinRequest[]);
 
-  const fetchRequests = async () => {
+  const fetchRequests = async (force = false) => {
     const cached = getCachedJoinRequests(clubId);
     if (cached) setRequests(cached as JoinRequest[]);
-    setRequests(await preloadJoinRequests(clubId, true) as JoinRequest[]);
+    setRequests(await preloadJoinRequests(clubId, force) as JoinRequest[]);
   };
 
   useEffect(() => { fetchRequests(); }, [clubId]);

@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useClub } from '@/contexts/ClubContext';
 import { useProfile } from '@/hooks/useProfile';
 import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { usePreloadedNavigate } from '@/hooks/usePreloadedNavigate';
 import { getSuperAdminModeForUser, isSuperAdminUser, setSuperAdminLockActive, SUPER_ADMIN_MODE_EVENT } from '@/lib/superAdminMode';
 import { ChevronDown, User, Settings, LogOut, ArrowRightLeft, Check, ChevronRight, Shield, Crown, Settings2, Bot, Users } from 'lucide-react';
 import {
@@ -26,7 +27,7 @@ const roleLabelMap: Record<string, string> = {
 };
 
 const ProfileDropdown = ({ viewMode = 'personal' }: { viewMode?: 'personal' | 'club' }) => {
-  const navigate = useNavigate();
+  const navigate = usePreloadedNavigate();
   const location = useLocation();
   const { user, signOut } = useAuth();
   const { profile } = useProfile();
