@@ -313,6 +313,8 @@ export const preloadClubMembers = (clubId: string, force = false) => cached(club
   const { data: profilesData } = await db.from("profiles").select("user_id, full_name, avatar_url, programme, year, email, phone, about").in("user_id", userIds);
   const profileMap = new Map((profilesData ?? []).map((p: any) => [p.user_id, p]));
   return membersData.map((m: any) => ({
-    user_id: m.user_id, role: m.role, ...profileMap.get(m.user_id)
+    user_id: m.user_id,
+    role: m.role,
+    ...((profileMap.get(m.user_id) as Record<string, any> | undefined) ?? {}),
   }));
 }, force);

@@ -11,7 +11,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pi
 import ProfileDropdown from '@/components/dashboard/ProfileDropdown';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { MobileBottomNav } from '@/components/mobile/MobileBottomNav';
-import { getCachedAdminStatus, preloadAdminStatus } from '@/lib/preloadCache';
+import { getCachedAdminStatus, getCachedSuperAdminStats, preloadAdminStatus, preloadSuperAdminStats } from '@/lib/preloadCache';
 import { isSuperAdminUser } from '@/lib/superAdminMode';
 
 const roleLabelMap: Record<string, string> = {
