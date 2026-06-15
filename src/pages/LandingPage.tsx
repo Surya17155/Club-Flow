@@ -2,8 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { getAuthenticatedHomePath } from "@/lib/superAdminMode";
-import heroIllustration from "@/assets/hero-illustration-mobile.webp";
-import heroIllustrationDesktop from "@/assets/hero-illustration-desktop.webp";
+import heroIllustration from "@/assets/hero-illustration.png";
+import heroIllustrationDesktop from "@/assets/hero-illustration-desktop.png";
 
 type PageName = "home" | "pricing" | "about" | "contact";
 
