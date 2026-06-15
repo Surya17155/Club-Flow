@@ -1,221 +1,128 @@
-# Design 2: "New Brutalism Style" — Full Dashboard Redesign
 
-## What Changes
+# Face Recognition Attendance — Implementation Plan
 
-Add a second design theme ("Design 2 — New Brutalism Style") to the design system. When active, it transforms the desktop dashboard (sidebar + main content) into a Neo-Brutalist aesthetic: cream background, thick black borders, hard offset shadows, bold Space Grotesk typography, and colored cards with rounded (not sharp) corners. The profile dropdown options move into the sidebar contextually based on mode (Personal vs Club).
+A fully client-side face recognition system using **face-api.js** (free, MIT licensed, runs in-browser via TensorFlow.js). No images are stored — only a 128-float "face descriptor" per user is saved in the database. Matching also happens in the browser; the server only stores descriptors and receives the final attendance row.
 
-## Layout Structure (Design 2 Active)
+## 1. Backend (Lovable Cloud)
+
+One migration adds face enrollment storage and an attendance-method tag.
+
+**`profiles` table — new columns**
+- `face_descriptor` (`jsonb`) — the averaged 128-float Master Face Descriptor (null until user enrolls).
+- `face_enrolled_at` (`timestamptz`) — when enrollment was completed.
+
+**`attendance` table — new column**
+- `method` (`text`, default `'qr'`) — values: `'qr' | 'face' | 'manual'`. Lets reports distinguish how a row was captured. Existing rows default to `'qr'`.
+
+**`events` table — new column**
+- `attendance_mode` (`text`, default `'qr'`) — `'qr' | 'face'`. Chosen at event creation, decides which UI organizers see.
+
+RLS stays the same (existing INSERT policy on `attendance` already allows club admins to insert, which is exactly who runs the scanner). No new policies needed — face matching happens client-side, so the server just receives a normal authenticated insert.
+
+## 2. Models hosting
+
+Download these weight files from the official `face-api.js` repo (`/weights`) and commit them to `public/models/` so they're served from the app origin (no CORS, free):
+- `ssd_mobilenetv1_model-weights_manifest.json` + shard
+- `face_landmark_68_model-weights_manifest.json` + shard
+- `face_recognition_model-weights_manifest.json` + shard
+
+Approx total ~6 MB, loaded once and cached by the browser.
+
+## 3. Shared face utilities — `src/lib/face/`
+
+- `faceApiLoader.ts` — singleton that lazy-loads the three nets from `/models`. Exposes `ensureFaceModels()` returning a `Promise<void>`. Guarantees we only download weights once per session.
+- `faceDescriptor.ts`
+  - `computeDescriptorFromImage(img: HTMLImageElement | HTMLVideoElement)` → `Float32Array | null`.
+  - `averageDescriptors(arr: Float32Array[])` → `Float32Array` (element-wise mean; the "Master Descriptor").
+  - `serialize(d)` / `deserialize(json)` for JSONB round-trips.
+- `useFaceMatcher.ts` — React hook: takes `Array<{ userId, name, descriptor }>` and returns a memoised `faceapi.FaceMatcher` with distance threshold **0.45**.
+
+Dependencies: `bun add face-api.js`. No native build steps needed.
+
+## 4. Phase 1 — Face enrollment in Profile (Personal mode)
+
+New component `src/components/profile/FaceSetupCard.tsx`, rendered inside `src/pages/Profile.tsx` under a "Face Setup" Neo-Brutal card.
+
+UI states:
+1. **Not enrolled** — three numbered photo slots (1/2/3). Each slot has two buttons: **Snap** (opens inline webcam preview) and **Upload**. Slots show a preview thumbnail once filled.
+2. **Processing** — after all three are captured, click **Generate Face ID**. We run `computeDescriptorFromImage` on each, validate that a single face was detected in every photo (otherwise show a Neo-Brutal error and ask to redo that slot), then `averageDescriptors`.
+3. **Enrolled** — green "Face ID active" badge, timestamp, and **Re-enroll** button (resets and overwrites the JSONB).
+
+On save: `supabase.from('profiles').update({ face_descriptor: Array.from(master), face_enrolled_at: new Date().toISOString() }).eq('user_id', user.id)`.
+
+Privacy copy: a small note under the card explains "Your photos are processed locally in your browser and never uploaded. Only an anonymous mathematical fingerprint is saved." No photos ever touch the server or storage buckets.
+
+## 5. Phase 2 — Event creation: pick attendance method
+
+Edit `src/pages/CreateEvent.tsx`:
+- Replace the existing "QR code generation" step with a final **Attendance Method** toggle (Neo-Brutal segmented control): **QR Code** | **Face ID**.
+- Everything before it (name, type, dates, time, location, participants) stays unchanged.
+- On submit, write `attendance_mode` along with the existing payload.
+  - If `qr`: keep current `qr_token` generation + post-create QR display screen exactly as today.
+  - If `face`: skip QR generation, show a "Face ID attendance enabled — open scanner from event card" success screen with a **Open Scanner** button that navigates to `/events/:id/face-scan`.
+
+The event card / event detail dialog gets a small badge showing the chosen mode ("QR" or "Face ID").
+
+## 6. Phase 2 — Live scanner: `FaceScanner.tsx`
+
+New route `/events/:eventId/face-scan`, gated to club admins (president / vice_president / secretary) of the event's club, mirroring the existing QR management access rule.
+
+Component layout (Neo-Brutal: `#F4EFE7` page bg, 2px black borders, hard `4px 4px 0 #111` shadows, Space Grotesk):
 
 ```text
-┌─────────────────────────────────────────────────────────────┐
-│  Background: #FFFDF5 (cream)                                │
-│  ┌──────────┬──────────────────────────────────────────────┐ │
-│  │ SIDEBAR  │  Main Card (white, border-4 black,           │ │
-│  │ Black bg │  rounded-2xl, shadow-[8px_8px_0_0_#000])     │ │
-│  │ border-4 │                                              │ │
-│  │ rounded  │  ┌─ Header: Greeting + Toggle ─────────────┐ │ │
-│  │ corners  │  │                                         │ │ │
-│  │          │  ├─ Personal: 2 stat cards (centered)      │ │ │
-│  │ Context  │  │  [Clubs Joined]  [Events Attended]      │ │ │
-│  │ -aware   │  │                                         │ │ │
-│  │ nav items│  ├─ Bottom half: 50/50 split               │ │ │
-│  │          │  │  [Profile Card]  [Upcoming Events]      │ │ │
-│  │          │  │  (4:5 ratio)     (4:5 ratio)            │ │ │
-│  │          │  └─────────────────────────────────────────┘ │ │
-│  └──────────┴──────────────────────────────────────────────┘ │
-└─────────────────────────────────────────────────────────────┘
++---------------------------------------------+
+|  ← Back   Event name           [● LIVE]     |
++---------------------------------------------+
+|                                             |
+|        [   <video> webcam feed   ]          |
+|        [  overlay: scanning box  ]          |
+|                                             |
+|  Status: Scanning…  |  Matched today: 12    |
++---------------------------------------------+
+|  Recently marked: Aarav S. • Priya K. • …   |
++---------------------------------------------+
 ```
 
-## Technical Plan
+Lifecycle:
+1. On mount: `ensureFaceModels()`, then `getUserMedia({ video: { facingMode: 'user' } })` into a hidden `<video>` element; show "Allow camera" error UI on rejection.
+2. Fetch eligible members for the event's club (respecting `access_type`): `club_members` join `profiles` where `face_descriptor IS NOT NULL`. Build `FaceMatcher` once with threshold `0.45`.
+3. Pre-fetch today's `attendance` rows for the event into a `Set<userId>` so re-detections are silently ignored.
+4. **Scan loop** (`setInterval` 500 ms, cleared on unmount, paused while a match is being processed):
+   - `faceapi.detectSingleFace(video, new TinyOptions).withFaceLandmarks().withFaceDescriptor()`
+   - If detected: `matcher.findBestMatch(descriptor)`.
+   - If `match.label !== 'unknown'` AND `match.distance < 0.45` AND user not already marked:
+     - Insert `{ event_id, student_id: matchedUserId, method: 'face', status: 'present' }` into `attendance`.
+     - Add to local marked-set.
+     - Trigger the **success overlay**: full-card green flash (`#22C55E`) with a big check + "Marked: <Name>", auto-dismiss after 1.8 s, scanner paused during that window.
+   - On duplicate-key error or unique-violation: ignore silently.
+5. On unmount: stop all media tracks and clear interval.
 
-### 1. Update DesignContext — Add Design 2
+Performance notes: SSD MobileNet at 500 ms intervals on a single face is comfortably real-time on a laptop; the matcher is initialised once.
 
-**File:** `src/contexts/DesignContext.tsx`
+## 7. Existing flows that stay untouched
 
-- Extend `DesignTheme` union: `'design-1' | 'design-2'`
-- Add design entry: `{ id: 'design-2', name: 'Design 2', description: 'New Brutalism Style — Cream background, thick borders, hard shadows, Space Grotesk typography' }`
+- QR flow (`MarkAttendance.tsx`, QR generation in `CreateEvent.tsx`, QR management UI) continues to work for events created with `attendance_mode = 'qr'`.
+- Attendance history, exports, dashboards, feedback, audit log all read the same `attendance` rows — they just get an extra `method` column that reports can optionally surface.
+- All design tokens, mobile layouts, navigation rules, and the existing Neo-Brutalism style are reused; no new fonts or colors.
 
-### 2. Redesign DashboardSidebar for Design 2
+## 8. Technical summary (for reference)
 
-**File:** `src/components/layout/DashboardSidebar.tsx`
+```text
+profiles.face_descriptor : jsonb   // number[128]
+profiles.face_enrolled_at: timestamptz
+events.attendance_mode   : 'qr'|'face'  default 'qr'
+attendance.method        : 'qr'|'face'|'manual'  default 'qr'
 
-- Read `useDesign()` to check active design
-- When `design-2`:
-  - Background: `#1a1a1a` (near-black), `border-r-4 border-black`
-  - Rounded corners on the inner panel (not outer edges — blends with background)
-  - Nav items: thick black text, active state = cream/yellow pill with black border + hard shadow
-  - Keep macOS magnification effect on collapsed hover (unchanged)
-  - Keep collapse/expand toggle
-  - **Move profile dropdown options into sidebar:**
-    - In **Club mode** (president/admin): show Assign Powers, Club Settings, AI Chatbot, Switch Club, Manage Club
-    - In **Personal mode**: show only core nav (Dashboard, Events, Clubs, Discover, Calendar, Profile, Settings)
-    - Super Admin toggle moves to sidebar when applicable
-  - Sign Out stays at bottom
+threshold = 0.45    interval = 500ms    models in /public/models
+```
 
-### 3. Redesign AdminDashboard desktop view for Design 2
+## 9. Out of scope (explicit)
 
-**File:** `src/pages/AdminDashboard.tsx`
+- No server-side face matching, no edge function for recognition — everything runs in the browser, keeping it free.
+- No storage of training photos; only the averaged descriptor.
+- No biometric data export endpoints.
+- No changes to manual attendance, feedback, reporting columns, or auth.
 
-- Wrap existing desktop return in a design check
-- When `design-2` active:
-  - Outer background: `#FFFDF5` (cream)
-  - Main card: `bg-white border-4 border-black rounded-2xl shadow-[8px_8px_0px_0px_#000]` with generous padding
-  - **Personal mode:**
-    - Only 2 stat cards: "Clubs Joined" and "Events Attended" — centered in a `grid-cols-2` layout
-    - Cards: `border-4 border-black rounded-2xl shadow-[4px_4px_0_0_#000]`, light yellow (`#FFF8E1`) and light orange (`#FFF3E0`)
-    - Below: 50/50 split with Profile Card (left, 4:5 aspect) and Upcoming Events (right, 4:5 aspect)
-    - Profile card: same blur-overlay style as MobileProfileCard but in neo-brutalist frame (border-4, hard shadow, rounded-2xl)
-    - Upcoming Events: scrollable list inside bordered card
-  - **Club mode:**
-    - 3 stat cards remain (Total Members, Total Events, Avg Attendance) in neo-brutalist style
-    - Analytics chart below in bordered card
-  - Typography: Space Grotesk (bold/black weights), greeting in large bold text
-  - View mode toggle: bordered pill with hard shadow, active button fills with accent color
-  - Remove ProfileDropdown from header (options now in sidebar)
+---
 
-### 4. Redesign DesktopFrame and DashboardLayout for Design 2
-
-**Files:** `src/components/layout/DesktopFrame.tsx`, `src/components/layout/DashboardLayout.tsx`
-
-- When `design-2`: outer background becomes `#FFFDF5`, main card gets `border-4 border-black rounded-2xl shadow-[8px_8px_0_0_#000]`
-
-### 5. Add Design 2 to Super Admin theme switcher
-
-**File:** `src/pages/SuperAdminDashboard.tsx`
-
-- The new design entry from DesignContext will automatically appear in the existing theme grid
-- Remove the placeholder "More designs coming soon" card or keep it for future designs
-
-### 6. Load Space Grotesk font
-
-**File:** `index.html`
-
-- Add Google Fonts link for Space Grotesk (400, 500, 700, 900 weights) — already referenced in `tailwind.config.ts` as `font-display`
-
-## Style Tokens (Design 2)
-
-
-| Element         | Value                                                                              |
-| --------------- | ---------------------------------------------------------------------------------- |
-| Background      | `#FFFDF5` (cream)                                                                  |
-| Card BG         | `#FFFFFF`                                                                          |
-| Borders         | `border-4 border-black` (all elements)                                             |
-| Shadows         | `shadow-[6px_6px_0px_0px_#000]` (cards), `shadow-[4px_4px_0px_0px_#000]` (buttons) |
-| Corners         | `rounded-2xl` (curved, not sharp per user request)                                 |
-| Stat card 1     | `#FFF8E1` (light yellow)                                                           |
-| Stat card 2     | `#FFF3E0` (light orange)                                                           |
-| Club stat cards | light green, light purple, light blue                                              |
-| Font            | Space Grotesk, weights 700/900 for headings, 500 for body                          |
-| Active nav      | Cream/white pill, black text, hard shadow                                          |
-
-
-## What Stays the Same
-
-- Mobile views (untouched)
-- macOS magnification effect on collapsed sidebar hover
-- Collapse/expand sidebar toggle
-- All data fetching and business logic
-- Design 1 remains fully functional and switchable
-
-## Implementation Order
-
-1. Update DesignContext with Design 2
-2. Load Space Grotesk font
-3. Update DashboardSidebar (design-aware styling + moved profile options)
-4. Update AdminDashboard desktop view (neo-brutalist cards, 2-card personal layout, profile card, upcoming events)
-5. Update DesktopFrame/DashboardLayout shells
-6. Verify Super Admin theme switcher shows both designs  
-  
-prompt for your help (Chatgpt master prompt using the reference orange colored neo brutalism style image,  have alo given you too):  
-  
-Design a desktop dashboard UI using a New Brutalism design style with a clean structured layout and a collapsible sidebar.
-  ### CORE STYLE
-  Use a bold, flat New Brutalism aesthetic:
-  - No gradients
-  - No blur effects
-  - No soft shadows
-  - Use strong borders and offset shadows
-  - High contrast typography
-  ---
-  ### BACKGROUND
-  Use a warm cream stone background:
-  #F4EFE7
-  ---
-  ### SIDEBAR
-  Create a collapsible sidebar:
-  - Expanded width: 220px
-  - Collapsed width: 64px
-  - Background: #111111
-  - Text: #FFFFFF
-  Navigation items:
-  Dashboard, Events, Clubs, Discover, Calendar, Profile, Settings
-  Active item:
-  - background: #E98A3A
-  - color: #111111
-  - border: 2px solid #111111
-  Inactive:
-  - color: #B0B0B0
-  Hover:
-  - background: #2A2A2A
-  Transition:
-  - 0.25s ease
-  Main content shifts horizontally when sidebar collapses/expands.
-  ---
-  ### TYPOGRAPHY
-  Headings:
-  - Font: Clash Display
-  - Weight: 600
-  - Sizes:
-    H1: 40px
-    H2: 28px
-    H3: 20px
-  Body:
-  - Font: Satoshi
-  - Size: 14px
-  Small text:
-  - 12px
-  Text color:
-  - #111111 primary
-  - #2A2A2A secondary
-  ---
-  ### CARDS
-  Default card:
-  - background: #FFFFFF
-  - border: 2px solid #111111
-  - border-radius: 12px
-  - box-shadow: 4px 4px 0px #111111
-  - padding: 16px
-  Hover:
-  - transform: translate(-2px, -2px)
-  - box-shadow: 6px 6px 0px #111111
-  Accent card:
-  - background: #F6E1CF
-  ---
-  ### LAYOUT
-  Main layout:
-  [Sidebar] + [Main Content]
-  Inside main content:
-  Stats Row:
-  - 3 cards (Clubs Joined, Events Attended, Upcoming Events)
-  Main Grid:
-  - Left: Calendar (large)
-  - Right: Upcoming Events (scrollable)
-  Grid:
-  - grid-template-columns: 1fr 320px
-  - gap: 20px
-  ---
-  ### SPACING
-  - Page padding: 24px
-  - Card padding: 16px
-  - Gap: 20px
-  ---
-  ### UX FEEL
-  - Bold, structured, high contrast
-  - Minimal but expressive
-  - Physical interaction feel (hover shifts)
-  - No soft UI elements
-  ---
-  ### RESPONSIVE
-  Sidebar hidden on mobile.
-  ---
-  Ensure strict consistency in borders, spacing, and typography. Do not introduce gradients, blur, or soft shadows.
+Approve this plan and I'll implement it in the order: migration → models + utilities → Profile enrollment card → CreateEvent toggle → FaceScanner page + route.

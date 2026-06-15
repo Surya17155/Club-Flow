@@ -20,6 +20,7 @@ export type Database = {
           event_id: string
           id: string
           manually_added: boolean | null
+          method: string
           scanned_at: string
           status: string
           student_id: string
@@ -29,6 +30,7 @@ export type Database = {
           event_id: string
           id?: string
           manually_added?: boolean | null
+          method?: string
           scanned_at?: string
           status?: string
           student_id: string
@@ -38,6 +40,7 @@ export type Database = {
           event_id?: string
           id?: string
           manually_added?: boolean | null
+          method?: string
           scanned_at?: string
           status?: string
           student_id?: string
@@ -354,6 +357,7 @@ export type Database = {
         Row: {
           access_type: string
           attendance_given: boolean
+          attendance_mode: string
           category: string
           club_id: string
           created_at: string
@@ -371,6 +375,7 @@ export type Database = {
         Insert: {
           access_type?: string
           attendance_given?: boolean
+          attendance_mode?: string
           category?: string
           club_id: string
           created_at?: string
@@ -388,6 +393,7 @@ export type Database = {
         Update: {
           access_type?: string
           attendance_given?: boolean
+          attendance_mode?: string
           category?: string
           club_id?: string
           created_at?: string
@@ -640,6 +646,8 @@ export type Database = {
           class_coordinator: string | null
           created_at: string
           email: string | null
+          face_descriptor: Json | null
+          face_enrolled_at: string | null
           full_name: string
           id: string
           phone: string | null
@@ -660,6 +668,8 @@ export type Database = {
           class_coordinator?: string | null
           created_at?: string
           email?: string | null
+          face_descriptor?: Json | null
+          face_enrolled_at?: string | null
           full_name: string
           id?: string
           phone?: string | null
@@ -680,6 +690,8 @@ export type Database = {
           class_coordinator?: string | null
           created_at?: string
           email?: string | null
+          face_descriptor?: Json | null
+          face_enrolled_at?: string | null
           full_name?: string
           id?: string
           phone?: string | null
