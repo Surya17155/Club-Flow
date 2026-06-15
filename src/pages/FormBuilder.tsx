@@ -215,6 +215,12 @@ export default function FormBuilder() {
             </Field>
             <Toggle label="Allow multiple responses" value={allowMultiple} onChange={setAllowMultiple} />
             <Toggle label="Anonymous mode" value={anonymous} onChange={setAnonymous} />
+            <Toggle label="Public (all members can see)" value={isPublic} onChange={setIsPublic} />
+          </div>
+          <div className="text-[11px]" style={{ color: '#666' }}>
+            {isPublic
+              ? 'This form will be visible to every signed-in member across all clubs.'
+              : 'This form will only be visible to members of the selected club.'}
           </div>
         </div>
 
