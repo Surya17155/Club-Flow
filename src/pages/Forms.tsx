@@ -31,7 +31,9 @@ export default function Forms() {
   const { user } = useAuth();
   const { activeClub, clubs } = useClub();
   const [tab, setTab] = useState<'available' | 'manage'>('available');
+  const [availableStatus, setAvailableStatus] = useState<AvailableStatus>('active');
   const [forms, setForms] = useState<FormRow[]>([]);
+  const [submittedIds, setSubmittedIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
 
   const isPresident = useMemo(
@@ -52,15 +54,49 @@ export default function Forms() {
       }
       query = query.in('club_id', presidentClubIds);
     } else {
+      // Available — RLS already scopes to user's clubs + public forms
       query = query.eq('is_published', true);
     }
     const { data, error } = await query;
     if (error) toast.error(error.message);
     else setForms((data as FormRow[]) || []);
+
+    // Which of these has the user already submitted?
+    if (user && data && data.length) {
+      const { data: resp } = await supabase
+        .from('form_responses')
+        .select('form_id')
+        .eq('user_id', user.id)
+        .in('form_id', (data as FormRow[]).map((f) => f.id));
+      setSubmittedIds(new Set((resp ?? []).map((r: any) => r.form_id)));
+    } else {
+      setSubmittedIds(new Set());
+    }
     setLoading(false);
   };
 
-  useEffect(() => { load(); /* eslint-disable-next-line */ }, [tab, presidentClubIds.join(',')]);
+  useEffect(() => { load(); /* eslint-disable-next-line */ }, [tab, presidentClubIds.join(','), user?.id]);
+
+  const now = Date.now();
+  const visibleForms = useMemo(() => {
+    if (tab !== 'available') return forms;
+    return forms.filter((f) => {
+      const submitted = submittedIds.has(f.id);
+      const expired = f.deadline ? new Date(f.deadline).getTime() < now : false;
+      if (availableStatus === 'active') return !submitted && !expired;
+      if (availableStatus === 'pending') return !submitted && expired; // missed deadline, never submitted
+      return submitted; // completed
+    });
+  }, [forms, submittedIds, tab, availableStatus, now]);
+
+  const countFor = (s: AvailableStatus) =>
+    forms.filter((f) => {
+      const submitted = submittedIds.has(f.id);
+      const expired = f.deadline ? new Date(f.deadline).getTime() < now : false;
+      if (s === 'active') return !submitted && !expired;
+      if (s === 'pending') return !submitted && expired;
+      return submitted;
+    }).length;
 
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this form and all its responses?')) return;
