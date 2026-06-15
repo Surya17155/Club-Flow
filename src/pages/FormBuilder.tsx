@@ -172,23 +172,18 @@ export default function FormBuilder() {
       <div style={{ background: BG, fontFamily: "'Space Grotesk', sans-serif" }} className="min-h-screen flex items-center justify-center p-6">
         <div className="text-center p-6" style={{ background: CARD, border: BORDER, borderRadius: '8px', boxShadow: SHADOW }}>
           <div className="font-bold mb-2">Only club presidents can create forms.</div>
-          <button onClick={() => navigate('/forms')} className="text-sm underline">Back</button>
+          <button onClick={() => navigate('/forms')} className="text-sm underline">Go to Forms</button>
         </div>
       </div>
     );
   }
 
-  return (
-    <div style={{ background: BG, fontFamily: "'Space Grotesk', sans-serif", minHeight: '100vh' }} className="px-4 py-6 md:px-8">
-      <div className="max-w-3xl mx-auto">
-        <button
-          onClick={() => navigate('/forms')}
-          className="flex items-center gap-2 px-3 py-2 text-sm font-bold mb-5"
-          style={{ background: CARD, border: BORDER, borderRadius: '6px', boxShadow: '3px 3px 0px #111' }}
-        >
-          <ArrowLeft className="w-4 h-4" /> Back
-        </button>
+  const statusLabel = isPublished ? 'PUBLISHED' : 'DRAFT';
+  const statusBg = isPublished ? '#C7F0BA' : '#FDE8D0';
 
+  return (
+    <div style={{ background: BG, fontFamily: "'Space Grotesk', sans-serif", minHeight: '100vh' }} className="px-4 pb-32 md:px-8">
+      <div className="max-w-3xl mx-auto pt-16 md:pt-8">
         <h1 className="text-3xl font-black mb-4">{isEdit ? 'Edit Form' : 'Create Form'}</h1>
 
         {/* Settings */}
@@ -302,16 +297,43 @@ export default function FormBuilder() {
             ))}
           </div>
         </div>
+      </div>
 
-        <div className="flex flex-wrap gap-2 sticky bottom-4">
-          <motion.button whileTap={{ scale: 0.96 }} disabled={saving} onClick={() => save(false)}
-            className="flex items-center gap-1.5 px-4 py-2.5 text-sm font-bold"
-            style={{ background: CARD, border: BORDER, borderRadius: '6px', boxShadow: SHADOW }}>
+      {/* Sticky bottom action bar */}
+      <div
+        className="fixed bottom-0 left-0 right-0 z-40 px-4 py-3 md:px-8"
+        style={{
+          background: CARD,
+          borderTop: BORDER,
+          boxShadow: '0 -4px 0px #111',
+          paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)',
+        }}
+      >
+        <div className="max-w-3xl mx-auto flex items-center gap-3">
+          <div
+            className="flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] font-bold"
+            style={{ background: statusBg, border: '1.5px solid #111', borderRadius: '999px' }}
+          >
+            <CircleDot className="w-3 h-3" /> {statusLabel}
+          </div>
+
+          <motion.button
+            whileTap={{ scale: 0.96 }}
+            disabled={saving}
+            onClick={() => save(false)}
+            className="ml-auto flex items-center gap-1.5 px-4 py-2.5 text-sm font-bold"
+            style={{ background: CARD, border: BORDER, borderRadius: '6px', boxShadow: '3px 3px 0px #111' }}
+          >
             <Save className="w-4 h-4" /> Save draft
           </motion.button>
-          <motion.button whileTap={{ scale: 0.96 }} disabled={saving} onClick={() => save(true)}
+
+          <motion.button
+            whileTap={{ scale: 0.96 }}
+            disabled={saving}
+            onClick={() => save(true)}
             className="flex items-center gap-1.5 px-4 py-2.5 text-sm font-bold"
-            style={{ background: '#E98A3A', border: BORDER, borderRadius: '6px', boxShadow: SHADOW }}>
+            style={{ background: '#E98A3A', border: BORDER, borderRadius: '6px', boxShadow: '3px 3px 0px #111' }}
+          >
             <Send className="w-4 h-4" /> {saving ? 'Saving…' : 'Publish'}
           </motion.button>
         </div>
