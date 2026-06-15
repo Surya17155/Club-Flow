@@ -27,6 +27,7 @@ import { isSuperAdminUser } from '@/lib/superAdminMode';
 export function PagePreloader() {
   const { user } = useAuth();
   const { activeClub, clubs } = useClub();
+  const clubIdsKey = clubs.map((club) => club.club_id).join('|');
 
   useEffect(() => {
     let toastId: string | number | undefined;
@@ -64,8 +65,9 @@ export function PagePreloader() {
     if (!user) return;
 
     // Critical preloads run immediately so navigation is instant
+    const clubIds = clubIdsKey ? clubIdsKey.split('|') : [];
     const commonRoutes = ['/admin', '/events', '/discover', '/profile', '/settings', '/attendance-history'];
-    commonRoutes.forEach((path) => preloadRouteData(path, { userId: user.id, email: user.email, activeClubId: activeClub?.club_id, clubIds: clubs.map((club) => club.club_id) }));
+    commonRoutes.forEach((path) => preloadRouteData(path, { userId: user.id, email: user.email, activeClubId: activeClub?.club_id, clubIds }));
     preloadAdminStatus(user.id, user.email);
     preloadProfile(user.id);
     preloadPersonalStats(user.id);
@@ -94,7 +96,7 @@ export function PagePreloader() {
       }
     });
     return () => cancelIdle(handle as any);
-  }, [activeClub?.club_id, clubs, user?.id, user?.email]);
+  }, [activeClub?.club_id, clubIdsKey, user?.id, user?.email]);
 
   useEffect(() => {
     if (!user || !activeClub?.club_id) return;

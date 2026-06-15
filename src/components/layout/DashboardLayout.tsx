@@ -1,10 +1,11 @@
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { ArrowLeft, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { MobileBottomNav } from "@/components/mobile/MobileBottomNav";
 import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 import { useDesign } from "@/contexts/DesignContext";
+import { usePreloadedNavigate } from "@/hooks/usePreloadedNavigate";
 
 const pageTitles: Record<string, string> = {
   "/events": "Events",
@@ -26,7 +27,7 @@ interface DashboardLayoutProps {
 }
 
 export function DashboardLayout({ children, showHeader = true }: DashboardLayoutProps) {
-  const navigate = useNavigate();
+  const navigate = usePreloadedNavigate();
   const location = useLocation();
   const isMobile = useIsMobile();
   const { activeDesign } = useDesign();
