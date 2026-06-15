@@ -22,6 +22,7 @@ const DRAWER_ROUTES = [
   '/super-admin',
   '/global-reports',
   '/manage-outsiders',
+  '/forms',
 ] as const;
 
 const shouldShowDrawer = (pathname: string) =>
