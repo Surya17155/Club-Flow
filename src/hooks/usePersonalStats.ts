@@ -36,7 +36,7 @@ export const usePersonalStats = () => {
 
     const fetchStats = async () => {
       const cached = getCachedPersonalStats(user.id);
-      if (cached) setStats(cached);
+      if (cached) { setStats(cached); return; }
       setStats(await preloadPersonalStats(user.id));
     };
 

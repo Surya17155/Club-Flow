@@ -20,7 +20,7 @@ export const useClubStats = (clubId: string | undefined) => {
 
     const fetchStats = async () => {
       const cached = getCachedClubStats(clubId);
-      if (cached) setStats(cached);
+      if (cached) { setStats(cached); return; }
       setStats(await preloadClubStats(clubId));
     };
 
