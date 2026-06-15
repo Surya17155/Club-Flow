@@ -35,10 +35,10 @@ const AssignPowersPage = () => {
 
   useEffect(() => {
     if (!activeClub) return;
-    const fetchMembers = async () => {
+    const fetchMembers = async (force = false) => {
       const cached = getCachedAssignableMembers(activeClub.club_id);
       if (cached) setMembers(cached as ClubMember[]);
-      setMembers(await preloadAssignableMembers(activeClub.club_id, true) as ClubMember[]);
+      setMembers(await preloadAssignableMembers(activeClub.club_id, force) as ClubMember[]);
     };
     fetchMembers();
   }, [activeClub?.club_id]);

@@ -83,11 +83,11 @@ const ManageOutsiders = () => {
     email: '', fullName: '', programme: '', section: '', year: '', rollNo: '', phone: '',
   });
 
-  const fetchOutsiders = async () => {
+  const fetchOutsiders = async (force = false) => {
     const cached = getCachedOutsiders();
     if (cached) setOutsiders(cached);
     try {
-      setOutsiders(await preloadOutsiders(true));
+      setOutsiders(await preloadOutsiders(force));
     } catch (err: any) {
       toast({ title: 'Error', description: err.message || 'Failed to fetch outsiders', variant: 'destructive' });
     }

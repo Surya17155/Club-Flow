@@ -248,10 +248,10 @@ const MemberManagement = ({ clubId, isSuperAdmin = false }: Props) => {
     setAddingSearchUser(false);
   };
 
-  const fetchMembers = async () => {
+  const fetchMembers = async (force = false) => {
     const cached = getCachedClubMembers(clubId);
     if (cached) setMembers(cached as Member[]);
-    setMembers(await preloadClubMembers(clubId, true) as Member[]);
+    setMembers(await preloadClubMembers(clubId, force) as Member[]);
   };
 
   useEffect(() => { fetchMembers(); }, [clubId]);
