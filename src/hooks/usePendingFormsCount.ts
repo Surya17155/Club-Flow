@@ -45,18 +45,11 @@ export function usePendingFormsCount() {
     window.addEventListener('focus', onFocus);
     window.addEventListener('formsChanged', onFocus);
 
-    const channel = supabase
-      .channel(`pending-forms-${user.id}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'forms' }, () => load())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'form_responses', filter: `user_id=eq.${user.id}` }, () => load())
-      .subscribe();
-
     return () => {
       cancelled = true;
       clearInterval(interval);
       window.removeEventListener('focus', onFocus);
       window.removeEventListener('formsChanged', onFocus);
-      supabase.removeChannel(channel);
     };
 
   }, [user?.id]);
