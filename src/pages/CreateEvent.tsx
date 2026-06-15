@@ -644,7 +644,7 @@ const CreateEvent = () => {
           </div>
         )}
 
-        </main>
+
 
         {/* Publish Button */}
         <div className="flex justify-center mt-8 pb-8">
