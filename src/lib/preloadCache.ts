@@ -92,6 +92,10 @@ export interface CachedUpcomingEvent {
   end_time: string | null;
 }
 
+const emptyPersonalStats: CachedPersonalStats = { clubCount: 0, eventsAttended: 0, totalEventsAttendance: 0, attendanceRate: 0, recentAttendance: [], attendanceRecords: [] };
+const emptyClubStats: CachedClubStats = { totalMembers: 0, totalEvents: 0, avgAttendanceRate: 0, chartData: [] };
+const emptySuperAdminStats = { totalClubs: 0, globalMembers: 0, totalEvents: 0, allEvents: [], clubs: [], members: [], upcomingEvents: [], growthData: [] };
+
 const formatUpcomingEvent = (event: any): CachedUpcomingEvent => {
   const start = new Date(event.event_date);
   const end = event.end_date ? new Date(event.end_date) : null;
@@ -148,14 +152,14 @@ export const preloadUserClubs = (userId: string, force = false) => cached(userCl
     role: m.role,
     logo_url: m.clubs?.logo_url ?? null,
   }));
-}, force);
+}, force, []);
 
 export const getCachedProfile = (userId: string) => read(profileCache, userId);
 export const setCachedProfile = (userId: string, profile: any) => profileCache.set(userId, { data: profile, fetchedAt: Date.now() });
 export const preloadProfile = (userId: string, force = false) => cached(profileCache, userId, async () => {
   const { data } = await db.from('profiles').select('*').eq('user_id', userId).maybeSingle();
   return data ?? null;
-}, force);
+}, force, null);
 
 export const getCachedPersonalStats = (userId: string) => read(personalStatsCache, userId);
 export const preloadPersonalStats = (userId: string, force = false) => cached(personalStatsCache, userId, async () => {
@@ -187,7 +191,7 @@ export const preloadPersonalStats = (userId: string, force = false) => cached(pe
         attendance_given: a.events?.attendance_given ?? false,
       })),
   };
-}, force);
+}, force, emptyPersonalStats);
 
 export const getCachedClubStats = (clubId?: string) => clubId ? read(clubStatsCache, clubId) : undefined;
 export const preloadClubStats = (clubId: string, force = false) => cached(clubStatsCache, clubId, async () => {
@@ -218,14 +222,14 @@ export const preloadClubStats = (clubId: string, force = false) => cached(clubSt
     }
   }
   return { totalMembers, totalEvents: events.length, avgAttendanceRate, chartData };
-}, force);
+}, force, emptyClubStats);
 
 const powersKey = (userId: string, clubId: string) => `${userId}:${clubId}`;
 export const getCachedDelegatedPowers = (userId?: string, clubId?: string) => userId && clubId ? read(delegatedPowersCache, powersKey(userId, clubId)) : undefined;
 export const preloadDelegatedPowers = (userId: string, clubId: string, force = false) => cached(delegatedPowersCache, powersKey(userId, clubId), async () => {
   const { data, error } = await db.from('delegated_powers').select('*').eq('club_id', clubId);
   return !error && data ? data : [];
-}, force);
+}, force, []);
 
 export const getCachedSuperAdminStats = () => read(superAdminStatsCache, 'all');
 export const preloadSuperAdminStats = (force = false) => cached(superAdminStatsCache, 'all', async () => {
@@ -274,7 +278,7 @@ export const preloadSuperAdminStats = (force = false) => cached(superAdminStatsC
     upcomingEvents: eventsList.filter((e: any) => e.event_date >= now).sort((a: any, b: any) => new Date(a.event_date).getTime() - new Date(b.event_date).getTime()).slice(0, 20).map((e: any) => ({ id: e.id, name: e.name, event_date: e.event_date, end_date: e.end_date, club_name: clubMap.get(e.club_id) || '', club_id: e.club_id, participant_count: participantCountMap.get(e.id) || 0, category: e.category, event_type: e.event_type, description: e.description })),
     growthData: monthNames.map((month, i) => ({ month, events: eventsList.filter((e: any) => { const d = new Date(e.event_date); return d.getFullYear() === currentYear && d.getMonth() === i; }).length, members: Math.round(membersList.length / 12) })),
   };
-}, force);
+}, force, emptySuperAdminStats);
 
 const eventsKey = (viewMode: 'personal' | 'club', clubId?: string | null) => `${viewMode}:${viewMode === 'club' ? clubId || 'all' : 'all'}`;
 export const getCachedEvents = (viewMode: 'personal' | 'club', clubId?: string | null) => read(eventsCache, eventsKey(viewMode, clubId));
@@ -290,7 +294,7 @@ export const preloadEvents = (viewMode: 'personal' | 'club', clubId?: string | n
     (attData ?? []).forEach((a: any) => { attendanceCounts[a.event_id] = (attendanceCounts[a.event_id] || 0) + 1; });
   }
   return { events, attendanceCounts };
-}, force);
+}, force, { events: [], attendanceCounts: {} });
 
 export const getCachedDiscoverClubs = (userId: string) => read(discoverCache, userId);
 export const preloadDiscoverClubs = (userId: string, force = false) => cached(discoverCache, userId, async () => {
@@ -307,21 +311,21 @@ export const preloadDiscoverClubs = (userId: string, force = false) => cached(di
     myClubIds: (myMemberships ?? []).map((m: any) => m.club_id),
     myRequests: (requests ?? []).map((r: any) => [r.club_id, r.status]),
   };
-}, force);
+}, force, { clubs: [], myClubIds: [], myRequests: [] });
 
 export const getCachedOutsiders = () => read(outsidersCache, 'all');
 export const preloadOutsiders = (force = false) => cached(outsidersCache, 'all', async () => {
   const { data, error } = await supabase.functions.invoke('manage-outsider', { method: 'GET' });
   if (error) throw error;
   return data?.outsiders || [];
-}, force);
+}, force, []);
 
 export const getCachedClubSettings = (clubId?: string) => clubId ? read(clubSettingsCache, clubId) : undefined;
 export const setCachedClubSettings = (clubId: string, data: any) => clubSettingsCache.set(clubId, { data, fetchedAt: Date.now() });
 export const preloadClubSettings = (clubId: string, force = false) => cached(clubSettingsCache, clubId, async () => {
   const { data } = await db.from('clubs').select('name, tagline, about, category, logo_url, social_instagram, social_linkedin').eq('id', clubId).maybeSingle();
   return data ?? null;
-}, force);
+}, force, []);
 
 export const getCachedUpcomingEvents = () => read(upcomingEventsCache, 'upcoming');
 export const preloadUpcomingEvents = (force = false) => cached(upcomingEventsCache, 'upcoming', async () => {
@@ -333,7 +337,7 @@ export const preloadUpcomingEvents = (force = false) => cached(upcomingEventsCac
     .order('event_date', { ascending: true })
     .limit(10);
   return (data ?? []).map(formatUpcomingEvent);
-}, force);
+}, force, []);
 
 export const getCachedClubMembers = (clubId: string) => read(clubMembersCache, clubId);
 export const preloadClubMembers = (clubId: string, force = false) => cached(clubMembersCache, clubId, async () => {
@@ -350,7 +354,7 @@ export const preloadClubMembers = (clubId: string, force = false) => cached(club
     joined_at: m.joined_at,
     ...((profileMap.get(m.user_id) as Record<string, any> | undefined) ?? {}),
   }));
-}, force);
+}, force, []);
 
 export const getCachedJoinRequests = (clubId: string) => read(joinRequestsCache, clubId);
 export const preloadJoinRequests = (clubId: string, force = false) => cached(joinRequestsCache, clubId, async () => {
