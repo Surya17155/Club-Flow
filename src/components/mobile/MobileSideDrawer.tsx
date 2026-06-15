@@ -36,11 +36,11 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
   );
   useEffect(() => {
     if (!isSuperAdmin) return;
-    const sync = () => setIsSuperAdminMode(isSuperAdminLockActive());
+    const sync = () => setIsSuperAdminMode(getSuperAdminModeForUser(user?.email));
     window.addEventListener(SUPER_ADMIN_MODE_EVENT, sync);
     sync();
     return () => window.removeEventListener(SUPER_ADMIN_MODE_EVENT, sync);
-  }, [isSuperAdmin, location.pathname]);
+  }, [isSuperAdmin, location.pathname, user?.email]);
 
   const initials = (profile?.full_name || 'U')
     .split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);

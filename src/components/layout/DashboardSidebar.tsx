@@ -177,18 +177,18 @@ export function DashboardSidebar() {
     () => getSuperAdminModeForUser(user?.email)
   );
   useEffect(() => {
-    const sync = () => setIsSuperAdminMode(isSuperAdminLockActive());
+    const sync = () => setIsSuperAdminMode(getSuperAdminModeForUser(user?.email));
     window.addEventListener(SUPER_ADMIN_MODE_EVENT, sync);
     window.addEventListener('storage', sync);
     return () => {
       window.removeEventListener(SUPER_ADMIN_MODE_EVENT, sync);
       window.removeEventListener('storage', sync);
     };
-  }, []);
+  }, [user?.email]);
   // Re-sync when route changes (in case the guard armed/disarmed the lock).
   useEffect(() => {
-    setIsSuperAdminMode(isSuperAdminLockActive());
-  }, [location.pathname]);
+    setIsSuperAdminMode(getSuperAdminModeForUser(user?.email));
+  }, [location.pathname, user?.email]);
 
   // Determine view mode from localStorage, listen for changes
   const [viewMode, setViewModeLocal] = useState<'personal' | 'club'>(

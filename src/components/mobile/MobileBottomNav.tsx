@@ -53,7 +53,7 @@ function MobileBottomNavInner() {
   const [isSuperAdminMode, setIsSuperAdminMode] = useState(() => getSuperAdminModeForUser(user?.email));
 
   useEffect(() => {
-    const syncSuperAdminMode = () => setIsSuperAdminMode(isSuperAdminLockActive());
+    const syncSuperAdminMode = () => setIsSuperAdminMode(getSuperAdminModeForUser(user?.email));
     syncSuperAdminMode();
     window.addEventListener(SUPER_ADMIN_MODE_EVENT, syncSuperAdminMode);
     window.addEventListener('storage', syncSuperAdminMode);
@@ -61,7 +61,7 @@ function MobileBottomNavInner() {
       window.removeEventListener(SUPER_ADMIN_MODE_EVENT, syncSuperAdminMode);
       window.removeEventListener('storage', syncSuperAdminMode);
     };
-  }, [location.pathname]);
+  }, [location.pathname, user?.email]);
 
   let canCreateEvent = false;
   try {
