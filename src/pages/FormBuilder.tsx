@@ -128,8 +128,8 @@ export default function FormBuilder() {
         description: description.trim() || null,
         deadline: deadline ? new Date(deadline).toISOString() : null,
         allow_multiple: allowMultiple,
-        anonymous,
-        is_public: false,
+        anonymous: false,
+        is_public: isPublic,
         is_published: publish ?? isPublished,
       } as any;
 
