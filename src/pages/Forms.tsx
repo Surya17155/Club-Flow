@@ -196,7 +196,7 @@ export default function Forms() {
     <div style={{ background: BG, fontFamily: "'Space Grotesk', sans-serif", minHeight: '100vh' }} className="px-4 py-6 md:px-8">
       <div className="max-w-5xl mx-auto">
 
-        <div className="flex items-start justify-between flex-wrap gap-4 mb-6">
+        <div className="flex flex-col items-center text-center gap-4 mb-6">
           <div>
             <h1 className="text-3xl md:text-4xl font-black" style={{ color: '#111', letterSpacing: '-0.02em' }}>
               {isClubMode ? 'Manage Forms' : 'My Forms'}
