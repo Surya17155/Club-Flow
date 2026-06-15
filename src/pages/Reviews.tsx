@@ -189,10 +189,6 @@ export default function Reviews() {
               {isClubMode ? 'Only club post holders can view reviews.' : 'Switch to Club Mode to view event reviews.'}
             </p>
           </div>
-        ) : loading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="w-8 h-8 border-3 border-[#E98A3A] border-t-transparent rounded-full animate-spin" />
-          </div>
         ) : events.length === 0 ? (
           <div className="text-center py-20">
             <MessageSquare className="w-12 h-12 mx-auto mb-3" style={{ color: '#ccc' }} />

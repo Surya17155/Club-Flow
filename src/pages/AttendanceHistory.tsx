@@ -47,11 +47,7 @@ export default function AttendanceHistory() {
 
       {/* Content */}
       <div className="px-4 pb-28 space-y-3">
-        {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="w-8 h-8 border-3 border-[#E98A3A] border-t-transparent rounded-full animate-spin" />
-          </div>
-        ) : records.length === 0 ? (
+        {records.length === 0 ? (
           <div className="text-center py-20">
             <Calendar className="w-12 h-12 mx-auto mb-3" style={{ color: '#ccc' }} />
             <p className="text-sm font-bold" style={{ color: '#888', fontFamily: "'Space Grotesk', sans-serif" }}>

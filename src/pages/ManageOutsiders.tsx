@@ -234,11 +234,7 @@ const ManageOutsiders = () => {
 
       {/* Content */}
       <div className={`px-5 pt-5 pb-8 ${isMobile ? 'pb-28' : ''}`}>
-        {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="w-10 h-10 border-[3px] rounded-full animate-spin" style={{ borderColor: `${NB.border}40`, borderTopColor: NB.orange }} />
-          </div>
-        ) : outsiders.length === 0 ? (
+        {outsiders.length === 0 ? (
           <div
             className="flex flex-col items-center justify-center py-16 text-center border-2 mt-2"
             style={{ background: NB.card, borderColor: NB.border, borderRadius: 14, boxShadow: `6px 6px 0 0 ${NB.border}` }}

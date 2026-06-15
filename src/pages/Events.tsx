@@ -344,11 +344,7 @@ const Events = () => {
           ))}
         </div>
 
-        {loading ? (
-          <div className="flex justify-center py-12">
-            <div className="w-8 h-8 border-[3px] border-[#E98A3A]/30 border-t-[#E98A3A] rounded-full animate-spin" />
-          </div>
-        ) : filteredEvents.length === 0 ? (
+        {filteredEvents.length === 0 ? (
           <p className="text-center py-12" style={{ color: '#888', fontFamily: isNeo ? NEO.font : undefined }}>No events found.</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">

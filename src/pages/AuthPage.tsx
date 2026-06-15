@@ -36,15 +36,7 @@ const AuthPage = () => {
     if (m === "login" || m === "signup") setMode(m);
   }, [searchParams]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: "#F4EFE7" }}>
-        <div className="w-8 h-8 border-3 border-[#E98A3A] border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  if (user) return <Navigate to="/dashboard" replace />;
+  if (!loading && user) return <Navigate to="/dashboard" replace />;
 
   const getRedirectPath = () => {
     const fromParam = searchParams.get("redirect");
