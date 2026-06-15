@@ -62,7 +62,6 @@ export default function Reviews() {
   const { activeClub } = useClub();
   const isMobile = useIsMobile();
   const [events, setEvents] = useState<EventWithReviews[]>([]);
-  const [loading, setLoading] = useState(true);
   const [expandedEventId, setExpandedEventId] = useState<string | null>(null);
   const [profileUser, setProfileUser] = useState<ReviewData | null>(null);
 
@@ -75,8 +74,7 @@ export default function Reviews() {
   const canViewReviews = isClubMode && isPostHolder;
 
   const fetchReviews = useCallback(async () => {
-    if (!user || !canViewReviews || !activeClub) { setLoading(false); return; }
-    setLoading(true);
+    if (!user || !canViewReviews || !activeClub) return;
 
     // Fetch past events for the active club
     const { data: eventsData } = await supabase
@@ -86,7 +84,7 @@ export default function Reviews() {
       .lt('event_date', new Date().toISOString())
       .order('event_date', { ascending: false });
 
-    if (!eventsData || eventsData.length === 0) { setEvents([]); setLoading(false); return; }
+    if (!eventsData || eventsData.length === 0) { setEvents([]); return; }
 
     // Fetch all feedback for these events
     const eventIds = eventsData.map(e => e.id);
@@ -107,7 +105,6 @@ export default function Reviews() {
         avg_rating: 0,
         review_count: 0,
       })));
-      setLoading(false);
       return;
     }
 
@@ -156,7 +153,6 @@ export default function Reviews() {
     });
 
     setEvents(eventsWithReviews);
-    setLoading(false);
   }, [user?.id, activeClub?.club_id, canViewReviews]);
 
   useEffect(() => { fetchReviews(); }, [fetchReviews]);
