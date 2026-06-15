@@ -26,15 +26,13 @@ export const useDelegatedPowers = (overrideClubId?: string) => {
   const { activeClub } = useClub();
   const effectiveClubId = overrideClubId || activeClub?.club_id;
   const [powers, setPowers] = useState<DelegatedPower[]>(() => getCachedDelegatedPowers(user?.id, effectiveClubId) ?? []);
-  const [loading, setLoading] = useState(() => user && effectiveClubId ? !getCachedDelegatedPowers(user.id, effectiveClubId) : false);
+  const [loading, setLoading] = useState(false);
 
   const fetchPowers = useCallback(async (force = false) => {
-    if (!user || !effectiveClubId) { setPowers([]); setLoading(false); return; }
+    if (!user || !effectiveClubId) { setPowers([]); return; }
     const cached = getCachedDelegatedPowers(user.id, effectiveClubId);
     if (cached && !force) setPowers(cached as DelegatedPower[]);
-    else setLoading(true);
     setPowers(await preloadDelegatedPowers(user.id, effectiveClubId, force) as DelegatedPower[]);
-    setLoading(false);
   }, [user?.id, effectiveClubId]);
 
   useEffect(() => { fetchPowers(); }, [fetchPowers]);

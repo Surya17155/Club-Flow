@@ -13,17 +13,15 @@ export const useClubStats = (clubId: string | undefined) => {
     totalMembers: 0, totalEvents: 0, avgAttendanceRate: 0, chartData: [],
   };
   const [stats, setStats] = useState<ClubStats>(() => getCachedClubStats(clubId) ?? defaultStats);
-  const [loading, setLoading] = useState(() => clubId ? !getCachedClubStats(clubId) : false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!clubId) { setLoading(false); return; }
+    if (!clubId) return;
 
     const fetchStats = async () => {
       const cached = getCachedClubStats(clubId);
       if (cached) setStats(cached);
-      else setLoading(true);
       setStats(await preloadClubStats(clubId));
-      setLoading(false);
     };
 
     fetchStats();

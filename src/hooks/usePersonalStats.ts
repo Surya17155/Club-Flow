@@ -29,17 +29,15 @@ export const usePersonalStats = () => {
     clubCount: 0, eventsAttended: 0, totalEventsAttendance: 0, attendanceRate: 0, recentAttendance: [], attendanceRecords: [],
   };
   const [stats, setStats] = useState<PersonalStats>(() => user ? getCachedPersonalStats(user.id) ?? defaultStats : defaultStats);
-  const [loading, setLoading] = useState(() => user ? !getCachedPersonalStats(user.id) : false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!user) { setLoading(false); return; }
+    if (!user) return;
 
     const fetchStats = async () => {
       const cached = getCachedPersonalStats(user.id);
       if (cached) setStats(cached);
-      else setLoading(true);
       setStats(await preloadPersonalStats(user.id));
-      setLoading(false);
     };
 
     fetchStats();
