@@ -1,16 +1,17 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { Plus, FileText, Edit3, BarChart3, Trash2, ExternalLink, Clock, User as UserIcon, Building2, CalendarClock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useClub } from '@/contexts/ClubContext';
 import { toast } from 'sonner';
+import { preloadRoute } from '@/lib/routePreload';
 
 const BG = '#F4EFE7';
 const CARD = '#FFFDF5';
 const BORDER = '2px solid #111';
 const SHADOW = '4px 4px 0px #111';
+const PAGE_SIZE = 24;
 
 interface FormRow {
   id: string;
@@ -55,6 +56,8 @@ export default function Forms() {
   const [creatorNames, setCreatorNames] = useState<Record<string, string>>({});
   const [questionCounts, setQuestionCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(0);
+  const requestSeq = useRef(0);
   const clubIdsKey = clubs.map((club) => club.club_id).join(',');
 
   const isPresidentOfActive = useMemo(
@@ -62,12 +65,14 @@ export default function Forms() {
     [clubs, activeClub?.club_id]
   );
 
-  const load = async () => {
+  const load = useCallback(async () => {
+    const seq = ++requestSeq.current;
     setLoading(true);
     let query = supabase
       .from('forms')
       .select('id, title, description, club_id, created_by, is_published, is_public, accepting_responses, deadline, created_at')
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .range(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE - 1);
     if (tab === 'manage') {
       if (!activeClub?.club_id) { setForms([]); setLoading(false); return; }
       query = query.eq('club_id', activeClub.club_id);
@@ -77,6 +82,7 @@ export default function Forms() {
       query = query.eq('is_published', true).in('club_id', clubIds);
     }
     const { data, error } = await query;
+    if (seq !== requestSeq.current) return;
     if (error) { toast.error(error.message); setLoading(false); return; }
     const rows = (data as FormRow[]) || [];
     setForms(rows);
@@ -94,6 +100,7 @@ export default function Forms() {
           ? supabase.from('form_responses').select('form_id, submitted_at').eq('user_id', user.id).in('form_id', formIds)
           : Promise.resolve({ data: [] as any[] }),
       ]);
+      if (seq !== requestSeq.current) return;
 
       const cn: Record<string, string> = {};
       (clubsRes.data ?? []).forEach((c: any) => { cn[c.id] = c.name; });
@@ -114,9 +121,10 @@ export default function Forms() {
       setClubNames({}); setCreatorNames({}); setQuestionCounts({}); setSubmittedMap({});
     }
     setLoading(false);
-  };
+  }, [activeClub?.club_id, clubIdsKey, page, tab, user?.id]);
 
-  useEffect(() => { load(); /* eslint-disable-next-line */ }, [tab, activeClub?.club_id, user?.id, clubIdsKey]);
+  useEffect(() => { setPage(0); }, [tab, activeClub?.club_id, clubIdsKey]);
+  useEffect(() => { load(); }, [load]);
 
   // Refresh on focus + on app-wide form mutations (avoids realtime overhead)
   useEffect(() => {
@@ -128,10 +136,10 @@ export default function Forms() {
       window.removeEventListener('formsChanged', onRefresh);
     };
     // eslint-disable-next-line
-  }, [user?.id, tab, activeClub?.club_id, clubIdsKey]);
+  }, [load]);
 
 
-  const now = Date.now();
+  const now = useMemo(() => Date.now(), [forms]);
 
   const classify = (f: FormRow): AvailableStatus => {
     const submitted = !!submittedMap[f.id];
