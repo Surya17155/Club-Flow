@@ -972,7 +972,7 @@ const SuperAdminDashboard = () => {
                 <Icon className="w-6 h-6" style={{ color: NB.border }} />
               </div>
               <div>
-                <h3 className="text-3xl font-black" style={{ fontFamily: NB.font }}>{loading ? '...' : stat.value}</h3>
+                <h3 className="text-3xl font-black" style={{ fontFamily: NB.font }}>{stat.value}</h3>
                 <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#888' }}>{stat.label}</p>
               </div>
             </div>
@@ -993,9 +993,7 @@ const SuperAdminDashboard = () => {
             </button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 overflow-y-auto pr-2 flex-1" style={{ scrollbarWidth: 'none' }}>
-            {loading ?
-            <p className="col-span-3 text-center py-8" style={{ color: '#888' }}>Loading clubs...</p> :
-            filteredClubs.length === 0 ?
+            {filteredClubs.length === 0 ?
             <p className="col-span-3 text-center py-8" style={{ color: '#888' }}>No clubs found</p> :
             filteredClubs.map((club) =>
             <div key={club.id} className="p-4 relative" style={{ background: NB.bg, border: `2px solid ${NB.border}`, borderRadius: '10px', boxShadow: `3px 3px 0px ${NB.border}` }}>
@@ -1048,9 +1046,7 @@ const SuperAdminDashboard = () => {
       <div className="p-5" style={{ background: NB.card, border: `2px solid ${NB.border}`, borderRadius: '12px', boxShadow: `4px 4px 0px ${NB.border}` }}>
         <h2 className="text-lg font-black mb-4" style={{ fontFamily: NB.font }}>Global Event Feed</h2>
         <div className="flex gap-6 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
-          {loading ?
-          <p style={{ color: '#888' }} className="py-4">Loading events...</p> :
-          upcomingEvents.length === 0 ?
+          {upcomingEvents.length === 0 ?
           <p style={{ color: '#888' }} className="py-4">No upcoming events</p> :
           upcomingEvents.map((event) => {
             const d = new Date(event.event_date);
