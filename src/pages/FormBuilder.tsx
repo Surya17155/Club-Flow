@@ -50,6 +50,7 @@ export default function FormBuilder() {
       setDeadline(form.deadline ? new Date(form.deadline).toISOString().slice(0, 16) : '');
       setAllowMultiple(form.allow_multiple);
       setAnonymous(form.anonymous);
+      setIsPublic((form as any).is_public ?? false);
       setIsPublished(form.is_published);
 
       const { data: qs } = await supabase.from('form_questions').select('*').eq('form_id', id!).order('position');
