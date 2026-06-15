@@ -39,21 +39,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(initialSession?.user ?? null);
   const [session, setSession] = useState<Session | null>(initialSession);
   const [loading, setLoading] = useState(!initialSession);
-  const initialSessionLoaded = useRef(!!initialSession);
+  const initialSessionLoaded = useRef(false);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (initialSessionLoaded.current) setLoading(false);
-    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      // Ignore the listener's INITIAL_SESSION until getSession() has verified storage.
+      // This prevents a transient null event from clearing a hydrated user and
+      // sending protected routes back to the landing page.
+      if (!initialSessionLoaded.current && event === 'INITIAL_SESSION') return;
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
+      initialSessionLoaded.current = true;
       setSession(session);
       setUser(session?.user ?? null);
-      initialSessionLoaded.current = true;
       setLoading(false);
     });
+
+    supabase.auth.getSession()
+      .then(({ data: { session } }) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+      })
+      .catch(() => {
+        setSession(null);
+        setUser(null);
+      })
+      .finally(() => {
+        initialSessionLoaded.current = true;
+        setLoading(false);
+      });
 
     return () => subscription.unsubscribe();
   }, []);
@@ -84,6 +97,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     if (signInError) throw signInError;
 
+    setSession(signedInData.session);
+    setUser(signedInData.user ?? data.user ?? null);
+
     return {
       ...data,
       session: signedInData.session,
@@ -97,11 +113,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       password,
     });
     if (error) throw error;
+    setSession(data.session);
+    setUser(data.user ?? null);
+    setLoading(false);
     return data;
   };
 
   const signOut = async () => {
     await supabase.auth.signOut();
+    setSession(null);
+    setUser(null);
+    setLoading(false);
   };
 
   const resetPassword = async (email: string) => {
