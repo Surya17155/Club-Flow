@@ -10,6 +10,61 @@ type CacheEntry<T> = {
   fetchedAt?: number;
 };
 
+export type CacheStatusSnapshot = {
+  active: number;
+  completed: number;
+  total: number;
+  lastLabel: string;
+  lastSource: 'idle' | 'warmed-cache' | 'fresh-fetch';
+  updatedAt: number;
+};
+
+let cacheStatus: CacheStatusSnapshot = {
+  active: 0,
+  completed: 0,
+  total: 0,
+  lastLabel: 'Idle',
+  lastSource: 'idle',
+  updatedAt: Date.now(),
+};
+
+const cacheStatusListeners = new Set<(snapshot: CacheStatusSnapshot) => void>();
+const emitCacheStatus = () => cacheStatusListeners.forEach((listener) => listener(cacheStatus));
+const setCacheStatus = (updates: Partial<CacheStatusSnapshot>) => {
+  cacheStatus = { ...cacheStatus, ...updates, updatedAt: Date.now() };
+  emitCacheStatus();
+};
+
+export const getCacheStatusSnapshot = () => cacheStatus;
+export const subscribeCacheStatus = (listener: (snapshot: CacheStatusSnapshot) => void) => {
+  cacheStatusListeners.add(listener);
+  listener(cacheStatus);
+  return () => cacheStatusListeners.delete(listener);
+};
+
+const noteCacheHit = (label: string) => {
+  setCacheStatus({ lastLabel: label, lastSource: 'warmed-cache' });
+};
+
+const beginFreshFetch = (label: string) => {
+  setCacheStatus({
+    active: cacheStatus.active + 1,
+    completed: cacheStatus.active === 0 ? 0 : cacheStatus.completed,
+    total: cacheStatus.active === 0 ? 1 : cacheStatus.total + 1,
+    lastLabel: label,
+    lastSource: 'fresh-fetch',
+  });
+};
+
+const finishFreshFetch = (label: string) => {
+  setCacheStatus({
+    active: Math.max(0, cacheStatus.active - 1),
+    completed: cacheStatus.completed + 1,
+    lastLabel: label,
+    lastSource: 'fresh-fetch',
+  });
+};
+
 const isFresh = <T,>(entry?: CacheEntry<T>) =>
   !!entry && 'data' in entry && !!entry.fetchedAt && Date.now() - entry.fetchedAt < CACHE_TTL;
 
@@ -20,9 +75,13 @@ const read = <T,>(cache: Map<string, CacheEntry<T>>, key: string) => {
 
 const cached = <T,>(cache: Map<string, CacheEntry<T>>, key: string, loader: () => Promise<T>, force = false, fallback?: T) => {
   const entry = cache.get(key);
-  if (!force && isFresh(entry)) return Promise.resolve(entry!.data as T);
+  if (!force && isFresh(entry)) {
+    noteCacheHit(key);
+    return Promise.resolve(entry!.data as T);
+  }
   if (entry?.promise) return entry.promise;
 
+  beginFreshFetch(key);
   const promise = loader().then((data) => {
     cache.set(key, { data, fetchedAt: Date.now() });
     return data;
@@ -33,6 +92,8 @@ const cached = <T,>(cache: Map<string, CacheEntry<T>>, key: string, loader: () =
       return fallback;
     }
     throw error;
+  }).finally(() => {
+    finishFreshFetch(key);
   });
 
   cache.set(key, { ...entry, promise });
