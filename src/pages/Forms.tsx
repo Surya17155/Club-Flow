@@ -178,13 +178,6 @@ export default function Forms() {
   return (
     <div style={{ background: BG, fontFamily: "'Space Grotesk', sans-serif", minHeight: '100vh' }} className="px-4 py-6 md:px-8">
       <div className="max-w-5xl mx-auto">
-        <button
-          onClick={() => navigate(-1)}
-          className="flex items-center gap-2 px-3 py-2 text-sm font-bold mb-6"
-          style={{ background: CARD, color: '#111', border: BORDER, borderRadius: '6px', boxShadow: '3px 3px 0px #111' }}
-        >
-          <ArrowLeft className="w-4 h-4" /> Back
-        </button>
 
         <div className="flex items-start justify-between flex-wrap gap-4 mb-6">
           <div>
