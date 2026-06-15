@@ -539,6 +539,41 @@ export type Database = {
           },
         ]
       }
+      form_views: {
+        Row: {
+          form_id: string
+          id: string
+          started: boolean
+          started_at: string | null
+          user_id: string
+          viewed_at: string
+        }
+        Insert: {
+          form_id: string
+          id?: string
+          started?: boolean
+          started_at?: string | null
+          user_id: string
+          viewed_at?: string
+        }
+        Update: {
+          form_id?: string
+          id?: string
+          started?: boolean
+          started_at?: string | null
+          user_id?: string
+          viewed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "form_views_form_id_fkey"
+            columns: ["form_id"]
+            isOneToOne: false
+            referencedRelation: "forms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       forms: {
         Row: {
           accepting_responses: boolean

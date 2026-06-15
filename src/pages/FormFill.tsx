@@ -57,11 +57,28 @@ export default function FormFill() {
         const { data: existing } = await supabase.from('form_responses').select('id').eq('form_id', id).eq('user_id', user.id).maybeSingle();
         if (existing) setAlreadySubmitted(true);
       }
+      // Track view (idempotent)
+      if (user) {
+        await supabase.from('form_views').upsert(
+          { form_id: id, user_id: user.id, viewed_at: new Date().toISOString() },
+          { onConflict: 'form_id,user_id', ignoreDuplicates: false }
+        );
+      }
       setLoading(false);
     })();
   }, [id, user?.id]);
 
-  const setA = (qid: string, v: any) => setAnswers((p) => ({ ...p, [qid]: v }));
+  const setA = (qid: string, v: any) => {
+    setAnswers((p) => {
+      // Mark "started" on first answer change
+      if (Object.keys(p).length === 0 && user && id) {
+        supabase.from('form_views').update({ started: true, started_at: new Date().toISOString() })
+          .eq('form_id', id).eq('user_id', user.id).then(() => {});
+      }
+      return { ...p, [qid]: v };
+    });
+  };
+
 
   const submit = async () => {
     if (!user || !form || !id) return;

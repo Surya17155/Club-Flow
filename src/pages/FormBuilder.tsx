@@ -40,6 +40,8 @@ export default function FormBuilder() {
   const [questions, setQuestions] = useState<DraftQuestion[]>([]);
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
+  const [confirmPublish, setConfirmPublish] = useState(false);
+
 
   useEffect(() => {
     if (!isEdit) return;
@@ -157,9 +159,14 @@ export default function FormBuilder() {
         if (error) throw error;
       }
 
-      toast.success(publish ? 'Form published!' : 'Saved');
+      if (publish) {
+        toast.success('✓ Form Published Successfully', { description: 'The form is now visible to eligible club members.' });
+      } else {
+        toast.success('Saved');
+      }
       window.dispatchEvent(new Event('formsChanged'));
       navigate('/forms');
+
 
     } catch (e: any) {
       toast.error(e.message ?? 'Save failed');
@@ -345,7 +352,7 @@ export default function FormBuilder() {
           <motion.button
             whileTap={{ scale: 0.96 }}
             disabled={saving}
-            onClick={() => save(true)}
+            onClick={() => setConfirmPublish(true)}
             className="flex items-center gap-1.5 px-4 py-2.5 text-sm font-bold"
             style={{ background: '#E98A3A', border: BORDER, borderRadius: '6px', boxShadow: '3px 3px 0px #111' }}
           >
@@ -353,9 +360,49 @@ export default function FormBuilder() {
           </motion.button>
         </div>
       </div>
+
+      {confirmPublish && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center px-4"
+          style={{ background: 'rgba(0,0,0,0.45)' }}
+          onClick={() => !saving && setConfirmPublish(false)}
+        >
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-md p-5"
+            style={{ background: CARD, border: BORDER, borderRadius: '10px', boxShadow: SHADOW }}
+          >
+            <h3 className="text-xl font-black mb-2">Publish Form?</h3>
+            <p className="text-sm mb-5" style={{ color: '#555' }}>
+              This form will become available to all eligible club members immediately.
+            </p>
+            <div className="flex justify-end gap-2">
+              <button
+                disabled={saving}
+                onClick={() => setConfirmPublish(false)}
+                className="px-4 py-2 text-sm font-bold"
+                style={{ background: CARD, border: BORDER, borderRadius: '6px', boxShadow: '3px 3px 0px #111' }}
+              >
+                Cancel
+              </button>
+              <button
+                disabled={saving}
+                onClick={async () => { await save(true); setConfirmPublish(false); }}
+                className="px-4 py-2 text-sm font-bold"
+                style={{ background: '#E98A3A', border: BORDER, borderRadius: '6px', boxShadow: '3px 3px 0px #111' }}
+              >
+                {saving ? 'Publishing…' : 'Publish Form'}
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }
+
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (

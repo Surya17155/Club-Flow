@@ -112,6 +112,19 @@ export default function Forms() {
 
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [tab, activeClub?.club_id, user?.id]);
 
+  // Realtime: react to new/published forms and new responses anywhere
+  useEffect(() => {
+    if (!user) return;
+    const channel = supabase
+      .channel(`forms-page-${user.id}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'forms' }, () => load())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'form_responses', filter: `user_id=eq.${user.id}` }, () => load())
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+    // eslint-disable-next-line
+  }, [user?.id, tab, activeClub?.club_id]);
+
+
   const now = Date.now();
 
   const classify = (f: FormRow): AvailableStatus => {

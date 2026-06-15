@@ -30,11 +30,14 @@ export default function FormResponses() {
   const [answers, setAnswers] = useState<AnswerRow[]>([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
+  const [assigned, setAssigned] = useState(0);
+  const [viewed, setViewed] = useState(0);
+  const [started, setStarted] = useState(0);
 
   const load = async () => {
     if (!id) return;
     setLoading(true);
-    const { data: f } = await supabase.from('forms').select('title').eq('id', id).maybeSingle();
+    const { data: f } = await supabase.from('forms').select('title, club_id, is_public').eq('id', id).maybeSingle();
     setTitle(f?.title ?? 'Form');
     const { data: qs } = await supabase.from('form_questions').select('*').eq('form_id', id).order('position');
     setQuestions((qs ?? []).map((q: any) => ({
@@ -48,10 +51,24 @@ export default function FormResponses() {
       const { data: ans } = await supabase.from('form_answers').select('*').in('response_id', rs.map((r: any) => r.id));
       setAnswers((ans as AnswerRow[]) ?? []);
     } else setAnswers([]);
+
+    // Analytics
+    if (f?.club_id) {
+      const { count: memberCount } = await supabase
+        .from('club_members')
+        .select('user_id', { count: 'exact', head: true })
+        .eq('club_id', f.club_id);
+      setAssigned(memberCount ?? 0);
+    }
+    const { data: views } = await supabase.from('form_views').select('user_id, started').eq('form_id', id);
+    setViewed((views ?? []).length);
+    setStarted((views ?? []).filter((v: any) => v.started).length);
+
     setLoading(false);
   };
 
   useEffect(() => { load(); }, [id]);
+
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -157,6 +174,24 @@ export default function FormResponses() {
             </button>
           </div>
         </div>
+
+        {/* Analytics tiles */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-2 mb-4">
+          {[
+            { label: 'Assigned', value: assigned, bg: '#FDE8D0' },
+            { label: 'Viewed', value: viewed, bg: '#FFF3B0' },
+            { label: 'Started', value: started, bg: '#D6E8FF' },
+            { label: 'Completed', value: responses.length, bg: '#C7F0BA' },
+            { label: 'Completion Rate', value: assigned ? `${((responses.length / assigned) * 100).toFixed(1)}%` : '—', bg: '#E98A3A' },
+          ].map((s) => (
+            <div key={s.label} className="p-3" style={{ background: s.bg, border: BORDER, borderRadius: '8px', boxShadow: '3px 3px 0px #111' }}>
+              <div className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#444' }}>{s.label}</div>
+              <div className="text-xl font-black mt-1">{s.value}</div>
+            </div>
+          ))}
+        </div>
+
+
 
         <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by name, roll no, email…"
           className="w-full md:w-72 p-2 text-sm mb-3" style={{ background: '#fff', border: '1.5px solid #111', borderRadius: '6px' }} />
