@@ -23,10 +23,11 @@ export function SuperAdminGuard() {
     const modeIsActive = initializeSuperAdminModeForSession(user.email);
     const isSuperAdmin = isSuperAdminUser(user.email);
 
-    if (isSuperAdmin && modeIsActive && ['/', '/dashboard', '/admin'].includes(location.pathname)) {
+    if (isSuperAdmin && modeIsActive && location.pathname === '/') {
       navigate(getAuthenticatedHomePath(user.email), { replace: true });
       return;
     }
+
 
     if (!isSuperAdmin && isSuperAdminLockActive()) {
       resetSuperAdminModeSession();
