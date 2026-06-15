@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { UserPlus, Trash2, Eye, Loader2, Search, Users, MoreVertical, ShieldCheck, Upload, FileSpreadsheet, CheckCircle2, XCircle, AlertCircle, ChevronRight, Pencil, Linkedin, Instagram, Mail, Phone, ExternalLink } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import VerifiedBadge, { getRoleBadgeVariant } from '@/components/ui/VerifiedBadge';
+import { getCachedClubMembers, preloadClubMembers } from '@/lib/preloadCache';
 
 interface SearchedUser {
   user_id: string;
@@ -81,8 +82,8 @@ const NB_BTN_BLACK = "bg-[#111] text-white font-bold border-[2px] border-[#111] 
 
 const MemberManagement = ({ clubId, isSuperAdmin = false }: Props) => {
   const { user } = useAuth();
-  const [members, setMembers] = useState<Member[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [members, setMembers] = useState<Member[]>(() => (getCachedClubMembers(clubId) ?? []) as Member[]);
+  const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMember, setViewMember] = useState<Member | null>(null);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
@@ -249,58 +250,9 @@ const MemberManagement = ({ clubId, isSuperAdmin = false }: Props) => {
   };
 
   const fetchMembers = async () => {
-    setLoading(true);
-    const { data: memberRows, error: memberError } = await supabase
-      .from('club_members')
-      .select('id, user_id, role, joined_at')
-      .eq('club_id', clubId)
-      .order('joined_at', { ascending: true });
-
-    if (memberError) {
-      toast.error('Failed to load members');
-      setMembers([]);
-      setLoading(false);
-      return;
-    }
-
-    const userIds = (memberRows ?? []).map((member) => member.user_id);
-    let profilesByUserId = new Map<string, any>();
-
-    if (userIds.length > 0) {
-      const { data: profileRows, error: profileError } = await supabase
-        .from('profiles')
-        .select('user_id, full_name, email, programme, roll_no, avatar_url, phone, year, section, about, social_linkedin, social_instagram, social_gmail')
-        .in('user_id', userIds);
-
-      if (profileError) {
-        toast.error('Failed to load member details');
-      } else {
-        profilesByUserId = new Map((profileRows ?? []).map((profile) => [profile.user_id, profile]));
-      }
-    }
-
-    setMembers((memberRows ?? []).map((member) => {
-      const profile = profilesByUserId.get(member.user_id);
-      return {
-        id: member.id,
-        user_id: member.user_id,
-        role: member.role,
-        joined_at: member.joined_at,
-        full_name: profile?.full_name ?? 'Unknown',
-        email: profile?.email ?? null,
-        programme: profile?.programme ?? null,
-        roll_no: profile?.roll_no ?? null,
-        avatar_url: profile?.avatar_url ?? null,
-        phone: profile?.phone ?? null,
-        year: profile?.year ?? null,
-        section: profile?.section ?? null,
-        about: profile?.about ?? null,
-        social_linkedin: profile?.social_linkedin ?? null,
-        social_instagram: profile?.social_instagram ?? null,
-        social_gmail: profile?.social_gmail ?? null,
-      };
-    }));
-    setLoading(false);
+    const cached = getCachedClubMembers(clubId);
+    if (cached) setMembers(cached as Member[]);
+    setMembers(await preloadClubMembers(clubId, true) as Member[]);
   };
 
   useEffect(() => { fetchMembers(); }, [clubId]);
