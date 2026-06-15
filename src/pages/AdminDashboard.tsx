@@ -54,7 +54,7 @@ import {
 import { MobileDashboardView } from "@/components/mobile/MobileDashboardView";
 import { AttendanceHistoryModal } from "@/components/mobile/AttendanceHistoryModal";
 import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
-import { getCachedUpcomingEvents } from "@/lib/preloadCache";
+import { getCachedUpcomingEvents, preloadUpcomingEvents } from "@/lib/preloadCache";
 
 const roleLabelMap: Record<string, string> = {
   admin: "Admin",
@@ -97,11 +97,16 @@ const AdminDashboard = () => {
   const { activeDesign } = useDesign();
   const isNeo = activeDesign === 'design-2';
 
-  const [upcomingEvents] = useState<any[]>(() => getCachedUpcomingEvents() ?? []);
+  const [upcomingEvents, setUpcomingEvents] = useState<any[]>(() => getCachedUpcomingEvents() ?? []);
   const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
   const [manageEventsOpen, setManageEventsOpen] = useState(false);
   const [activeStatModal, setActiveStatModal] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (getCachedUpcomingEvents()) return;
+    preloadUpcomingEvents().then(setUpcomingEvents).catch(() => undefined);
+  }, []);
 
   const fullName = profile?.full_name || user?.user_metadata?.full_name || "Student";
   const programme = profile?.programme || user?.user_metadata?.programme || "";
