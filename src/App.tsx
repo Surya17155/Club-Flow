@@ -3,7 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Suspense } from "react";
+import { Suspense, lazy } from "react";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ClubProvider } from "@/contexts/ClubContext";
 import { DesignProvider } from "@/contexts/DesignContext";
@@ -12,16 +12,8 @@ import { PagePreloader } from "@/components/navigation/PagePreloader";
 import { ProtectedRoute } from "@/components/navigation/ProtectedRoute";
 import { lazyRoute } from "@/lib/routePreload";
 
-const DesktopFrame = lazyRouteFrame();
-const MobileNavigationOverlay = lazyRouteMobileOverlay();
-
-function lazyRouteFrame() {
-  return import("react").then ? undefined as never : undefined as never;
-}
-
-function lazyRouteMobileOverlay() {
-  return import("react").then ? undefined as never : undefined as never;
-}
+const DesktopFrame = lazy(() => import("@/components/layout/DesktopFrame").then((m) => ({ default: m.DesktopFrame })));
+const MobileNavigationOverlay = lazy(() => import("@/components/mobile/MobileNavigationOverlay").then((m) => ({ default: m.MobileNavigationOverlay })));
 
 const LandingPage = lazyRoute("landing");
 const AuthPage = lazyRoute("auth");
