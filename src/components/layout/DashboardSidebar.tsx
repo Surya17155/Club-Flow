@@ -196,6 +196,8 @@ export function DashboardSidebar() {
     () => (localStorage.getItem('dashboardViewMode') as 'personal' | 'club') || 'personal'
   );
   const isClubMode = viewMode === 'club';
+  const pendingFormsCount = usePendingFormsCount();
+
 
   useEffect(() => {
     const handler = () => {
