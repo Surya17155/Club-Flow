@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { getAuthenticatedHomePath } from "@/lib/superAdminMode";
 import heroIllustration from "@/assets/hero-illustration.png";
 import heroIllustrationDesktop from "@/assets/hero-illustration-desktop.png";
 
@@ -7,6 +9,7 @@ type PageName = "home" | "pricing" | "about" | "contact";
 
 const LandingPage = () => {
   const navigate = useNavigate();
+  const { user, loading } = useAuth();
   const [activePage, setActivePage] = useState<PageName>("home");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const mainRef = useRef<HTMLDivElement>(null);
@@ -15,6 +18,8 @@ const LandingPage = () => {
     mainRef.current?.scrollTo({ top: 0, behavior: "smooth" });
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [activePage]);
+
+  if (!loading && user) return <Navigate to={getAuthenticatedHomePath(user.email)} replace />;
 
   const navLink = (page: PageName, label: string) => (
     <button

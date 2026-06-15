@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { isSuperAdminLockActive, isSuperAdminUser } from '@/lib/superAdminMode';
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -9,11 +10,21 @@ interface ProtectedRouteProps {
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { user, session, loading } = useAuth();
   const location = useLocation();
+  const authUser = user ?? session?.user ?? null;
 
   if (loading) return null;
 
-  if (!user && !session) {
+  if (!authUser && !session) {
     return <Navigate to="/" replace state={{ from: location.pathname }} />;
+  }
+
+  if (
+    authUser &&
+    isSuperAdminUser(authUser.email) &&
+    isSuperAdminLockActive() &&
+    ['/dashboard', '/admin'].includes(location.pathname)
+  ) {
+    return <Navigate to="/super-admin" replace />;
   }
 
   return <>{children}</>;
