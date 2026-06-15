@@ -17,16 +17,19 @@ export function usePendingFormsCount() {
   useEffect(() => {
     let cancelled = false;
     const ids = clubIds ? clubIds.split(',') : [];
-    if (!user || ids.length === 0) { setCount(0); return; }
+    if (!user) { setCount(0); return; }
 
     const load = async () => {
-      const { data: forms } = await supabase
+      let q = supabase
         .from('forms')
         .select('id, deadline')
         .eq('is_published', true)
         .eq('accepting_responses', true)
-        .in('club_id', ids)
         .or(`deadline.is.null,deadline.gte.${new Date().toISOString()}`);
+      q = ids.length > 0
+        ? q.or(`is_public.eq.true,club_id.in.(${ids.join(',')})`)
+        : q.eq('is_public', true);
+      const { data: forms } = await q;
       if (cancelled || !forms) return;
 
       if (forms.length === 0) { setCount(0); return; }
