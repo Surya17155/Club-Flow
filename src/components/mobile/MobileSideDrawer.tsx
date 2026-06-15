@@ -204,9 +204,9 @@ function MobileSideDrawerInner({ open, onClose, viewMode, setViewMode }: MobileS
                         className="flex items-center gap-3 w-full px-4 py-3 text-left transition-all"
                         style={{
                           background: active ? '#E98A3A' : 'transparent',
-                          color: active ? '#111' : '#E98A3A',
+                          color: active ? '#111' : '#333',
                           fontFamily: "'Space Grotesk', sans-serif",
-                          fontWeight: active ? 800 : 700,
+                          fontWeight: active ? 800 : 600,
                           border: active ? '2px solid #111' : '2px solid transparent',
                           boxShadow: active ? '3px 3px 0px #111' : 'none',
                         }}
