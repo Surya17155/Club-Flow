@@ -201,7 +201,7 @@ function to24(hour: string, minute: string, period: 'AM' | 'PM'): string {
 }
 
 const CreateEvent = () => {
-  const { user, loading } = useAuth();
+  const { user } = useAuth();
   const { activeClub, loading: clubsLoading } = useClub();
   const { hasPower, loading: powersLoading } = useDelegatedPowers();
   const navigate = useNavigate();
@@ -228,9 +228,9 @@ const CreateEvent = () => {
   const [qrToken, setQrToken] = useState<string | null>(null);
   const [publishing, setPublishing] = useState(false);
 
-  if (!user) return null;
+  if (!user || (!activeClub && clubsLoading)) return null;
 
-  if ((!activeClub && !clubsLoading) || (!powersLoading && activeClub && !hasPower('create_event'))) {
+  if (!activeClub || (!powersLoading && !hasPower('create_event'))) {
     return (
       <div className="min-h-screen flex items-center justify-center p-6" style={{ background: '#F4EFE7' }}>
         <div className="max-w-md bg-[#FFFDF9] border-[3px] border-[#111] rounded-[8px] p-6 text-center" style={{ boxShadow: '6px 6px 0px #111' }}>
