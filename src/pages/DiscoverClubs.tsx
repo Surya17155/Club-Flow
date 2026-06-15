@@ -124,7 +124,7 @@ const DiscoverClubs = () => {
     }
   };
 
-  if (!user) return null;
+  if (!user) return <div className="min-h-screen" style={{ backgroundColor: '#F4EFE7' }} />;
 
   const filtered = clubs.filter(c =>
     c.name.toLowerCase().includes(search.toLowerCase()) ||
