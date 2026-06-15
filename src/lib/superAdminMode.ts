@@ -61,6 +61,12 @@ export const getAuthenticatedHomePath = (email?: string | null) =>
   getSuperAdminModeForUser(email) ? '/super-admin' : '/dashboard';
 
 export const resolveAuthRedirect = (email?: string | null, requestedPath?: string | null) => {
-  if (!isSuperAdminUser(email)) return requestedPath || '/dashboard';
+  const normalizedPath = requestedPath || '/dashboard';
+  const superAdminOnlyPaths = ['/super-admin', '/global-reports', '/manage-outsiders', '/super-admin/chatbot'];
+
+  if (!isSuperAdminUser(email)) {
+    return superAdminOnlyPaths.includes(normalizedPath) ? '/dashboard' : normalizedPath;
+  }
+
   return '/super-admin';
 };
