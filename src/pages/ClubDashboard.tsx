@@ -22,8 +22,7 @@ import { Button } from '@/components/ui/button';
 import { MobileClubProfileCard } from '@/components/mobile/MobileClubProfileCard';
 import { MobileBottomNav } from '@/components/mobile/MobileBottomNav';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-getCachedClubMembers, preloadClubMembers, getCachedClubSettings, preloadClubSettings,
-import { getCachedAdminStatus, preloadAdminStatus } from '@/lib/preloadCache';
+import { getCachedAdminStatus, preloadAdminStatus, getCachedClubMembers, preloadClubMembers, getCachedClubSettings, preloadClubSettings } from '@/lib/preloadCache';
 
 
 
@@ -56,7 +55,7 @@ const ClubDashboard = () => {
 
   useEffect(() => {
     if (!routeClubId) { setClubNameOverride(null); return; }
-    let cancelled = false;
+    let cancelled = False;
     setClubNameOverride(null);
     const fetch = async () => {
       const cached = getCachedClubSettings(routeClubId);
@@ -65,7 +64,6 @@ const ClubDashboard = () => {
       if (!cancelled && data) setClubNameOverride(data.name);
     };
     fetch();
-    return () => { cancelled = true; };
     return () => { cancelled = true; };
   }, [routeClubId, activeClub?.club_id, activeClub?.club_name]);
 
@@ -105,24 +103,6 @@ const ClubDashboard = () => {
       if (data) setClubDetails(data);
     };
     fetch();
-  const [postHolders, setPostHolders] = useState<PostHolder[]>(() => {
-    if (!clubId) return [];
-    const cached = getCachedClubMembers(clubId);
-    return cached ? cached.filter((m: any) => roleOrder.includes(m.role)).sort((a: any, b: any) => roleOrder.indexOf(a.role) - roleOrder.indexOf(b.role)) : [];
-  });
-  useEffect(() => {
-    if (!clubId) return;
-    const fetchPostHolders = async () => {
-      const cached = getCachedClubMembers(clubId);
-      if (cached) {
-        setPostHolders(cached.filter((m: any) => roleOrder.includes(m.role)).sort((a: any, b: any) => roleOrder.indexOf(a.role) - roleOrder.indexOf(b.role)));
-      }
-      const data = await preloadClubMembers(clubId);
-      if (data) {
-        setPostHolders(data.filter((m: any) => roleOrder.includes(m.role)).sort((a: any, b: any) => roleOrder.indexOf(a.role) - roleOrder.indexOf(b.role)));
-      }
-    };
-    fetchPostHolders();
   }, [clubId]);
           .sort((a, b) => roleOrder.indexOf(a.role) - roleOrder.indexOf(b.role))
       );
