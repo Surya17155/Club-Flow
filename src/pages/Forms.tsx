@@ -30,38 +30,47 @@ export default function Forms() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { activeClub, clubs } = useClub();
-  const [tab, setTab] = useState<'available' | 'manage'>('available');
+
+  const [viewMode, setViewMode] = useState<'personal' | 'club'>(
+    () => (localStorage.getItem('dashboardViewMode') as 'personal' | 'club') || 'personal'
+  );
+  useEffect(() => {
+    const sync = () =>
+      setViewMode((localStorage.getItem('dashboardViewMode') as 'personal' | 'club') || 'personal');
+    window.addEventListener('viewModeChanged', sync);
+    window.addEventListener('storage', sync);
+    return () => {
+      window.removeEventListener('viewModeChanged', sync);
+      window.removeEventListener('storage', sync);
+    };
+  }, []);
+  const isClubMode = viewMode === 'club';
+
+  // Club mode → manage only. Personal mode → fill only.
+  const tab: 'available' | 'manage' = isClubMode ? 'manage' : 'available';
   const [availableStatus, setAvailableStatus] = useState<AvailableStatus>('active');
   const [forms, setForms] = useState<FormRow[]>([]);
   const [submittedIds, setSubmittedIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
 
-  const isPresident = useMemo(
-    () => clubs.some((c) => c.role === 'president'),
-    [clubs]
-  );
-  const presidentClubIds = useMemo(
-    () => clubs.filter((c) => c.role === 'president').map((c) => c.club_id),
-    [clubs]
+  const isPresidentOfActive = useMemo(
+    () => !!clubs.find((c) => c.club_id === activeClub?.club_id && c.role === 'president'),
+    [clubs, activeClub?.club_id]
   );
 
   const load = async () => {
     setLoading(true);
     let query = supabase.from('forms').select('*').order('created_at', { ascending: false });
     if (tab === 'manage') {
-      if (presidentClubIds.length === 0) {
-        setForms([]); setLoading(false); return;
-      }
-      query = query.in('club_id', presidentClubIds);
+      if (!activeClub?.club_id) { setForms([]); setLoading(false); return; }
+      query = query.eq('club_id', activeClub.club_id);
     } else {
-      // Available — RLS already scopes to user's clubs + public forms
       query = query.eq('is_published', true);
     }
     const { data, error } = await query;
     if (error) toast.error(error.message);
     else setForms((data as FormRow[]) || []);
 
-    // Which of these has the user already submitted?
     if (user && data && data.length) {
       const { data: resp } = await supabase
         .from('form_responses')
@@ -75,7 +84,7 @@ export default function Forms() {
     setLoading(false);
   };
 
-  useEffect(() => { load(); /* eslint-disable-next-line */ }, [tab, presidentClubIds.join(','), user?.id]);
+  useEffect(() => { load(); /* eslint-disable-next-line */ }, [tab, activeClub?.club_id, user?.id]);
 
   const now = Date.now();
   const visibleForms = useMemo(() => {
