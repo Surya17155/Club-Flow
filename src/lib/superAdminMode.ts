@@ -52,8 +52,13 @@ export const resetSuperAdminModeSession = () => {
   window.dispatchEvent(new Event(SUPER_ADMIN_MODE_EVENT));
 };
 
+export const getSuperAdminModeForUser = (email?: string | null) => {
+  if (typeof window === 'undefined' || !isSuperAdminUser(email)) return false;
+  return isSuperAdminLockActive() || sessionStorage.getItem(SUPER_ADMIN_MODE_INITIALIZED_KEY) !== 'true';
+};
+
 export const getAuthenticatedHomePath = (email?: string | null) =>
-  isSuperAdminUser(email) ? '/super-admin' : '/dashboard';
+  getSuperAdminModeForUser(email) ? '/super-admin' : '/dashboard';
 
 export const resolveAuthRedirect = (email?: string | null, requestedPath?: string | null) => {
   if (!isSuperAdminUser(email)) return requestedPath || '/dashboard';
