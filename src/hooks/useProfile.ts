@@ -14,7 +14,7 @@ export const useProfile = () => {
   const fetchProfile = async (force = false) => {
     if (!user) return;
     const cached = getCachedProfile(user.id);
-    if (cached && !force) setProfile(cached);
+    if (cached && !force) { setProfile(cached); return; }
     const data = await preloadProfile(user.id, force);
     if (data) setProfile(data);
   };
