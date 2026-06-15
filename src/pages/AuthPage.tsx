@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { lovable } from "@/integrations/lovable/index";
 import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff } from "lucide-react";
+import { getAuthenticatedHomePath, initializeSuperAdminModeForSession, resolveAuthRedirect } from "@/lib/superAdminMode";
 
 const PROGRAMMES = ["B.Tech (CS)", "B.Tech (IT)", "BBA", "MBA", "B.Com", "BA (Hons)", "BCA", "MCA"];
 const YEARS = ["1st Year", "2nd Year", "3rd Year", "4th Year"];
@@ -36,7 +37,7 @@ const AuthPage = () => {
     if (m === "login" || m === "signup") setMode(m);
   }, [searchParams]);
 
-  if (!loading && user) return <Navigate to="/dashboard" replace />;
+  if (!loading && user) return <Navigate to={getAuthenticatedHomePath(user.email)} replace />;
 
   const getRedirectPath = () => {
     const fromParam = searchParams.get("redirect");
@@ -55,8 +56,9 @@ const AuthPage = () => {
     setIsLoading(true);
     try {
       await signIn(loginEmail, loginPassword);
+      initializeSuperAdminModeForSession(loginEmail);
       toast({ title: "Welcome back!", description: "Successfully logged in." });
-      const rp = getRedirectPath();
+      const rp = resolveAuthRedirect(loginEmail, getRedirectPath());
       sessionStorage.removeItem("pendingRedirect");
       navigate(rp, { replace: true });
     } catch (error: any) {
@@ -112,9 +114,10 @@ const AuthPage = () => {
         return;
       }
       toast({ title: "Account created!", description: "Welcome to Attendly!" });
-      const rp = searchParams.get("redirect");
+      initializeSuperAdminModeForSession(formData.email);
+      const rp = resolveAuthRedirect(formData.email, searchParams.get("redirect"));
       if (rp) sessionStorage.removeItem("pendingRedirect");
-      navigate(rp || "/dashboard", { replace: true });
+      navigate(rp, { replace: true });
     } catch (error: any) {
       if (error.message?.toLowerCase().includes("already registered")) {
         toast({ title: "Account already exists", description: 'An account with this email already exists. Use "Forgot Password" on the login side.', variant: "destructive" });
