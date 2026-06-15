@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Plus, FileText, Edit3, BarChart3, Trash2, ExternalLink, Clock, User as UserIcon, Building2, CalendarClock } from 'lucide-react';
+import { Plus, FileText, Edit3, BarChart3, Trash2, ExternalLink, Clock, User as UserIcon, Building2, CalendarClock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useClub } from '@/contexts/ClubContext';
