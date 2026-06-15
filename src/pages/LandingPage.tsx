@@ -2,8 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { getAuthenticatedHomePath } from "@/lib/superAdminMode";
-import heroIllustration from "@/assets/hero-illustration.png";
-import heroIllustrationDesktop from "@/assets/hero-illustration-desktop.png";
+import heroIllustration from "@/assets/hero-illustration-mobile.webp";
+import heroIllustrationDesktop from "@/assets/hero-illustration-desktop.webp";
 
 type PageName = "home" | "pricing" | "about" | "contact";
 
@@ -159,7 +159,7 @@ const LandingPage = () => {
             <section className="max-w-screen-2xl mx-auto px-6 pt-4 pb-4 md:pt-8 md:pb-12 lg:pt-12 lg:pb-16 min-h-[calc(100svh-64px)] md:min-h-auto md:h-[calc(100vh-64px)] flex flex-col justify-start md:justify-center relative overflow-hidden">
               {/* Hero illustration - mobile only */}
               <div className="flex justify-center md:hidden mb-2">
-                <img src={heroIllustration} alt="Student scanning QR code for attendance" className="w-44 h-auto" />
+                <img src={heroIllustration} alt="Student scanning QR code for attendance" className="w-44 h-auto" width={352} height={440} fetchPriority="high" decoding="async" />
               </div>
 
               {/* Desktop illustration - right aligned */}
@@ -168,6 +168,10 @@ const LandingPage = () => {
                   src={heroIllustrationDesktop}
                   alt="Student scanning QR code"
                   className="w-full h-auto object-contain object-right"
+                  width={840}
+                  height={1321}
+                  fetchPriority="high"
+                  decoding="async"
                 />
               </div>
 
