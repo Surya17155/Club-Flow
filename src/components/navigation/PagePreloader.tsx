@@ -1,7 +1,9 @@
 import { useEffect } from 'react';
+import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { useClub } from '@/contexts/ClubContext';
 import {
+  getCacheStatusSnapshot,
   preloadAdminStatus,
   preloadAssignableMembers,
   preloadClubMembers,
@@ -17,17 +19,50 @@ import {
   preloadSuperAdminStats,
   preloadUpcomingEvents,
   preloadUserClubs,
+  preloadRouteData,
+  subscribeCacheStatus,
 } from '@/lib/preloadCache';
 import { isSuperAdminUser } from '@/lib/superAdminMode';
 
 export function PagePreloader() {
   const { user } = useAuth();
-  const { activeClub } = useClub();
+  const { activeClub, clubs } = useClub();
+
+  useEffect(() => {
+    let toastId: string | number | undefined;
+    let dismissTimer: number | undefined;
+
+    return subscribeCacheStatus((status) => {
+      if (status.active > 0) {
+        if (dismissTimer) window.clearTimeout(dismissTimer);
+        toastId = toast.loading(`Preloading app data ${status.completed}/${Math.max(status.total, status.active)}`, {
+          id: toastId ?? 'background-preload-progress',
+          description: 'Navigation stays available while cache warms.',
+          duration: Infinity,
+        });
+        return;
+      }
+
+      if (toastId && getCacheStatusSnapshot().total > 0) {
+        toast.success('Preload complete', {
+          id: toastId,
+          description: 'Pages will use warmed cache where available.',
+          duration: 1500,
+        });
+        dismissTimer = window.setTimeout(() => {
+          toast.dismiss(toastId);
+          toastId = undefined;
+        }, 1600);
+      }
+    });
+  }, []);
 
   useEffect(() => {
     if (!user) return;
 
     // Critical preloads run immediately so navigation is instant
+    const commonRoutes = ['/admin', '/events', '/discover', '/profile', '/settings', '/attendance-history'];
+    commonRoutes.forEach((path) => preloadRouteData(path, { userId: user.id, email: user.email, activeClubId: activeClub?.club_id, clubIds: clubs.map((club) => club.club_id) }));
     preloadAdminStatus(user.id, user.email);
     preloadProfile(user.id);
     preloadPersonalStats(user.id);
@@ -56,7 +91,7 @@ export function PagePreloader() {
       }
     });
     return () => cancelIdle(handle as any);
-  }, [user?.id, user?.email]);
+  }, [activeClub?.club_id, clubs, user?.id, user?.email]);
 
   useEffect(() => {
     if (!user || !activeClub?.club_id) return;
