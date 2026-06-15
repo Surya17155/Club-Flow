@@ -27,28 +27,18 @@ export function PagePreloader() {
   useEffect(() => {
     if (!user) return;
 
-    // Critical preloads run immediately so navigation is instant
+    // Keep startup light: hydrate only data needed for the current shell.
     preloadAdminStatus(user.id, user.email);
     preloadProfile(user.id);
-    preloadPersonalStats(user.id);
-    preloadEvents('personal');
-    preloadUpcomingEvents();
-    preloadUserClubs(user.id).then((clubs) => {
-      clubs.forEach((club) => {
-        preloadEvents('club', club.club_id);
-        preloadClubStats(club.club_id);
-        preloadDelegatedPowers(user.id, club.club_id);
-        preloadClubMembers(club.club_id);
-        preloadClubSettings(club.club_id);
-        preloadJoinRequests(club.club_id);
-        preloadAssignableMembers(club.club_id);
-      });
-    });
+    preloadUserClubs(user.id);
 
-    // Defer non-critical to idle
+    // Defer dashboard-only reads until the browser is idle.
     const idle = window.requestIdleCallback ?? ((cb: IdleRequestCallback) => window.setTimeout(() => cb({ didTimeout: false, timeRemaining: () => 0 } as IdleDeadline), 1));
     const cancelIdle = window.cancelIdleCallback ?? window.clearTimeout;
     const handle = idle(() => {
+      preloadPersonalStats(user.id);
+      preloadEvents('personal');
+      preloadUpcomingEvents();
       preloadDiscoverClubs(user.id);
       if (isSuperAdminUser(user.email)) {
         preloadSuperAdminStats();
@@ -61,12 +51,8 @@ export function PagePreloader() {
   useEffect(() => {
     if (!user || !activeClub?.club_id) return;
     preloadClubStats(activeClub.club_id);
-    preloadClubMembers(activeClub.club_id);
     preloadDelegatedPowers(user.id, activeClub.club_id);
-    preloadEvents('club', activeClub.club_id);
     preloadClubSettings(activeClub.club_id);
-    preloadJoinRequests(activeClub.club_id);
-    preloadAssignableMembers(activeClub.club_id);
   }, [user?.id, activeClub?.club_id]);
 
   return null;
