@@ -45,6 +45,7 @@ const MarkAttendance = lazyRoute("markAttendance");
 const SuperAdminDashboard = lazyRoute("superAdmin");
 const GlobalReports = lazyRoute("globalReports");
 const ManageOutsiders = lazyRoute("manageOutsiders");
+const FaceScanner = lazyRoute("faceScanner");
 const NotFound = lazyRoute("notFound");
 
 const queryClient = new QueryClient({
@@ -122,6 +123,7 @@ const App = () => (
                   <Route path="/forms/:id/responses" element={<ProtectedRoute><FormResponses /></ProtectedRoute>} />
                   <Route path="/forms/:id" element={<ProtectedRoute><FormFill /></ProtectedRoute>} />
                   <Route path="/manage-outsiders" element={<ProtectedRoute><DesktopFrame><ManageOutsiders /></DesktopFrame></ProtectedRoute>} />
+                  <Route path="/events/:eventId/face-scan" element={<ProtectedRoute><FaceScanner /></ProtectedRoute>} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
