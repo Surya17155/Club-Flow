@@ -55,6 +55,7 @@ import {
 import { MobileDashboardView } from "@/components/mobile/MobileDashboardView";
 import { AttendanceHistoryModal } from "@/components/mobile/AttendanceHistoryModal";
 import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
+import { getCachedUpcomingEvents, preloadUpcomingEvents } from "@/lib/preloadCache";
 
 const roleLabelMap: Record<string, string> = {
   admin: "Admin",
@@ -97,7 +98,7 @@ const AdminDashboard = () => {
   const { activeDesign } = useDesign();
   const isNeo = activeDesign === 'design-2';
 
-  const [upcomingEvents, setUpcomingEvents] = useState<any[]>([]);
+  const [upcomingEvents, setUpcomingEvents] = useState<any[]>(() => getCachedUpcomingEvents() ?? []);
   const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
   const [manageEventsOpen, setManageEventsOpen] = useState(false);
@@ -105,35 +106,9 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     const fetchUpcoming = async () => {
-      const now = new Date().toISOString();
-      const { data } = await supabase
-        .from("events")
-        .select("id, name, event_date, end_date, description, event_type, category, access_type, attendance_given, clubs(name)")
-        .gte("event_date", now)
-        .order("event_date", { ascending: true })
-        .limit(10);
-      if (data) {
-        setUpcomingEvents(
-          data.map((e: any) => {
-            const d = new Date(e.event_date);
-            const endD = e.end_date ? new Date(e.end_date) : null;
-            return {
-              ...e,
-              month: d.toLocaleString("default", { month: "short" }).toUpperCase(),
-              day: String(d.getDate()),
-              club_name: e.clubs?.name || "",
-              full_date: d.toLocaleDateString("en-US", {
-                weekday: "long",
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              }),
-              time: d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }),
-              end_time: endD ? endD.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }) : null,
-            };
-          }),
-        );
-      }
+      const cached = getCachedUpcomingEvents();
+      if (cached) setUpcomingEvents(cached);
+      setUpcomingEvents(await preloadUpcomingEvents());
     };
     fetchUpcoming();
   }, []);
