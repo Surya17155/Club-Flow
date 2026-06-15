@@ -203,10 +203,10 @@ export const getCachedClubStats = (clubId?: string) => clubId ? read(clubStatsCa
 export const preloadClubStats = (clubId: string, force = false) => cached(clubStatsCache, clubId, async () => {
   const [membersRes, eventsRes] = await Promise.all([
     db.from('club_members').select('id', { count: 'exact', head: true }).eq('club_id', clubId),
-    db.from('events').select('id, name, event_date').eq('club_id', clubId).order('event_date', { ascending: true }),
+    db.from('events').select('id, name, event_date', { count: 'exact' }).eq('club_id', clubId).order('event_date', { ascending: false }).limit(20),
   ]);
   const totalMembers = membersRes.count ?? 0;
-  const events = eventsRes.data ?? [];
+  const events = [...(eventsRes.data ?? [])].reverse();
   let chartData: CachedClubStats['chartData'] = [];
   let avgAttendanceRate = 0;
   if (events.length > 0) {
@@ -227,7 +227,7 @@ export const preloadClubStats = (clubId: string, force = false) => cached(clubSt
       avgAttendanceRate = Math.round(eventsWithAttendance.reduce((sum: number, e: any) => sum + ((attendanceByEvent[e.id]?.present || 0) / totalMembers) * 100, 0) / eventsWithAttendance.length);
     }
   }
-  return { totalMembers, totalEvents: events.length, avgAttendanceRate, chartData };
+  return { totalMembers, totalEvents: eventsRes.count ?? events.length, avgAttendanceRate, chartData };
 }, force, emptyClubStats);
 
 const powersKey = (userId: string, clubId: string) => `${userId}:${clubId}`;
@@ -289,7 +289,7 @@ export const preloadSuperAdminStats = (force = false) => cached(superAdminStatsC
 const eventsKey = (viewMode: 'personal' | 'club', clubId?: string | null) => `${viewMode}:${viewMode === 'club' ? clubId || 'all' : 'all'}`;
 export const getCachedEvents = (viewMode: 'personal' | 'club', clubId?: string | null) => read(eventsCache, eventsKey(viewMode, clubId));
 export const preloadEvents = (viewMode: 'personal' | 'club', clubId?: string | null, force = false) => cached(eventsCache, eventsKey(viewMode, clubId), async () => {
-  let query = db.from('events').select('id, name, event_type, category, event_date, end_date, access_type, description, qr_token, club_id, attendance_given, clubs(name)').order('event_date', { ascending: true });
+  let query = db.from('events').select('id, name, event_type, category, event_date, end_date, access_type, description, qr_token, club_id, attendance_given, clubs(name)').order('event_date', { ascending: true }).limit(80);
   if (viewMode === 'club' && clubId) query = query.eq('club_id', clubId);
   const { data, error } = await query;
   const events = !error && data ? data : [];
