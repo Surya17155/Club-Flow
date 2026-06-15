@@ -57,11 +57,5 @@ export const getAuthenticatedHomePath = (email?: string | null) =>
 
 export const resolveAuthRedirect = (email?: string | null, requestedPath?: string | null) => {
   if (!isSuperAdminUser(email)) return requestedPath || '/dashboard';
-
-  const normalizedPath = requestedPath || '/dashboard';
-  if (['/', '/dashboard', '/admin', '/login', '/signup', '/auth'].includes(normalizedPath)) {
-    return '/super-admin';
-  }
-
-  return normalizedPath;
+  return '/super-admin';
 };
