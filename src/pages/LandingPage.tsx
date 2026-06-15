@@ -345,7 +345,7 @@ const LandingPage = () => {
 
             {/* Pricing Footer */}
             <footer className="flex flex-col md:flex-row justify-between items-center px-8 py-12 w-full gap-4 bg-[#111111] border-t-2 border-[#111111]">
-              <div className="text-lg font-black text-[#E98A3A]">​CLUB FLOW</div>
+              <div className="text-lg font-black text-[#E98A3A]">CLUB FLOW</div>
               <div className="flex gap-8 font-['Space_Grotesk'] uppercase text-xs tracking-widest text-[#F4EFE7]">
                 <a className="hover:text-[#E98A3A] transition-colors" href="#">Privacy Policy</a>
                 <a className="hover:text-[#E98A3A] transition-colors" href="#">Terms of Service</a>
