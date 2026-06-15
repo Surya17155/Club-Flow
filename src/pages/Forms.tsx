@@ -57,6 +57,7 @@ export default function Forms() {
   const [questionCounts, setQuestionCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
+  const [hasNextPage, setHasNextPage] = useState(false);
   const requestSeq = useRef(0);
   const clubIdsKey = clubs.map((club) => club.club_id).join(',');
   const openRoute = useCallback((path: string) => { preloadRoute(path); navigate(path); }, [navigate]);
@@ -86,6 +87,7 @@ export default function Forms() {
     if (seq !== requestSeq.current) return;
     if (error) { toast.error(error.message); setLoading(false); return; }
     const rows = (data as FormRow[]) || [];
+    setHasNextPage(rows.length === PAGE_SIZE);
     setForms(rows);
 
     if (rows.length) {
@@ -381,6 +383,27 @@ export default function Forms() {
                 </div>
               );
             })}
+          </div>
+        )}
+        {!loading && forms.length > 0 && (
+          <div className="mt-5 flex items-center justify-end gap-2">
+            <button
+              disabled={page === 0}
+              onClick={() => setPage((p) => Math.max(0, p - 1))}
+              className="px-3 py-1.5 text-xs font-bold disabled:opacity-40 disabled:cursor-not-allowed"
+              style={{ background: CARD, border: '1.5px solid #111', borderRadius: '6px' }}
+            >
+              Previous
+            </button>
+            <span className="text-xs font-bold" style={{ color: '#555' }}>Page {page + 1}</span>
+            <button
+              disabled={!hasNextPage}
+              onClick={() => setPage((p) => p + 1)}
+              className="px-3 py-1.5 text-xs font-bold disabled:opacity-40 disabled:cursor-not-allowed"
+              style={{ background: '#E98A3A', color: '#111', border: '1.5px solid #111', borderRadius: '6px' }}
+            >
+              Next
+            </button>
           </div>
         )}
       </div>
