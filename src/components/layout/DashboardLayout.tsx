@@ -1,5 +1,4 @@
-import { useAuth } from "@/contexts/AuthContext";
-import { Navigate, useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { ArrowLeft, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -27,7 +26,6 @@ interface DashboardLayoutProps {
 }
 
 export function DashboardLayout({ children, showHeader = true }: DashboardLayoutProps) {
-  const { user, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useIsMobile();
@@ -35,18 +33,6 @@ export function DashboardLayout({ children, showHeader = true }: DashboardLayout
   const isNeo = activeDesign === "design-2";
 
   const pageTitle = pageTitles[location.pathname] || "Dashboard";
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: isNeo ? "#F4EFE7" : "#000000" }}>
-        <div className="w-8 h-8 border-3 border-white/30 border-t-white rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  if (!user) {
-    return <Navigate to="/" replace />;
-  }
 
   if (!isMobile) {
     return (
