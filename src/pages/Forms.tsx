@@ -201,14 +201,13 @@ export default function Forms() {
             <p className="text-sm mt-1" style={{ color: '#555' }}>{subtitle}</p>
           </div>
           {isClubMode && isPresidentOfActive && (
-            <motion.button
-              whileTap={{ scale: 0.96 }}
+            <button
               onClick={handleCreate}
-              className="flex items-center gap-2 px-4 py-2.5 text-sm font-bold"
+              className="flex items-center gap-2 px-4 py-2.5 text-sm font-bold transition-transform active:scale-[0.98]"
               style={{ background: '#E98A3A', color: '#111', border: BORDER, borderRadius: '6px', boxShadow: SHADOW }}
             >
               <Plus className="w-4 h-4" /> Create Form
-            </motion.button>
+            </button>
           )}
         </div>
 
@@ -270,10 +269,8 @@ export default function Forms() {
               const clubName = clubNames[f.club_id] ?? 'Club';
               const creatorName = f.created_by ? creatorNames[f.created_by] ?? 'Unknown' : '—';
               return (
-                <motion.div
+                <div
                   key={f.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
                   className="p-4 flex flex-col"
                   style={{ background: CARD, border: BORDER, borderRadius: '8px', boxShadow: SHADOW }}
                 >
@@ -376,7 +373,7 @@ export default function Forms() {
                       </>
                     )}
                   </div>
-                </motion.div>
+                </div>
               );
             })}
           </div>
