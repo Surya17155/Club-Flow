@@ -55,6 +55,7 @@ const ClubDashboard = () => {
 
   useEffect(() => {
     if (!routeClubId) { setClubNameOverride(null); return; }
+    if (routeClubId === activeClub?.club_id) { setClubNameOverride(null); return; }
     let cancelled = false;
     setClubNameOverride(null);
     const fetch = async () => {
@@ -65,7 +66,7 @@ const ClubDashboard = () => {
     };
     fetch();
     return () => { cancelled = true; };
-  }, [routeClubId, activeClub?.club_id, activeClub?.club_name]);
+  }, [routeClubId, activeClub?.club_id]);
 
   const { stats: clubStats } = useClubStats(clubId);
   const [manageEventsOpen, setManageEventsOpen] = useState(false);
@@ -85,6 +86,7 @@ const ClubDashboard = () => {
       if (cached !== undefined) {
         setIsSuperAdmin(cached);
         setIsRoleCheckComplete(true);
+        return;
       }
       const status = await preloadAdminStatus(user.id, user.email);
       setIsSuperAdmin(status);
