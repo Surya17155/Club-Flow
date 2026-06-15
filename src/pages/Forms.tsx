@@ -55,6 +55,7 @@ export default function Forms() {
   const [creatorNames, setCreatorNames] = useState<Record<string, string>>({});
   const [questionCounts, setQuestionCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
+  const clubIdsKey = clubs.map((club) => club.club_id).join(',');
 
   const isPresidentOfActive = useMemo(
     () => !!clubs.find((c) => c.club_id === activeClub?.club_id && c.role === 'president'),
@@ -115,7 +116,7 @@ export default function Forms() {
     setLoading(false);
   };
 
-  useEffect(() => { load(); /* eslint-disable-next-line */ }, [tab, activeClub?.club_id, user?.id, clubs.length]);
+  useEffect(() => { load(); /* eslint-disable-next-line */ }, [tab, activeClub?.club_id, user?.id, clubIdsKey]);
 
   // Refresh on focus + on app-wide form mutations (avoids realtime overhead)
   useEffect(() => {
@@ -127,7 +128,7 @@ export default function Forms() {
       window.removeEventListener('formsChanged', onRefresh);
     };
     // eslint-disable-next-line
-  }, [user?.id, tab, activeClub?.club_id, clubs.length]);
+  }, [user?.id, tab, activeClub?.club_id, clubIdsKey]);
 
 
   const now = Date.now();
