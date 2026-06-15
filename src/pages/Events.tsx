@@ -11,7 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useClub } from '@/contexts/ClubContext';
 import { useUserClubs } from '@/hooks/useUserClubs';
 import { useDelegatedPowers } from '@/hooks/useDelegatedPowers';
-import { useNavigate } from 'react-router-dom';
+import { usePreloadedNavigate } from '@/hooks/usePreloadedNavigate';
 import { QRCodeSVG } from 'qrcode.react';
 import EventFeedbackModal from '@/components/dashboard/EventFeedbackModal';
 import { useDesign } from '@/contexts/DesignContext';
@@ -122,7 +122,7 @@ const Events = () => {
   const { activeClub } = useClub();
   const { clubs: userClubs } = useUserClubs();
   const { hasPower } = useDelegatedPowers();
-  const navigate = useNavigate();
+  const navigate = usePreloadedNavigate();
   const { activeDesign } = useDesign();
   const isNeo = activeDesign === 'design-2';
 
