@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar';
 import { Switch } from '@/components/ui/switch';
-import { supabase } from '@/integrations/supabase/client';
 import { useClub } from '@/contexts/ClubContext';
 import { useDelegatedPowers, AVAILABLE_POWERS } from '@/hooks/useDelegatedPowers';
 import { toast } from 'sonner';
