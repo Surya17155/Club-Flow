@@ -112,15 +112,15 @@ export default function Forms() {
 
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [tab, activeClub?.club_id, user?.id]);
 
-  // Realtime: react to new/published forms and new responses anywhere
+  // Refresh on focus + on app-wide form mutations (avoids realtime overhead)
   useEffect(() => {
-    if (!user) return;
-    const channel = supabase
-      .channel(`forms-page-${user.id}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'forms' }, () => load())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'form_responses', filter: `user_id=eq.${user.id}` }, () => load())
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    const onRefresh = () => load();
+    window.addEventListener('focus', onRefresh);
+    window.addEventListener('formsChanged', onRefresh);
+    return () => {
+      window.removeEventListener('focus', onRefresh);
+      window.removeEventListener('formsChanged', onRefresh);
+    };
     // eslint-disable-next-line
   }, [user?.id, tab, activeClub?.club_id]);
 
