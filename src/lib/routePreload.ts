@@ -31,6 +31,7 @@ const routeLoaders = {
   superAdmin: () => import("@/pages/SuperAdminDashboard"),
   globalReports: () => import("@/pages/GlobalReports"),
   manageOutsiders: () => import("@/pages/ManageOutsiders"),
+  faceScanner: () => import("@/pages/FaceScanner"),
   notFound: () => import("@/pages/NotFound"),
 } as const;
 
@@ -69,6 +70,7 @@ const pathToRouteKey: Array<[RegExp, RouteKey]> = [
   [/^\/mark-attendance\//, "markAttendance"],
   [/^\/global-reports/, "globalReports"],
   [/^\/manage-outsiders/, "manageOutsiders"],
+  [/^\/events\/[^/]+\/face-scan/, "faceScanner"],
 ];
 
 export const lazyRoute = (key: RouteKey) => lazy(routeLoaders[key]);
