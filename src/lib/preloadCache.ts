@@ -144,14 +144,20 @@ export const preloadAdminStatus = (userId: string, email?: string | null, force 
 
 export const getCachedUserClubs = (userId: string) => read(userClubsCache, userId);
 export const preloadUserClubs = (userId: string, force = false) => cached(userClubsCache, userId, async () => {
-  const { data, error } = await db.from('club_members').select('club_id, role, clubs(id, name, logo_url)').eq('user_id', userId);
-  if (error || !data) return [];
-  return data.map((m: any) => ({
+  const { data, error } = await db.from('club_members').select('club_id, role').eq('user_id', userId).limit(40);
+  if (error || !data?.length) return [];
+  const clubIds = data.map((m: any) => m.club_id);
+  const { data: clubsData } = await db.from('clubs').select('id, name, logo_url').in('id', clubIds);
+  const clubsById = new Map((clubsData ?? []).map((club: any) => [club.id, club]));
+  return data.map((m: any) => {
+    const club = clubsById.get(m.club_id) as any;
+    return {
     club_id: m.club_id,
-    club_name: m.clubs?.name ?? '',
+    club_name: club?.name ?? '',
     role: m.role,
-    logo_url: m.clubs?.logo_url ?? null,
-  }));
+    logo_url: club?.logo_url ?? null,
+  };
+  });
 }, force, []);
 
 export const getCachedProfile = (userId: string) => read(profileCache, userId);
@@ -164,15 +170,15 @@ export const preloadProfile = (userId: string, force = false) => cached(profileC
 export const getCachedPersonalStats = (userId: string) => read(personalStatsCache, userId);
 export const preloadPersonalStats = (userId: string, force = false) => cached(personalStatsCache, userId, async () => {
   const [clubsRes, attendanceRes] = await Promise.all([
-    db.from('club_members').select('club_id, clubs(name)').eq('user_id', userId),
-    db.from('attendance').select('id, event_id, status, scanned_at, events(name, event_date, event_type, attendance_given, clubs(name))').eq('student_id', userId).order('scanned_at', { ascending: false }),
+    db.from('club_members').select('club_id', { count: 'exact', head: true }).eq('user_id', userId),
+    db.from('attendance').select('id, event_id, status, scanned_at, events(name, event_date, event_type, attendance_given, clubs(name))').eq('student_id', userId).order('scanned_at', { ascending: false }).limit(80),
   ]);
   const rawRecords = attendanceRes.data ?? [];
   const eventsAttended = rawRecords.filter((a: any) => a.status === 'present').length;
   const totalEventsAttendance = rawRecords.filter((a: any) => a.status === 'present' && a.events?.attendance_given === true).length;
   const attendanceRate = rawRecords.length > 0 ? Math.round((eventsAttended / rawRecords.length) * 100) : 0;
   return {
-    clubCount: clubsRes.data?.length ?? 0,
+    clubCount: clubsRes.count ?? 0,
     eventsAttended,
     totalEventsAttendance,
     attendanceRate,
