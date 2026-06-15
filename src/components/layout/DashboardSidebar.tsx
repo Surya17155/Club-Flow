@@ -446,6 +446,7 @@ export function DashboardSidebar() {
             : (isClubMode ? clubNavItems : personalNavItems)
           ).map((item, index) => {
             const active = isActive(item.url);
+            const badge = item.url === '/forms' && pendingFormsCount > 0 ? pendingFormsCount : 0;
 
             if (collapsed) {
               return (
@@ -458,6 +459,18 @@ export function DashboardSidebar() {
                     onClick={() => navigate(item.url)}
                     isNeo={isNeo}
                   />
+                  {badge > 0 && (
+                    <span
+                      className="absolute top-0 right-1 flex items-center justify-center text-[10px] font-bold pointer-events-none"
+                      style={{
+                        minWidth: 16, height: 16, padding: '0 4px',
+                        background: '#E11D48', color: '#fff',
+                        borderRadius: 999, border: '1.5px solid #111',
+                      }}
+                    >
+                      {badge > 9 ? '9+' : badge}
+                    </span>
+                  )}
                 </div>
               );
             }
@@ -480,12 +493,25 @@ export function DashboardSidebar() {
                 onMouseLeave={(e) => { if (!active) e.currentTarget.style.background = 'transparent'; }}
               >
                 <item.icon className="w-[18px] h-[18px] shrink-0" />
-                <span className="text-sm truncate" style={{ transition: 'opacity 0.2s ease' }}>
+                <span className="text-sm truncate flex-1" style={{ transition: 'opacity 0.2s ease' }}>
                   {item.title}
                 </span>
+                {badge > 0 && (
+                  <span
+                    className="flex items-center justify-center text-[10px] font-bold shrink-0"
+                    style={{
+                      minWidth: 18, height: 18, padding: '0 5px',
+                      background: '#E11D48', color: '#fff',
+                      borderRadius: 999,
+                    }}
+                  >
+                    {badge > 99 ? '99+' : badge}
+                  </span>
+                )}
               </button>
             );
           })}
+
 
           {/* Super Admin sub-items (after Dashboard) */}
           {isSuperAdminEmail && isSuperAdminMode && !collapsed && (
