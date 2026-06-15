@@ -823,7 +823,7 @@ const SuperAdminDashboard = () => {
                   <div className="w-9 h-9 mx-auto mb-1.5 flex items-center justify-center" style={{ background: `${NB.orange}30`, border: `2px solid ${NB.border}`, borderRadius: '8px' }}>
                     <Icon className="w-4 h-4" style={{ color: NB.orange }} />
                   </div>
-                  <h3 className="text-2xl font-black" style={{ fontFamily: NB.font, color: NB.border }}>{loading ? '...' : stat.value}</h3>
+                  <h3 className="text-2xl font-black" style={{ fontFamily: NB.font, color: NB.border }}>{stat.value}</h3>
                   <p className="text-[11px] font-semibold uppercase tracking-wider mt-0.5" style={{ color: '#888' }}>
                     {stat.label}
                   </p>
@@ -843,11 +843,7 @@ const SuperAdminDashboard = () => {
               </button>
             </div>
             <div className="space-y-3">
-              {loading ?
-              <div className="p-6 text-center" style={{ background: NB.card, border: `2px solid ${NB.border}`, borderRadius: '10px' }}>
-                  <p className="text-sm" style={{ color: '#888' }}>Loading clubs...</p>
-                </div> :
-              filteredClubs.length === 0 ?
+              {filteredClubs.length === 0 ?
               <div className="p-6 text-center" style={{ background: NB.card, border: `2px solid ${NB.border}`, borderRadius: '10px' }}>
                   <Building2 className="w-8 h-8 mx-auto mb-2" style={{ color: '#888' }} />
                   <p className="text-sm" style={{ color: '#888' }}>No clubs found</p>
@@ -903,11 +899,7 @@ const SuperAdminDashboard = () => {
           <section>
             <h3 className="text-base font-black mb-3" style={{ fontFamily: NB.font }}>Global Event Feed</h3>
             <div className="space-y-3">
-              {loading ?
-              <div className="p-6 text-center" style={{ background: NB.card, border: `2px solid ${NB.border}`, borderRadius: '10px' }}>
-                  <p className="text-sm" style={{ color: '#888' }}>Loading events...</p>
-                </div> :
-              upcomingEvents.length === 0 ?
+              {upcomingEvents.length === 0 ?
               <div className="p-6 text-center" style={{ background: NB.card, border: `2px solid ${NB.border}`, borderRadius: '10px' }}>
                   <Calendar className="w-8 h-8 mx-auto mb-2" style={{ color: '#888' }} />
                   <p className="text-sm" style={{ color: '#888' }}>No upcoming events</p>
