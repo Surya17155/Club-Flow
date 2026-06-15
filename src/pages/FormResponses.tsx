@@ -175,6 +175,24 @@ export default function FormResponses() {
           </div>
         </div>
 
+        {/* Analytics tiles */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-2 mb-4">
+          {[
+            { label: 'Assigned', value: assigned, bg: '#FDE8D0' },
+            { label: 'Viewed', value: viewed, bg: '#FFF3B0' },
+            { label: 'Started', value: started, bg: '#D6E8FF' },
+            { label: 'Completed', value: responses.length, bg: '#C7F0BA' },
+            { label: 'Completion Rate', value: assigned ? `${((responses.length / assigned) * 100).toFixed(1)}%` : '—', bg: '#E98A3A' },
+          ].map((s) => (
+            <div key={s.label} className="p-3" style={{ background: s.bg, border: BORDER, borderRadius: '8px', boxShadow: '3px 3px 0px #111' }}>
+              <div className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#444' }}>{s.label}</div>
+              <div className="text-xl font-black mt-1">{s.value}</div>
+            </div>
+          ))}
+        </div>
+
+
+
         <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by name, roll no, email…"
           className="w-full md:w-72 p-2 text-sm mb-3" style={{ background: '#fff', border: '1.5px solid #111', borderRadius: '6px' }} />
 
