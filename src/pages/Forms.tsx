@@ -174,19 +174,54 @@ export default function Forms() {
           )}
         </div>
 
+        {tab === 'available' && (
+          <div className="flex flex-wrap gap-2 mb-4">
+            {(['active', 'pending', 'completed'] as AvailableStatus[]).map((s) => {
+              const active = availableStatus === s;
+              const label = s === 'active' ? 'Active' : s === 'pending' ? 'Pending' : 'Completed';
+              return (
+                <button
+                  key={s}
+                  onClick={() => setAvailableStatus(s)}
+                  className="px-3 py-1.5 text-xs font-bold"
+                  style={{
+                    background: active ? '#E98A3A' : CARD,
+                    color: '#111',
+                    border: '1.5px solid #111',
+                    borderRadius: '999px',
+                    boxShadow: active ? 'none' : '2px 2px 0px #111',
+                  }}
+                >
+                  {label} ({countFor(s)})
+                </button>
+              );
+            })}
+          </div>
+        )}
+
         {loading ? (
           <div className="text-center py-12 text-sm font-semibold" style={{ color: '#555' }}>Loading forms…</div>
-        ) : forms.length === 0 ? (
+        ) : visibleForms.length === 0 ? (
           <div className="text-center py-16 px-6" style={{ background: CARD, border: BORDER, borderRadius: '10px', boxShadow: SHADOW }}>
             <FileText className="w-12 h-12 mx-auto mb-3" style={{ color: '#E98A3A' }} />
-            <div className="font-bold mb-1">No forms yet</div>
+            <div className="font-bold mb-1">
+              {tab === 'manage'
+                ? 'No forms yet'
+                : availableStatus === 'active'
+                ? 'No active forms'
+                : availableStatus === 'pending'
+                ? 'Nothing pending'
+                : 'Nothing completed yet'}
+            </div>
             <div className="text-xs" style={{ color: '#666' }}>
-              {tab === 'manage' ? 'Create your first form to get started.' : 'No published forms available right now.'}
+              {tab === 'manage'
+                ? 'Create your first form to get started.'
+                : 'Forms from your clubs will appear here once published.'}
             </div>
           </div>
         ) : (
           <div className="grid gap-3 md:grid-cols-2">
-            {forms.map((f) => (
+            {visibleForms.map((f) => (
               <motion.div
                 key={f.id}
                 initial={{ opacity: 0, y: 10 }}
