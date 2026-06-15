@@ -3,14 +3,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useClub } from '@/contexts/ClubContext';
 import {
   preloadAdminStatus,
-  preloadAssignableMembers,
-  preloadClubMembers,
   preloadClubSettings,
   preloadClubStats,
   preloadDelegatedPowers,
   preloadDiscoverClubs,
   preloadEvents,
-  preloadJoinRequests,
   preloadOutsiders,
   preloadPersonalStats,
   preloadProfile,
