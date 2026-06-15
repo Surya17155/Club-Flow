@@ -33,6 +33,7 @@ export default function FormBuilder() {
   const [deadline, setDeadline] = useState('');
   const [allowMultiple, setAllowMultiple] = useState(false);
   const [anonymous, setAnonymous] = useState(false);
+  const [isPublic, setIsPublic] = useState(false);
   const [isPublished, setIsPublished] = useState(false);
   const [questions, setQuestions] = useState<DraftQuestion[]>([]);
   const [loading, setLoading] = useState(isEdit);
