@@ -27,8 +27,9 @@ const cached = <T,>(cache: Map<string, CacheEntry<T>>, key: string, loader: () =
     cache.set(key, { data, fetchedAt: Date.now() });
     return data;
   }).catch((error) => {
-    cache.delete(key);
-    throw error;
+    const fallback = entry && 'data' in entry ? entry.data as T : ([] as T);
+    cache.set(key, { data: fallback, fetchedAt: Date.now() });
+    return fallback;
   });
 
   cache.set(key, { ...entry, promise });
