@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useClub } from '@/contexts/ClubContext';
 
 /**
  * Count of published forms the current user CAN fill but has NOT yet submitted
@@ -9,34 +10,36 @@ import { useAuth } from '@/contexts/AuthContext';
  */
 export function usePendingFormsCount() {
   const { user } = useAuth();
+  const { clubs } = useClub();
   const [count, setCount] = useState(0);
+  const clubIds = clubs.map((club) => club.club_id).join(',');
 
   useEffect(() => {
     let cancelled = false;
-    if (!user) { setCount(0); return; }
+    const ids = clubIds ? clubIds.split(',') : [];
+    if (!user || ids.length === 0) { setCount(0); return; }
 
     const load = async () => {
       const { data: forms } = await supabase
         .from('forms')
         .select('id, deadline')
-        .eq('is_published', true);
+        .eq('is_published', true)
+        .eq('accepting_responses', true)
+        .in('club_id', ids)
+        .or(`deadline.is.null,deadline.gte.${new Date().toISOString()}`);
       if (cancelled || !forms) return;
 
-      const now = Date.now();
-      const active = forms.filter(
-        (f: any) => !f.deadline || new Date(f.deadline).getTime() >= now
-      );
-      if (active.length === 0) { setCount(0); return; }
+      if (forms.length === 0) { setCount(0); return; }
 
       const { data: resp } = await supabase
         .from('form_responses')
         .select('form_id')
         .eq('user_id', user.id)
-        .in('form_id', active.map((f: any) => f.id));
+        .in('form_id', forms.map((f: any) => f.id));
       if (cancelled) return;
 
       const submitted = new Set((resp ?? []).map((r: any) => r.form_id));
-      setCount(active.filter((f: any) => !submitted.has(f.id)).length);
+      setCount(forms.filter((f: any) => !submitted.has(f.id)).length);
     };
 
     load();
@@ -52,7 +55,7 @@ export function usePendingFormsCount() {
       window.removeEventListener('formsChanged', onFocus);
     };
 
-  }, [user?.id]);
+  }, [user?.id, clubIds]);
 
   return count;
 }
