@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Navigate, useNavigate } from 'react-router-dom';
 import { Search, Users, ArrowLeft, Send, Check, Clock, X } from 'lucide-react';
 import { MobileBottomNav } from '@/components/mobile/MobileBottomNav';
 import { Button } from '@/components/ui/button';
@@ -71,14 +70,12 @@ const hoverOut = (e: React.MouseEvent<HTMLElement>) => {
 };
 
 const DiscoverClubs = () => {
-  const { user, loading: authLoading } = useAuth();
-  const navigate = useNavigate();
+  const { user } = useAuth();
   const isMobile = useIsMobile();
   const { activeDesign } = useDesign();
   const isNeo = activeDesign === 'design-2';
   const cachedDiscover = user ? getCachedDiscoverClubs(user.id) : undefined;
   const [clubs, setClubs] = useState<ClubCard[]>(cachedDiscover?.clubs ?? []);
-  const [loading, setLoading] = useState(!cachedDiscover);
   const [search, setSearch] = useState('');
   const [myClubIds, setMyClubIds] = useState<Set<string>>(() => new Set(cachedDiscover?.myClubIds ?? []));
   const [myRequests, setMyRequests] = useState<Map<string, string>>(() => new Map(cachedDiscover?.myRequests ?? []));
@@ -98,14 +95,11 @@ const DiscoverClubs = () => {
       setClubs(cached.clubs);
       setMyClubIds(new Set(cached.myClubIds));
       setMyRequests(new Map(cached.myRequests));
-    } else {
-      setLoading(true);
     }
     const data = await preloadDiscoverClubs(user!.id);
     setClubs(data.clubs);
     setMyClubIds(new Set(data.myClubIds));
     setMyRequests(new Map(data.myRequests));
-    setLoading(false);
   };
 
   const handleJoinRequest = async () => {
@@ -131,14 +125,7 @@ const DiscoverClubs = () => {
     }
   };
 
-  if (authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: isNeo ? '#F4EFE7' : undefined }}>
-        <div className="w-8 h-8 border-[3px] border-[#E98A3A]/30 border-t-[#E98A3A] rounded-full animate-spin" />
-      </div>
-    );
-  }
-  if (!user) return <Navigate to="/" replace />;
+  if (!user) return null;
 
   const filtered = clubs.filter(c =>
     c.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -181,11 +168,7 @@ const DiscoverClubs = () => {
         </div>
       </header>
 
-      {loading ? (
-        <div className="flex justify-center py-12">
-          <div className="w-8 h-8 border-[3px] border-[#E98A3A]/30 border-t-[#E98A3A] rounded-full animate-spin" />
-        </div>
-      ) : filtered.length === 0 ? (
+      {filtered.length === 0 ? (
         <div className="text-center py-12" style={{ color: '#888', fontFamily: isNeo ? NEO.font : undefined }}>No clubs found</div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
