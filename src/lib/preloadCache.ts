@@ -18,7 +18,7 @@ const read = <T,>(cache: Map<string, CacheEntry<T>>, key: string) => {
   return isFresh(entry) ? entry?.data : undefined;
 };
 
-const cached = <T,>(cache: Map<string, CacheEntry<T>>, key: string, loader: () => Promise<T>, force = false) => {
+const cached = <T,>(cache: Map<string, CacheEntry<T>>, key: string, loader: () => Promise<T>, force = false, fallback?: T) => {
   const entry = cache.get(key);
   if (!force && isFresh(entry)) return Promise.resolve(entry!.data as T);
   if (entry?.promise) return entry.promise;
@@ -27,9 +27,12 @@ const cached = <T,>(cache: Map<string, CacheEntry<T>>, key: string, loader: () =
     cache.set(key, { data, fetchedAt: Date.now() });
     return data;
   }).catch((error) => {
-    const fallback = entry && 'data' in entry ? entry.data as T : ([] as T);
-    cache.set(key, { data: fallback, fetchedAt: Date.now() });
-    return fallback;
+    if (entry && 'data' in entry) return entry.data as T;
+    if (fallback !== undefined) {
+      cache.set(key, { data: fallback, fetchedAt: Date.now() });
+      return fallback;
+    }
+    throw error;
   });
 
   cache.set(key, { ...entry, promise });
