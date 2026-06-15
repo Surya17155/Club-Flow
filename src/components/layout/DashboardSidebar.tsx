@@ -274,12 +274,13 @@ export const DashboardSidebar = memo(function DashboardSidebar() {
     <>
       <div
         className="flex flex-col shrink-0"
-        onMouseMove={(e) => { if (collapsed) mouseY.set(e.clientY); }}
+        onMouseMove={(e) => { if (collapsed && window.innerWidth >= 1024) mouseY.set(e.clientY); }}
         onMouseLeave={() => mouseY.set(Infinity)}
         style={{
           width: collapsed ? 64 : 220,
           background: sidebarBg,
-          transition: 'width 0.25s ease',
+          transition: 'width 0.2s ease',
+          contain: 'layout paint',
           borderRadius: isNeo ? '16px' : '16px',
           border: isNeo ? '3px solid #111111' : 'none',
           margin: '12px',
@@ -710,7 +711,7 @@ export const DashboardSidebar = memo(function DashboardSidebar() {
         {/* Bottom: collapse toggle only */}
         <div
           className="px-3 pb-4 mt-auto"
-          onMouseMove={(e) => { if (collapsed) mouseY.set(e.clientY); }}
+          onMouseMove={(e) => { if (collapsed && window.innerWidth >= 1024) mouseY.set(e.clientY); }}
           onMouseLeave={() => mouseY.set(Infinity)}
         >
           <button
