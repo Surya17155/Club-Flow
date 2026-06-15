@@ -144,12 +144,12 @@ export default function FormBuilder() {
       const qRows = questions.map((q, i) => ({
         form_id: formId!,
         position: i,
-        type: q.type,
+        type: q.type as string,
         label: q.label.trim(),
         description: q.description?.trim() || null,
         required: q.required,
-        options: NEEDS_OPTIONS.includes(q.type) ? q.options.filter((o) => o.trim()) : [],
-        config: q.config ?? {},
+        options: (NEEDS_OPTIONS.includes(q.type) ? q.options.filter((o) => o.trim()) : []) as any,
+        config: (q.config ?? {}) as any,
       }));
       if (qRows.length) {
         const { error } = await supabase.from('form_questions').insert(qRows);
