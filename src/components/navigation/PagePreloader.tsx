@@ -24,6 +24,8 @@ import {
 } from '@/lib/preloadCache';
 import { isSuperAdminUser } from '@/lib/superAdminMode';
 
+const warm = <T,>(promise: Promise<T>) => promise.catch(() => undefined);
+
 export function PagePreloader() {
   const { user } = useAuth();
   const { activeClub, clubs } = useClub();
@@ -67,21 +69,22 @@ export function PagePreloader() {
     // Critical preloads run immediately so navigation is instant
     const clubIds = clubIdsKey ? clubIdsKey.split('|') : [];
     const commonRoutes = ['/admin', '/events', '/discover', '/profile', '/settings', '/attendance-history'];
-    commonRoutes.forEach((path) => preloadRouteData(path, { userId: user.id, email: user.email, activeClubId: activeClub?.club_id, clubIds }));
-    preloadAdminStatus(user.id, user.email);
-    preloadProfile(user.id);
-    preloadPersonalStats(user.id);
-    preloadEvents('personal');
-    preloadUpcomingEvents();
-    preloadUserClubs(user.id).then((clubs) => {
+    commonRoutes.forEach((path) => warm(preloadRouteData(path, { userId: user.id, email: user.email, activeClubId: activeClub?.club_id, clubIds })));
+    warm(preloadAdminStatus(user.id, user.email));
+    warm(preloadProfile(user.id));
+    warm(preloadPersonalStats(user.id));
+    warm(preloadEvents('personal'));
+    warm(preloadUpcomingEvents());
+    warm(preloadUserClubs(user.id)).then((clubs) => {
+      if (!clubs) return;
       clubs.forEach((club) => {
-        preloadEvents('club', club.club_id);
-        preloadClubStats(club.club_id);
-        preloadDelegatedPowers(user.id, club.club_id);
-        preloadClubMembers(club.club_id);
-        preloadClubSettings(club.club_id);
-        preloadJoinRequests(club.club_id);
-        preloadAssignableMembers(club.club_id);
+        warm(preloadEvents('club', club.club_id));
+        warm(preloadClubStats(club.club_id));
+        warm(preloadDelegatedPowers(user.id, club.club_id));
+        warm(preloadClubMembers(club.club_id));
+        warm(preloadClubSettings(club.club_id));
+        warm(preloadJoinRequests(club.club_id));
+        warm(preloadAssignableMembers(club.club_id));
       });
     });
 
@@ -89,10 +92,10 @@ export function PagePreloader() {
     const idle = window.requestIdleCallback ?? ((cb: IdleRequestCallback) => window.setTimeout(() => cb({ didTimeout: false, timeRemaining: () => 0 } as IdleDeadline), 1));
     const cancelIdle = window.cancelIdleCallback ?? window.clearTimeout;
     const handle = idle(() => {
-      preloadDiscoverClubs(user.id);
+      warm(preloadDiscoverClubs(user.id));
       if (isSuperAdminUser(user.email)) {
-        preloadSuperAdminStats();
-        preloadOutsiders().catch(() => undefined);
+        warm(preloadSuperAdminStats());
+        warm(preloadOutsiders());
       }
     });
     return () => cancelIdle(handle as any);
@@ -100,13 +103,13 @@ export function PagePreloader() {
 
   useEffect(() => {
     if (!user || !activeClub?.club_id) return;
-    preloadClubStats(activeClub.club_id);
-    preloadClubMembers(activeClub.club_id);
-    preloadDelegatedPowers(user.id, activeClub.club_id);
-    preloadEvents('club', activeClub.club_id);
-    preloadClubSettings(activeClub.club_id);
-    preloadJoinRequests(activeClub.club_id);
-    preloadAssignableMembers(activeClub.club_id);
+    warm(preloadClubStats(activeClub.club_id));
+    warm(preloadClubMembers(activeClub.club_id));
+    warm(preloadDelegatedPowers(user.id, activeClub.club_id));
+    warm(preloadEvents('club', activeClub.club_id));
+    warm(preloadClubSettings(activeClub.club_id));
+    warm(preloadJoinRequests(activeClub.club_id));
+    warm(preloadAssignableMembers(activeClub.club_id));
   }, [user?.id, activeClub?.club_id]);
 
   return null;
