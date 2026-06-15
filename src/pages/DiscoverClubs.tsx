@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Search, Users, ArrowLeft, Send, Check, Clock, X } from 'lucide-react';
+import { Search, Users, Send, Check, Clock, X } from 'lucide-react';
 import { MobileBottomNav } from '@/components/mobile/MobileBottomNav';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import ProfileDropdown from '@/components/dashboard/ProfileDropdown';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useDesign } from '@/contexts/DesignContext';

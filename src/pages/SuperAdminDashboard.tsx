@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useSuperAdminStats } from '@/hooks/useSuperAdminStats';
 import { Search, Plus, Settings, TrendingUp, Users, Calendar, Building2, Clock, ChevronDown, Eye, UserCog, Shield, FileText, MoreVertical, Trash2, ChevronRight, Pencil, Download, Crown } from 'lucide-react';
@@ -34,7 +34,7 @@ const roleLabelMap: Record<string, string> = {
 
 const SuperAdminDashboard = () => {
   const NB = { font: "'Space Grotesk', sans-serif", bg: '#F4EFE7', card: '#FFFDF5', border: '#111', orange: '#E98A3A' };
-  const { user, loading: authLoading } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [isAdmin, setIsAdmin] = useState<boolean | null>(() => user ? getCachedAdminStatus(user.id, user.email) ?? null : null);
@@ -104,14 +104,7 @@ const SuperAdminDashboard = () => {
     checkAdmin();
   }, [user?.id, user?.email]);
 
-  if (authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center dashboard-corner-gradient">
-        <div className="w-8 h-8 border-[3px] border-primary/30 border-t-primary rounded-full animate-spin" />
-      </div>);
-  }
-
-  if (!user) return <Navigate to="/" replace />;
+  if (!user) return null;
 
   if (isAdmin === false) {
     return (

@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { usePersonalStats } from '@/hooks/usePersonalStats';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { MobileBottomNav } from '@/components/mobile/MobileBottomNav';
@@ -21,9 +20,8 @@ interface AttendanceRecord {
 }
 
 export default function AttendanceHistory() {
-  const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { stats, loading } = usePersonalStats();
+  const { stats } = usePersonalStats();
   const [selectedRecord, setSelectedRecord] = useState<AttendanceRecord | null>(null);
   const [feedbackEvent, setFeedbackEvent] = useState<{ id: string; name: string } | null>(null);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
